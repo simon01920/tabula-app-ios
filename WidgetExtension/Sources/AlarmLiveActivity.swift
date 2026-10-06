@@ -1,4 +1,4 @@
-// UNCOMPILED (written on Windows/WSL without the iOS SDK). Phase 0 AlarmKit probe; Phase 4 replaces it with the real design.
+// COMPILED 2026-10-06 (xtool path, base + macro variants, 0 warnings; XcodeGen CI run 37449454629). Not yet run on a device. Phase 0 AlarmKit probe; Phase 4 replaces it with the real design.
 // APIs checked on 2026-10-04 against developer.apple.com JSON docs; citations in docs/spikes/ALARMKIT.md.
 //
 // APIs used

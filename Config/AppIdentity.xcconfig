@@ -1,0 +1,41 @@
+// AppIdentity.xcconfig: the ONE source of truth for Tabula's identity values and the paid-account switch.
+//
+// Consumers
+//   project.yml (XcodeGen/CI)  project-level configFiles → build settings below are referenced as $(NAME).
+//   xtool.yml (local)          cannot read xcconfig → its literal values are checked against this file by
+//                              scripts/validate.sh (scripts/validate_config.py).
+//   CI (.github/workflows)     reads this file via scripts/identity.py; the release job overrides
+//                              TABULA_DEVELOPMENT_TEAM and TABULA_PAID_ACCOUNT on the xcodebuild command line.
+//   Literal copies that must match (validated): Config/*.entitlements (App Group), Config/Watch-Info.plist
+//   (WKCompanionAppBundleIdentifier), TimetableCore AppGroup.canonicalIdentifier, xtool.yml bundleID.
+//
+// Format rules (parsed by Xcode AND by scripts/identity.py / validate_config.py): one `NAME = value` per line,
+// `//` comments only on their own line, no #include, no [sdk=…] conditions. Nothing secret belongs here:
+// Team ID and identifiers are public (they appear in every signed app). Secrets live in GitHub Actions secrets.
+// Day-of-enrolment steps: docs/PAID_ACCOUNT_SWITCHOVER.md.
+
+// --- Apple Developer Program (deferred: human decision 2026-10-06) ---------------------------------------
+// PLACEHOLDER: empty until the paid account exists. CI passes the GitHub variable APPLE_TEAM_ID on the command
+// line (it wins over this value). Leave empty in git unless you deliberately sign locally on a Mac.
+TABULA_DEVELOPMENT_TEAM =
+
+// Paid-account switch. 0 = free/unsigned: only the App Group entitlement (Config/*.entitlements, also used by
+// xtool). 1 = paid: Config/Entitlements/PaidAccount/*.entitlements (CloudKit, push, Time Sensitive,
+// increased memory limit, associated domains). Keep 0 here; CI sets 1 from the GitHub variable
+// TABULA_PAID_ACCOUNT on the xcodebuild command line. The xtool path never uses the paid files.
+TABULA_PAID_ACCOUNT = 0
+
+// --- Identifiers (changing any of these after the first TestFlight upload = a different app) ------------
+TABULA_BUNDLE_ID_PREFIX = sk.simondev
+TABULA_BUNDLE_ID = sk.simondev.tabula
+TABULA_APP_GROUP = group.sk.simondev.tabula
+TABULA_ICLOUD_CONTAINER = iCloud.sk.simondev.tabula
+TABULA_SHARE_DOMAIN = tabula.simondev.sk
+
+// --- Entitlements selection (Xcode nested-macro indirection on TABULA_PAID_ACCOUNT) -------------------------
+TABULA_APP_ENTITLEMENTS_0 = Config/Tabula.entitlements
+TABULA_APP_ENTITLEMENTS_1 = Config/Entitlements/PaidAccount/Tabula.entitlements
+TABULA_APP_ENTITLEMENTS = $(TABULA_APP_ENTITLEMENTS_$(TABULA_PAID_ACCOUNT))
+TABULA_WIDGET_ENTITLEMENTS_0 = Config/TabulaWidgets.entitlements
+TABULA_WIDGET_ENTITLEMENTS_1 = Config/Entitlements/PaidAccount/TabulaWidgets.entitlements
+TABULA_WIDGET_ENTITLEMENTS = $(TABULA_WIDGET_ENTITLEMENTS_$(TABULA_PAID_ACCOUNT))

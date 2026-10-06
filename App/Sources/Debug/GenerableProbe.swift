@@ -1,4 +1,4 @@
-// Phase 0 FoundationModels macro probe. UNCOMPILED.
+// Phase 0 FoundationModels macro probe. COMPILED 2026-10-06 (xtool path, base + macro variants, 0 warnings; XcodeGen CI run 37449454629).
 // Macro variant only (`#if TABULA_MACRO_PROBES`, see Package.swift / project.yml): the base app must build
 // with zero macros (CLAUDE.md rule 5). xtool 1.20.1 ships FoundationModels macros via OpenAppleMacros
 // (SDKBuilder.oamLibraries = FoundationModelsMacros, PreviewsMacros, SwiftUIMacros).

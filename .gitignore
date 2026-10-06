@@ -32,6 +32,10 @@ AuthKey_*.p8
 *.gguf
 models/
 
+# --- Python helper scripts ---
+__pycache__/
+*.pyc
+
 # --- Node (backend Worker, later) ---
 node_modules/
 .wrangler/
@@ -49,3 +53,6 @@ Thumbs.db
 #     containing a real person's name; the kit zip duplicates files already in the repo.
 examples/
 tabula-kit.zip
+
+# --- Claude Code agent worktrees (temporary, per-agent checkouts)
+.claude/worktrees/

@@ -1,4 +1,4 @@
-// Phase 0 platform probes (env-ci-engineer). UNCOMPILED — no Darwin SDK in WSL yet.
+// Phase 0 platform probes (env-ci-engineer). COMPILED 2026-10-06 (xtool path, base + macro variants, 0 warnings; XcodeGen CI run 37449454629).
 // Developer-facing debug UI: labels are verbatim (not localized) on purpose; only the
 // "Localization" rows exercise the String Catalog.
 //
@@ -227,7 +227,13 @@ final class ObservationTickProbe {
 
 // MARK: - Section
 
+/// The four areas of this probe; DebugScreen can show a subset (`-TabulaScreen debug-<area>`).
+enum PlatformProbePart: CaseIterable, Hashable, Sendable {
+    case platform, appGroup, localization, macros
+}
+
 struct PlatformProbesSection: View {
+    var parts: Set<PlatformProbePart> = Set(PlatformProbePart.allCases)
     @StateObject private var model = PlatformProbeModel()
     @Environment(\.phase0ProbeToken) private var entryToken
     #if TABULA_MACRO_PROBES
@@ -235,10 +241,10 @@ struct PlatformProbesSection: View {
     #endif
 
     var body: some View {
-        platformSection
-        appGroupSection
-        localizationSection
-        macroSection
+        if parts.contains(.platform) { platformSection }
+        if parts.contains(.appGroup) { appGroupSection }
+        if parts.contains(.localization) { localizationSection }
+        if parts.contains(.macros) { macroSection }
     }
 
     private var platformSection: some View {

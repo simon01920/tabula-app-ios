@@ -1,4 +1,4 @@
-// UNCOMPILED (written on Windows/WSL without the iOS SDK). Phase 0 debug probe only; delete after the Phase 0 gate.
+// COMPILED 2026-10-06 (xtool path, base + macro variants, 0 warnings; XcodeGen CI run 37449454629). Not yet run on a device. Phase 0 debug probe only; delete after the Phase 0 gate.
 // Every API below was checked on 2026-10-04 against developer.apple.com JSON docs; citations in docs/spikes/ALARMKIT.md.
 //
 // APIs used

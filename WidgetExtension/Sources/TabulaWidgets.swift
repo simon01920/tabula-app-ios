@@ -1,4 +1,4 @@
-// Widget extension (target/product `TabulaWidgets`). UNCOMPILED.
+// Widget extension (target/product `TabulaWidgets`). COMPILED 2026-10-06 (xtool path, base + macro variants, 0 warnings; XcodeGen CI run 37449454629).
 // xtool packs this as a Foundation NSExtension (PlugIns/TabulaWidgets.appex, entry point
 // _NSExtensionMain); ExtensionKit-style extensions are NOT supported by xtool (issue #138).
 // APIs (docs checked): WidgetBundle, Widget, StaticConfiguration, TimelineProvider

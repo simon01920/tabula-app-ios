@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  PAID-ACCOUNT ONLY. Widget extension entitlements for the XcodeGen/CI path when TABULA_PAID_ACCOUNT = 1
+  (selected via TABULA_WIDGET_ENTITLEMENTS in Config/AppIdentity.xcconfig). Today it grants the same App Group
+  as Config/TabulaWidgets.entitlements: the widget reads the app's snapshot and needs no CloudKit/push.
+  It exists so a paid-only widget capability can be added later without touching project.yml.
+  Never used by xtool. $(VARS) come from Config/AppIdentity.xcconfig (Xcode expands them).
+-->
+<plist version="1.0">
+<dict>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>$(TABULA_APP_GROUP)</string>
+	</array>
+</dict>
+</plist>

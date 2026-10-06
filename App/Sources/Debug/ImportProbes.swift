@@ -1,4 +1,4 @@
-// UNCOMPILED — written on Linux without an iOS SDK (Phase 0); first compile + on-device run pending (docs/spikes/LLM_RUNTIME.md).
+// COMPILED 2026-10-06 (xtool path, base + macro variants, 0 warnings; XcodeGen CI run 37449454629); on-device run pending (docs/spikes/LLM_RUNTIME.md).
 //
 // Phase 0 import-feasibility probes (docs/specs/AI_IMPORT.md), shown inside the app's debug screen:
 //   (a) OCR languages supported by Vision RecognizeDocumentsRequest (and RecognizeTextRequest, for comparison),

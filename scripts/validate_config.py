@@ -15,6 +15,10 @@ import sys
 import yaml
 
 ROOT = pathlib.Path(sys.argv[1])
+sys.path.insert(0, str(ROOT / "scripts"))
+sys.dont_write_bytecode = True   # no scripts/__pycache__ in the working tree
+import identity  # noqa: E402  (scripts/identity.py: Config/AppIdentity.xcconfig reader)
+
 FAILS = 0
 
 
@@ -56,6 +60,16 @@ pj = yaml.safe_load((ROOT / "project.yml").read_text())
 tgt = pj["targets"]
 base = lambda t: tgt[t].get("settings", {}).get("base", {})  # noqa: E731
 
+# Identity values as Xcode resolves them from Config/AppIdentity.xcconfig (switch as committed, i.e. off).
+ID_RAW = identity.parse(ROOT / "Config/AppIdentity.xcconfig")
+ID = identity.resolve(ID_RAW)
+ID_PAID = identity.resolve(ID_RAW, {"TABULA_PAID_ACCOUNT": "1"})
+
+
+def xs(value, values=ID):
+    """Resolve $(VAR) references in a project.yml setting the way Xcode would (identity values only)."""
+    return identity.resolve({**values, "__v": str(value)})["__v"]
+
 # --- xtool.yml schema (xtool 1.20.1 PackSchema) --------------------------------------------------------
 allowed = {"version", "orgID", "bundleID", "product", "infoPath", "entitlementsPath", "iconPath",
            "resources", "extensions", "skipLSP"}
@@ -76,11 +90,11 @@ for t, need in {"TabulaApp": "App/Sources", "TabulaWidgets": "WidgetExtension/So
 # --- bundle IDs -------------------------------------------------------------------------------------------
 app_id = xt["bundleID"]
 widget_id_xtool = ext.get("bundleID") or f"{app_id}.{ext['product']}"   # Planner: orgID(app.bundleID).product
-check(base("TabulaApp").get("PRODUCT_BUNDLE_IDENTIFIER") == app_id,
+check(xs(base("TabulaApp").get("PRODUCT_BUNDLE_IDENTIFIER")) == app_id,
       f"app bundle ID identical on both paths ({app_id})", "app bundle ID differs between xtool.yml and project.yml")
-check(base("TabulaWidgets").get("PRODUCT_BUNDLE_IDENTIFIER") == widget_id_xtool,
+check(xs(base("TabulaWidgets").get("PRODUCT_BUNDLE_IDENTIFIER")) == widget_id_xtool,
       f"widget bundle ID identical on both paths ({widget_id_xtool})", "widget bundle ID differs")
-watch_id = base("TabulaWatch").get("PRODUCT_BUNDLE_IDENTIFIER", "")
+watch_id = xs(base("TabulaWatch").get("PRODUCT_BUNDLE_IDENTIFIER", ""))
 check(watch_id.startswith(app_id + "."), f"watch bundle ID {watch_id} is prefixed by the app ID",
       f"watch bundle ID {watch_id} must start with {app_id}.")
 watch_plist = plistlib.load(open(ROOT / base("TabulaWatch")["INFOPLIST_FILE"], "rb"))
@@ -106,8 +120,9 @@ check(str(pj["settings"]["base"].get("SWIFT_VERSION")) == "6.0" and
 for t, plist, ents in (("TabulaApp", xt["infoPath"], xt["entitlementsPath"]),
                        ("TabulaWidgets", ext["infoPath"], ext["entitlementsPath"])):
     check(base(t).get("INFOPLIST_FILE") == plist, f"{t}: same Info.plist on both paths ({plist})", f"{t} plist differs")
-    check(base(t).get("CODE_SIGN_ENTITLEMENTS") == ents, f"{t}: same entitlements on both paths ({ents})",
-          f"{t} entitlements differ")
+    check(xs(base(t).get("CODE_SIGN_ENTITLEMENTS")) == ents,
+          f"{t}: same entitlements on both paths with the paid switch off ({ents})",
+          f"{t} entitlements differ: project.yml resolves to {xs(base(t).get('CODE_SIGN_ENTITLEMENTS'))!r}, xtool.yml {ents!r}")
 canonical_group = re.search(r'canonicalIdentifier = "([^"]+)"',
                             (ROOT / "Packages/TimetableCore/Sources/TimetableCore/AppGroup.swift").read_text()).group(1)
 for ents in (xt["entitlementsPath"], ext["entitlementsPath"]):
@@ -178,6 +193,116 @@ info = plistlib.load(open(ROOT / xt["infoPath"], "rb"))
 check(info.get("ITSAppUsesNonExemptEncryption") is False, "App-Info.plist ITSAppUsesNonExemptEncryption = false",
       "ITSAppUsesNonExemptEncryption must be false")
 
+# --- identity single source + paid-account placeholders (docs/PAID_ACCOUNT_SWITCHOVER.md) ------------------
+REQUIRED_ID = ("TABULA_DEVELOPMENT_TEAM", "TABULA_PAID_ACCOUNT", "TABULA_BUNDLE_ID_PREFIX", "TABULA_BUNDLE_ID",
+               "TABULA_APP_GROUP", "TABULA_ICLOUD_CONTAINER", "TABULA_SHARE_DOMAIN",
+               "TABULA_APP_ENTITLEMENTS", "TABULA_WIDGET_ENTITLEMENTS")
+missing_id = [k for k in REQUIRED_ID if k not in ID_RAW]
+check(not missing_id, f"AppIdentity.xcconfig defines {len(REQUIRED_ID)} required values", f"AppIdentity.xcconfig lacks {missing_id}")
+check(ID_RAW.get("TABULA_PAID_ACCOUNT") == "0", "paid-account switch is OFF in git (TABULA_PAID_ACCOUNT = 0)",
+      f"TABULA_PAID_ACCOUNT must be 0 in the committed xcconfig (CI sets 1), got {ID_RAW.get('TABULA_PAID_ACCOUNT')!r}")
+team = ID.get("TABULA_DEVELOPMENT_TEAM", "")
+check(team == "" or re.fullmatch(r"[A-Z0-9]{10}", team),
+      f"TABULA_DEVELOPMENT_TEAM {'= placeholder (empty)' if not team else 'is a 10-char Team ID'}",
+      f"TABULA_DEVELOPMENT_TEAM must be empty or a 10-character Team ID, got {team!r}")
+bid = ID.get("TABULA_BUNDLE_ID", "")
+for label, ok_cond in (
+        ("bundle ID starts with TABULA_BUNDLE_ID_PREFIX", bid.startswith(ID.get("TABULA_BUNDLE_ID_PREFIX", "?") + ".")),
+        ("project.yml options.bundleIdPrefix = TABULA_BUNDLE_ID_PREFIX",
+         pj["options"].get("bundleIdPrefix") == ID.get("TABULA_BUNDLE_ID_PREFIX")),
+        ("xtool.yml bundleID = TABULA_BUNDLE_ID", xt["bundleID"] == bid),
+        ("TABULA_APP_GROUP = group.<bundle ID>", ID.get("TABULA_APP_GROUP") == f"group.{bid}"),
+        ("TABULA_ICLOUD_CONTAINER = iCloud.<bundle ID>", ID.get("TABULA_ICLOUD_CONTAINER") == f"iCloud.{bid}"),
+        ("TimetableCore AppGroup.canonicalIdentifier = TABULA_APP_GROUP", canonical_group == ID.get("TABULA_APP_GROUP")),
+        ("Watch-Info.plist WKCompanionAppBundleIdentifier = TABULA_BUNDLE_ID",
+         watch_plist.get("WKCompanionAppBundleIdentifier") == bid),
+        ("TABULA_SHARE_DOMAIN is a bare host name", re.fullmatch(r"[a-z0-9.-]+\.[a-z]{2,}", ID.get("TABULA_SHARE_DOMAIN", "")))):
+    check(ok_cond, f"identity: {label}", f"identity mismatch: {label}")
+check(pj.get("configFiles") == {"Debug": "Config/AppIdentity.xcconfig", "Release": "Config/AppIdentity.xcconfig"},
+      "project.yml: Config/AppIdentity.xcconfig is the base configuration (Debug + Release)",
+      f"project.yml configFiles must point both configs at Config/AppIdentity.xcconfig: {pj.get('configFiles')}")
+shadowed = [f"{scope}:{k}" for scope, s in [("project", pj.get("settings", {}).get("base", {}))]
+            + [(t, base(t)) for t in tgt] for k in s if k.startswith("TABULA_")]
+check(not shadowed, "project.yml never redefines TABULA_* (the xcconfig stays authoritative)",
+      f"project.yml redefines {shadowed}: buildSettings override the xcconfig")
+check(pj["settings"]["base"].get("DEVELOPMENT_TEAM") == "$(TABULA_DEVELOPMENT_TEAM)",
+      "project.yml DEVELOPMENT_TEAM = $(TABULA_DEVELOPMENT_TEAM) (build setting, no generate-time env needed)",
+      f"project.yml DEVELOPMENT_TEAM is {pj['settings']['base'].get('DEVELOPMENT_TEAM')!r}")
+for t, var in (("TabulaApp", "TABULA_APP_ENTITLEMENTS"), ("TabulaWidgets", "TABULA_WIDGET_ENTITLEMENTS")):
+    check(base(t).get("CODE_SIGN_ENTITLEMENTS") == f"$({var})", f"project.yml {t} entitlements come from $({var})",
+          f"project.yml {t} CODE_SIGN_ENTITLEMENTS must be $({var})")
+
+PAID_KEYS = {"com.apple.developer.icloud-container-identifiers", "com.apple.developer.icloud-services",
+             "com.apple.developer.icloud-container-environment", "com.apple.developer.ubiquity-container-identifiers",
+             "com.apple.developer.ubiquity-kvstore-identifier", "aps-environment",
+             "com.apple.developer.usernotifications.time-sensitive", "com.apple.developer.kernel.increased-memory-limit",
+             "com.apple.developer.associated-domains", "com.apple.developer.in-app-payments"}
+PAID_DIR = "Config/Entitlements/PaidAccount/"
+# Switch OFF: every build input (xtool.yml entitlements, project.yml as resolved with PAID=0, any plist or
+# entitlements file outside the PaidAccount folder) must be free of paid-only keys.
+off_inputs = {xt["entitlementsPath"], ext["entitlementsPath"], xs("$(TABULA_APP_ENTITLEMENTS)"),
+              xs("$(TABULA_WIDGET_ENTITLEMENTS)")}
+for f in sorted(ROOT.joinpath("Config").rglob("*")):
+    rel = f.relative_to(ROOT).as_posix()
+    if f.suffix in (".entitlements", ".plist", ".xcprivacy") and not rel.startswith(PAID_DIR):
+        off_inputs.add(rel)
+leaks = {p: sorted(set(plistlib.load(open(ROOT / p, "rb"))) & PAID_KEYS) for p in sorted(off_inputs)}
+leaks = {p: k for p, k in leaks.items() if k}
+check(not any(p.startswith(PAID_DIR) for p in off_inputs) and not leaks,
+      f"switch OFF: no paid-only entitlement in any build input ({len(off_inputs)} files incl. xtool.yml + resolved project.yml)",
+      f"switch OFF leaks paid entitlements: {leaks or [p for p in off_inputs if p.startswith(PAID_DIR)]}")
+check(not xt["entitlementsPath"].startswith(PAID_DIR) and not ext["entitlementsPath"].startswith(PAID_DIR),
+      "xtool.yml never uses the PaidAccount entitlements", "xtool.yml must not reference Config/Entitlements/PaidAccount")
+# Switch ON: the selection resolves to the PaidAccount files, and they carry exactly what docs/specs need.
+app_paid, widget_paid = ID_PAID["TABULA_APP_ENTITLEMENTS"], ID_PAID["TABULA_WIDGET_ENTITLEMENTS"]
+check(app_paid.startswith(PAID_DIR) and widget_paid.startswith(PAID_DIR)
+      and (ROOT / app_paid).is_file() and (ROOT / widget_paid).is_file(),
+      f"switch ON (TABULA_PAID_ACCOUNT=1) selects {app_paid} + {widget_paid.rsplit('/', 1)[-1]}",
+      f"switch ON resolves to {app_paid!r} / {widget_paid!r} (missing or outside {PAID_DIR})")
+for path in sorted(ROOT.joinpath(PAID_DIR).glob("*.entitlements")):
+    rel = path.relative_to(ROOT).as_posix()
+    ents = plistlib.load(open(path, "rb"))
+    refs = set(re.findall(r"\$\(([A-Za-z0-9_]+)\)", json.dumps(ents, default=str)))   # values only, not comments
+    check(refs <= set(ID_RAW), f"{rel}: every $(VAR) is defined in AppIdentity.xcconfig ({', '.join(sorted(refs))})",
+          f"{rel}: undefined references {sorted(refs - set(ID_RAW))}")
+    resolved = json.loads(xs(json.dumps(ents, default=str), ID_PAID))
+    check(resolved.get("com.apple.security.application-groups") == [ID["TABULA_APP_GROUP"]],
+          f"{rel}: App Group resolves to {ID['TABULA_APP_GROUP']}", f"{rel}: App Group wrong: {resolved}")
+    if path.name == "Tabula.entitlements":
+        expected = {
+            "com.apple.developer.icloud-container-identifiers": [ID["TABULA_ICLOUD_CONTAINER"]],
+            "com.apple.developer.icloud-services": ["CloudKit"],
+            "aps-environment": "development",
+            "com.apple.developer.usernotifications.time-sensitive": True,
+            "com.apple.developer.kernel.increased-memory-limit": True,
+            "com.apple.developer.associated-domains": [f"applinks:{ID['TABULA_SHARE_DOMAIN']}"],
+        }
+        wrong = {k: resolved.get(k) for k, v in expected.items() if resolved.get(k) != v}
+        check(not wrong, f"{rel}: CloudKit, push, Time Sensitive, increased memory, associated domains resolve correctly",
+              f"{rel}: unexpected values {wrong}")
+
+# xtool cannot compile String Catalogs: a .xcstrings SwiftPM resource makes `xtool dev build` FAIL
+# (VERIFIED 2026-10-06, Probes/XCStringsSwiftPM: "xtool/.xtool-tmp/xcstringstool … is not an executable file").
+xc_res = [f"{d['name']}/{t['name']}: {r.get('path')}" for d in (dump_default, dump_core, dump_ui)
+          for t in d["targets"] for r in t.get("resources", []) if str(r.get("path", "")).endswith(".xcstrings")]
+check(not xc_res, "no Package.swift target declares a .xcstrings resource (would break the xtool build)",
+      f".xcstrings declared as SwiftPM resource (breaks xtool): {xc_res}")
+
+# .env.example documents every variable the scripts/CI read (names only, never values).
+ENV_NAMES = ("TABULA_PAID_ACCOUNT", "TABULA_DEVELOPMENT_TEAM", "APPLE_TEAM_ID", "ASC_KEY_ID", "ASC_ISSUER_ID",
+             "ASC_KEY_P8_BASE64", "TABULA_MACRO_PROBES", "TABULA_WORKDIR", "TABULA_SCRATCH", "TABULA_SWIFTLY_ENV",
+             "TABULA_DARWIN_SDK", "TABULA_WATCH_TARGET", "XCODEGEN")
+env_example = ROOT / ".env.example"
+if env_example.is_file():
+    lines = [ln.strip() for ln in env_example.read_text().splitlines() if ln.strip() and not ln.lstrip().startswith("#")]
+    declared = {ln.split("=", 1)[0] for ln in lines}
+    valued = [ln for ln in lines if "=" in ln and ln.split("=", 1)[1].strip()]
+    check(set(ENV_NAMES) <= declared, f".env.example lists all {len(ENV_NAMES)} variables",
+          f".env.example misses {sorted(set(ENV_NAMES) - declared)}")
+    check(not valued, ".env.example contains names only (no values)", f".env.example has values: {valued}")
+else:
+    fail(".env.example missing")
+
 # --- workflow ---------------------------------------------------------------------------------------------
 wf = yaml.safe_load((ROOT / ".github/workflows/ios.yml").read_text())
 ok("ios.yml parses; jobs: " + ", ".join(wf["jobs"]))
@@ -188,5 +313,90 @@ check(not any("secrets." in str(v) for v in job_env.values()), "ios.yml: release
       "ios.yml: secrets mapped at job level")
 xcg = json.dumps(wf["jobs"]["ios-xcodegen"])
 check("arm64_32" in xcg and "lipo -archs" in xcg, "ios.yml asserts arm64_32 in the watch binary", "watch arch check missing")
+check("TABULA_PAID_ACCOUNT=1" in xcg and "-showBuildSettings" in xcg,
+      "ios.yml resolves the paid switch with xcodebuild -showBuildSettings (both states)", "paid switch CI assertion missing")
+rel = json.dumps(wf["jobs"]["release-testflight"])
+check("vars.TABULA_PAID_ACCOUNT" in rel and 'TABULA_PAID_ACCOUNT=\\"$TABULA_PAID_ACCOUNT\\"' in rel
+      and 'TABULA_DEVELOPMENT_TEAM=\\"$APPLE_TEAM_ID\\"' in rel,
+      "release job passes vars.APPLE_TEAM_ID + vars.TABULA_PAID_ACCOUNT to xcodebuild", "release job identity wiring missing")
+xtj = wf["jobs"]["ios-xtool-path"]
+xt_step = next(s for s in xtj["steps"] if "xtool dev build" in str(s.get("run", "")))
+check(xt_step.get("timeout-minutes", 99) <= 10 and "</dev/null" in xt_step["run"] and "alarm" in xt_step["run"],
+      "ios.yml xtool step: step timeout <= 10 min, outer perl alarm, stdin </dev/null (hang guard)",
+      "ios.yml xtool step lacks the hang guard")
+# Run 37449454629 root cause: Contents/MacOS/xtool without XTL_CLI=1 starts the GUI and hangs forever.
+xtj_lines = [ln for s in xtj["steps"] for ln in str(s.get("run", "")).splitlines()]
+path_lines = [ln for ln in xtj_lines if "GITHUB_PATH" in ln or "ln -s" in ln]
+check(any("Contents/Resources/bin" in ln for ln in path_lines)
+      and not any("Contents/MacOS" in ln for ln in path_lines)
+      and any(s.get("id") == "smoke" for s in xtj["steps"]),
+      "ios.yml uses the xtool CLI wrapper (Contents/Resources/bin, XTL_CLI=1) + a 60 s smoke test",
+      "ios.yml must put xtool.app/Contents/Resources/bin on PATH (Contents/MacOS/xtool is the GUI app)")
+for jname, job in wf["jobs"].items():
+    if "xcode" in str(job.get("runs-on", "")) or "macos" in str(job.get("runs-on", "")):
+        cap = 30 if jname == "release-testflight" else 15
+        check(job.get("timeout-minutes", 999) <= cap, f"ios.yml {jname}: macOS job timeout <= {cap} min",
+              f"ios.yml {jname}: timeout-minutes {job.get('timeout-minutes')} > {cap} (billed macOS minutes)")
+check("__swift5_entry" in json.dumps(xtj), "ios.yml checks the widget appex keeps __text/__swift5_entry",
+      "appex code regression guard missing")
+
+# Screenshot workflow (iOS Simulator) — cost guards.
+ui = yaml.safe_load((ROOT / ".github/workflows/ui-screenshots.yml").read_text())
+ui_on = ui.get("on", ui.get(True))   # PyYAML parses the bare key `on` as True
+uj = ui["jobs"]["ios-simulator-screenshots"]
+UI_PATHS = {"App/**", "WidgetExtension/**", "Packages/TimetableUI/Sources/**", "Packages/TimetableUI/Package.swift",
+            "Resources/**", "Config/App-Info.plist", ".github/workflows/ui-screenshots.yml"}
+check(set(ui_on) == {"push", "workflow_dispatch"} and ui_on["push"].get("branches") == ["main"]
+      and set(ui_on["push"].get("paths", [])) == UI_PATHS,
+      "ui-screenshots.yml: manual + push to main only for on-screen paths (no PRs, no TimetableCore, no Config/**)",
+      f"ui-screenshots.yml triggers differ from the cost decision: {ui_on}")
+check(ui["concurrency"].get("cancel-in-progress") is True and uj.get("timeout-minutes", 99) <= 15,
+      "ui-screenshots.yml: cancel-in-progress + timeout <= 15 min", "ui-screenshots.yml lacks cost guards")
+ui_txt = (ROOT / ".github/workflows/ui-screenshots.yml").read_text()
+check("secrets." not in ui_txt and "CODE_SIGNING_ALLOWED=NO" in ui_txt,
+      "ui-screenshots.yml uses no secrets and builds unsigned", "ui-screenshots.yml must not need secrets/signing")
+for step_kw in ("-TabulaScreen", "appearance dark", "content_size", "simctl io", "list devicetypes",
+                "scripts/sim_pick.py", "--platform iOS", "--platform watchOS"):
+    check(step_kw in ui_txt, f"ui-screenshots.yml: {step_kw}", f"ui-screenshots.yml missing {step_kw}")
+# qa-reviewer 2026-10-06: `simctl list -j runtimes devicetypes` treats "devicetypes" as a search term → no runtimes.
+bad_list = [ln.strip() for ln in ui_txt.splitlines()
+            if not ln.strip().startswith("#") and re.search(r"simctl list -j\s+[A-Za-z]", ln)]
+check(not bad_list, "ui-screenshots.yml: `xcrun simctl list -j` is always called without a section/search term",
+      f"ui-screenshots.yml: partial simctl JSON (search-term bug): {bad_list}")
+
+# ios.yml cost gating (orchestrator decision 2026-10-06, private repo).
+ios_on = wf.get("on", wf.get(True))
+check(ios_on["pull_request"].get("branches") == ["main"], "ios.yml: pull_request limited to branches [main]",
+      f"ios.yml pull_request trigger too broad: {ios_on['pull_request']}")
+check(ios_on["workflow_dispatch"]["inputs"]["upload"].get("default") is False, "ios.yml: upload input defaults to false",
+      "ios.yml: workflow_dispatch input upload must default to false")
+chg = wf["jobs"].get("changes", {})
+chg_txt = json.dumps(chg)
+check(chg.get("runs-on") == "ubuntu-latest" and "scripts/ci_paths.py" in chg_txt and "git diff --name-only" in chg_txt
+      and chg.get("outputs", {}).get("app")
+      and all(not s.get("uses") or str(s["uses"]).startswith("actions/checkout@") for s in chg.get("steps", [])),
+      "ios.yml: Linux `changes` job (git diff + scripts/ci_paths.py, no third-party action) exposes outputs.app",
+      "ios.yml: changes job missing or wrong")
+for jname in ("ios-xcodegen", "ios-xtool-path"):
+    j = wf["jobs"][jname]
+    check("changes" in (j.get("needs") if isinstance(j.get("needs"), list) else [j.get("needs")])
+          and str(j.get("if", "")).replace(" ", "") == "needs.changes.outputs.app=='true'",
+          f"ios.yml {jname}: runs only when needs.changes.outputs.app == 'true'",
+          f"ios.yml {jname}: not gated by the changes job")
+check(str(wf["jobs"]["release-testflight"].get("if", "")).replace(" ", "")
+      == "github.event_name=='workflow_dispatch'&&inputs.upload",
+      "ios.yml release-testflight: job-level if (manual + upload only)", "release job gate missing")
+check("TABULA_PAID_ACCOUNT must be 0 or 1" in rel, "ios.yml release: TABULA_PAID_ACCOUNT validated to {0,1}",
+      "ios.yml release: TABULA_PAID_ACCOUNT not validated")
+
+# All workflows: actions pinned to commit SHAs; nobody hard-codes the paid switch ON.
+for wf_file in sorted((ROOT / ".github/workflows").glob("*.yml")):
+    txt = wf_file.read_text()
+    unpinned = [u for u in re.findall(r"uses:\s*([^\s#]+)", txt) if not re.search(r"@[0-9a-f]{40}$", u)]
+    check(not unpinned, f"{wf_file.name}: all actions pinned to commit SHAs", f"{wf_file.name}: unpinned actions {unpinned}")
+    # Allowed only inside the read-only `$(setting … TABULA_PAID_ACCOUNT=1)` -showBuildSettings probe.
+    check("TABULA_PAID_ACCOUNT=1" not in re.sub(r"\$\(setting [^)]*TABULA_PAID_ACCOUNT=1\)", "", txt),
+          f"{wf_file.name}: never hard-codes TABULA_PAID_ACCOUNT=1 for a build",
+          f"{wf_file.name}: hard-codes the paid switch ON")
 
 sys.exit(1 if FAILS else 0)

@@ -21,6 +21,8 @@ let package = Package(
             name: "TimetableUI",
             dependencies: [.product(name: "TimetableCore", package: "TimetableCore")]
         ),
+        // Linux-runnable tests for the pure (non-SwiftUI) helpers, e.g. LaunchArguments / ScreenRoute.
+        .testTarget(name: "TimetableUITests", dependencies: ["TimetableUI"]),
     ],
     swiftLanguageModes: [.v6]
 )

@@ -1,4 +1,4 @@
-// Phase 0 App Intents probe. UNCOMPILED.
+// Phase 0 App Intents probe. COMPILED 2026-10-06 (xtool path, base + macro variants, 0 warnings; XcodeGen CI run 37449454629).
 // Questions it answers on device:
 //   1. Does an AppIntent + AppShortcutsProvider compile and link on this build path?
 //   2. Does the shortcut appear in the Shortcuts app / Spotlight? That needs

@@ -4,6 +4,20 @@ Date: 2026-10-04 · Orchestrator: Claude Code (Opus 5.5) · Status: **STOPPED AT
 
 **Final evidence (orchestrator re-run after all fixes):** `bash scripts/validate.sh` → `EXIT=0`, 75 OK, 0 FAIL, 0 WARN, `ALL CHECKS PASSED`; core tests `✔ Test run with 9 tests in 2 suites passed`; macro scan clean (base app macro-free); no CRLF files. All Apple-platform Swift remains **UNCOMPILED** (no SDK yet). Nothing committed to git.
 
+## Addendum: human response (2026-10-06) and what changed
+- **D0 Phase 1 now:** yes ("go directly to phase 1 and finish it"). Plan: `docs/specs/PHASE1_PLAN.md`.
+- **D1 Apple Developer Program:** **deferred** until the app has shape. Placeholders + a single switch are being prepared (`docs/PAID_ACCOUNT_SWITCHOVER.md`).
+- **D2 GitHub:** repo `simon01920/tabula-app-ios` created, **private**, so macOS minutes are billed after the free allowance. Pushing needs one-time auth on this PC (`docs/GITHUB_SETUP.md`).
+- **D3 xtool path:** not answered explicitly. The human supplied `Xcode_27.xip`, and the orchestrator proceeded on the xtool path. Recorded here so the decision stays visible.
+- **H2/H3 SDK:** the `.xip` was copied to WSL `/root/` and `xtool sdk install` succeeded, with no Apple login needed for the SDK. The bundled Xcode is **27.0 (27A266a)**, matching OpenAppleMacros. *Correction:* the install log listed only iPhoneOS/iPhoneSimulator/macOS, but `WatchOS27.0.sdk` is also present, so watch sources are type-checked locally (`scripts/watch-typecheck.sh`).
+- **H4/H5 device:** not possible for now (off-site). Interim UI verification goes through **iOS Simulator screenshots on GitHub Actions** (Windows can't run the iOS Simulator).
+- Phase 0 work committed locally (`b2c0458`); CLAUDE.md `Commands` filled in.
+- **First CI run** ([37449454629](https://github.com/simon01920/tabula-app-ios/actions/runs/37449454629), workflow_dispatch):
+  - ✓ Linux core tests.
+  - ✓ **XcodeGen path**: unsigned iOS app + widget + embedded watch app, with an `arm64_32` slice for the Series 7, en/sk `.strings` and `.stringsdict`, and privacy manifests.
+  - ✗ **xtool path**: `xtool dev build` hung on macOS, probably an interactive prompt, until it was cancelled at ~40 min. Fix in progress (timeouts, non-interactive mode or SwiftPM fallback).
+- Still open from §6: D4–D13. Their recommended options are used as defaults behind switches where code depends on them (D6 Time Sensitive ≤ 60 min, D7 alarms only from user rules).
+
 ## 1. Understanding of the project (≤ 10 lines)
 1. **Tabula**: a local-first iOS 26+/watchOS 26+ SwiftUI app that unifies timetable, homework/assignments, exams and reminders, with widgets, Live Activity and an Apple Watch app.
 2. Onboarding (elementary / secondary / university / other) pre-configures fields, rotation, time structure, views and reminders. Presets are data in `TimetableCore`, and everything stays editable.

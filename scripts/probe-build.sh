@@ -6,11 +6,12 @@
 #   bash scripts/probe-build.sh XCStringsSwiftPM       # does SwiftBuild compile a catalog for iOS on Linux?
 set -euo pipefail
 
-# shellcheck source=/dev/null
-[ -f "$HOME/.local/share/swiftly/env.sh" ] && . "$HOME/.local/share/swiftly/env.sh"
-
 NAME="${1:?usage: probe-build.sh <ProbeDirName>}"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=lib/toolchain.sh
+. "$REPO_ROOT/scripts/lib/toolchain.sh"
+tabula_load_toolchain
+tabula_require swift clang xtool
 SRC="$REPO_ROOT/Probes/$NAME"
 WORK="${TABULA_WORKDIR:-$HOME/.cache/tabula/work}-probes/$NAME"
 [ -d "$SRC" ] || { echo "error: no such probe: $SRC" >&2; exit 1; }

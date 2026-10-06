@@ -6,10 +6,11 @@
 # Needs: swift 6.4, python3 + PyYAML, rsync (for the XcodeGen step).
 set -uo pipefail
 
-# shellcheck source=/dev/null
-[ -f "$HOME/.local/share/swiftly/env.sh" ] && . "$HOME/.local/share/swiftly/env.sh"
-
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=lib/toolchain.sh
+. "$REPO_ROOT/scripts/lib/toolchain.sh"
+tabula_load_toolchain
+tabula_require swift swiftc python3
 SCRATCH="${TABULA_SCRATCH:-$HOME/.cache/tabula}"
 TMP="$(mktemp -d "${TMPDIR:-/tmp}/tabula-validate.XXXXXX")"
 trap 'rm -rf "$TMP"' EXIT
@@ -21,7 +22,9 @@ bad()  { printf 'FAIL %s\n' "$*"; FAILS=$((FAILS + 1)); }
 step "Toolchain"
 swift --version 2>&1 | head -1
 command -v xtool >/dev/null && xtool --version || echo "xtool: not installed"
+XCODEGEN_FROM_ENV="${XCODEGEN:-}"
 XCODEGEN="${XCODEGEN:-$(command -v xcodegen || echo "$SCRATCH/XcodeGen/.build/release/xcodegen")}"
+echo "xcodegen path: $XCODEGEN ($([ -n "$XCODEGEN_FROM_ENV" ] && echo 'from XCODEGEN' || echo 'PATH or default'))"
 [ -x "$XCODEGEN" ] && "$XCODEGEN" --version || echo "xcodegen: not available"
 
 step "TimetableCore tests (Linux)"
@@ -31,11 +34,22 @@ else
   tail -30 "$TMP/core.log"; bad "swift test TimetableCore"
 fi
 
-step "TimetableUI builds on Linux (SwiftUI/AlarmKit code is behind #if canImport(...))"
-if swift build --package-path "$REPO_ROOT/Packages/TimetableUI" --scratch-path "$SCRATCH/TimetableUI" >"$TMP/ui.log" 2>&1; then
-  ok "swift build Packages/TimetableUI"
+step "TimetableUI builds + tests on Linux (SwiftUI/AlarmKit code is behind #if canImport(...))"
+if swift test --package-path "$REPO_ROOT/Packages/TimetableUI" --scratch-path "$SCRATCH/TimetableUI" >"$TMP/ui.log" 2>&1; then
+  ok "swift test Packages/TimetableUI: $(grep -E 'Test run with .* passed' "$TMP/ui.log" | tail -1)"
 else
-  tail -20 "$TMP/ui.log"; bad "swift build Packages/TimetableUI"
+  tail -20 "$TMP/ui.log"; bad "swift test Packages/TimetableUI"
+fi
+
+step "watchOS type-check (WatchOS SDK from the xtool Darwin SDK bundle; skipped where it is not installed)"
+if ls -d "${TABULA_DARWIN_SDK:-$HOME/.swiftpm/swift-sdks/darwin.artifactbundle}"/Xcode.app/Contents/Developer/Platforms/WatchOS.platform/Developer/SDKs/WatchOS[0-9]*.sdk >/dev/null 2>&1; then
+  if bash "$REPO_ROOT/scripts/watch-typecheck.sh" >"$TMP/watch.log" 2>&1; then
+    ok "$(tail -1 "$TMP/watch.log")"
+  else
+    tail -20 "$TMP/watch.log"; bad "scripts/watch-typecheck.sh"
+  fi
+else
+  echo "SKIP no WatchOS SDK here (CI Linux job / before 'xtool sdk install'); CI builds the watch app on macOS"
 fi
 
 step "Root Package.swift (xtool path): products"
@@ -122,6 +136,15 @@ else
 fi
 if python3 "$REPO_ROOT/scripts/l10n-compile.py" "$REPO_ROOT/Resources/Localizable.xcstrings" "$TMP/l10n"; then ok "l10n-compile Resources/Localizable.xcstrings"; else bad "l10n-compile"; fi
 
+step "CI helper self-tests (macOS-job path gate, simulator picker)"
+for helper in ci_paths.py sim_pick.py; do
+  if python3 -B "$REPO_ROOT/scripts/$helper" --self-test >"$TMP/$helper.log" 2>&1; then
+    ok "$helper --self-test: $(tail -1 "$TMP/$helper.log")"
+  else
+    cat "$TMP/$helper.log"; bad "$helper --self-test"
+  fi
+done
+
 step "App icon PNG"
 python3 - "$REPO_ROOT/Resources/AppIcon.png" <<'PY' || FAILS=$((FAILS + 1))
 import struct, sys
@@ -135,8 +158,15 @@ PY
 step "XcodeGen generate (proves project.yml parses and resolves)"
 if [ -x "$XCODEGEN" ] && command -v rsync >/dev/null; then
   rsync -a --exclude .git --exclude examples --exclude spikes --exclude '*.zip' --exclude xtool --exclude .build "$REPO_ROOT/" "$TMP/xg/"
-  if (cd "$TMP/xg" && TABULA_DEVELOPMENT_TEAM="" "$XCODEGEN" generate --spec project.yml --quiet); then
+  # No environment needed any more: identity + team come from Config/AppIdentity.xcconfig as $(…) settings.
+  if (cd "$TMP/xg" && env -u TABULA_DEVELOPMENT_TEAM "$XCODEGEN" generate --spec project.yml --quiet); then
     P="$TMP/xg/Tabula.xcodeproj/project.pbxproj"
+    [ "$(grep -c 'baseConfigurationReference = .* /\* AppIdentity.xcconfig \*/' "$P")" -ge 2 ] \
+      && ok "Debug + Release project configs are based on AppIdentity.xcconfig" || bad "AppIdentity.xcconfig not set as base configuration"
+    grep -q 'CODE_SIGN_ENTITLEMENTS = "$(TABULA_APP_ENTITLEMENTS)"' "$P" && grep -q 'CODE_SIGN_ENTITLEMENTS = "$(TABULA_WIDGET_ENTITLEMENTS)"' "$P" \
+      && ok "entitlements selected via the paid-account switch" || bad "CODE_SIGN_ENTITLEMENTS not wired to TABULA_*_ENTITLEMENTS"
+    if grep -q 'Entitlements/PaidAccount' "$P"; then bad "pbxproj references PaidAccount entitlements directly"; else ok "pbxproj has no direct PaidAccount reference"; fi
+    grep -q 'DEVELOPMENT_TEAM = "$(TABULA_DEVELOPMENT_TEAM)"' "$P" && ok "DEVELOPMENT_TEAM = \$(TABULA_DEVELOPMENT_TEAM)" || bad "DEVELOPMENT_TEAM not wired to the xcconfig"
     grep -q 'dstPath = "$(CONTENTS_FOLDER_PATH)/Watch"' "$P" && ok "watch app embedded (Embed Watch Content)" || bad "watch embed phase missing"
     grep -q 'TabulaWidgets.appex in Embed Foundation Extensions' "$P" && ok "widget embedded (PlugIns)" || bad "widget embed phase missing"
     [ "$(grep -c 'PrivacyInfo.xcprivacy in Resources \*/ = {isa = PBXBuildFile' "$P")" -eq 2 ] && ok "both privacy manifests (app + widget) in Resources phases" || bad "privacy manifests not in Resources phases"
@@ -150,7 +180,17 @@ if [ -x "$XCODEGEN" ] && command -v rsync >/dev/null; then
     bad "xcodegen generate"
   fi
 else
-  echo "SKIP xcodegen or rsync not available (set XCODEGEN=/path/to/xcodegen)"
+  # Say exactly why, so a skip is never mistaken for a pass (qa-reviewer 2026-10-06).
+  if [ ! -x "$XCODEGEN" ]; then
+    if [ -n "${XCODEGEN_FROM_ENV:-}" ]; then
+      echo "SKIP XcodeGen step: XCODEGEN=$XCODEGEN (from the environment) is not an executable file"
+    else
+      echo "SKIP XcodeGen step: no 'xcodegen' on PATH and no executable at the default $XCODEGEN"
+    fi
+    echo "     Point it at a build, e.g.: XCODEGEN=/root/.cache/tabula/XcodeGen/.build/release/xcodegen bash scripts/validate.sh"
+    echo "     (build once: docs/ENVIRONMENT.md §3, XcodeGen 2.46.0 from source; the CI Linux job skips this step by design)"
+  fi
+  command -v rsync >/dev/null || echo "SKIP XcodeGen step: rsync not installed (apt-get install rsync)"
 fi
 
 printf '\n%s\n' "$([ "$FAILS" -eq 0 ] && echo 'ALL CHECKS PASSED' || echo "$FAILS CHECK(S) FAILED")"

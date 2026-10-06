@@ -1,30 +1,37 @@
 # ENVIRONMENT — verified facts, failures and human steps
 
-Owner: env-ci-engineer · Phase 0 spike · Last updated: 2026-10-04 (rev. 2: qa-reviewer fixes)
+Owner: env-ci-engineer · Phase 0 spike · Last updated: 2026-10-06 (rev. 3: first real compile, CI run, simulator pipeline, paid-account placeholders)
 Status legend: **VERIFIED** (I ran it here, output quoted) · **FAILED** (I *executed* it here and it did not work) ·
-**BLOCKED** (needs the Darwin SDK, a device, an Apple account or a CI run; the unblock step is given) ·
+**BLOCKED** (needs a device, an Apple account or a CI run; the unblock step is given) ·
 **RESEARCH-ONLY** (taken from official docs or source code, not executed; "expected fail" = a source-based prediction, not a run).
-All Apple-platform Swift in this repo is **UNCOMPILED** until the Darwin SDK is installed or CI runs.
+Since 2026-10-06 all Apple-platform Swift **compiles**: iOS app + widget via xtool on WSL (base and macro variants,
+0 errors, 0 warnings) and via XcodeGen/xcodebuild in CI (incl. the watch app); the watch sources also type-check
+locally. Nothing has run on a device yet (no device access: human decision 2026-10-06); UI verification goes
+through the CI iOS Simulator job (§19). Log files of the runs quoted here: `/root/phase0_*.log` in WSL.
 
 ## 0. Verdict summary
 
 | Area | Verdict | One line |
 |---|---|---|
-| WSL toolchain (Swift 6.4, Linux tests) | VERIFIED | `swift test` on TimetableCore: 9/9 pass, repo path with a space works |
+| WSL toolchain (Swift 6.4, Linux tests) | VERIFIED | `swift test` on TimetableCore passes; TimetableUI tests 9/9; repo path with a space works; scripts now load swiftly in non-login shells (`scripts/lib/toolchain.sh`) |
 | xtool 1.20.1 install | VERIFIED | AppImage runs under FUSE, SHA-256 matches the release digest |
-| xtool build / install on iPhone | BLOCKED | needs Xcode 27 `.xip` + `xtool setup` (human), then USB passthrough |
-| XcodeGen spec | VERIFIED | XcodeGen 2.46.0 built from source on Linux; `xcodegen generate` succeeds; widget and watch embedding present |
-| Both build paths use the same sources | VERIFIED (static) | `scripts/validate.sh` (75 OK checks) compares sources, plists, entitlements, bundle IDs, deployment targets, Swift mode, privacy manifests; compilation itself is BLOCKED |
-| Macro isolation (CLAUDE.md rule 5) | VERIFIED (static) | default app build has no macros in env-ci files; macro probes compile only with `TABULA_MACRO_PROBES` (`scripts/xtool-dev.sh --macro-probes`; always on in CI). **Exception:** `ImportProbes.swift` (import-ml) uses `@State`, a macro in the Xcode 27 SDK → WARN in validate.sh |
-| Macros under xtool | RESEARCH-ONLY (partial) | SwiftUI (`@Entry`, `@State`, `@Animatable`) + FoundationModels macros are shipped by xtool via OpenAppleMacros (tracks exactly Xcode 27.0.0 27A266a); `@Observable` is an OSS-toolchain macro; SwiftData and App Intents macros are NOT provided |
-| App Intents under xtool | RESEARCH-ONLY | compiles in principle; Shortcuts metadata needs Apple's macOS-only processor (xtool PR #217 closed unmerged) |
-| String Catalogs under xtool | FAILED (Linux host, executed) / iOS cross-build RESEARCH-ONLY / mitigated | SwiftPM copies `.xcstrings` raw on Linux; for iOS, SwiftBuild would call the macOS-only `xcstringstool`; own `scripts/l10n-compile.py` produces `.lproj` tables (VERIFIED on Linux for `.strings`, self-test 6/6) |
-| Widgets under xtool | RESEARCH-ONLY | supported as Foundation NSExtension (`PlugIns/`); ExtensionKit not supported |
-| watchOS under xtool | RESEARCH-ONLY (expected fail) | xtool's SDK has no watchOS triples and its packer only makes iPhoneOS bundles (source) → watch app is CI-only |
-| Watch architecture (Series 7 = arm64_32) | RESEARCH-ONLY | swift-build `watchOSDevice.xcspec`: `ARCHS_STANDARD = (arm64, arm64_32)`, arm64_32 `DeploymentTargetRange = ("0", "27")` → built for watchOS 26.0; CI asserts `lipo -archs` contains arm64_32 |
+| Darwin SDK (Xcode 27.0 **27A266a**) | VERIFIED | `xtool sdk status` → `installed · Flavor normal · epoch=2,darwinTools=1.1.0,oam=1.3.0`; bundle `Xcode.app/Contents/version.plist` `ProductBuildVersion 27A266a` = the build OpenAppleMacros 1.3.0 tracks; 9.4 GB |
+| xtool **build** (iOS device, unsigned) | VERIFIED (after 2 fixes) | `bash scripts/xtool-dev.sh build` → `Build complete! (13.60 secs)`, `Wrote to …/xtool/TabulaApp.app`, 18 s wall clean, **0 errors / 0 warnings** (negative control proves warnings are surfaced). Fixes: cross-import overlays flag, widget `-u _main` (§2) |
+| xtool **install** on iPhone | BLOCKED | no device access for now (human decision 2026-10-06); also needs `xtool auth` (currently `Logged out`) + USB passthrough (H4) |
+| Simulator build | VERIFIED (local build) / CI pipeline UNRUN | `xtool dev build --triple arm64-apple-ios-simulator` works (Mach-O platform 7); no simulator exists on Windows. UI checks run on the CI iOS Simulator (`ui-screenshots.yml`, §19) |
+| XcodeGen spec | VERIFIED | locally `xcodegen generate`; in CI run 37449454629 `xcodebuild` **Build Succeeded** (Xcode 27.0 27A266a): app + widget + watch (`watch archs: arm64 arm64_32`), all bundle checks `ok` |
+| Both build paths use the same sources | VERIFIED (compiled on both) | xtool on WSL + XcodeGen in CI; `scripts/validate.sh` → `ALL CHECKS PASSED` (123 OK) incl. identity single-source + paid-switch checks |
+| Macro isolation (CLAUDE.md rule 5) | VERIFIED (compiled) | base variant: 0 macro symbols (`ObservationTickProbe`/`Phase0GenerableSlot` absent); macro variant: present. `ImportProbes.swift` no longer uses `@State` (no WARN) |
+| Macros under xtool | **VERIFIED (compile)**: `@Observable`, `@Entry`, `@State`, `@Generable`/`@Guide` · **FAILED**: SwiftData | `--macro-probes` build 0 errors/0 warnings; binary has 64 `ObservationTickProbe` + 118 `Phase0GenerableSlot` symbols. SwiftData probe: `plugin for module 'SwiftDataMacros' not found`. Runtime behaviour = device/simulator check |
+| App Intents under xtool | VERIFIED (compiles) / metadata absent (VERIFIED) | links; the xtool bundle has **no** `Metadata.appintents` → Shortcuts listing expected only on the Xcode/TestFlight path |
+| String Catalogs under xtool | **FAILED (executed, iOS cross-build)** / mitigated | `.xcstrings` as SwiftPM resource = hard build error (`xtool/.xtool-tmp/xcstringstool … is not an executable file`); `scripts/l10n-compile.py` `.lproj` tables are in the bundle (app + widget, en + sk); validate.sh forbids `.xcstrings` SwiftPM resources |
+| Widgets under xtool | VERIFIED (build + package) / device BLOCKED | `PlugIns/TabulaWidgets.appex` (346 KB, `__text` + `__swift5_entry`, `NSExtensionPointIdentifier com.apple.widgetkit-extension`, ad-hoc signed with the App Group) |
+| watchOS under xtool | FAILED by design (no triple) / **local type-check VERIFIED** | xtool's swift-sdk has no watchOS triple, but the bundle's Xcode.app contains `WatchOS27.0.sdk`: `scripts/watch-typecheck.sh` type-checks TimetableCore + TimetableUI + WatchApp for `arm64_32-apple-watchos26.0` in 8.4 s; negative control fails with `'textSelection' is unavailable in watchOS`. Link/package/install = CI/TestFlight |
+| Watch architecture (Series 7 = arm64_32) | VERIFIED (CI) | CI run 37449454629: `watch archs: arm64 arm64_32` |
 | TestFlight readiness (static) | VERIFIED (static) | `ITSAppUsesNonExemptEncryption = false`; `PrivacyInfo.xcprivacy` for app and widget on both paths (UserDefaults CA92.1 + 1C8F.1) |
-| CI workflow | BLOCKED | written + YAML-validated; needs a GitHub repo to run |
-| TestFlight upload | BLOCKED | needs paid Apple Developer Program + App Store Connect API key (Admin role) in GitHub secrets |
+| CI workflow | PARTIAL (root cause of the failure found + fixed, re-run pending) | [run 37449454629](https://github.com/simon01920/tabula-app-ios/actions/runs/37449454629): core-linux ✓ (1 m 15 s), ios-xcodegen ✓ (1 m 07 s), ios-xtool-path ✗ cancelled after 40 min: we started `xtool.app/Contents/MacOS/xtool`, which is the **GUI app** unless `XTL_CLI=1` (xtool source `macOS/XToolMac/XToolMac.swift`); the CLI is `Contents/Resources/bin/xtool`. Fixed + 15-min caps (§8) |
+| Paid-account placeholders | VERIFIED (static) / CI assertion UNRUN | `Config/AppIdentity.xcconfig` single source + `TABULA_PAID_ACCOUNT` switch; 8/8 negative tests fail as intended; runbook `docs/PAID_ACCOUNT_SWITCHOVER.md` (§20) |
+| TestFlight upload | BLOCKED | paid Apple Developer Program deferred (human decision 2026-10-06); steps in `docs/PAID_ACCOUNT_SWITCHOVER.md` |
 
 ## 1. Toolchain (WSL2)
 
@@ -38,6 +45,8 @@ All Apple-platform Swift in this repo is **UNCOMPILED** until the Darwin SDK is 
 | SwiftBuild is the default build system in 6.4 | VERIFIED | `swift build --build-system native` prints `'--build-system native' has been deprecated` | — |
 | Linux validation script | VERIFIED | `bash scripts/validate.sh` → `ALL CHECKS PASSED` (core tests, TimetableUI Linux build, root manifest, plists via plistlib **and** swift-corelibs Foundation, YAML schemas, path sync, l10n compile, PNG, `xcodegen generate`). Log: `/root/phase0_validate.log` | run before every commit |
 | Extra package installed | VERIFIED | `apt-get install poppler-utils` (to read the Xcode SDK agreement PDF) | — |
+| swiftly in non-login shells | FAILED → fixed | `wsl.exe --exec bash -c 'command -v swift'` → nothing (swiftly only adds itself to PATH via `~/.profile`); first `xtool sdk install` died at 99 % with `Could not find executable 'clang' in PATH`. Fix: every script sources `scripts/lib/toolchain.sh` (`tabula_load_toolchain` searches `$TABULA_SWIFTLY_ENV`, `$SWIFTLY_HOME_DIR`, `$XDG_DATA_HOME/swiftly`, `~/.local/share/swiftly`, `/root/.local/share/swiftly`; `tabula_require swift clang xtool` fails with a hint). VERIFIED: step A/B builds run from `wsl.exe --exec bash` | run scripts as-is; for ad-hoc commands `. ~/.local/share/swiftly/env.sh` first |
+| Calling WSL from Git Bash | VERIFIED (gotcha) | `wsl.exe -d Ubuntu -- bash -c '…$VAR…'` re-parses the command in a second shell, so `$VAR` set inside the quotes expands to empty; use `wsl.exe -d Ubuntu --exec bash -c '…'` or `--exec bash script.sh` | — |
 
 ## 2. xtool
 
@@ -47,19 +56,27 @@ All Apple-platform Swift in this repo is **UNCOMPILED** until the Darwin SDK is 
 | Install + checksum | VERIFIED | `sha256 actual=040c58d5…159831` = expected; installed to `/usr/local/bin/xtool`; log `/root/phase0_xtool_install.log` | — |
 | FUSE / AppImage | VERIFIED | AppImage executes directly (`/dev/fuse`, `fusermount3` present); `--appimage-extract` not needed | if FUSE ever breaks: `xtool --appimage-extract` and run `squashfs-root/AppRun` |
 | `xtool --version` / `--help` | VERIFIED | `xtool 1.20.1`; subcommands `setup auth sdk new dev ds devices install uninstall launch`; `dev build [--sign] [--ipa] [--triple]` | — |
-| Darwin SDK | BLOCKED | `xtool sdk status` → `Not installed` | Human step H2–H3 |
-| Auth | BLOCKED | `xtool auth status` → `Logged out` | Human step H3 (interactive, never in chat) |
-| Device discovery | BLOCKED | `xtool devices --no-wait` → (empty); `usbmuxd` inactive, no `/var/run/usbmuxd` | Human step H4 |
-| Wrapper gate | VERIFIED | `bash scripts/xtool-dev.sh build` → `error: Darwin SDK not installed …` exit 2 | — |
+| Darwin SDK | VERIFIED | human-supplied `Xcode_27.xip` (2,014,229,334 B, sha256 `6a270c53…a67c3`); `xtool sdk install` (2nd attempt, after the PATH fix) → `xtool sdk status`: `Darwin SDK is installed · Path /root/.swiftpm/swift-sdks/darwin.artifactbundle · Flavor normal · Version epoch=2,darwinTools=1.1.0,oam=1.3.0`; `swift sdk list` → `darwin`; 9.4 GB. Finalized swift-sdk triples: `arm64-apple-ios`, `arm64/x86_64-apple-ios-simulator`, `arm64/x86_64-apple-macosx` (iPhoneOS27.0, iPhoneSimulator27.0, MacOSX27.0 SDKs) | — |
+| Xcode build in the SDK | VERIFIED | `Xcode.app/Contents/version.plist`: `ProductBuildVersion 27A266a`, `CFBundleShortVersionString 27.0`; `Info.plist` `DTXcodeBuild 27A266`; iPhoneOS.platform `ProductBuildVersion 24A430` (27.0); WatchOS.platform `24R360` (27.0). **= OpenAppleMacros' tracked 27A266a** | keep this xip; re-check OAM when changing Xcode |
+| watchOS SDK presence | VERIFIED (corrects an earlier note) | not a swift-sdk triple, but physically present: `…/Xcode.app/Contents/Developer/Platforms/WatchOS.platform/Developer/SDKs/WatchOS27.0.sdk` (340 MB platform) + WatchSimulator | used by `scripts/watch-typecheck.sh` |
+| Auth | BLOCKED (not needed to build) | `xtool auth status` → `Logged out`; `dev build` needs no login (VERIFIED) | only for device installs (H3 login part, deferred) |
+| Device discovery | BLOCKED | no device access for now (human decision 2026-10-06) | H4 later |
+| Wrapper gate | VERIFIED | (before SDK) `bash scripts/xtool-dev.sh build` → `error: Darwin SDK not installed …` exit 2 | — |
+| Cross-import overlays | FAILED → fixed | first build: `ImportProbes.swift:220:32: error: cannot find type 'PhotosPickerItem' in scope`. The type lives in the cross-import overlay `_PhotosUI_SwiftUI` (SDK has `PhotosUI.swiftcrossimport/SwiftUI.swiftoverlay`). xtool's `toolset.json` passes `-Xfrontend -enable-cross-import-overlays` but its SwiftBuild `toolset-swb.json` does not. Fix: `Package.swift` `.unsafeFlags(["-Xfrontend", "-enable-cross-import-overlays"])` on TabulaApp + TabulaWidgets (root package, so allowed). Also matters for `_StoreKit_SwiftUI`, `_AppIntents_SwiftUI`, `_MapKit_SwiftUI` | report upstream (xtool issue) when convenient |
+| Empty widget appex → signing failure | FAILED → fixed | after compiling: `>>> Can't find free space of LoadCommands for CodeSignature!` / `Error: Signing failed` (zsign, during xtool's ad-hoc "Applying entitlements…", even without `--sign`). Root cause: the appex had **no `__text`** (sections `__stubs __got` only, 49 KB): xtool links extensions with `-e _NSExtensionMain`, nothing references the widget's `_main`, so ld64.lld never pulls the package objects; zsign computes header space from `__text`. Reproduced by relinking SwiftBuild's exact command: `-u _main` → 321 KB with `__text … __swift5_entry`. Fix: TabulaWidgets `linkerSettings: .unsafeFlags(["-Xlinker","-u","-Xlinker","_main"])`. Guards: `xtool-dev.sh` (llvm-objdump) and CI (`otool -l`) fail if `__text`/`__swift5_entry` are missing | device check: widget renders (proves `__swift5_entry` lookup works with `_NSExtensionMain`) |
+| Bundle produced by `xtool dev build` | VERIFIED | `TabulaApp.app`: `TabulaApp` (arm64, 1.17 MB), `Info.plist` merged (xtool defaults `CFBundleIdentifier sk.simondev.tabula`, `CFBundleVersion 1`, `CFBundleShortVersionString 1.0.0`, `MinimumOSVersion 26.0`, `CFBundleSupportedPlatforms [iPhoneOS]`, `UIRequiredDeviceCapabilities [arm64]`, `CFBundleIconFile AppIcon` + all keys of `Config/App-Info.plist`), `AppIcon.png`, `PrivacyInfo.xcprivacy`, `en.lproj`/`sk.lproj` `Localizable.strings(+dict)`, `_CodeSignature`, embedded entitlements `{application-groups: [group.sk.simondev.tabula]}`; `PlugIns/TabulaWidgets.appex` (`CFBundlePackageType XPC!`, `NSExtensionPointIdentifier com.apple.widgetkit-extension`, same resources). No `Metadata.appintents`, no `Assets.car` (expected). Strongly linked: ActivityKit, AlarmKit, AppIntents, FoundationModels, PhotosUI, `_PhotosUI_SwiftUI`, SwiftUI, Vision, WidgetKit… (fine: minimum iOS 26) | — |
+| SDK version stamped in binaries | VERIFIED (oddity) | `LC_BUILD_VERSION platform=2 minos=26.0.0 sdk=26.0.0` although compiled against iPhoneOS27.0.sdk (`-target-sdk-version 27.0`); the xcodebuild path will stamp 27.0. Runtime "linked-on-or-after" behaviour may differ between the paths | watch for iOS 27-only behaviour differences between xtool and TestFlight builds |
+| Probe packages | VERIFIED (executed) | §13 | — |
 | Licence | VERIFIED | `LICENSE.md`: MIT (Kabir Oberai). Build tool only, not shipped in the app | — |
 | `xtool.yml` schema | VERIFIED (source) | 1.20.1 `Sources/PackLib/PackSchema.swift`: `version, orgID, bundleID, product, infoPath, entitlementsPath, iconPath, resources, extensions[{product, bundleID, infoPath, resources, entitlementsPath}], skipLSP` | `validate.sh` rejects unknown keys |
 | Products must be automatic libraries of the root package | VERIFIED (source + manifest) | `Planner.selectLibrary` filters `type == .autoLibrary`; `validate.sh`: `OK product TabulaApp: automatic library, path App/Sources` | — |
 | Info.plist handling | VERIFIED (source) | xtool builds defaults (`CFBundleIdentifier`, `CFBundleVersion "1"`, `CFBundleShortVersionString "1.0.0"`, `UIDeviceFamily [1,2]`, `UILaunchScreen`) and **merges `infoPath` over them verbatim** → shared plists must not contain `$(VAR)` | enforced by `validate.sh` |
 | macOS build of xtool exists | VERIFIED | release asset `xtool.app.zip` sha256 `39123efc…33ca2`; binary at `xtool.app/Contents/MacOS/xtool` | used by CI job `ios-xtool-path` |
-| `xtool dev build` without login | RESEARCH-ONLY (source) | `DevBuildCommand`: auth token only required with `--sign`; `EnsureSDKOperation` is a no-op on macOS | first CI run proves it |
+| `xtool dev build` without login | VERIFIED (WSL) / macOS CI re-run pending | WSL: builds with `xtool auth status` = `Logged out`. Source (`DevCommand.swift` 1.20.1): token only for `--sign`; `EnsureSDKOperation` is a no-op on macOS; no prompt in the build path. The CI hang was not a prompt (see next row) | — |
+| macOS xtool CLI entry point | VERIFIED (source + release zip) / FAILED as first used | release `xtool.app.zip` (sha256 `39123efc…33ca2`, cached at `~/.cache/tabula/dl/`): `Contents/MacOS/xtool` (36 MB, bundle `sh.xtool.XToolMac`) + `Contents/Resources/bin/xtool` (705-byte bash wrapper ending `XTL_CLI=1 "$APP_PATH/Contents/MacOS/xtool" "$@"`). `macOS/XToolMac/XToolMac.swift`: `if ProcessInfo.processInfo.environment["XTL_CLI"] == "1" { try await runXTool() } else { XToolMacUI.main() }`. The official Homebrew cask links `Contents/Resources/bin/xtool`. CI run 37449454629 symlinked the GUI binary → `xtool --version` printed nothing and the job was cancelled after 40 min (orphan `xtool` process killed at cleanup) | `ios.yml` now puts `Contents/Resources/bin` on PATH; validate.sh fails if `Contents/MacOS` is ever put on PATH again |
 | xtool SwiftBuild toolset | VERIFIED | downloaded `darwin-tools-linux-llvm v1.1.0 toolset-x86_64.tar.gz` (sha256 `a5166f2d…74188`): only `bin/dsymutil`, `bin/ld64.lld`, `bin/libtool` — no `xcstringstool`, `actool`, `appintentsmetadataprocessor` | explains the catalog/asset/intents gaps |
-| SDK size | RESEARCH-ONLY | 1.20.0 notes: new SDK layout bundles all of `Xcode.app/Contents/Developer`, ~7 GB (was ~3 GB); `xtool sdk install --slim` opts out | ample disk (950 GB free) |
-| OpenAppleMacros (macro implementations xtool ships) | RESEARCH-ONLY | repo `xtool-org/OpenAppleMacros` v1.3.0 (MIT) README: "Currently tracking: **Xcode 27.0.0 (27A266a)**"; supported: SwiftUI `@Animatable @AnimatableIgnored @Entry @State`, FoundationModels `@Generable @Guide @SessionPropertyEntry`, Previews (expand to empty); NOT supported: SwiftData (`@Model @Query` …), App Intents macros (`@AppIntent @AppEntity` …), TipKit, StateReporting | install the SDK from **Xcode 27.0 (27A266a)** to match (H2) |
+| SDK size | VERIFIED | `du -sh` → **9.4 GB** (normal flavor; includes the full Xcode.app incl. WatchOS/tvOS/visionOS platforms) | `--slim` would drop the watchOS SDK used by `watch-typecheck.sh` |
+| OpenAppleMacros (macro implementations xtool ships) | VERIFIED (match + compile) | repo `xtool-org/OpenAppleMacros` v1.3.0 (MIT) README: "Currently tracking: **Xcode 27.0.0 (27A266a)**" = the installed SDK's build. Compile line loads `SwiftUIMacros`, `FoundationModelsMacros`, `PreviewsMacros` via the SDK's `swift-plugin-server` and `ObservationMacros`, `FoundationMacros`, `SwiftMacros` from the swiftly toolchain. NOT provided: SwiftData (probe FAILED), App Intents macros, TipKit, StateReporting | re-check when Xcode changes |
 | Open upstream items | RESEARCH-ONLY | PR **#217** pure-Swift AppIntents metadata generator: **closed, not merged** (2026-06-02). PR **#219** `.xcassets` compiler: **open** (updated 2026-06-18). PR **#284** one App Group on free teams: **open** (2026-09-28). Issue **#149** SwiftData macros: **open**. Issue **#138** ExtensionKit: **open**. Nothing found on watchOS or `.xcstrings`. Source: `https://api.github.com/repos/xtool-org/xtool/issues/<n>` | re-check at each phase gate |
 
 ### 2.1 Bundle-ID prefix (important)
@@ -75,64 +92,68 @@ VERIFIED in 1.20.1 source (`Sources/XKit/Utilities/ProvisioningIdentifiers.swift
 | iCloud container | `iCloud.sk.simondev.tabula` | not handled by xtool (no iCloud capability registration) | CloudKit testing = CI/TestFlight only |
 | Free team | — | App Groups are filtered out (`DeveloperServicesCapability(.appGroups, isFree: false)` + FIXME) | widget↔app sharing fails on free teams until PR #284 ships |
 
-xtool auto-registers only these capabilities from entitlements: Data Protection, App Groups (paid), Associated Domains, HealthKit, HomeKit, Inter-App Audio, Multipath, Network Extensions, Personal VPN, Push, SiriKit, Wireless Accessory, Wi-Fi Aware. **Time Sensitive, iCloud/CloudKit, increased-memory-limit, In-App Purchase capability are not handled** → keep `Config/*.entitlements` (shared with xtool) to App Groups only; add the others in a CI-only entitlements file when those phases start.
+xtool auto-registers only these capabilities from entitlements: Data Protection, App Groups (paid), Associated Domains, HealthKit, HomeKit, Inter-App Audio, Multipath, Network Extensions, Personal VPN, Push, SiriKit, Wireless Accessory, Wi-Fi Aware. **Time Sensitive, iCloud/CloudKit, increased-memory-limit, In-App Purchase capability are not handled** → keep `Config/*.entitlements` (shared with xtool) to App Groups only. The others are prepared (2026-10-06) in the CI-only `Config/Entitlements/PaidAccount/*.entitlements`, selected only by `TABULA_PAID_ACCOUNT = 1` (§20, `docs/PAID_ACCOUNT_SWITCHOVER.md`).
 
 ## 3. Build paths
 
 | Item | Status | Evidence | Next step / unblock |
 |---|---|---|---|
-| (a) SwiftPM + `xtool.yml` | VERIFIED (manifest) / BLOCKED (compile) | `swift package describe` passes on Linux; compile needs SDK | H2–H3, then `bash scripts/xtool-dev.sh build` |
-| (b) XcodeGen `project.yml` | VERIFIED (generate) / BLOCKED (xcodebuild) | XcodeGen 2.46.0 from source with Swift 6.4: `Build complete! (103.33 secs)`, `Version: 2.46.0`; `xcodegen generate` → `Created project at …/Tabula.xcodeproj` exit 0; pbxproj contains `Embed Watch Content` with `dstPath = "$(CONTENTS_FOLDER_PATH)/Watch"`, `TabulaWidgets.appex in Embed Foundation Extensions`, two `XCLocalSwiftPackageReference`s, shared scheme `TabulaApp.xcscheme`; Config plists left untouched | first CI run |
+| (a) SwiftPM + `xtool.yml` | VERIFIED (compile + package, WSL) | step A (base) and step B (macro) both `Build complete!`, 0 errors / 0 warnings, ~18–20 s clean; bundle inspected (§2) | install = device (deferred) |
+| (b) XcodeGen `project.yml` | VERIFIED (CI xcodebuild) | [CI run 37449454629](https://github.com/simon01920/tabula-app-ios/actions/runs/37449454629) (`xcode-27-arm64` image 20260928.0222.1, Xcode 27.0 Build version 27A266a, SDKs `iphoneos27.0` / `watchos27.0`, xcbeautify 3.2.1): **Build Succeeded**, every bundle check `ok` incl. `PlugIns/TabulaWidgets.appex`, `Watch/TabulaWatch.app/TabulaWatch`, en/sk `.strings`+`.stringsdict`, both privacy manifests, `ITSAppUsesNonExemptEncryption=false`, `watch archs: arm64 arm64_32`. Only warning from our project: `User supplied UIDeviceFamily key in the Info.plist will be overwritten` → **fixed** (key removed from the shared plist; Xcode uses `TARGETED_DEVICE_FAMILY "1"`, xtool falls back to its default `[1, 2]`, harmless for local dev installs) | — |
 | XcodeGen licence/maintenance | VERIFIED | MIT; latest release 2.46.0 (2026-07-16), pushed 2026-09-13, not archived; `xcodegen.zip` sha256 `4d9e34b6…196806` | — |
-| `${TABULA_DEVELOPMENT_TEAM}` | VERIFIED | unset → XcodeGen keeps the literal `"${TABULA_DEVELOPMENT_TEAM}"`; set to empty → `DEVELOPMENT_TEAM = ""`; set → value | always export it (empty for unsigned builds) — done in CI |
-| Same sources | VERIFIED (static) | `validate.sh`: `OK project.yml targets/sources/plists in sync with Package.swift + xtool.yml` | — |
+| Team ID + identity wiring | VERIFIED (static + local XcodeGen) / Xcode resolution: CI assertion UNRUN | replaced XcodeGen's `${TABULA_DEVELOPMENT_TEAM}` env expansion (which kept the literal when unset) by Xcode build-setting references from `Config/AppIdentity.xcconfig` (project-level `configFiles`): `DEVELOPMENT_TEAM = $(TABULA_DEVELOPMENT_TEAM)`, `PRODUCT_BUNDLE_IDENTIFIER = $(TABULA_BUNDLE_ID)[.TabulaWidgets/.watchkitapp]`, `CODE_SIGN_ENTITLEMENTS = $(TABULA_APP_ENTITLEMENTS)` / `$(TABULA_WIDGET_ENTITLEMENTS)`. `xcodegen generate` needs no env any more (validate.sh runs it with the variable unset; pbxproj has both `baseConfigurationReference … AppIdentity.xcconfig`). CI `ios-xcodegen` asserts the resolution with `xcodebuild -showBuildSettings` | next CI run |
+| Same sources | VERIFIED (compiled on both paths) | `validate.sh`: `OK project.yml targets/sources/plists in sync with Package.swift + xtool.yml`; both paths compiled 2026-10-06 | — |
 
 Source mapping (identical on both paths): `App/Sources` (module `TabulaApp`), `WidgetExtension/Sources` (module `TabulaWidgets`), `Packages/TimetableCore`, `Packages/TimetableUI`, `Config/App-Info.plist`, `Config/Widgets-Info.plist`, `Config/Tabula.entitlements`, `Config/TabulaWidgets.entitlements`, `Resources/Localizable.xcstrings`. App bundle is `TabulaApp.app` on both paths; display name "Tabula" comes from the plist.
 
-Differences by design: watch app (`WatchApp/Sources`, CI only) · icon: xtool uses `Resources/AppIcon.png` (`CFBundleIconFile`), Xcode uses `Resources/Assets.xcassets` (xtool cannot compile asset catalogs, PR #219) · strings: Xcode compiles the catalog, xtool path uses `.build-l10n/` from `scripts/l10n-compile.py` · versions: xtool `1.0.0 (1)`, Xcode `MARKETING_VERSION 0.1.0` / `CURRENT_PROJECT_VERSION` (CI overrides with the run number) · `SWIFT_PACKAGE` is defined only on the xtool path (the debug screen shows which path built the app).
+Differences by design: watch app (`WatchApp/Sources`, CI only; local type-check only) · device family: Xcode `TARGETED_DEVICE_FAMILY "1"`, xtool default `[1, 2]` · xtool-only `Package.swift` flags (`-enable-cross-import-overlays`, widget `-u _main`) · icon: xtool uses `Resources/AppIcon.png` (`CFBundleIconFile`), Xcode uses `Resources/Assets.xcassets` (xtool cannot compile asset catalogs, PR #219) · strings: Xcode compiles the catalog, xtool path uses `.build-l10n/` from `scripts/l10n-compile.py` · versions: xtool `1.0.0 (1)`, Xcode `MARKETING_VERSION 0.1.0` / `CURRENT_PROJECT_VERSION` (CI overrides with the run number) · `SWIFT_PACKAGE` is defined only on the xtool path (the debug screen shows which path built the app).
 
 ## 4. Macros
 
 | Macro | Status | Evidence | Next step / unblock |
 |---|---|---|---|
-| `@Observable` | RESEARCH-ONLY → expect works | ObservationMacros ship in the open-source toolchain; xtool PR #101 test notes: "OSS toolchain macros continue to work (tested `@Observable`, `#bundle`)" | device row "@Observable ticks" (BLOCKED: H2–H4) |
-| SwiftUI `@Entry`, `@State`, `#Preview` | RESEARCH-ONLY → expect works | 1.20.0 notes: "SwiftUI macros (#101)"; `SDKBuilder.oamLibraries = ["FoundationModelsMacros", "PreviewsMacros", "SwiftUIMacros"]`, OpenAppleMacros 1.3.0 | device row "@Entry environment value" |
-| FoundationModels `@Generable`, `@Guide` | RESEARCH-ONLY → expect works | 1.20.1 notes: "Adds support for FoundationModels macros (#270)" | device row "@Generable schema" |
-| SwiftData `@Model`, `@Query` | RESEARCH-ONLY → expect FAIL | `SwiftDataMacros` not in `oamLibraries`; issue #149 error `external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found`; maintainer suggests GRDB | `bash scripts/probe-build.sh MacroProbeSwiftData` after H3 |
-| App Intents | RESEARCH-ONLY | `AppIntent`/`AppShortcutsProvider` are protocols (no macro needed). Shortcuts/Spotlight listing requires `Metadata.appintents` from `appintentsmetadataprocessor` (SwiftBuild `AppIntentsMetadata.xcspec`, macOS binary, not in xtool's toolset); PR #217 closed unmerged | device: is "Run Tabula probe" listed in Shortcuts? (expect no on xtool, yes on TestFlight) |
+| `@Observable` | **VERIFIED (compile, xtool)** | `--macro-probes` build: 0 errors/0 warnings; `ObservationMacros` loaded from the swiftly toolchain (`-load-resolved-plugin …/libObservationMacros.so`); binary contains 64 `ObservationTickProbe` symbols + Observation registrar references. Also compiled in CI (Xcode) | runtime: CI simulator screenshot / device "Tick" row |
+| SwiftUI `@Entry`, `@State`, `#Preview` | **VERIFIED (compile, xtool)** for `@Entry`, `@State` | `SwiftUIMacros` via the SDK's `swift-plugin-server` (OpenAppleMacros, Xcode 27A266a); 22 `phase0ProbeToken` symbols. `#Preview` not used | runtime: "@Entry environment value" row |
+| FoundationModels `@Generable`, `@Guide` | **VERIFIED (compile, xtool)** | 118 `Phase0GenerableSlot` symbols; the binary calls `GenerationSchema(type:description:properties:)` and `GenerationSchema.Property(name:description:type:guides:)`, i.e. the macro expansion | runtime: "@Generable schema" row |
+| SwiftData `@Model`, `@Query` | **FAILED (executed)** | `bash scripts/probe-build.sh MacroProbeSwiftData` → exit 1: `error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; plugin for module 'SwiftDataMacros' not found` (×5) and `error: unknown attribute 'Query'`. Log `/root/phase0_probe_MacroProbeSwiftData.log` | keep the versioned Codable store (ARCHITECTURE) |
+| App Intents | VERIFIED (compile) / metadata absent | links on the xtool path; bundle has no `Metadata.appintents` (no `appintentsmetadataprocessor` in xtool's toolset; PR #217 closed unmerged) | device/TestFlight: is "Run Tabula probe" listed in Shortcuts? (expect no on xtool, yes on TestFlight) |
 
-| `@State` | RESEARCH-ONLY | In the Xcode 27 SDK `@State` is a SwiftUI **macro** (OAM README; xtool PR #101: "State is a PW in the former [6.3], macro in the latter [6.4]"). `@StateObject`, `@Published`, `@Environment` are not macros | base variant uses `@StateObject`/`@Published`; `ImportProbes.swift` still uses `@State` (WARN) |
+| `@State` | VERIFIED (macro in the Xcode 27 SDK; compiles via OAM) | In the Xcode 27 SDK `@State` is a SwiftUI **macro** (OAM README; xtool PR #101). Compiles under xtool in the macro variant. `@StateObject`, `@Published`, `@Environment` are not macros | base variant uses `@StateObject`/`@Published`; `ImportProbes.swift` no longer uses `@State` (validate.sh: no WARN) |
 
 **Macro isolation (qa-reviewer item 3).** The default (BASE) build contains no Swift macros in env-ci files, so one unsupported macro cannot block every device check. All macro probes (`@Observable`, `@Entry`, `@State`, `@Generable`/`@Guide`) sit behind `#if TABULA_MACRO_PROBES` with non-macro fallbacks (ObservableObject/@Published, plain `EnvironmentKey`, Generable row "not built").
 - xtool path: `Package.swift` reads `Context.environment["TABULA_MACRO_PROBES"]`; `scripts/xtool-dev.sh --macro-probes` sets it and builds in a separate work dir (`…/work-macro`).
 - VERIFIED on Linux: `swift package dump-package` → TabulaApp settings `[]` without the variable, `[{"kind": {"define": {"_0": "TABULA_MACRO_PROBES"}}, "tool": "swift"}]` with `TABULA_MACRO_PROBES=1`, and `[]` again after unsetting (SwiftPM's manifest cache honours the environment; same scratch path).
 - XcodeGen/CI path: `SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) TABULA_MACRO_PROBES"` on TabulaApp (Xcode ships Apple's own macro plugins) — VERIFIED in the generated pbxproj.
-- `validate.sh` scans App/Widget/Watch/TimetableUI/TimetableCore sources for macro attributes outside the guard (FAIL). Negative test with an injected unguarded `@Observable` and an `@Entry` in the `#else` branch → `FAIL … ['40: @Observable', '45: @Entry var leak2 = 1']`. Known exception reported as WARN: `ImportProbes.swift` (5× `@State`, owner import-ml).
+- `validate.sh` scans App/Widget/Watch/TimetableUI/TimetableCore sources for macro attributes outside the guard (FAIL). Negative test with an injected unguarded `@Observable` and an `@Entry` in the `#else` branch → `FAIL … ['40: @Observable', '45: @Entry var leak2 = 1']`. The former `ImportProbes.swift` exception is gone (no WARN).
+- Compiled proof (2026-10-06): base-variant binary has 0 `ObservationTickProbe` / 0 `Phase0GenerableSlot` symbols, macro variant 64 / 118.
 
-Decision input for ARCHITECTURE: keep the **versioned Codable store** default; SwiftData is not viable on the local path.
+Decision input for ARCHITECTURE: keep the **versioned Codable store** default; SwiftData is not viable on the local path (now executed, not just predicted). `@Observable` **is** viable on both paths (compile-verified; runtime check pending), so Phase 2 may use it, subject to the CLAUDE.md rule-5 gate decision by the orchestrator/human.
 
 ## 5. Extensions & watchOS
 
 | Item | Status | Evidence | Next step / unblock |
 |---|---|---|---|
-| Widget extension (WidgetKit) | RESEARCH-ONLY | xtool `Appex.md`: Foundation extensions via `extensions:`; packer puts them in `PlugIns/<product>.appex`, links `-e _NSExtensionMain` | H2–H4, add widget, check checklist items 4 |
+| Widget extension (WidgetKit) | VERIFIED (build + package, both paths) / runtime BLOCKED | xtool: `PlugIns/TabulaWidgets.appex` after the `-u _main` fix (§2); CI: `TabulaWidgets.appex in Embed Foundation Extensions` built. Whether the widget actually renders (gallery, timeline, App Group read-back) is a device check; the simulator job cannot add widgets to the Home Screen | device (later) |
 | ExtensionKit extensions | RESEARCH-ONLY → not supported | issue #138 open (`Extensions/` folder not supported) | avoid ExtensionKit-only extension points locally |
 | Live Activity (`AlarmLiveActivity`) | RESEARCH-ONLY | lives in the same WidgetKit extension (registered in `TabulaWidgetBundle`) | notifications agent's checklist |
-| watchOS app under xtool | RESEARCH-ONLY (expected fail, source) | SDK definition has only `arm64-apple-ios`, `*-apple-ios-simulator`, `*-apple-macosx` triples; `Packer` writes `CFBundleSupportedPlatforms = [iPhoneOS]` and only `iphoneos/iphonesimulator` product dirs | watch = CI-only (XcodeGen) |
-| Watch architecture | RESEARCH-ONLY | Apple Watch Series 7 = S7 = arm64_32. swift-build (main `b0458a1`) `Sources/SWBApplePlatform/Specs/watchOSDevice.xcspec`: `ARCHS_STANDARD = ( arm64, arm64_32 )`; arm64_32 has `DeploymentTargetRange = ( "0", "27" )` (inclusive per `VersionRange.contains`), so it is built for `WATCHOS_DEPLOYMENT_TARGET` 26.0. `project.yml` sets no `ARCHS` (validate.sh checks the pbxproj) | CI: `xcodebuild … ONLY_ACTIVE_ARCH=NO`, then `lipo -archs …/TabulaWatch` must contain arm64_32. Never raise the watch deployment target past 26.x while Series 7 is supported |
-| watchOS via CI | BLOCKED | `project.yml` target `TabulaWatch` (watchOS 26.0) embedded in the iOS app; CI job verifies `TabulaApp.app/Watch/TabulaWatch.app` | first CI run |
-| watchOS on-device install | BLOCKED | without a Mac, the only route is TestFlight (paid account) → iPhone → Watch app | iteration cost below |
-| Experiment: local watchOS type-check | BLOCKED (idea) | the full SDK bundles `WatchOS.platform`; try `swift build --build-system swiftbuild --triple arm64_32-apple-watchos26.0 --toolset "$SDK/toolset-swb.json" --package-path Packages/TimetableUI` with `XCODE_EXTRA_PLATFORM_FOLDERS="$SDK/Developer/Platforms"` | try after H3; would catch watchOS compile errors in shared packages without CI |
+| watchOS app under xtool | FAILED by design (source) | SDK definition has only `arm64-apple-ios`, `*-apple-ios-simulator`, `*-apple-macosx` triples; `Packer` writes `CFBundleSupportedPlatforms = [iPhoneOS]` and only `iphoneos/iphonesimulator` product dirs | watch build = CI (XcodeGen) |
+| Watch architecture | VERIFIED (CI) | CI run 37449454629: `watch archs: arm64 arm64_32` (Series 7 = S7 = arm64_32; swift-build `watchOSDevice.xcspec` arm64_32 `DeploymentTargetRange ("0", "27")`). `project.yml` sets no `ARCHS` | never raise the watch deployment target past 26.x while Series 7 is supported |
+| watchOS via CI | VERIFIED | `TabulaWatch` compiled + linked + embedded at `TabulaApp.app/Watch/TabulaWatch.app/TabulaWatch` | — |
+| watchOS on-device install | BLOCKED | without a Mac, the only route is TestFlight (paid account, deferred) → iPhone → Watch app | iteration cost below |
+| **Local watchOS type-check** | **VERIFIED** | `bash scripts/watch-typecheck.sh`: `swiftc -target arm64_32-apple-watchos26.0 -sdk …/WatchOS27.0.sdk -resource-dir …/XcodeDefault.xctoolchain/usr/lib/swift` emits TimetableCore + TimetableUI modules and type-checks `WatchApp/Sources` → `watchOS type-check OK (arm64_32-apple-watchos26.0)` in **8.4 s**. Negative control (iOS-only `.textSelection(.enabled)` in a throwaway copy) → `error: 'textSelection' is unavailable in watchOS`, exit 1. Runs in `validate.sh` when the SDK is present (SKIP in the CI Linux job) | — |
+| watchOS simulator screenshot | UNRUN (optional CI input) | `ui-screenshots.yml` input `watch: true` boots the largest Apple Watch simulator, installs `TabulaApp.app/Watch/TabulaWatch.app`, screenshots it (`continue-on-error`) | run manually when watch UI exists |
 
-Iteration-speed cost of the CI-only watch route (estimate, not measured): CI build ~10–20 min + TestFlight processing ~5–30 min + install ≈ **30–60 min per watch change**, vs. a local xtool loop for iOS (unmeasured, expected a few minutes). Mitigation: keep watch UI thin, logic in TimetableCore (Linux-tested), CI watchOS build on every push.
+Iteration-speed cost of the watch route (2026-10-06): watchOS **compile errors** now surface locally in ~8 s (type-check), so the expensive loop is only for **runtime/UI**: CI build ~1–2 min (measured: whole XcodeGen job 1 m 07 s) + optional CI watch-simulator screenshot (~3 min extra, estimate) ≈ **5–10 min**; on the real Watch only via TestFlight (paid account): + processing 5–30 min + install ≈ **30–60 min per change** (estimate). Mitigation unchanged: thin watch UI, logic in TimetableCore (Linux-tested).
 
 ## 6. String Catalogs (`.xcstrings`)
 
 | Item | Status | Evidence | Next step / unblock |
 |---|---|---|---|
+| Xcode path (XcodeGen, CI) | VERIFIED (CI) | [run 37449454629](https://github.com/simon01920/tabula-app-ios/actions/runs/37449454629): Xcode compiled `Resources/Localizable.xcstrings` into `TabulaApp.app/{en,sk}.lproj/Localizable.strings` + `.stringsdict` and `TabulaWidgets.appex/{en,sk}.lproj/Localizable.strings` (all `ok`) | runtime lookup: CI simulator `debug-localization` screenshot |
 | SwiftPM native, Linux host | FAILED | probe package: `[1/7] Copying Localizable.xcstrings`; bundle contains raw `Localizable.xcstrings`; lookup → `<MISSING>` | — |
 | SwiftBuild, Linux host | FAILED | `warning: no rule to process file '…/Localizable.xcstrings' of type 'text.json.xcstrings' for architecture 'x86_64'`; copied raw; lookup → `<MISSING>` | — |
-| SwiftBuild, iOS cross-build via xtool | BLOCKED | swift-build `Specs/XCStrings.xcspec`: `CommandLine = "xcstringstool compile [options] …"` — macOS tool, absent from xtool's toolset → expect build error or raw copy | `bash scripts/probe-build.sh XCStringsSwiftPM` after H3 |
+| SwiftBuild, iOS cross-build via xtool | **FAILED (executed)** | `bash scripts/probe-build.sh XCStringsSwiftPM` → exit 1: `error: …/Resources/Localizable.xcstrings Could not read xcstrings file: The command \`(cd … && env -i … …/xtool/.xtool-tmp/xcstringstool compile --dry-run --output-directory … Localizable.xcstrings)\` … xcstringstool is not an executable file.` → a `.xcstrings` SwiftPM resource **breaks the whole build** (not a raw copy). Log `/root/phase0_probe_XCStringsSwiftPM.log` | `validate.sh` fails if any Package.swift target declares a `.xcstrings` resource |
+| `.lproj` tables in the xtool bundle | VERIFIED | `l10n-compile.py` output copied by xtool.yml: app and widget each have `en.lproj` + `sk.lproj` `Localizable.strings` (730/763 B) and `.stringsdict` (590/690 B) | runtime lookup = device/simulator check |
 | Mitigation `scripts/l10n-compile.py` | VERIFIED (Linux) | converts catalog → `en.lproj`/`sk.lproj` `Localizable.strings` (+ `.stringsdict` for plurals); Linux Foundation reads them: `en hello: Hello from the String Catalog`, `sk hello: Ahoj zo String Catalogu` | wired into `xtool-dev.sh` + `xtool.yml resources` |
 | Plural `.stringsdict` at runtime | BLOCKED | structure matches Apple's documented format (`NSStringLocalizedFormatKey = %#@arg@`, `NSStringPluralRuleType`, `NSStringFormatValueTypeKey = lld`); swift-corelibs Foundation **crashes** on stringsdict lookup on Linux (Signal 11 in `Bundle.localizedString` → `NSString.getCharacters`) so it cannot be checked here | device checklist item 5 (sk: "1 hodina · 3 hodiny · 5 hodín") |
 | Limits of the converter | VERIFIED | rejects `substitutions` and `device` variations (non-zero exit); `%%` is not treated as a format specifier; empty or `state: new` units are skipped and fall back to the source language (as do missing translations). `python3 scripts/l10n-compile.py --self-test` → 6/6 OK | revisit in Phase 2 if needed |
@@ -170,19 +191,38 @@ TestFlight readiness (static, VERIFIED by validate.sh):
 
 | Item | Status | Evidence | Next step / unblock |
 |---|---|---|---|
-| Workflow file | VERIFIED (syntax) | PyYAML parse: jobs `core-linux, ios-xcodegen, ios-xtool-path, release-testflight` | push to GitHub (H6) |
-| (a) Linux job | BLOCKED | `container: swift:6.4.0-noble` (tag exists on Docker Hub), `swift test --package-path Packages/TimetableCore` (same command as WSL), then installs python3/PyYAML/rsync and runs `bash scripts/validate.sh` (XcodeGen step skipped there) | first run |
-| (b) XcodeGen + unsigned xcodebuild | BLOCKED | `xcodegen generate` + `xcodebuild build -scheme TabulaApp -destination 'generic/platform=iOS' ONLY_ACTIVE_ARCH=NO CODE_SIGNING_ALLOWED=NO` (macro variant); hard-fails unless the appex, the watch binary, `en`/`sk` `.lproj/Localizable.strings(+dict)` in app and widget, both `PrivacyInfo.xcprivacy` exist, `ITSAppUsesNonExemptEncryption` is false and `lipo -archs` of the watch binary contains `arm64_32` | first run |
-| (c) xtool path on macOS | BLOCKED | pinned `xtool.app.zip` 1.20.1 (SHA-256 checked) → `xtool dev build` (unsigned, no login, base variant) → hard-fails unless the appex, `en`/`sk` lproj tables (app + widget) and both privacy manifests exist | first run. Fallback if xtool-on-CI is flaky: `swift build --swift-sdk arm64-apple-ios --package-path .` (compiles the same targets, no packaging) |
+| Workflow files | VERIFIED (syntax + structure) | `ios.yml` jobs `core-linux, ios-xcodegen, ios-xtool-path, release-testflight`; `ui-screenshots.yml` job `ios-simulator-screenshots` (§19). Every `run:` block passes `bash -n`; validate.sh checks triggers, cost guards, SHA pinning, secret scoping | — |
+| Repo + first run | VERIFIED | repo `simon01920/tabula-app-ios` (private), pushed 2026-10-06 by the orchestrator (gh CLI over HTTPS, `docs/GITHUB_SETUP.md`); first run **37449454629** (workflow_dispatch, `upload=false`) | — |
+| (a) Linux job | VERIFIED | run 37449454629: success in 1 m 15 s (`swift:6.4.0-noble`; TimetableCore tests + validate.sh). From now on validate.sh also runs the TimetableUI tests there | — |
+| (b) XcodeGen + unsigned xcodebuild | VERIFIED | run 37449454629: success in 1 m 07 s; details §3. New since: `-showBuildSettings` assertion of identity + paid switch (both states, team override), `CFBundleIdentifier` = xcconfig | next run proves the new step |
+| (c) xtool path on macOS | **FAILED (executed) → root cause fixed, re-run pending** | run 37449454629: steps up to "Compile String Catalog" succeeded in 6 s; the next step's first command `xtool --version` never printed; cancelled at 40 min (all billed). Cause: GUI binary instead of the CLI wrapper (§2). Fix: `Contents/Resources/bin` on PATH; 60 s smoke test `xtool --version` (step cap 2 min); `xtool dev build` under an outer `perl -e 'alarm shift; exec @ARGV' 540` timeout (macOS has no GNU `timeout`; verified on WSL: exit 142 when it fires), stdin `</dev/null`, step cap 10 min; job cap **15 min**; appex `__text`/`__swift5_entry` check. If the smoke test fails, a diagnostic `xcodebuild build -scheme Tabula-Package -destination 'generic/platform=iOS'` (scheme name RESEARCH-ONLY: Xcode's `<package>-Package` convention; `xcodebuild -list` is printed first) compiles the SwiftPM targets for evidence and the job still **fails** (both paths must stay green). Note: that run also used the pre-fix sources, which fail on xtool regardless (PhotosPickerItem, empty appex) | next CI run |
+| macOS job caps | VERIFIED (static) | `timeout-minutes: 15` on `ios-xcodegen`, `ios-xtool-path`, `ios-simulator-screenshots`; `release-testflight` 30 (archive + export + upload; killing an upload midway is worse); validate.sh enforces the caps | — |
+| XcodeGen embedded-binary validation | VERIFIED (CI) | run 37449454629 log: `Validate Embedded Binary TabulaWatch.app`, `Validate Embedded Binary TabulaWidgets.appex`, `Validate TabulaApp.app` | — |
+| Action versions | VERIFIED | run 37449454629 warned `Node.js 20 is deprecated … actions/checkout@v4, actions/upload-artifact@v4`. Now `actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1` and `actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a` (both v7.0.1, `using: node24`, resolved via the GitHub API); validate.sh fails on any unpinned `uses:` | bump deliberately |
 | (d) TestFlight release | BLOCKED | `workflow_dispatch`; `concurrency.cancel-in-progress` is false for manual runs, so a push cannot cancel an upload; secrets are mapped only into the steps that use them (the config check sees booleans only); skips with a notice if `ASC_KEY_ID / ASC_ISSUER_ID / ASC_KEY_P8_BASE64 / vars.APPLE_TEAM_ID` are missing; archive with `-allowProvisioningUpdates -authenticationKeyPath/ID/IssuerID`, export (`method app-store-connect`, `destination export`), upload `xcrun altool --upload-app … --apiKey --apiIssuer` | H1, H7, H8 |
-| Runner with Xcode 27 | RESEARCH-ONLY | actions/runner-images README: label **`xcode-27`** (preview, issue #14404); image `macOS 27.0 (26A428)`, version `20260928.0222.1`; Xcode `27.0 (default) 27A266a` at `/Applications/Xcode_27.app`, 27.1, 27.2 beta; watchOS 27.0 SDK installed; Xcbeautify 3.2.1. `macos-26` defaults to Xcode 26.6 | switch to the GA label when announced |
+| Runner with Xcode 27 | VERIFIED | run 37449454629 log: `Image: xcode-27-arm64`, image version `20260928.0222.1`, `Xcode 27.0` / `Build version 27A266a`, SDKs `iOS 27.0 -sdk iphoneos27.0`, `watchOS 27.0 -sdk watchos27.0`, xcbeautify 3.2.1. Same Xcode build as the local SDK | switch to the GA label when announced |
 | Upload method | RESEARCH-ONLY | Apple "Upload builds" (developer.apple.com/help/app-store-connect/manage-builds/upload-builds): Xcode, `xcrun altool --upload-app`, Transporter, App Store Connect API; iOS apps must be built with Xcode 26+. Chose export + altool because forum reports show `destination=upload` failing with API keys in some setups (developer.apple.com/forums/thread/742458) | — |
 | API key role | RESEARCH-ONLY | cloud-managed distribution signing via `xcodebuild` needs an **Admin** key (developer.apple.com/forums/thread/698117); xtool docs ask for a Team Key with **App Manager** role | H7: two keys recommended (least privilege) |
 | Cost | RESEARCH-ONLY | docs.github.com billing: standard runners **free for public repos**; private repos: GitHub Free 2,000 min/month, Pro 3,000; rates macOS `$0.062/min` vs Linux `$0.006/min` (~10×). Current docs bill in dollars and no longer state a minute multiplier — check the billing dashboard | decision D2 |
 
-Supply-chain note: XcodeGen and xtool downloads are pinned by SHA-256; GitHub actions are pinned by tag (`@v4`) — pin them to commit SHAs as a later hardening step.
+Supply-chain note: XcodeGen and xtool downloads are pinned by SHA-256; GitHub actions are pinned to commit SHAs (2026-10-06).
 
-Estimate (not measured): two macOS jobs ≈ 20–40 min per push ≈ $1.2–$2.5 per push on a private repo once the free allowance is used. Mitigations in the workflow: `paths-ignore` for docs, `concurrency` cancel-in-progress, release job manual only.
+**Trigger matrix** (orchestrator cost decision 2026-10-06; private repo, macOS ≈ 10× Linux; enforced by validate.sh):
+
+| Event / change | `core-linux` | `changes` (Linux) | `ios-xcodegen` + `ios-xtool-path` (macOS) | `release-testflight` (macOS) | `ios-simulator-screenshots` (macOS) |
+|---|---|---|---|---|---|
+| docs-only (`docs/**`, `**/*.md`, `examples/**`) | — (no workflow) | — | — | — | — |
+| push/PR to main: TimetableCore **tests**, TimetableUI tests, `Probes/`, `spikes/`, other `scripts/` | ✓ | ✓ → app=false | — | — | — |
+| push/PR to main: `Packages/TimetableCore/Sources/**` or `Package.swift`, `WatchApp/**`, `Config/**` (except App-Info.plist), `Package.swift`, `project.yml`, `xtool.yml`, `scripts/l10n-compile.py`, `scripts/identity.py`, `ios.yml` | ✓ | ✓ → app=true | ✓ | — | — |
+| push to main: `App/**`, `WidgetExtension/**`, `Packages/TimetableUI/Sources/**`, `Resources/**`, `Config/App-Info.plist` | ✓ | ✓ → app=true | ✓ | — | ✓ |
+| PR to main with the same app/UI changes | ✓ | ✓ → app=true | ✓ | — | — (never on PRs) |
+| PR to another branch | — | — | — | — | — |
+| manual "iOS CI" (`upload` default **false**) | ✓ | app=true | ✓ | only if `upload: true` (job-level `if`, no runner otherwise) | — |
+| manual "UI screenshots" | — | — | — | — | ✓ |
+
+App-relevant list = `scripts/ci_paths.py` (`--self-test`, 31 cases). Two documented deviations from the orchestrator's list, both only *reduce* or protect minutes: `Packages/TimetableUI/**` → `Sources/**` + `Package.swift` (TimetableUI tests are Linux-only, per "tests-only → no macOS job"); `scripts/identity.py` added (the macOS `ios-xcodegen` job executes it). No base commit (new branch, force push with a missing `before`) → app=true (safe default).
+
+**Expected macOS minutes** (GitHub bills each job rounded **up** to whole minutes): app/UI push to main ≈ `ios-xcodegen` 2 (measured 1 m 07 s) + `ios-xtool-path` ~2–3 (estimate) + screenshots ~5–8 (estimate) ≈ **9–13 billed macOS min** (≈ $0.55–0.80 at $0.062/min beyond the allowance); core-sources/config push ≈ **4–5**; same change as PR + merge ≈ 4–5 + 9–13; tests/scripts-only push = **0** macOS (≈ 2–3 Linux min); worst case of a hung job = 15 (TestFlight 30). Measured so far: Linux 1 m 15 s, XcodeGen 1 m 07 s; the first xtool job burned 40 min (GUI binary, fixed). Private-repo notes: `docs/GITHUB_SETUP.md`.
 
 ## 9. Device connection (WSL ↔ iPhone)
 
@@ -208,7 +248,14 @@ Estimate (not measured): two macOS jobs ≈ 20–40 min per push ≈ $1.2–$2.5
 7. "watchOS can be built locally with xtool" — false (no watchOS triples/packaging).
 8. "App Store Connect key with App Manager role is enough for CI distribution signing" — likely false (Admin needed for cloud signing per Apple forums).
 9. "`@State` is a property wrapper" — false in the Xcode 27 SDK: it is a SwiftUI macro (OAM README). The base variant now avoids it in env-ci files.
-10. Known gap, not a failure: in Phase 0 the debug screen *is* the app, so it ships in Release archives/TestFlight builds. **Phase 2 task:** gate `DebugScreen` behind `#if DEBUG` or a hidden toggle.
+10. Known gap, not a failure: in Phase 0 the debug screen *is* the app, so it ships in Release archives/TestFlight builds. **Phase 2 task:** gate `DebugScreen` behind `#if DEBUG` or a hidden toggle, **together with the launch-argument router** (`App/Sources/Routing/AppScreen.swift`, `-TabulaScreen`) and its "Launch route" row, which also run in Release builds today (qa-reviewer 2026-10-06). The CI screenshot job builds Debug, so gating does not affect it.
+11. "Sourcing swiftly's env.sh once is enough": false in non-login shells (`wsl.exe -- bash -c`); `xtool sdk install` failed with `Could not find executable 'clang' in PATH`. Fixed: `scripts/lib/toolchain.sh` in every script (2026-10-06).
+12. "xtool compiles what Xcode compiles": false for cross-import overlays (`PhotosPickerItem` not found): xtool's SwiftBuild toolset omits `-enable-cross-import-overlays`. Fixed in Package.swift.
+13. "xtool packs a working widget appex": false with SwiftBuild + ld64.lld: the appex had no code, and zsign then failed with `Can't find free space of LoadCommands for CodeSignature!` (misleading message). Fixed with `-u _main`; guarded in xtool-dev.sh and CI.
+14. "The Xcode 27 xip/SDK has no watchOS SDK" (orchestrator note 2026-10-06): false. `WatchOS27.0.sdk` is inside the bundle's `Xcode.app`; only xtool's swift-sdk triples omit it. That enabled the local watchOS type-check.
+15. "A `.xcstrings` SwiftPM resource is copied raw by xtool": false for the iOS cross-build, which is a **hard build error**.
+16. "Our shared Info.plist is warning-free in Xcode": false, `UIDeviceFamily` triggered an Xcode warning (removed).
+17. "`xtool.app/Contents/MacOS/xtool` is the CLI" (Phase 0 workflow): false. It is the GUI app unless `XTL_CLI=1`; the CLI is `Contents/Resources/bin/xtool`. Cost: one CI run cancelled after 40 billed macOS minutes. Fixed, with 15-min caps on every macOS job.
 
 ## 12. API checks (Apple docs JSON, fetched 2026-10-04)
 
@@ -221,12 +268,20 @@ Not found as doc pages (404): `com.apple.developer.usernotifications.time-sensit
 
 Separate SwiftPM packages with their own `xtool.yml`, not referenced by `Package.swift`, `project.yml` or CI, so an expected failure cannot break the app. Delete after the Phase 0 gate.
 
-| Probe | Question | Command (WSL, after H3) | Expected |
+| Probe | Question | Command (WSL) | Result 2026-10-06 |
 |---|---|---|---|
-| `MacroProbeSwiftData` | Do SwiftData `@Model`/`@Query` expand under xtool? | `bash scripts/probe-build.sh MacroProbeSwiftData` | FAIL (`SwiftDataMacros` missing, #149) |
-| `XCStringsSwiftPM` | Does SwiftBuild compile a catalog that is a SwiftPM resource, for iOS, on Linux? | `bash scripts/probe-build.sh XCStringsSwiftPM` | unknown: build error (no `xcstringstool`) or raw copy |
+| `MacroProbeSwiftData` | Do SwiftData `@Model`/`@Query` expand under xtool? | `bash scripts/probe-build.sh MacroProbeSwiftData` | **FAILED (exit 1)** as predicted: `external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; plugin for module 'SwiftDataMacros' not found`, `unknown attribute 'Query'` |
+| `XCStringsSwiftPM` | Does SwiftBuild compile a catalog that is a SwiftPM resource, for iOS, on Linux? | `bash scripts/probe-build.sh XCStringsSwiftPM` | **FAILED (exit 1)**: build error, not a raw copy: `…/xtool/.xtool-tmp/xcstringstool … is not an executable file` |
+
+Both questions are answered, so the probes can be deleted at the Phase 0 gate (orchestrator decision).
 
 ## 14. Human steps (numbered; nothing secret ever goes into chat)
+
+Status 2026-10-06: **H2 done** (Xcode 27.0 27A266a xip supplied) · **H3 SDK part done** (`xtool sdk install`;
+`xtool auth` login not done, not needed for builds) · **H6 done** (repo + gh CLI auth, `docs/GITHUB_SETUP.md`) ·
+**H4/H5 deferred** (no device access; UI checks via CI simulator, §19) · **H1, H7, H8, H9 deferred** (paid account;
+exact order and what each unblocks: `docs/PAID_ACCOUNT_SWITCHOVER.md`; H8 now also includes the GitHub
+variable `TABULA_PAID_ACCOUNT`).
 
 - **H1 — Apple Developer Program.** Decide individual vs organisation (organisation needs a D-U-N-S number; the seller name shown on the App Store differs) and enrol at https://developer.apple.com/programs/enroll/ (annual fee). Blocks: App Groups via xtool, CloudKit, Time Sensitive, TestFlight, IAP, increased memory limit.
 - **H2 — Xcode 27 .xip.** In a browser: https://developer.apple.com/download/all/?q=Xcode → download **Xcode 27.0 (build 27A266a)** `.xip` — the exact version OpenAppleMacros tracks; a later 27.x may expand macros differently (Apple ID; accepting the Xcode and Apple SDKs Agreement — read §10 first). Then in WSL copy it to ext4: `cp /mnt/c/Users/simon/Downloads/Xcode_27*.xip ~/`
@@ -238,22 +293,35 @@ Separate SwiftPM packages with their own `xtool.yml`, not referenced by `Package
 - **H8 — GitHub secrets/variables** (repo → Settings → Secrets and variables → Actions): secrets `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8_BASE64`; variable `APPLE_TEAM_ID`. To produce the base64 locally without printing it: PowerShell `[Convert]::ToBase64String([IO.File]::ReadAllBytes("$HOME\Downloads\AuthKey_XXXXXXXXXX.p8")) | Set-Clipboard`, paste into the secret field, then clear the clipboard. Never paste keys into chat or commit them (`.gitignore` blocks `*.p8`).
 - **H9 — App Store Connect app record.** My Apps → + → New App: platform iOS, bundle ID `sk.simondev.tabula` (register the explicit App IDs `sk.simondev.tabula`, `.TabulaWidgets`, `.watchkitapp` and App Group `group.sk.simondev.tabula` in Certificates, Identifiers & Profiles if automatic signing does not create them). Then run the workflow manually (Actions → iOS CI → Run workflow).
 
-## 15. On-device checklist (Phase 0, after H5) — record results here
+## 15. Phase 0 checklist: what is covered where (local compile / CI simulator / real device later)
 
-Two steps (macro isolation): **Step A** = base variant, `bash scripts/xtool-dev.sh` (items 1–5, 8, 10–12; "Macro probes" row = OFF, macro rows say "not built"). **Step B** = macro variant, `bash scripts/xtool-dev.sh --macro-probes` (items 6, 7, 9; "Macro probes" row = ON). If step B fails to build, record the compiler error: that is the macro verdict, and the step A results still stand. Caveat: `ImportProbes.swift` uses `@State` (a macro), so step A is only truly macro-free once import-ml removes it.
+Two build variants (macro isolation): **Step A** = base, `bash scripts/xtool-dev.sh [build]`; **Step B** = macro
+variant, `bash scripts/xtool-dev.sh --macro-probes [build]`. Both **compile** (2026-10-06, 0 errors/0 warnings).
+No device is available for now (human decision), so the columns say what each layer can prove:
+**Local** = xtool compile/package on WSL (+ bundle inspection) · **CI sim** = `ui-screenshots.yml` on the iOS
+Simulator (XcodeGen build = Apple's own macro plugins; screenshot per `-TabulaScreen` id, light/dark/AX-XXXL; launch
+smoke test) · **Device** = later, after a device is available (xtool install) or via TestFlight (paid account).
 
-1. App launches; title "Tabula · Phase 0 probes". **Build path** row says `xtool / SwiftPM`.
-2. **Bundle ID** row: record the exact `XTL-…` value.
-3. **App Group**: tap "Run App Group round-trip" → free team: expect Container URL FAIL (nil); paid team: all three PASS.
-4. Add the **"Tabula probe"** widget (small). It shows "App Group: OK/MISSING", the app's value and a ticking countdown. After step 3 + "Refresh read-backs", the **Widget read-back** row shows `<value> @ <time>`. Widget gallery name is "Tabula probe" (a raw `probe.widget.name` = extension strings not compiled).
-5. (A5) **Localization**: en.lproj and sk.lproj PASS; sk line reads "Ahoj zo String Catalogu | 1 hodina · 3 hodiny · 5 hodín". Switch the phone to Slovak → "Current language" row turns Slovak.
-6. (Step B) **@Observable**: "Tick" increments the counter.
-7. (Step B) **@Entry**: shows `injected-by-DebugScreen` (PASS). (Step A shows the same value via a plain EnvironmentKey, status INFO.)
-8. **AppIntent**: "Run AppIntent in-process" → PASS + timestamp. Shortcuts app → search "Tabula": is "Run Tabula probe" listed? Run it from there, then "Refresh read-backs" → timestamp changes.
-9. (Step B) **@Generable**: schema text visible (Step A: "not built").
-10. App icon on the Home Screen is the blue grid.
-11. `bash scripts/probe-build.sh MacroProbeSwiftData` and `… XCStringsSwiftPM`: record exit status + key error lines.
-12. Import and AlarmKit sections: see the import-ml and notifications checklists.
+| # | Check | Local (done) | CI sim (`-TabulaScreen …`) | Device (later) |
+|---|---|---|---|---|
+| 1 | App launches; title "Tabula · Phase 0 probes"; **Build path** row | compiles + packages (both variants) | launch smoke test + title + row shows `XcodeGen / xcodebuild` (`debug`) | row shows `xtool / SwiftPM` |
+| 2 | **Bundle ID** row (`XTL-…` on xtool installs) | `CFBundleIdentifier sk.simondev.tabula` in bundle (rewritten only when xtool signs) | shows `sk.simondev.tabula` (`debug`) | record exact `XTL-…` |
+| 3 | **App Group** round-trip (button) | entitlement embedded (ad-hoc) | not covered (needs a tap; unsigned sim build) | free team: Container URL FAIL expected; paid: 3× PASS |
+| 4 | **Widget** in gallery + read-back | appex packaged with code (`__text`, `__swift5_entry`) | not covered (simctl cannot add widgets) | gallery name "Tabula probe", countdown, read-back row |
+| 5 | **Localization** en/sk incl. Slovak plurals | `en.lproj`/`sk.lproj` `.strings` + `.stringsdict` present in app + widget | rows PASS/FAIL + sk line "1 hodina · 3 hodiny · 5 hodín" (`debug-localization`) | same on the xtool build (own catalog compiler) + switch phone to Slovak |
+| 6 | **@Observable** tick | macro variant compiles (64 symbols) | row visible; tick needs a tap (`debug-macros`) | tap "Tick" (Step B) |
+| 7 | **@Entry** value | compiles (OAM `SwiftUIMacros`) | `injected-by-DebugScreen` PASS (`debug-macros`) | Step B on the xtool build (OAM expansion at runtime) |
+| 8 | **AppIntent** in-process + Shortcuts listing | compiles; xtool bundle has no `Metadata.appintents` | row visible; needs a tap (`debug-macros`) | tap + Shortcuts search (expect listed only on TestFlight) |
+| 9 | **@Generable** schema text | compiles (118 symbols, schema calls) | schema text visible (`debug-macros`) | Step B on the xtool build |
+| 10 | App icon | `AppIcon.png` + `CFBundleIconFile` (xtool); asset catalog (Xcode) | not visible in app screenshots | Home Screen |
+| 11 | SwiftData / xcstrings probes | **done**: both FAILED as recorded in §13 | — | — |
+| 12 | Import + AlarmKit sections | compile | static rows: OCR language flags, Foundation Models availability, AlarmKit authorization state (`debug-import`, `debug-alarms`) | photo OCR, alarms ringing, Silent/Focus matrix (`docs/spikes/*`) |
+| 13 | Dark mode / Dynamic Type layout | — | light, dark and `accessibility-extra-extra-extra-large` screenshots of every id | VoiceOver pass |
+| 14 | watch app | `scripts/watch-typecheck.sh` OK | optional `watch: true` input → watch simulator screenshot | Series 7 via TestFlight only |
+
+Caveat: the CI simulator runs the **XcodeGen** build (Apple's macro plugins, Xcode-compiled catalog). The xtool-specific
+runtime questions (OpenAppleMacros expansion at runtime, own `.lproj` tables, `XTL-` identifiers) stay device items,
+or could use the locally built simulator `.app` (`--simulator`) on a hosted simulator (§19).
 
 ## 16. Proposed `Commands` section for CLAUDE.md (orchestrator to merge; not edited by me)
 
@@ -263,11 +331,15 @@ Two steps (macro isolation): **Step A** = base variant, `bash scripts/xtool-dev.
 - Core tests: `bash scripts/core-test.sh`  (= swift test --package-path Packages/TimetableCore, ext4 scratch path)
 - Local build: `bash scripts/xtool-dev.sh build`   · build+install+launch on iPhone: `bash scripts/xtool-dev.sh`
 - Macro-probe variant (CLAUDE.md rule 5): `bash scripts/xtool-dev.sh --macro-probes [build]`
+- iOS Simulator .app (local, no simulator to run it): `bash scripts/xtool-dev.sh --simulator`
+- watchOS type-check (local, ~8 s): `bash scripts/watch-typecheck.sh`
+- Identity values / paid switch: `python3 scripts/identity.py [--set TABULA_PAID_ACCOUNT=1] [NAME]`
 - String Catalog compiler self-test: `python3 scripts/l10n-compile.py --self-test`
 - Isolated probes: `bash scripts/probe-build.sh <MacroProbeSwiftData|XCStringsSwiftPM>`
-- Regenerate Xcode project (CI does this): `TABULA_DEVELOPMENT_TEAM= xcodegen generate --spec project.yml`
-- From Windows Git Bash: `MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu -- bash -lc 'cd "/mnt/c/Users/simon/Documents/Claude Code/school_timetable" && bash scripts/validate.sh'`
-- CI: `.github/workflows/ios.yml` (TestFlight: Actions → iOS CI → Run workflow)
+- Regenerate Xcode project (CI does this): `xcodegen generate --spec project.yml` (no env needed any more)
+- From Windows Git Bash: `MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu --exec bash -c 'cd "/mnt/c/Users/simon/Documents/Claude Code/school_timetable" && bash scripts/validate.sh'`
+- CI: `.github/workflows/ios.yml` (TestFlight: Actions → iOS CI → Run workflow) · UI screenshots: `.github/workflows/ui-screenshots.yml`
+- Open a screen directly: launch argument `-TabulaScreen <id>` (ids in `App/Sources/Routing/AppScreen.swift`)
 ```
 
 ## 17. Local LLM runtime (import-ml)
@@ -305,3 +377,38 @@ Full report + 60-row device matrix: [`docs/spikes/ALARMKIT.md`](spikes/ALARMKIT.
 | 64 pending cap | RESEARCH-ONLY | documented only on the deprecated `UILocalNotification` page (soonest 64 kept, rest silently dropped) | probe "64-cap" button on device |
 
 Spec conflicts raised (decisions in the Phase 0 gate report): Time Sensitive for offsets > 60 min; auto-scheduled "exam tomorrow" alarms vs App Review; snooze depends on the countdown Live Activity; alarm buttons need App Intents (unproven under xtool); adapter should diff alarms by stable ID.
+
+## 19. Simulator build & UI screenshots (replacement for device UI checks)
+
+No physical device for now (human decision 2026-10-06). The Windows tools the human installed (VS 2022, Windows SDK,
+Swift for Windows, Android Studio) cannot run iOS apps: the iOS Simulator exists only on macOS. So UI is checked
+on GitHub's macOS runners.
+
+| Item | Status | Evidence | Next step |
+|---|---|---|---|
+| Local simulator build (xtool) | VERIFIED (build) | `bash scripts/xtool-dev.sh --simulator` (= `xtool dev build --triple arm64-apple-ios-simulator` in `~/.cache/tabula/work-sim`) → `Build complete! (14.27 secs)` clean, 0 errors/0 warnings; app + appex are Mach-O **platform 7 (iOS Simulator)**, arm64, ad-hoc signed with the App Group entitlement. Caveat: xtool's packer still writes `CFBundleSupportedPlatforms = [iPhoneOS]`, and nothing here can run it | only useful for a hosted simulator or a Mac |
+| Hosted simulator (Appetize) | RESEARCH-ONLY (no account) | docs.appetize.io (fetched 2026-10-06): iOS uploads must be a `.zip`/`.tar.gz` of a **simulator `.app`** (`.ipa` not supported), ARM simulator builds recommended; launch arguments via `launchArgs` (JSON array) reach `ProcessInfo.arguments`, so `-TabulaScreen` works; device table lists iPhone 17 Pro Max with iOS 26.0. Pricing/free tier not checked. Whether it accepts xtool's simulator build (`CFBundleSupportedPlatforms` mismatch) is unknown; the CI artifact `TabulaApp-iphonesimulator-<n>` (xcodebuild, zipped) is the safer upload | paid service = ask the human first (CLAUDE.md) |
+| CI job `ios-simulator-screenshots` (`.github/workflows/ui-screenshots.yml`) | UNRUN on macOS (written; `bash -n` + structure checked; picker logic tested on sample `simctl` JSON; the create and screenshot steps dry-run on WSL with a stub `xcrun`: live app → 6 PNGs + job summary, simulated crash → exit 1 + per-shot crash logs. The dry run caught and fixed a bug: sourcing `SIM_NAME=iPhone 17 Pro Max` as shell) | `xcode-27` runner: logs `xcrun simctl list devicetypes` + `runtimes`; creates a fresh simulator of the **largest "Pro Max"** on the newest available iOS runtime (override input `device`); `xcodebuild build -destination "platform=iOS Simulator,id=…" CODE_SIGNING_ALLOWED=NO`; boots, fixes the status bar (9:41, full battery), installs; for every id in `screens` (default `debug debug-localization debug-macros debug-import debug-alarms`): `simctl launch … -TabulaScreen <id>`, 8 s, **fails if the process is gone** (crash on launch), `simctl io … screenshot` in `appearance light`, `appearance dark` and `content_size accessibility-extra-extra-extra-large`; optional `watch` input screenshots the watch app on the largest Apple Watch simulator; uploads PNGs + `log show` + build log | first run after the orchestrator pushes |
+| Triggers / cost | VERIFIED (static, validate.sh enforces) | manual, or push to `main` touching only on-screen inputs: `App/**`, `WidgetExtension/**`, `Packages/TimetableUI/Sources/**` + `Package.swift`, `Resources/**`, `Config/App-Info.plist`, the workflow itself (not TimetableCore, not the rest of `Config/`, not TimetableUI tests); never on PRs; `cancel-in-progress`; `timeout-minutes: 15`; estimate 5–8 macOS minutes per run (billed rounded up per job). Full matrix: §8 | — |
+| Simulator picker | VERIFIED (self-test) / FAILED as first written | qa-reviewer: `xcrun simctl list -j runtimes devicetypes` treats `devicetypes` as a **search term** → `"runtimes": []`. Now `xcrun simctl list -j` (full) + `scripts/sim_pick.py`; `--self-test` on a realistic full sample (devicetypes/runtimes/devices/pairs; iOS 26.4 + 27.0 + unavailable 27.2 with `availabilityError`; watchOS 26.4 + 27.0; tvOS) → 8/8: iOS 27.0 + iPhone 17 Pro Max, unavailable runtime ignored, override honoured, unknown override fails, watchOS 27.0 + Series 11 (46mm), empty-runtimes (old bug) fails loudly, partial JSON rejected, fallback without `supportedDeviceTypes` respects `minRuntimeVersion`. Runs in validate.sh; validate.sh fails on any `simctl list -j <word>` in the workflow | — |
+| Launch-argument router | VERIFIED (Linux tests + iOS compile) | `TimetableUI.LaunchArguments` / `ScreenRoute` (9/9 swift-testing tests on Linux), `App/Sources/Routing/AppScreen.swift`; unknown ids fall back to `debug` and show `UNKNOWN "<id>"` as a FAIL row, so a typo is visible in the screenshot | runtime proof = first CI screenshot |
+
+**How the human views the screenshots:** github.com/simon01920/tabula-app-ios → **Actions** → "UI screenshots (iOS
+Simulator)" → open a run → **Summary** lists device/runtime and every PNG → section **Artifacts** →
+`ui-screenshots-<run number>` (zip: `screenshots/<id>-light|dark|ax-xxxl-text.png`, `logs/app.log`, build log;
+kept 14 days). CLI: `gh run download <run id> -n ui-screenshots-<n>`. Manual run: Actions → the workflow → **Run
+workflow** (choose `screens`, optional `device`, `watch`).
+
+**How Phase 2 screens register:** add a case to `AppScreen` (stable kebab-case id), map it in `AppRootView`, add
+the id to the workflow's `screens` default; data-driven screens render a deterministic fixture when opened this way.
+
+## 20. Paid-account placeholders (account deferred)
+
+Full runbook: [`docs/PAID_ACCOUNT_SWITCHOVER.md`](PAID_ACCOUNT_SWITCHOVER.md). Variables list: `.env.example`.
+
+| Item | Status | Evidence |
+|---|---|---|
+| Single source of identity | VERIFIED (static) | `Config/AppIdentity.xcconfig`: `TABULA_DEVELOPMENT_TEAM =` (empty placeholder), `TABULA_PAID_ACCOUNT = 0`, `TABULA_BUNDLE_ID_PREFIX = sk.simondev`, `TABULA_BUNDLE_ID = sk.simondev.tabula`, `TABULA_APP_GROUP = group.sk.simondev.tabula`, `TABULA_ICLOUD_CONTAINER = iCloud.sk.simondev.tabula`, `TABULA_SHARE_DOMAIN = tabula.simondev.sk`, entitlement selectors. Read by Xcode (project-level `configFiles`) and by `scripts/identity.py` (CI, validate). xtool.yml, `Config/*.entitlements`, `Watch-Info.plist` and `TimetableCore.AppGroup.canonicalIdentifier` keep literals, checked against it |
+| Paid-only entitlements, not wired | VERIFIED (static) | `Config/Entitlements/PaidAccount/Tabula.entitlements`: App Group, `icloud-container-identifiers [$(TABULA_ICLOUD_CONTAINER)]`, `icloud-services [CloudKit]`, `aps-environment development` (CKSyncEngine docs: "requires the CloudKit and Remote notifications entitlements"), `usernotifications.time-sensitive` (key RESEARCH-ONLY, no Apple doc page), `kernel.increased-memory-limit`, `associated-domains [applinks:$(TABULA_SHARE_DOMAIN)]`; key formats checked against Apple's docs JSON 2026-10-06. Widget file: App Group only |
+| One switch | VERIFIED (static) / Xcode resolution UNRUN | `TABULA_APP_ENTITLEMENTS = $(TABULA_APP_ENTITLEMENTS_$(TABULA_PAID_ACCOUNT))` (same for the widget); CI release job passes GitHub variables `APPLE_TEAM_ID` → `TABULA_DEVELOPMENT_TEAM` and `TABULA_PAID_ACCOUNT` (default 0) to `xcodebuild`. `ios-xcodegen` asserts both switch states + team override with `-showBuildSettings` |
+| Guard (switch off ⇒ no paid entitlement anywhere) | VERIFIED | `validate.sh` 123 OK. Negative tests on a throwaway copy, each produced the intended FAIL: switch committed ON; paid key added to `Config/Tabula.entitlements`; xtool.yml pointed at PaidAccount; project.yml hard-coding the paid file; bundle-ID drift xtool.yml vs xcconfig; a value in `.env.example`; undefined `$(VAR)` in a paid file; project.yml shadowing `TABULA_PAID_ACCOUNT` |

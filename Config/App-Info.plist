@@ -10,6 +10,9 @@
     (xtool would copy "$(PRODUCT_BUNDLE_IDENTIFIER)" literally and break the app).
   - Usage-description strings are English placeholders; they get localized via InfoPlist.xcstrings
     in Phase 2 (LOCALIZATION.md).
+  - No UIDeviceFamily here: Xcode takes it from TARGETED_DEVICE_FAMILY ("1" = iPhone, project.yml) and warned
+    "User supplied UIDeviceFamily key in the Info.plist will be overwritten" (first CI run, 2026-10-06).
+    The xtool path therefore uses xtool's default [1, 2]; harmless for local iPhone dev installs.
 -->
 <plist version="1.0">
 <dict>
@@ -17,10 +20,6 @@
 	<string>Tabula</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
-	<key>UIDeviceFamily</key>
-	<array>
-		<integer>1</integer>
-	</array>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UISupportedInterfaceOrientations</key>

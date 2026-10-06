@@ -19,15 +19,25 @@ options:
   developmentLanguage: en
   groupSortPosition: top
 
+# Identity values + the paid-account switch live in ONE file (see its header). Project-level base configuration,
+# so every target can use $(TABULA_BUNDLE_ID), $(TABULA_APP_ENTITLEMENTS), … . Do NOT redefine TABULA_* below:
+# buildSettings here would override the xcconfig. CI overrides TABULA_DEVELOPMENT_TEAM / TABULA_PAID_ACCOUNT on
+# the xcodebuild command line (highest precedence).
+configFiles:
+  Debug: Config/AppIdentity.xcconfig
+  Release: Config/AppIdentity.xcconfig
+
 settings:
   base:
     SWIFT_VERSION: "6.0"
     SWIFT_STRICT_CONCURRENCY: complete
     MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: "1"          # CI release job overrides with the run number
-    # No secrets here. Team ID comes from the environment at generate time (CI: APPLE_TEAM_ID variable);
-    # unsigned CI builds pass CODE_SIGNING_ALLOWED=NO and ignore it.
-    DEVELOPMENT_TEAM: ${TABULA_DEVELOPMENT_TEAM}
+    # No secrets here. $(…) is an Xcode build-setting reference (resolved at build time from
+    # Config/AppIdentity.xcconfig, empty placeholder until the paid account exists), NOT XcodeGen's ${ENV}
+    # expansion, so `xcodegen generate` no longer needs any environment variable. The CI release job passes
+    # TABULA_DEVELOPMENT_TEAM=<vars.APPLE_TEAM_ID>; unsigned builds pass CODE_SIGNING_ALLOWED=NO.
+    DEVELOPMENT_TEAM: $(TABULA_DEVELOPMENT_TEAM)
     CODE_SIGN_STYLE: Automatic
     GENERATE_INFOPLIST_FILE: YES          # Xcode adds bundle keys; Config/*.plist holds the shared extra keys
     LOCALIZATION_PREFERS_STRING_CATALOGS: YES
@@ -57,9 +67,11 @@ targets:
       base:
         PRODUCT_NAME: TabulaApp             # bundle TabulaApp.app, same as xtool; display name "Tabula" from plist
         PRODUCT_MODULE_NAME: TabulaApp      # same module name as the SwiftPM target on the xtool path
-        PRODUCT_BUNDLE_IDENTIFIER: sk.simondev.tabula
+        PRODUCT_BUNDLE_IDENTIFIER: $(TABULA_BUNDLE_ID)         # = xtool.yml bundleID (validate.sh)
         INFOPLIST_FILE: Config/App-Info.plist
-        CODE_SIGN_ENTITLEMENTS: Config/Tabula.entitlements
+        # Config/Tabula.entitlements (App Group only, shared with xtool) unless TABULA_PAID_ACCOUNT = 1, then
+        # Config/Entitlements/PaidAccount/Tabula.entitlements. Selection logic: Config/AppIdentity.xcconfig.
+        CODE_SIGN_ENTITLEMENTS: $(TABULA_APP_ENTITLEMENTS)
         TARGETED_DEVICE_FAMILY: "1"         # iPhone only for v1 (iPad is a stretch goal, PRODUCT.md)
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         # CI always builds the macro-probe variant (Xcode ships Apple's macro plugins). The local xtool
@@ -84,9 +96,9 @@ targets:
       base:
         PRODUCT_NAME: TabulaWidgets
         PRODUCT_MODULE_NAME: TabulaWidgets
-        PRODUCT_BUNDLE_IDENTIFIER: sk.simondev.tabula.TabulaWidgets   # identical to xtool's derived ID
+        PRODUCT_BUNDLE_IDENTIFIER: $(TABULA_BUNDLE_ID).TabulaWidgets   # identical to xtool's derived ID
         INFOPLIST_FILE: Config/Widgets-Info.plist
-        CODE_SIGN_ENTITLEMENTS: Config/TabulaWidgets.entitlements
+        CODE_SIGN_ENTITLEMENTS: $(TABULA_WIDGET_ENTITLEMENTS)          # same switch as the app
         TARGETED_DEVICE_FAMILY: "1"
         APPLICATION_EXTENSION_API_ONLY: YES
         SKIP_INSTALL: YES
@@ -105,7 +117,7 @@ targets:
       base:
         PRODUCT_NAME: TabulaWatch
         PRODUCT_MODULE_NAME: TabulaWatch
-        PRODUCT_BUNDLE_IDENTIFIER: sk.simondev.tabula.watchkitapp
+        PRODUCT_BUNDLE_IDENTIFIER: $(TABULA_BUNDLE_ID).watchkitapp
         INFOPLIST_FILE: Config/Watch-Info.plist
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         SKIP_INSTALL: YES                   # embedded in the iOS app; must not be installed separately in archives

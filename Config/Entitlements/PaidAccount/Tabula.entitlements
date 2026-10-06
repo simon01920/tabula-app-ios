@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  PAID-ACCOUNT ONLY. iOS app entitlements for the XcodeGen/CI path when TABULA_PAID_ACCOUNT = 1
+  (selected via TABULA_APP_ENTITLEMENTS in Config/AppIdentity.xcconfig). NOT wired by default, and NEVER
+  used by xtool (xtool.yml keeps Config/Tabula.entitlements; xtool cannot provision these capabilities and a
+  free team cannot have them at all). scripts/validate.sh enforces both rules.
+
+  $(VARS) are Xcode build settings from Config/AppIdentity.xcconfig; Xcode expands them when it processes
+  entitlements (this file is Xcode-only, so placeholders are allowed here, unlike Config/*.entitlements).
+
+  Keys (checked 2026-10-06 against developer.apple.com/documentation/bundleresources/entitlements/…):
+    com.apple.security.application-groups             widget/app snapshot sharing (same as the free file)
+    com.apple.developer.icloud-container-identifiers  [String] CloudKit container (Phase 6 sync)
+    com.apple.developer.icloud-services               [String] value "CloudKit"
+    aps-environment                                   "development" | "production"; Xcode sets it from the
+                                                      provisioning profile (TestFlight/App Store = production).
+                                                      Needed because CKSyncEngine "requires the CloudKit and
+                                                      Remote notifications entitlements" (CKSyncEngine docs).
+    com.apple.developer.usernotifications.time-sensitive  Bool. No Apple doc page (404); key taken from the
+                                                      capability ("Time Sensitive Notifications", paid only).
+                                                      RESEARCH-ONLY until the first signed CI build.
+    com.apple.developer.kernel.increased-memory-limit Bool, iOS 15+ (local LLM import, AI_IMPORT.md)
+    com.apple.developer.associated-domains            [String] "<service>:<domain>" (universal links, Phase 7;
+                                                      needs /.well-known/apple-app-site-association on the domain)
+  In-App Purchase needs no entitlement (App ID capability only). The Info.plist side of CloudKit sync
+  (UIBackgroundModes remote-notification) is Phase 6 feature work and needs no account.
+-->
+<plist version="1.0">
+<dict>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>$(TABULA_APP_GROUP)</string>
+	</array>
+	<key>com.apple.developer.icloud-container-identifiers</key>
+	<array>
+		<string>$(TABULA_ICLOUD_CONTAINER)</string>
+	</array>
+	<key>com.apple.developer.icloud-services</key>
+	<array>
+		<string>CloudKit</string>
+	</array>
+	<key>aps-environment</key>
+	<string>development</string>
+	<key>com.apple.developer.usernotifications.time-sensitive</key>
+	<true/>
+	<key>com.apple.developer.kernel.increased-memory-limit</key>
+	<true/>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:$(TABULA_SHARE_DOMAIN)</string>
+	</array>
+</dict>
+</plist>

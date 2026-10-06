@@ -5,10 +5,11 @@
 #   wsl.exe -d Ubuntu -- bash -lc 'cd "/mnt/c/Users/simon/Documents/Claude Code/school_timetable" && bash scripts/core-test.sh'
 set -euo pipefail
 
-# shellcheck source=/dev/null
-[ -f "$HOME/.local/share/swiftly/env.sh" ] && . "$HOME/.local/share/swiftly/env.sh"
-
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=lib/toolchain.sh
+. "$REPO_ROOT/scripts/lib/toolchain.sh"
+tabula_load_toolchain
+tabula_require swift
 SCRATCH="${TABULA_SCRATCH:-$HOME/.cache/tabula}/TimetableCore"
 
 swift --version

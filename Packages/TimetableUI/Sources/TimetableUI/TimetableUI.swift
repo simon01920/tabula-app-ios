@@ -1,4 +1,4 @@
-// Phase 0 placeholder for shared SwiftUI components. UNCOMPILED for Apple platforms (no SDK yet).
+// Phase 0 placeholder for shared SwiftUI components. COMPILED 2026-10-06 (xtool path, base + macro variants, 0 warnings; XcodeGen CI run 37449454629); watchOS: scripts/watch-typecheck.sh.
 // APIs used (checked against developer.apple.com JSON docs, see docs/ENVIRONMENT.md "API checks"):
 //   SwiftUI.View, Text(verbatim:), Label, HStack, Image(systemName:), accessibilityElement(children:),
 //   accessibilityLabel(_:)

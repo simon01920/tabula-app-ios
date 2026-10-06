@@ -1,4 +1,4 @@
-// UNCOMPILED for Apple platforms (no iOS SDK here). Phase 0 AlarmKit probe; delete with the debug probes after sign-off.
+// COMPILED 2026-10-06 (xtool path, base + macro variants, 0 warnings; XcodeGen CI run 37449454629). Phase 0 AlarmKit probe; delete with the debug probes after sign-off.
 // APIs used (checked 2026-10-04 against developer.apple.com JSON docs, see docs/spikes/ALARMKIT.md):
 //   AlarmKit.AlarmMetadata (protocol: Decodable, Encodable, Hashable, Sendable; iOS/iPadOS/Mac Catalyst 26.0, NOT watchOS/macOS)
 //

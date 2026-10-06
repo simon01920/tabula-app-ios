@@ -1,7 +1,12 @@
-# Tabula CI. Status: UNRUN (no GitHub repo yet) — see docs/ENVIRONMENT.md §8 "CI".
+# Tabula CI. First run 2026-10-06 (run 37449454629, dispatched by the orchestrator): core-linux + ios-xcodegen
+# green; see docs/ENVIRONMENT.md §8 "CI". UI screenshots on the iOS Simulator: ui-screenshots.yml.
 #
 # Jobs
 #   core-linux       Swift 6.4 container: TimetableCore tests + the Linux-runnable checks of scripts/validate.sh.
+#                    Runs for every non-docs change (push to main, PR to main, manual).
+#   changes          Linux, seconds: `git diff --name-only` + scripts/ci_paths.py decide whether the change is
+#                    app-relevant. The macOS jobs below run ONLY when it is (or on workflow_dispatch). Private
+#                    repo: macOS minutes are billed ~10x Linux (orchestrator decision 2026-10-06).
 #   ios-xcodegen     XcodeGen -> unsigned xcodebuild for generic iOS, incl. widget + embedded watchOS app.
 #                    Builds the MACRO-PROBE variant (project.yml defines TABULA_MACRO_PROBES).
 #   ios-xtool-path   xtool (macOS build) -> unsigned `xtool dev build` of the SwiftPM/xtool path
@@ -14,9 +19,10 @@
 # still marked "preview" as of 2026-10-04 — switch to the GA label once announced).
 # Secrets (Settings > Secrets and variables > Actions), never in the repo or chat:
 #   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8_BASE64 (base64 of the AuthKey_XXXX.p8 file)
-# Variable (not secret): APPLE_TEAM_ID (10-character Team ID)
-# Hardening TODO (later phase): pin third-party actions to full commit SHAs instead of tags
-# (actions/checkout@v4, actions/upload-artifact@v4); downloaded tools are already pinned by SHA-256.
+# Variables (not secret): APPLE_TEAM_ID (10-character Team ID), TABULA_PAID_ACCOUNT (1 = paid entitlements).
+# Both stay unset until the paid Apple Developer account exists (docs/PAID_ACCOUNT_SWITCHOVER.md); identity
+# values come from Config/AppIdentity.xcconfig. Third-party actions are pinned to commit SHAs (v7.0.1, node24);
+# downloaded tools are pinned by SHA-256.
 name: iOS CI
 
 on:
@@ -24,13 +30,14 @@ on:
     branches: [main]
     paths-ignore: ["docs/**", "**/*.md", "examples/**"]
   pull_request:
+    branches: [main]
     paths-ignore: ["docs/**", "**/*.md", "examples/**"]
   workflow_dispatch:
     inputs:
       upload:
-        description: "Archive and upload to TestFlight (requires ASC_* secrets)"
+        description: "Archive and upload to TestFlight (requires the paid account + ASC_* secrets)"
         type: boolean
-        default: true
+        default: false
 
 permissions:
   contents: read
@@ -54,7 +61,7 @@ jobs:
     container: swift:6.4.0-noble
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: swift --version
       - name: swift test TimetableCore
         run: swift test --package-path Packages/TimetableCore
@@ -65,12 +72,43 @@ jobs:
       - name: scripts/validate.sh (Linux-runnable checks; XcodeGen step is skipped here)
         run: bash scripts/validate.sh
 
+  changes:
+    name: Detect app-relevant changes (gates the macOS jobs)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      app: ${{ steps.diff.outputs.app }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0   # small repo; needed to diff against the push's `before` / the PR base
+      - name: git diff --name-only + scripts/ci_paths.py
+        id: diff
+        env:
+          EVENT: ${{ github.event_name }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            echo "manual run: all jobs"; echo "app=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          if [ "$EVENT" = "pull_request" ]; then base="$PR_BASE"; else base="$PUSH_BEFORE"; fi
+          if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "${base}^{commit}" 2>/dev/null; then
+            echo "::notice::no usable base commit ('$base'): treating the change as app-relevant"
+            echo "app=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          git diff --name-only "$base" HEAD | tee "$RUNNER_TEMP/changed.txt"
+          python3 scripts/ci_paths.py < "$RUNNER_TEMP/changed.txt" | tee -a "$GITHUB_OUTPUT"
+
   ios-xcodegen:
     name: XcodeGen path (unsigned iOS + watchOS build, macro variant)
+    needs: changes
+    if: needs.changes.outputs.app == 'true'
     runs-on: xcode-27
-    timeout-minutes: 40
+    timeout-minutes: 15   # measured 1 m 07 s (run 37449454629); private-repo macOS minutes are billed
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Select Xcode 27
         run: |
           sudo xcode-select -s "$XCODE_APP"
@@ -83,11 +121,31 @@ jobs:
           unzip -q xcodegen.zip -d "$RUNNER_TEMP"
           echo "$RUNNER_TEMP/xcodegen/bin" >> "$GITHUB_PATH"
       - name: Generate project
-        env:
-          TABULA_DEVELOPMENT_TEAM: ""   # unsigned build; must be set (even empty) or XcodeGen keeps the literal
         run: |
           xcodegen --version
-          xcodegen generate --spec project.yml
+          xcodegen generate --spec project.yml   # no env needed: identity comes from Config/AppIdentity.xcconfig
+      - name: Identity + paid-account switch as Xcode resolves them (no build, ~20 s)
+        run: |
+          # Proves the xcconfig wiring Linux cannot: nested $(TABULA_APP_ENTITLEMENTS_$(TABULA_PAID_ACCOUNT)).
+          setting() { # setting <target> <name> [extra xcodebuild settings...]
+            local target="$1" name="$2"; shift 2
+            xcodebuild -showBuildSettings -project Tabula.xcodeproj -target "$target" -configuration Release \
+              "$@" 2>/dev/null | awk -F' = ' -v k="    $name" '$1 == k {print $2; exit}'
+          }
+          fail=0
+          expect() { if [ "$2" = "$3" ]; then echo "ok   $1 = $2"; else echo "::error::$1 = '$2', expected '$3'"; fail=1; fi; }
+          BUNDLE_ID="$(python3 scripts/identity.py TABULA_BUNDLE_ID)"
+          expect "TabulaApp PRODUCT_BUNDLE_IDENTIFIER" "$(setting TabulaApp PRODUCT_BUNDLE_IDENTIFIER)" "$BUNDLE_ID"
+          expect "TabulaWatch PRODUCT_BUNDLE_IDENTIFIER" "$(setting TabulaWatch PRODUCT_BUNDLE_IDENTIFIER)" "$BUNDLE_ID.watchkitapp"
+          expect "DEVELOPMENT_TEAM (placeholder)" "$(setting TabulaApp DEVELOPMENT_TEAM)" ""
+          expect "switch OFF app entitlements" "$(setting TabulaApp CODE_SIGN_ENTITLEMENTS)" "Config/Tabula.entitlements"
+          expect "switch OFF widget entitlements" "$(setting TabulaWidgets CODE_SIGN_ENTITLEMENTS)" "Config/TabulaWidgets.entitlements"
+          expect "switch ON app entitlements" "$(setting TabulaApp CODE_SIGN_ENTITLEMENTS TABULA_PAID_ACCOUNT=1)" \
+            "Config/Entitlements/PaidAccount/Tabula.entitlements"
+          expect "switch ON widget entitlements" "$(setting TabulaWidgets CODE_SIGN_ENTITLEMENTS TABULA_PAID_ACCOUNT=1)" \
+            "Config/Entitlements/PaidAccount/TabulaWidgets.entitlements"
+          expect "team override" "$(setting TabulaApp DEVELOPMENT_TEAM TABULA_DEVELOPMENT_TEAM=ABCDE12345)" "ABCDE12345"
+          exit "$fail"
       - name: Build (generic iOS device, all architectures, no signing)
         run: |
           set -o pipefail
@@ -122,11 +180,13 @@ jobs:
           if [ "$missing" -ne 0 ]; then find "$APP" -maxdepth 3 | sort | head -150; exit 1; fi
           [ "$(plutil -extract ITSAppUsesNonExemptEncryption raw "$APP/Info.plist")" = "false" ] \
             || { echo "::error::ITSAppUsesNonExemptEncryption must be false"; exit 1; }
+          [ "$(plutil -extract CFBundleIdentifier raw "$APP/Info.plist")" = "$(python3 scripts/identity.py TABULA_BUNDLE_ID)" ] \
+            || { echo "::error::CFBundleIdentifier does not match Config/AppIdentity.xcconfig"; exit 1; }
           # Apple Watch Series 7 (S7) is arm64_32: the embedded watch binary must contain that slice.
           echo "watch archs: $(lipo -archs "$WATCH/TabulaWatch")"
           lipo -archs "$WATCH/TabulaWatch" | grep -qw arm64_32 \
             || { echo "::error::TabulaWatch lacks arm64_32 (Series 7). Check WATCHOS_DEPLOYMENT_TARGET/ARCHS."; exit 1; }
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
           name: xcodebuild-log
@@ -135,10 +195,17 @@ jobs:
 
   ios-xtool-path:
     name: xtool/SwiftPM path (unsigned xtool dev build, base variant)
+    needs: changes
+    if: needs.changes.outputs.app == 'true'
     runs-on: xcode-27
-    timeout-minutes: 40
+    # Run 37449454629 hung for 40 billed minutes: ROOT CAUSE (xtool 1.20.1 source, macOS/XToolMac/XToolMac.swift):
+    # `xtool.app/Contents/MacOS/xtool` runs the CLI only when XTL_CLI=1 and otherwise starts the macOS GUI
+    # (`XToolMacUI.main()`), which never returns on a headless runner. The CLI entry point is the wrapper
+    # `xtool.app/Contents/Resources/bin/xtool` (sets XTL_CLI=1; it is what the official Homebrew cask links).
+    # Belt and braces: 60 s smoke test, outer `perl alarm` timeouts, stdin </dev/null, 15-minute job cap.
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Select Xcode 27
         run: |
           sudo xcode-select -s "$XCODE_APP"
@@ -148,16 +215,37 @@ jobs:
           curl -fsSL -o xtool.app.zip "https://github.com/xtool-org/xtool/releases/download/${XTOOL_VERSION}/xtool.app.zip"
           echo "${XTOOL_MAC_SHA256}  xtool.app.zip" | shasum -a 256 -c -
           ditto -x -k xtool.app.zip "$RUNNER_TEMP"
-          mkdir -p "$RUNNER_TEMP/bin"
-          ln -s "$RUNNER_TEMP/xtool.app/Contents/MacOS/xtool" "$RUNNER_TEMP/bin/xtool"
-          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+          # CLI wrapper, NOT Contents/MacOS/xtool (that one is the GUI app without XTL_CLI=1).
+          test -x "$RUNNER_TEMP/xtool.app/Contents/Resources/bin/xtool"
+          echo "$RUNNER_TEMP/xtool.app/Contents/Resources/bin" >> "$GITHUB_PATH"
+      - name: xtool smoke test (CLI mode, 60 s cap)
+        id: smoke
+        continue-on-error: true
+        timeout-minutes: 2
+        run: |
+          command -v xtool
+          # perl alarm = portable outer timeout on macOS (no GNU `timeout`); exit 142 means it fired.
+          perl -e 'alarm shift; exec @ARGV' 60 xtool --version </dev/null
       - name: Compile String Catalog for the xtool path
+        if: steps.smoke.outcome == 'success'
         run: python3 scripts/l10n-compile.py Resources/Localizable.xcstrings .build-l10n
       - name: xtool dev build (no login needed without --sign; TABULA_MACRO_PROBES unset = base variant)
+        if: steps.smoke.outcome == 'success'
+        timeout-minutes: 10
+        run: perl -e 'alarm shift; exec @ARGV' 540 xtool dev build </dev/null
+      - name: Fallback when xtool cannot start (diagnostic compile of the root SwiftPM package, then fail)
+        if: steps.smoke.outcome != 'success'
+        timeout-minutes: 8
         run: |
-          xtool --version
-          xtool dev build
+          echo "::error::xtool did not start in CLI mode within 60 s; compiling the SwiftPM targets with xcodebuild for evidence"
+          xcodebuild -list </dev/null || true
+          set -o pipefail
+          perl -e 'alarm shift; exec @ARGV' 420 xcodebuild build -scheme Tabula-Package -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO </dev/null | xcbeautify --renderer github-actions \
+            && echo "::notice::SwiftPM targets compile for iOS; only the xtool packaging step is unverified"
+          exit 1
       - name: Verify bundle layout
+        if: steps.smoke.outcome == 'success'
         run: |
           APP=xtool/TabulaApp.app
           WIDGET="$APP/PlugIns/TabulaWidgets.appex"
@@ -173,15 +261,26 @@ jobs:
           need "$WIDGET/PrivacyInfo.xcprivacy"
           if [ "$missing" -ne 0 ]; then find "$APP" -maxdepth 3 | sort | head -150; exit 1; fi
           plutil -p "$APP/Info.plist" | grep -E 'CFBundleIdentifier|CFBundleDisplayName|NSAlarmKitUsageDescription|ITSAppUsesNonExemptEncryption'
+          # Regression guard (WSL finding 2026-10-06): the widget appex must contain its Swift code and the
+          # @main entry record; without `-u _main` (Package.swift) the linker dropped all of it.
+          for sect in __text __swift5_entry; do
+            otool -l "$WIDGET/TabulaWidgets" | grep -q "sectname $sect" \
+              && echo "ok   TabulaWidgets has $sect" || { echo "::error::TabulaWidgets appex lacks $sect"; exit 1; }
+          done
 
   release-testflight:
     name: Archive + upload to TestFlight (manual)
+    # Job-level gate: no macOS runner is even started unless someone runs the workflow manually with
+    # upload = true (input default false).
     if: github.event_name == 'workflow_dispatch' && inputs.upload
     needs: [core-linux, ios-xcodegen, ios-xtool-path]
     runs-on: xcode-27
-    timeout-minutes: 60
+    timeout-minutes: 30   # archive + export + altool upload; a kill mid-upload is worse than 15 extra minutes
     env:
       APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}   # not a secret
+      # Paid-account switch (GitHub variable, default 0): 1 selects Config/Entitlements/PaidAccount/* via
+      # Config/AppIdentity.xcconfig. Flip it only after the capabilities exist (docs/PAID_ACCOUNT_SWITCHOVER.md).
+      TABULA_PAID_ACCOUNT: ${{ vars.TABULA_PAID_ACCOUNT || '0' }}
     # Secrets are mapped only into the steps that need them (least exposure).
     steps:
       - name: Check release configuration (sees only booleans, never secret values)
@@ -196,13 +295,19 @@ jobs:
           [ "$HAS_ISSUER" = "true" ] || missing="$missing ASC_ISSUER_ID"
           [ "$HAS_P8" = "true" ] || missing="$missing ASC_KEY_P8_BASE64"
           [ -n "$APPLE_TEAM_ID" ] || missing="$missing APPLE_TEAM_ID(variable)"
+          # The xcconfig selects TABULA_APP_ENTITLEMENTS_$(TABULA_PAID_ACCOUNT): any value other than 0/1 would
+          # resolve to an EMPTY entitlements path and silently sign without entitlements. Fail loudly instead.
+          case "$TABULA_PAID_ACCOUNT" in
+            0|1) echo "paid-account switch TABULA_PAID_ACCOUNT=$TABULA_PAID_ACCOUNT" ;;
+            *) echo "::error::GitHub variable TABULA_PAID_ACCOUNT must be 0 or 1, got '$TABULA_PAID_ACCOUNT'"; exit 1 ;;
+          esac
           if [ -n "$missing" ]; then
-            echo "::notice::TestFlight upload skipped: not configured:$missing (see docs/ENVIRONMENT.md, Human steps)"
+            echo "::notice::TestFlight upload skipped: not configured:$missing (see docs/PAID_ACCOUNT_SWITCHOVER.md)"
             echo "enabled=false" >> "$GITHUB_OUTPUT"
           else
             echo "enabled=true" >> "$GITHUB_OUTPUT"
           fi
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         if: steps.cfg.outputs.enabled == 'true'
       - name: Select Xcode 27 + install XcodeGen
         if: steps.cfg.outputs.enabled == 'true'
@@ -223,9 +328,9 @@ jobs:
           echo "$ASC_KEY_P8_BASE64" | base64 --decode > "$KEY_DIR/AuthKey_${ASC_KEY_ID}.p8"
           chmod 600 "$KEY_DIR/AuthKey_${ASC_KEY_ID}.p8"
           echo "ASC_KEY_PATH=$KEY_DIR/AuthKey_${ASC_KEY_ID}.p8" >> "$GITHUB_ENV"
-      - name: Generate project (signed)
+      - name: Generate project
         if: steps.cfg.outputs.enabled == 'true'
-        run: TABULA_DEVELOPMENT_TEAM="$APPLE_TEAM_ID" xcodegen generate --spec project.yml
+        run: xcodegen generate --spec project.yml   # team + switch are passed to xcodebuild below
       - name: Archive (automatic signing via API key)
         if: steps.cfg.outputs.enabled == 'true'
         env:
@@ -243,7 +348,8 @@ jobs:
             -authenticationKeyPath "$ASC_KEY_PATH" \
             -authenticationKeyID "$ASC_KEY_ID" \
             -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
-            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            TABULA_DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            TABULA_PAID_ACCOUNT="$TABULA_PAID_ACCOUNT" \
             CURRENT_PROJECT_VERSION="${{ github.run_number }}" \
             | xcbeautify --renderer github-actions
       - name: Export .ipa (app-store-connect)

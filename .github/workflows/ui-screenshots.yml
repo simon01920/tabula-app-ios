@@ -1,0 +1,206 @@
+# UI screenshots on the iOS Simulator: the replacement for on-device UI checks while no physical device is
+# available (human decision 2026-10-06). Builds the XcodeGen/CI path for the simulator (no signing, no Apple
+# account), boots the largest available iPhone "Pro Max" simulator, launches each screen via the launch-argument
+# router (`-TabulaScreen <id>`, App/Sources/Routing/AppScreen.swift) and captures light, dark and largest
+# accessibility Dynamic Type screenshots. Also a launch smoke test: the job fails if the app is not running
+# after launch (crash on start).
+#
+# View results: GitHub → Actions → "UI screenshots (iOS Simulator)" → a run → "Artifacts" → ui-screenshots-<n>
+# (zip of PNGs + simulator/app logs). See docs/ENVIRONMENT.md §19.
+#
+# Minutes (private repo, macOS runner ≈ 10× Linux price; orchestrator decision 2026-10-06): runs only manually or
+# on pushes to main that touch what is visible on screen (list below: NOT TimetableCore, NOT all of Config, NOT
+# TimetableUI tests); never on pull requests; a newer push cancels an older run; hard 15-minute cap.
+# Status: UNRUN until the orchestrator pushes this file.
+name: UI screenshots (iOS Simulator)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "App/**"
+      - "WidgetExtension/**"
+      - "Packages/TimetableUI/Sources/**"
+      - "Packages/TimetableUI/Package.swift"
+      - "Resources/**"
+      - "Config/App-Info.plist"
+      - ".github/workflows/ui-screenshots.yml"
+  workflow_dispatch:
+    inputs:
+      screens:
+        description: "Space-separated -TabulaScreen ids (see AppScreen.swift)"
+        type: string
+        default: "debug debug-localization debug-macros debug-import debug-alarms"
+      device:
+        description: "Simulator device type name, e.g. 'iPhone 17 Pro Max' (empty = largest available Pro Max)"
+        type: string
+        default: ""
+      watch:
+        description: "Also screenshot the watch app on an Apple Watch simulator (~+3 min)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ui-screenshots-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  XCODE_APP: /Applications/Xcode_27.app
+  XCODEGEN_VERSION: "2.46.0"
+  XCODEGEN_SHA256: 4d9e34b62172d645eed6457cac13fc222569974098ef4ee9c3368bedf0196806
+  SCREENS: ${{ inputs.screens || 'debug debug-localization debug-macros debug-import debug-alarms' }}
+  DEVICE_OVERRIDE: ${{ inputs.device || '' }}
+  OUT: screenshots
+
+jobs:
+  ios-simulator-screenshots:
+    name: iOS Simulator screenshots (light / dark / large text)
+    runs-on: xcode-27
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Select Xcode 27 + list simulator device types and runtimes
+        run: |
+          sudo xcode-select -s "$XCODE_APP"
+          xcodebuild -version
+          xcrun simctl list devicetypes
+          xcrun simctl list runtimes
+          xcrun simctl help ui | sed -n '1,60p' || true
+
+      - name: Install XcodeGen (pinned + SHA-256)
+        run: |
+          curl -fsSL -o xcodegen.zip "https://github.com/yonaskolb/XcodeGen/releases/download/${XCODEGEN_VERSION}/xcodegen.zip"
+          echo "${XCODEGEN_SHA256}  xcodegen.zip" | shasum -a 256 -c -
+          unzip -q xcodegen.zip -d "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/xcodegen/bin" >> "$GITHUB_PATH"
+
+      - name: Generate project
+        run: xcodegen generate --spec project.yml
+
+      - name: Create a fresh simulator (largest iPhone Pro Max on the newest iOS runtime)
+        run: |
+          set -eo pipefail
+          # FULL list: `simctl list -j runtimes devicetypes` would treat "devicetypes" as a search term
+          # and return no runtimes. Selection logic + self-test: scripts/sim_pick.py.
+          xcrun simctl list -j > "$RUNNER_TEMP/simctl.json"
+          python3 scripts/sim_pick.py "$RUNNER_TEMP/simctl.json" --platform iOS --device "$DEVICE_OVERRIDE" \
+            > "$RUNNER_TEMP/pick.env"
+          tee -a "$GITHUB_ENV" < "$RUNNER_TEMP/pick.env"
+          # Values contain spaces (e.g. "iPhone 17 Pro Max"), so read them instead of sourcing the file.
+          SIM_TYPE="$(sed -n 's/^SIM_TYPE=//p' "$RUNNER_TEMP/pick.env")"
+          SIM_RUNTIME="$(sed -n 's/^SIM_RUNTIME=//p' "$RUNNER_TEMP/pick.env")"
+          UDID="$(xcrun simctl create "Tabula CI" "$SIM_TYPE" "$SIM_RUNTIME")"
+          echo "SIM_UDID=$UDID" | tee -a "$GITHUB_ENV"
+
+      - name: Build for the simulator (XcodeGen path, no signing)
+        run: |
+          set -o pipefail
+          mkdir -p build
+          xcodebuild build \
+            -project Tabula.xcodeproj \
+            -scheme TabulaApp \
+            -configuration Debug \
+            -destination "platform=iOS Simulator,id=$SIM_UDID" \
+            -derivedDataPath build/DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            | tee build/xcodebuild-sim.log | xcbeautify --renderer github-actions
+          APP="build/DerivedData/Build/Products/Debug-iphonesimulator/TabulaApp.app"
+          [ -d "$APP" ] || { echo "::error::$APP not found"; exit 1; }
+          echo "APP=$APP" >> "$GITHUB_ENV"
+          echo "BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist")" >> "$GITHUB_ENV"
+
+      - name: Boot, install, screenshot every screen (light, dark, accessibility XXXL text)
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          mkdir -p "$OUT" logs
+          xcrun simctl bootstatus "$SIM_UDID" -b
+          # Deterministic status bar for comparable screenshots.
+          xcrun simctl status_bar "$SIM_UDID" override --time "9:41" --dataNetwork wifi --wifiMode active \
+            --wifiBars 3 --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100 || true
+          xcrun simctl install "$SIM_UDID" "$APP"
+
+          shoot() { # shoot <screen> <variant>
+            local screen="$1" variant="$2" pid
+            xcrun simctl terminate "$SIM_UDID" "$BUNDLE_ID" >/dev/null 2>&1 || true
+            pid="$(xcrun simctl launch "$SIM_UDID" "$BUNDLE_ID" -TabulaScreen "$screen" | awk -F': ' '{print $2}')"
+            sleep 8
+            # Simulator apps are host processes: if it is gone, the app crashed on launch.
+            if ! kill -0 "$pid" 2>/dev/null; then
+              echo "::error::$BUNDLE_ID ($screen, $variant) is not running 8 s after launch: crash on start?"
+              xcrun simctl spawn "$SIM_UDID" log show --last 2m --style compact \
+                --predicate "process == \"TabulaApp\"" > "logs/crash-$screen-$variant.log" 2>&1 || true
+              return 1
+            fi
+            xcrun simctl io "$SIM_UDID" screenshot --type=png "$OUT/$screen-$variant.png"
+            echo "captured $OUT/$screen-$variant.png"
+          }
+
+          failed=0
+          for screen in $SCREENS; do
+            xcrun simctl ui "$SIM_UDID" content_size large || true
+            xcrun simctl ui "$SIM_UDID" appearance light; shoot "$screen" light || failed=1
+            xcrun simctl ui "$SIM_UDID" appearance dark;  shoot "$screen" dark  || failed=1
+            xcrun simctl ui "$SIM_UDID" appearance light
+            if xcrun simctl ui "$SIM_UDID" content_size accessibility-extra-extra-extra-large; then
+              shoot "$screen" ax-xxxl-text || failed=1
+            else
+              echo "::warning::simctl ui content_size not supported on this Xcode; large-text screenshot skipped"
+            fi
+          done
+          xcrun simctl ui "$SIM_UDID" content_size large || true
+          xcrun simctl spawn "$SIM_UDID" log show --last 10m --style compact \
+            --predicate 'process == "TabulaApp"' > logs/app.log 2>&1 || true
+          {
+            echo "### UI screenshots"
+            echo "Device: **$SIM_NAME** · runtime **$SIM_RUNTIME_NAME** · bundle \`$BUNDLE_ID\`"
+            echo; echo "Download: this run → **Artifacts** → \`ui-screenshots-${GITHUB_RUN_NUMBER}\`"; echo
+            for f in "$OUT"/*.png; do echo "- \`$(basename "$f")\` ($(sips -g pixelWidth -g pixelHeight "$f" | awk '/pixel/{printf "%s ", $2}')px)"; done
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$failed"
+
+      - name: Watch app screenshot (optional)
+        if: inputs.watch
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          xcrun simctl list -j > "$RUNNER_TEMP/simctl-watch.json"   # full list (see the iOS step)
+          python3 scripts/sim_pick.py "$RUNNER_TEMP/simctl-watch.json" --platform watchOS > "$RUNNER_TEMP/watch.env"
+          WRT="$(sed -n 's/^WATCH_RUNTIME=//p' "$RUNNER_TEMP/watch.env")"
+          WTYPE="$(sed -n 's/^WATCH_TYPE=//p' "$RUNNER_TEMP/watch.env")"
+          WNAME="$(sed -n 's/^WATCH_NAME=//p' "$RUNNER_TEMP/watch.env" | tr -c 'A-Za-z0-9\n' '_')"
+          echo "watch: $WNAME on $WRT"
+          WUDID="$(xcrun simctl create "Tabula CI Watch" "$WTYPE" "$WRT")"
+          xcrun simctl bootstatus "$WUDID" -b
+          xcrun simctl install "$WUDID" "$APP/Watch/TabulaWatch.app"
+          WBUNDLE="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Watch/TabulaWatch.app/Info.plist")"
+          xcrun simctl launch "$WUDID" "$WBUNDLE"
+          sleep 10
+          xcrun simctl io "$WUDID" screenshot --type=png "$OUT/watch-$WNAME.png"
+          echo "- \`watch-$WNAME.png\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Zip the simulator .app (for a hosted simulator such as Appetize later; research only, no account)
+        if: success()
+        run: ditto -c -k --keepParent "$APP" build/TabulaApp-iphonesimulator.zip && ls -la build/TabulaApp-iphonesimulator.zip
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: success()
+        with:
+          name: TabulaApp-iphonesimulator-${{ github.run_number }}
+          path: build/TabulaApp-iphonesimulator.zip
+          retention-days: 7
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: ui-screenshots-${{ github.run_number }}
+          path: |
+            screenshots/
+            logs/
+            build/xcodebuild-sim.log
+          if-no-files-found: warn
+          retention-days: 14
