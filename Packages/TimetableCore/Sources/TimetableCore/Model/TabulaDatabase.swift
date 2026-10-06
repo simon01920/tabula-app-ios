@@ -10,6 +10,8 @@ import Foundation
 ///   one case where ordering is not total.)
 /// - Missing arrays decode as empty.
 /// - Tombstoned entities (`meta.isDeleted`) are part of the database.
+/// - **Unknown keys survive** (DOMAIN_MODEL B4): keys of the root object, of entities and of child records
+///   that this version does not know are kept in `unknownFields` and written back on encode.
 public struct TabulaDatabase: Hashable, Sendable {
     /// The schema version written by this app version.
     public static let currentSchemaVersion = TimetableCoreInfo.schemaVersion
@@ -38,13 +40,17 @@ public struct TabulaDatabase: Hashable, Sendable {
     public var exams: [Exam]
     /// Reminder rules.
     public var reminderRules: [ReminderRule]
+    /// JSON keys written by a newer app version that this version does not understand. Preserved so that
+    /// re-saving the database does not erase them (DOMAIN_MODEL B4). Entries of entities that are no longer
+    /// in the database are ignored on encode.
+    public var unknownFields: UnknownFields
 
     /// Creates a database (empty collections by default).
     public init(schemaVersion: Int = TabulaDatabase.currentSchemaVersion, settings: AppSettings,
                 timetables: [Timetable] = [], subjects: [Subject] = [], bellSchedules: [BellSchedule] = [],
                 lessons: [Lesson] = [], terms: [Term] = [], breaks: [CalendarBreak] = [],
                 overrides: [ScheduleOverride] = [], tasks: [TaskItem] = [], exams: [Exam] = [],
-                reminderRules: [ReminderRule] = []) {
+                reminderRules: [ReminderRule] = [], unknownFields: UnknownFields = UnknownFields()) {
         self.schemaVersion = schemaVersion
         self.settings = settings
         self.timetables = timetables
@@ -57,10 +63,12 @@ public struct TabulaDatabase: Hashable, Sendable {
         self.tasks = tasks
         self.exams = exams
         self.reminderRules = reminderRules
+        self.unknownFields = unknownFields
     }
 
-    /// A copy with every entity array sorted by `id` and task children in canonical order — the order
-    /// that decoding the canonical encoding produces. `canonicalized() == decode(encode(self))`.
+    /// A copy with every entity array sorted by `id`, task children in canonical order and `unknownFields`
+    /// restricted to what encoding writes — the value that decoding the canonical encoding produces.
+    /// `canonicalized() == decode(encode(self))`.
     public func canonicalized() -> TabulaDatabase {
         var copy = self
         copy.timetables.sort { $0.id < $1.id }
@@ -77,6 +85,7 @@ public struct TabulaDatabase: Hashable, Sendable {
         }
         copy.exams.sort { $0.id < $1.id }
         copy.reminderRules.sort { $0.id < $1.id }
+        copy.unknownFields = prunedUnknownFields()
         return copy
     }
 
@@ -97,37 +106,82 @@ extension TabulaDatabase: Codable {
              tasks, exams, reminderRules
     }
 
-    /// Decodes a database; absent arrays become empty.
+    /// `true` when `key` is a root key this version knows.
+    static func isRootKey(_ key: String) -> Bool { CodingKeys(stringValue: key) != nil }
+
+    /// Decodes a database; absent arrays become empty; unknown keys go to `unknownFields`.
     public init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        self.schemaVersion = try c.decode(Int.self, forKey: .schemaVersion)
-        self.settings = try c.decode(AppSettings.self, forKey: .settings)
-        self.timetables = try c.decodeIfPresent([Timetable].self, forKey: .timetables) ?? []
-        self.subjects = try c.decodeIfPresent([Subject].self, forKey: .subjects) ?? []
-        self.bellSchedules = try c.decodeIfPresent([BellSchedule].self, forKey: .bellSchedules) ?? []
-        self.lessons = try c.decodeIfPresent([Lesson].self, forKey: .lessons) ?? []
-        self.terms = try c.decodeIfPresent([Term].self, forKey: .terms) ?? []
-        self.breaks = try c.decodeIfPresent([CalendarBreak].self, forKey: .breaks) ?? []
-        self.overrides = try c.decodeIfPresent([ScheduleOverride].self, forKey: .overrides) ?? []
-        self.tasks = try c.decodeIfPresent([TaskItem].self, forKey: .tasks) ?? []
-        self.exams = try c.decodeIfPresent([Exam].self, forKey: .exams) ?? []
-        self.reminderRules = try c.decodeIfPresent([ReminderRule].self, forKey: .reminderRules) ?? []
+        var unknown = UnknownFields()
+
+        func collection<E: SyncEntity>(_ key: CodingKeys) throws -> [E] {
+            guard let envelopes = try c.decodeIfPresent([UnknownFieldsEnvelope<E>].self, forKey: key) else {
+                return []
+            }
+            for envelope in envelopes where !envelope.unknown.isEmpty {
+                unknown.setFields(envelope.unknown, for: E.entityType, id: envelope.entity.id.uuid)
+            }
+            return envelopes.map(\.entity)
+        }
+
+        let schemaVersion = try c.decode(Int.self, forKey: .schemaVersion)
+        let settings = try c.decode(UnknownFieldsEnvelope<AppSettings>.self, forKey: .settings)
+        unknown.setFields(settings.unknown, for: .settings, id: settings.entity.id.uuid)
+        let timetables: [Timetable] = try collection(.timetables)
+        let subjects: [Subject] = try collection(.subjects)
+        let bellSchedules: [BellSchedule] = try collection(.bellSchedules)
+        let lessons: [Lesson] = try collection(.lessons)
+        let terms: [Term] = try collection(.terms)
+        let breaks: [CalendarBreak] = try collection(.breaks)
+        let overrides: [ScheduleOverride] = try collection(.overrides)
+        let tasks: [TaskItem] = try collection(.tasks)
+        let exams: [Exam] = try collection(.exams)
+        let reminderRules: [ReminderRule] = try collection(.reminderRules)
+
+        let all = try decoder.container(keyedBy: UnknownFieldsCodingKey.self)
+        for key in all.allKeys where !Self.isRootKey(key.stringValue) {
+            unknown.root[key.stringValue] = try all.decode(JSONValue.self, forKey: key)
+        }
+
+        self.init(schemaVersion: schemaVersion, settings: settings.entity, timetables: timetables,
+                  subjects: subjects, bellSchedules: bellSchedules, lessons: lessons, terms: terms, breaks: breaks,
+                  overrides: overrides, tasks: tasks, exams: exams, reminderRules: reminderRules,
+                  unknownFields: unknown)
     }
 
-    /// Encodes every array sorted by `id` (deterministic output).
+    /// Encodes every array sorted by `id` (deterministic output), with unknown keys merged back in
+    /// (keys this version knows always win).
     public func encode(to encoder: any Encoder) throws {
         var c = encoder.container(keyedBy: CodingKeys.self)
+        let unknown = unknownFields
+
+        func encodeCollection<E: SyncEntity>(_ entities: [E], _ key: CodingKeys) throws {
+            let byID = unknown.entities[E.entityType]
+            try c.encode(entities.sorted { $0.id < $1.id }.map {
+                UnknownFieldsEnvelope(entity: $0, unknown: byID?[$0.id.uuid])
+            }, forKey: key)
+        }
+
         try c.encode(schemaVersion, forKey: .schemaVersion)
-        try c.encode(settings, forKey: .settings)
-        try c.encode(timetables.sorted { $0.id < $1.id }, forKey: .timetables)
-        try c.encode(subjects.sorted { $0.id < $1.id }, forKey: .subjects)
-        try c.encode(bellSchedules.sorted { $0.id < $1.id }, forKey: .bellSchedules)
-        try c.encode(lessons.sorted { $0.id < $1.id }, forKey: .lessons)
-        try c.encode(terms.sorted { $0.id < $1.id }, forKey: .terms)
-        try c.encode(breaks.sorted { $0.id < $1.id }, forKey: .breaks)
-        try c.encode(overrides.sorted { $0.id < $1.id }, forKey: .overrides)
-        try c.encode(tasks.sorted { $0.id < $1.id }, forKey: .tasks)
-        try c.encode(exams.sorted { $0.id < $1.id }, forKey: .exams)
-        try c.encode(reminderRules.sorted { $0.id < $1.id }, forKey: .reminderRules)
+        try c.encode(UnknownFieldsEnvelope(entity: settings, unknown: unknown.fields(of: settings)),
+                     forKey: .settings)
+        try encodeCollection(timetables, .timetables)
+        try encodeCollection(subjects, .subjects)
+        try encodeCollection(bellSchedules, .bellSchedules)
+        try encodeCollection(lessons, .lessons)
+        try encodeCollection(terms, .terms)
+        try encodeCollection(breaks, .breaks)
+        try encodeCollection(overrides, .overrides)
+        try encodeCollection(tasks, .tasks)
+        try encodeCollection(exams, .exams)
+        try encodeCollection(reminderRules, .reminderRules)
+
+        let extraRootKeys = unknown.root.filter { !Self.isRootKey($0.key) }
+        if !extraRootKeys.isEmpty {
+            var extra = encoder.container(keyedBy: UnknownFieldsCodingKey.self)
+            for (key, value) in extraRootKeys {
+                try extra.encode(value, forKey: UnknownFieldsCodingKey(key))
+            }
+        }
     }
 }
