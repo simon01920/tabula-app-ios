@@ -13,7 +13,7 @@ public enum SyncError: Error, Hashable, Sendable {
 enum SyncJSON {
     /// The JSON object of `value` (canonical `TabulaJSON` encoding).
     static func object(_ value: some Encodable) throws -> [String: JSONValue] {
-        guard case .object(let object) = try JSONValue(encoding: value) else {
+        guard case .object(let object) = try SyncJSONParser.parse(TabulaJSON.makeEncoder().encode(value)) else {
             throw SyncError.malformedRecord("value does not encode as a JSON object")
         }
         return object
@@ -21,7 +21,7 @@ enum SyncJSON {
 
     /// Decodes a JSON object as `type`.
     static func decode<T: Decodable>(_ object: [String: JSONValue], as type: T.Type) throws -> T {
-        try JSONValue.object(object).decoded(as: type)
+        try TabulaJSON.makeDecoder().decode(type, from: SyncJSONParser.serialize(.object(object)))
     }
 
     /// Parses the `meta` member of a record (same shape as `EntityMeta`'s `Codable` form).
@@ -125,19 +125,25 @@ enum SyncRecordMerger {
     }
 
     /// Set-merge of two arrays of records by `id` (missing or non-array values count as empty). Records
-    /// present on one side are kept verbatim; records on both sides are merged. Output is sorted by `id`.
+    /// present on one side are kept verbatim; records on both sides are merged. Output is in canonical child
+    /// order: by integer `sortIndex` when present, then by `id`.
     static func mergeRecordArrays(_ a: JSONValue?, _ b: JSONValue?) throws -> JSONValue {
         let left = try recordsByID(a), right = try recordsByID(b)
-        var result: [JSONValue] = []
-        for id in Set(left.keys).union(right.keys).sorted() {
+        var result: [(sortIndex: Int64, id: String, record: [String: JSONValue])] = []
+        for id in Set(left.keys).union(right.keys) {
+            let record: [String: JSONValue]
             switch (left[id], right[id]) {
-            case let (x?, y?): result.append(.object(try merge(x, y, childCollections: [])))
-            case let (x?, nil): result.append(.object(x))
-            case let (nil, y?): result.append(.object(y))
-            case (nil, nil): break
+            case let (x?, y?): record = try merge(x, y, childCollections: [])
+            case let (x?, nil): record = x
+            case let (nil, y?): record = y
+            case (nil, nil): continue
             }
+            var sortIndex = Int64.min
+            if case .integer(let value)? = record["sortIndex"] { sortIndex = value }
+            result.append((sortIndex, id, record))
         }
-        return .array(result)
+        result.sort { ($0.sortIndex, $0.id) < ($1.sortIndex, $1.id) }
+        return .array(result.map { .object($0.record) })
     }
 
     /// `true` when `value` is an array whose elements all look like records (`id` string + `meta` object).
