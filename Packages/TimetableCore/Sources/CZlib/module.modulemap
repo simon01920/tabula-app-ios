@@ -1,0 +1,7 @@
+// System zlib for the share codec (raw DEFLATE). Linux: package zlib1g-dev; Apple SDKs ship
+// usr/include/zlib.h and usr/lib/libz.tbd. See docs/specs/SHARE_FORMAT.md §6.
+module CZlib [system] {
+    header "CZlib.h"
+    link "z"
+    export *
+}
