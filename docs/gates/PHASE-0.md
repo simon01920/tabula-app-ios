@@ -137,3 +137,18 @@ Full copy-pasteable commands: `docs/ENVIRONMENT.md` §14. Nothing secret ever go
 3. AlarmKit/notification matrix (`docs/spikes/ALARMKIT.md`): 60 rows: silent on/off × Focus × Low Power × force-quit × reboot × time zone × DST × Watch; alarm-limit and 64-cap probes.
 
 Record results directly in those files (Observed column), or tell me and I'll record them.
+
+## Addendum 2 (2026-10-06): CI + simulator evidence
+- **iOS CI [37491895908](https://github.com/simon01920/tabula-app-ios/actions/runs/37491895908):** all green.
+  - Linux core tests + validation: 3m08s.
+  - Change detection: 5s.
+  - **XcodeGen path:** 1m52s.
+  - **xtool path:** 1m10s; the hang is fixed.
+  - TestFlight job correctly not started.
+- **UI screenshots [37491895960](https://github.com/simon01920/tabula-app-ios/actions/runs/37491895960):** 9m27s; the app launches in the iOS 27 Simulator (iPhone Pro Max).
+  - The orchestrator inspected the screenshots. The launch route resolves.
+  - `@Entry` ✓ and `@Generable` schema ✓ at runtime.
+  - String Catalog en + sk ✓; **Slovak plurals render correctly** ("1 hodina · 3 hodiny · 5 hodín").
+  - Dark mode ✓.
+  - Artifacts: `ui-screenshots-1` (light / dark / AX-XXXL text for each probe screen).
+- Still device-only: AlarmKit through the silent switch, Time Sensitive delivery, OCR on real photos, widget on the Home Screen, Watch install.
