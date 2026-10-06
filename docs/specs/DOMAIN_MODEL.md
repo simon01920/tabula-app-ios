@@ -1,8 +1,10 @@
 # DOMAIN_MODEL — persisted schema reference (schema version 1)
 
-Status: written in Phase 1 Stage 1 (2026-10-06). **This is the document the post-Phase-1 schema freeze refers to.**
-After the Phase 1 gate, any change to what is described in §§1–6 needs human approval (CLAUDE.md).
-Source of truth for the code: `Packages/TimetableCore/Sources/TimetableCore/{Calendar,Model,Support,Theme}`.
+Status: written in Phase 1 Stage 1 (2026-10-06), consolidated in Stage 3 (2026-10-07: default field clock =
+`createdAt`, instant range, unknown-key guarantee in §7, every Phase 1 localisation key in Appendix A).
+**This is the document the post-Phase-1 schema freeze refers to.**
+After the Phase 1 gate, any change to what is described in §§1–7 needs human approval (CLAUDE.md).
+Source of truth for the code: `Packages/TimetableCore/Sources/TimetableCore/{Calendar,Model,Support,Theme,Sync}`.
 `DomainModelDocTests` fails if a localisation key or a union kind used by the code is missing from this file.
 
 Contents: 1 Encoding conventions · 2 Root and sync metadata · 3 Entities · 4 Embedded value types ·
@@ -20,7 +22,7 @@ All persisted JSON goes through `TabulaJSON.makeEncoder()` / `makeDecoder()`.
 | Text | UTF-8. Object keys sorted (`.sortedKeys`), slashes not escaped, compact. `pretty: true` (indentation) only for tests and human-readable backups; both decode identically. |
 | Determinism | The same logical database always produces the same bytes. Entity arrays are written sorted by `id`. `TaskItem.subtasks` / `.attachments` are written sorted by (`sortIndex`, `id`). Every `Set` is written as an ascending array. `decode(encode(x)) == x.canonicalized()` and `encode(decode(bytes)) == bytes` for canonical input. |
 | Optionals | `nil` optional fields are **omitted** (no `null`). Empty arrays are written (`"bringList":[]`). |
-| Instant (`Date`) | **Integer** milliseconds since 1970-01-01T00:00:00Z, rounded to the nearest ms (`1791280800000`). Decoding also accepts a fractional number (rounded). Integers keep decode→encode byte-stable. |
+| Instant (`Date`) | **Integer** milliseconds since 1970-01-01T00:00:00Z, rounded to the nearest ms (`1791280800000`). Decoding also accepts a fractional number (rounded). Integers keep decode→encode byte-stable. **Range** (`TabulaJSON.millisecondsRange`): `-62135510400000` (0001-01-02T00:00Z) … `253402214399999` (9999-12-30T23:59:59.999Z), inclusive, so every instant has a wall-clock date in years 1…9999 in every time zone. Anything else — out of range (`1e300`, `9223372036854775807`), non-finite, a string, `true` — is a decoding error (never a crash), and encoding a date outside the range throws (the store never writes what it cannot read). |
 | `LocalDate` | `"yyyy-MM-dd"`, years 0001–9999, strict (zero-padded, valid day). Proleptic Gregorian. |
 | `LocalTime` | `"HH:mm"`, 00:00–23:59, 24-hour. No seconds, no 24:00. |
 | `LocalDateRange` | `{"end":"yyyy-MM-dd","start":"yyyy-MM-dd"}`, **inclusive** both ends. `end < start` decodes (empty range) and is reported by validation. |
@@ -55,7 +57,9 @@ All persisted JSON goes through `TabulaJSON.makeEncoder()` / `makeDecoder()`.
 | `reminderRules` | [`ReminderRule`] | |
 
 Tombstoned entities (`meta.isDeleted == true`) stay in their array until a future garbage collection; every
-consumer must skip them.
+consumer must skip them. The same holds for **tombstoned children** (`TaskItem.subtasks` / `.attachments` whose
+`meta.isDeleted == true`): they stay in the parent's array so that a merge cannot resurrect them, and every consumer
+(UI lists, counts, share export, reminders) must skip them.
 
 ### 2.2 `EntityMeta` (key `meta` on every entity and child)
 
@@ -70,14 +74,39 @@ consumer must skip them.
 
 | Key | Type | Invariant |
 |---|---|---|
-| `createdAt` | HLCTimestamp | ≤ `updatedAt`. |
-| `updatedAt` | HLCTimestamp | Latest change to any field; ≥ every `fieldClocks` value. |
+| `createdAt` | HLCTimestamp | ≤ `updatedAt`. Creation time **and the default field clock** (below). |
+| `updatedAt` | HLCTimestamp | Latest mutation of the entity: a field write, a delete or a restore; ≥ every `fieldClocks` value. |
 | `isDeleted` | Bool | Tombstone. |
-| `fieldClocks` | {String: HLCTimestamp} | Keyed by the field's **JSON key** (top-level fields of the entity, e.g. `"room"`, `"periods"`). **Empty map or missing key = the field is at `updatedAt`.** Always written (possibly `{}`). |
+| `fieldClocks` | {String: HLCTimestamp} | Keyed by the field's **JSON key** (top-level fields of the entity, e.g. `"room"`, `"periods"`, and unknown keys from newer versions). **A missing key = the field is at `createdAt`.** Always written (possibly `{}`). |
 
-Merge granularity (implemented by Stage 2E): field-level last-writer-wins by `fieldClocks`, ties broken by the
-HLC node. `BellSchedule.periods` is **one** field. `TaskItem.subtasks` and `TaskItem.attachments` are set-merged
-by child `id`, each child carrying its own `meta`.
+**Default field clock = `createdAt`** (Stage 3 decision, replacing "missing = `updatedAt`" from Stage 1). The
+effective clock of field `k` is `fieldClocks[k] ?? createdAt` (`EntityMeta.clock(for:)`). A mutation therefore
+never moves the clock of a field it did not write, including absent (nil) fields and unknown keys, so no clocks
+have to be materialised.
+
+**Canonical form** (written by `MutationStamper` and `SyncMerge`): `fieldClocks` lists only keys written after
+creation, and omits entries equal to `createdAt`; every value lies in `createdAt…updatedAt` (validation warns
+otherwise). Creating an entity writes `createdAt = updatedAt = t` and `{}`; an edit at `t` sets `updatedAt = t` and
+`fieldClocks[k] = t` for exactly the changed keys `k`. Decoding accepts non-canonical input and re-encodes it
+unchanged (byte stability).
+
+**Settings singleton:** `AppSettings` has a fixed ID and is created independently on every device, so it starts as
+`AppSettings.untouchedDefaults` with `EntityMeta.untouchedSingleton` = `createdAt = updatedAt =`
+`"000000000000000-0000000000-0000000000000000"` (`HLCTimestamp.zero`). Onboarding and the stamper add clocks only for
+fields whose value differs from the default, so a real edit on any device always beats another device's untouched
+defaults, however late those were created. There is no other fixed-ID singleton.
+
+Merge granularity (Stage 2E, `SyncMerge`): field-level last-writer-wins by effective clock, ties broken by the HLC
+node. `BellSchedule.periods` is **one** field. `TaskItem.subtasks` and `TaskItem.attachments` are set-merged by child
+`id`, each child carrying its own `meta` and following the same rules. Merged metadata: `updatedAt` = max,
+`fieldClocks` = per-key max of the effective clocks, `createdAt` = max (equal on both sides for real replicas; max
+keeps the merge a join-semilattice for hand-made data), written canonically.
+
+**Tombstone rule** (entities and children): a tombstone's delete clock is its `updatedAt`; a live version asserts
+liveness at its `updatedAt`. The merge result is **deleted iff the newest delete clock ≥ the newest liveness clock**;
+an exact tie keeps the delete. So an edit or a restore (`MutationStamper.restore`, a liveness assertion) made after
+the delete — on a device that had not seen it — resurrects the entity with all merged fields; an edit made before
+the delete stays deleted. Field values keep merging while deleted, so a later restore shows the newest data.
 
 ### 2.3 Entity types (sync record types)
 
@@ -97,7 +126,8 @@ User text is stored verbatim; it is data, never a localisation key, unless the t
 ### 3.1 `AppSettings` (`settings`)
 
 Exactly one instance, always with id **`7AB01A00-5E77-4000-8000-000000000001`** (`AppSettings.singletonID`), so
-that settings created independently on two devices merge field by field. It is never tombstoned.
+that settings created independently on two devices merge field by field. It is never tombstoned. It is created with
+`createdAt = updatedAt = HLCTimestamp.zero` and clocks only for non-default fields (§2.2).
 
 | Key | Type | Opt | Default / notes |
 |---|---|---|---|
@@ -462,7 +492,9 @@ same issues in the same order). Tombstoned entities are skipped except for dupli
 | `invalidTimeRange` | error / warning | period, `.time` slot or exam `end ≤ start` (error); quiet hours `start == end` (warning) |
 | `invalidDateRange` | error | term, break or `validity.range` with `end < start` |
 | `overlappingPeriods` | warning | two valid periods of one schedule overlap |
-| `invalidValue` | error / warning | errors: rotation length/anchor/anchorIndex/schoolDays out of range, `cycleDay` key without a matching day cycle, `weekday` key in a day-cycle timetable, `cycleWeeks` outside 1…length, `span < 1`, free-form duration outside 1…1439, `repeatRule.interval < 1`, negative offsets, `afterMinutes ≤ 0`, negative `maxLeadMinutes`, deleted settings. Warnings: labels count ≠ length, empty `enabledDays`/`cycleWeeks`/`validity.terms`/`offsets`, `cycleWeeks` without a week cycle, lesson on a disabled weekday, period slot in a free-form timetable, slot on a non-lesson period, `span` running past the last lesson period of the default schedule, preset rule with `alarm` tier, settings ID ≠ singleton, unknown fixed time zone, `updatedAt < createdAt`, a field clock after `updatedAt` |
+| `invalidValue` | error / warning | errors: rotation length/anchor/anchorIndex/schoolDays out of range, `cycleDay` key without a matching day cycle, `weekday` key in a day-cycle timetable, `span < 1`, free-form duration outside 1…1439, `repeatRule.interval < 1`, negative offsets, `afterMinutes ≤ 0`, negative `maxLeadMinutes`, deleted settings. Warnings: labels count ≠ length, empty `enabledDays`/`cycleWeeks`/`validity.terms`/`offsets`, `cycleWeeks` or `followDay.cycleWeek` without a week cycle, lesson on a disabled weekday, period slot in a free-form timetable, slot on a non-lesson period, `span` running past the last lesson period of the default schedule, preset rule with `alarm` tier, settings ID ≠ singleton, unknown fixed time zone, `updatedAt < createdAt`, a field clock outside `createdAt…updatedAt` (field `meta.fieldClocks`) |
+| `cycleWeekOutOfRange` | error | `followDay.cycleWeek` (field `change.cycleWeek`) or a lesson's `occurrence.cycleWeeks` entry outside 1…length of the timetable's week cycle; `value` = the week. (Stage 3; reported as `invalidValue` before.) |
+| `schoolDaysMismatch` | warning | a day-cycle timetable whose `rotation.schoolDays` and `enabledDays` differ: one issue per weekday that is a school day but not shown (field `rotation.schoolDays` — it silently consumes a cycle day) or shown but not a school day (field `enabledDays` — it never has lessons); `value` = ISO weekday. Empty sets are left to `invalidValue`. (Stage 3) |
 | `unknownValue` | info | an open-vocabulary value or open-union kind this version does not know |
 | `emptyScheduleDay` | info | an enabled weekday (or a cycle day of a day cycle) with no live lesson |
 
@@ -478,13 +510,27 @@ deletion; `LocalTime` never exceeds 23:59 (no lesson spans midnight).
    for them and report them as `unknownValue` (info).
 2. **Closed enums / closed unions**: adding a case is a schema change → bump `schemaVersion` (older apps then open the
    file read-only, Stage 2E).
-3. **Unknown object keys are ignored on decode and dropped on re-encode.** Adding an optional field without a bump
-   is therefore only acceptable if losing it when an *older* version re-saves is acceptable; otherwise bump the
-   version. The sync layer should upload only changed fields so that an older device does not erase a newer
-   device's fields in CloudKit (open question B4).
+3. **Unknown object keys are preserved** (guarantee since Stage 2E, decision B4; this replaces Stage 1's "ignored on
+   decode and dropped on re-encode"). While decoding, `TabulaDatabase` records every key this version's encoding
+   does not produce in `TabulaDatabase.unknownFields` (`UnknownFields`), at these levels:
+   - the **root object**, including whole unknown entity arrays (e.g. a later `"notes": [...]` collection);
+   - **every entity**, including `settings` (keyed by entity type + ID);
+   - **child records** (`subtasks`, `attachments`; keyed by collection + child ID).
+
+   Encoding merges them back; keys this version knows always win; encoding stays deterministic (sorted keys,
+   unchanged input re-encodes byte for byte). "Known" = `EntityFieldCatalog` (= the `CodingKeys`, checked against
+   the types by a test). Entries of entities/children no longer in the database are dropped. The sync merge treats
+   unknown keys as fields with the clocks the newer version wrote in `fieldClocks` (missing = `createdAt`, §2.2) and
+   set-merges unknown root arrays of records (`id` + `meta`) by ID.
+   **Not preserved:** unknown keys *inside* embedded value objects (e.g. inside `rotation`, `timeSensitivePolicy`,
+   `Period`, `reminderOverride`). A newer version that needs one must add a top-level field, a new entity array or
+   an open-union kind instead, or bump `schemaVersion`.
+   Consequence: adding an **optional top-level field** to an entity/child or a **new entity array** needs no schema
+   bump — older apps keep, re-save and sync it.
 4. Renaming a key or a raw value, changing a type, or changing the meaning of a value is always a breaking change.
 5. Decoding tolerates: missing root arrays (→ empty), missing `WeekCycleAnchor.offset` (→ 0), lowercase UUIDs,
-   lowercase hex colours, fractional millisecond instants.
+   lowercase hex colours, fractional millisecond instants, non-canonical `fieldClocks`. It rejects (error, never a
+   crash) instants outside the §1 range.
 6. `TabulaDatabase` decoding accepts any `schemaVersion`; migrations operate on `JSONValue` before typed decoding
    (Stage 2E).
 
@@ -519,12 +565,16 @@ deletion; `LocalTime` never exceeds 23:59 (no lesson spans midnight).
 - `LocalDate` arithmetic is pure integer math (proleptic Gregorian); ISO weeks follow ISO 8601 (53-week years 2020,
   2026, 2032, 2037).
 - Instant arithmetic uses `Int64` seconds (Apple Watch arm64_32 has a 32-bit `Int`).
+- **Hostile values never trap** (Stage 3): `LocalDate.adding(days:)` saturates at 0001-01-01 / 9999-12-31
+  (`addingIfValid(days:)` returns `nil` instead); `CalendarContext.local(from:)` saturates for instants outside years
+  1…9999; rotation arithmetic reduces persisted offsets/anchors modulo the cycle length before adding; reminder
+  offsets that leave the instant range are dropped as `invalidOffset`. Real data never reaches the bounds.
 - Core never reads `Date()`, `UUID()`, `Calendar.current`, `TimeZone.current` or `Locale.current`: inject `now`,
   an `IDGenerator` (`SystemIDGenerator` / `SequentialIDGenerator`) and a `TimestampClock`.
 
 ---
 
-## Appendix A — localisation keys introduced by TimetableCore (Stage 1)
+## Appendix A — localisation keys introduced by TimetableCore (Phase 1)
 
 Core returns only keys; the UI resolves them in String Catalogs. English source text below is a suggestion with
 translator context. Argument placeholders are positional.
@@ -560,6 +610,8 @@ translator context. Argument placeholders are positional.
 | `validation.invalidValue` | A %1$@ has a value that is out of range. |
 | `validation.unknownValue` | A %1$@ uses something from a newer app version. |
 | `validation.emptyScheduleDay` | A school day has no lessons yet. |
+| `validation.cycleWeekOutOfRange` | A %1$@ uses a week that isn't part of the timetable's rotation. |
+| `validation.schoolDaysMismatch` | The rotation's school days don't match the days this %1$@ shows. |
 
 ### A.3 Schedule conflicts — arg (1) number of affected lessons (plural variations)
 
@@ -614,11 +666,117 @@ translator context. Argument placeholders are positional.
 | `sample.exam.title` | Unit test | sample exam title |
 | `sample.bring.sportsKit` | Sports kit | bring-list item for PE |
 
-Total: 103 keys (11 + 11 + 5 + 2 + 52 + 22).
+A.1–A.6 are Stage 1 (A.2 gained `validation.cycleWeekOutOfRange` and `validation.schoolDaysMismatch` in Stage 3); A.7–A.9 are Stages 2B–2D. `CoreL10n.allKeys` enumerates every key; `DomainModelDocTests` fails if one is missing here, and `StringCatalogTests` if one is missing from `Resources/Localizable.xcstrings` (English source + translator comment; other languages are Phase 2).
+
+### A.7 Schedule engine (Stage 2B, `ScheduleL10n.allKeys`) — no arguments
+
+| Key | English | Context |
+|---|---|---|
+| `schedule.change.timeChanged` | Time changed | Badge on a lesson whose start or end time differs today. |
+| `schedule.change.subjectChanged` | Substitute subject | Badge: another subject is taught in this lesson today. |
+| `schedule.change.roomChanged` | Room changed | Badge: the lesson is in another room today. |
+| `schedule.change.buildingChanged` | Building changed | Badge: the lesson is in another building today. |
+| `schedule.change.teacherChanged` | Substitute teacher | Badge: another teacher teaches this lesson today. |
+| `schedule.change.lessonTypeChanged` | Lesson type changed | Badge: e.g. a lecture becomes a seminar today. |
+| `schedule.change.notesChanged` | Notes changed | Badge: the lesson's notes differ today. |
+| `schedule.change.bringListChanged` | Bring list changed | Badge: the things to bring differ today. |
+| `schedule.warning.periodNotInSchedule` | A lesson's period doesn't exist in this day's bell schedule, so it isn't shown. | Schedule warning (debug/health screen). |
+| `schedule.warning.periodMappedByOrdinal` | A lesson was moved to the matching period of this day's bell schedule. | Informational schedule warning. |
+| `schedule.warning.spanExceedsSchedule` | A lesson runs past the last period of the day and was shortened. | Schedule warning. |
+| `schedule.warning.missingBellSchedule` | A bell schedule is missing, so the regular one is used. | Schedule warning. |
+| `schedule.warning.missingSubject` | A lesson's subject is missing. | Schedule warning. |
+| `schedule.warning.invalidTimeRange` | A lesson ends before it starts, so it isn't shown. | Schedule warning. |
+| `schedule.warning.supersededOverride` | Another change for this day replaces this one. | Schedule warning: two day-level changes target the same date; the later one wins. |
+| `schedule.warning.overrideTargetNotScheduled` | This change refers to a lesson that doesn't take place on this day. | Schedule warning. |
+| `schedule.warning.followDayKindMismatch` | This day follows a day that doesn't fit the timetable's rotation. | Schedule warning: e.g. 'follow Monday' in a timetable that uses numbered cycle days. |
+| `schedule.warning.unknownOverride` | This change comes from a newer version of Tabula and is ignored. | Schedule warning. |
+
+### A.8 Reminder planner (Stage 2C, `ReminderL10n.allKeys`)
+
+`%lld` arguments have English one/other variations; positional arguments let translations reorder.
+
+| Key | Args | English |
+|---|---|---|
+| `reminder.task.title` | 1 task title | %@ |
+| `reminder.exam.title` | 1 exam title | Exam: %@ |
+| `reminder.lesson.title` | 1 subject name | %@ |
+| `reminder.followUp.title` | 1 task/exam title | Still to do: %@ |
+| `reminder.packTonight.title` | — | Pack your bag |
+| `reminder.room` | 1 room | Room %@ |
+| `reminder.task.dueToday` | — | Due today |
+| `reminder.task.dueTodayAt` | 1 time | Due today at %@ |
+| `reminder.task.dueTomorrow` | — | Due tomorrow |
+| `reminder.task.dueTomorrowAt` | 1 time | Due tomorrow at %@ |
+| `reminder.task.dueInDays` | 1 days, 2 date | one: Due in %1$lld day, on %2$@<br>other: Due in %1$lld days, on %2$@ |
+| `reminder.task.dueInDaysAt` | 1 days, 2 date, 3 time | one: Due in %1$lld day, on %2$@ at %3$@<br>other: Due in %1$lld days, on %2$@ at %3$@ |
+| `reminder.exam.today` | — | Today |
+| `reminder.exam.todayAt` | 1 time | Today at %@ |
+| `reminder.exam.tomorrow` | — | Tomorrow |
+| `reminder.exam.tomorrowAt` | 1 time | Tomorrow at %@ |
+| `reminder.exam.inDays` | 1 days, 2 date | one: In %1$lld day, on %2$@<br>other: In %1$lld days, on %2$@ |
+| `reminder.exam.inDaysAt` | 1 days, 2 date, 3 time | one: In %1$lld day, on %2$@ at %3$@<br>other: In %1$lld days, on %2$@ at %3$@ |
+| `reminder.lesson.todayAt` | 1 time | Starts at %@ |
+| `reminder.lesson.tomorrowAt` | 1 time | Tomorrow at %@ |
+| `reminder.lesson.inDaysAt` | 1 days, 2 date, 3 time | one: In %1$lld day, on %2$@ at %3$@<br>other: In %1$lld days, on %2$@ at %3$@ |
+| `reminder.packTonight.today` | 1 items, 2 first subject, 3 other subjects | one: %1$lld item to pack for today: %2$@<br>other: %1$lld items to pack for today, starting with %2$@ |
+| `reminder.packTonight.tomorrow` | 1 items, 2 first subject, 3 other subjects | one: %1$lld item to pack for tomorrow: %2$@<br>other: %1$lld items to pack for tomorrow, starting with %2$@ |
+| `reminder.packTonight.inDays` | 1 items, 2 first subject, 3 other subjects, 4 days, 5 date | one: %1$lld item to pack for %5$@: %2$@<br>other: %1$lld items to pack for %5$@, starting with %2$@ |
+| `reminder.notice.saturated` | 1 count | one: %lld reminder couldn't be scheduled yet. Open Tabula regularly to keep reminders up to date.<br>other: %lld reminders couldn't be scheduled yet. Open Tabula regularly to keep reminders up to date. |
+| `reminder.notice.alarmLimit` | 1 count | one: %lld alarm will arrive as a notification instead.<br>other: %lld alarms will arrive as notifications instead. |
+| `reminder.tierChange.presetRuleAlarm` | — | Suggested reminders never ring as alarms, so this one arrives as a Time Sensitive notification. |
+| `reminder.tierChange.alarmsDisabled` | — | Alarms are turned off in Settings, so this reminder arrives as a Time Sensitive notification. |
+| `reminder.tierChange.alarmsUnavailable` | — | Tabula isn't allowed to set alarms, so this reminder arrives as a Time Sensitive notification. |
+| `reminder.tierChange.followUpNeverAlarm` | — | Follow-up reminders never ring as alarms. |
+| `reminder.tierChange.alarmLimitReached` | — | Too many alarms are set, so this one arrives as a Time Sensitive notification. |
+| `reminder.tierChange.timeSensitiveDisabled` | — | Time Sensitive notifications are turned off, so this reminder arrives as a normal notification. |
+| `reminder.tierChange.leadTimeTooLong` | — | This reminder comes long before the event, so it arrives as a normal notification. |
+| `reminder.dropped.budget` | — | Too many reminders are coming up; this one will be scheduled later. |
+| `reminder.dropped.quietHoursAfterDue` | — | Quiet hours would delay this reminder until after it's due. |
+| `reminder.dropped.afterDue` | — | This reminder would arrive after the item is due. |
+| `reminder.dropped.duplicate` | — | Another reminder for the same item arrives at the same time. |
+| `reminder.dropped.invalidOffset` | — | This reminder's time isn't valid. |
+| `reminder.dropped.unsupportedOffset` | — | This reminder comes from a newer version of Tabula. |
+| `reminder.action.markDone` | — | Mark as Done |
+| `reminder.action.snoozeOneHour` | — | Remind Me in 1 Hour |
+| `reminder.action.snoozeTomorrow` | — | Remind Me Tomorrow |
+
+### A.9 Share codec (Stage 2D, `ShareError.allL10nKeys` + `ShareWarning.allL10nKeys`; SHARE_FORMAT §9)
+
+| Key | Args | English |
+|---|---|---|
+| `share.error.invalidLink` | — | This isn't a Tabula share link. |
+| `share.error.invalidCode` | — | Check the code: it has 8 letters and digits. |
+| `share.error.damaged` | — | This shared timetable is damaged or incomplete. |
+| `share.error.unsupportedVersion` | — | This share format isn't supported. |
+| `share.error.newerVersion` | — | This timetable was shared from a newer version of Tabula. Update the app to open it. |
+| `share.error.tooLarge` | — | This timetable is too large to share. Remove some notes or tasks and try again. |
+| `share.error.invalidContent` | — | This shared timetable contains invalid data and can't be imported. |
+| `share.error.timetableNotFound` | — | This timetable no longer exists. |
+| `share.error.failed` | — | Something went wrong. Try again. |
+| `share.error.tooMany.subjects` | 1 count, 2 limit | one: This timetable has %1$lld subject; at most %2$lld can be shared.<br>other: This timetable has %1$lld subjects; at most %2$lld can be shared. |
+| `share.error.tooMany.lessons` | 1 count, 2 limit | one: This timetable has %1$lld lesson; at most %2$lld can be shared.<br>other: This timetable has %1$lld lessons; at most %2$lld can be shared. |
+| `share.error.tooMany.bellSchedules` | 1 count, 2 limit | one: This timetable has %1$lld bell schedule; at most %2$lld can be shared.<br>other: This timetable has %1$lld bell schedules; at most %2$lld can be shared. |
+| `share.error.tooMany.periods` | 1 count, 2 limit | one: A bell schedule has %1$lld period; at most %2$lld can be shared.<br>other: A bell schedule has %1$lld periods; at most %2$lld can be shared. |
+| `share.error.tooMany.terms` | 1 count, 2 limit | one: This timetable has %1$lld term; at most %2$lld can be shared.<br>other: This timetable has %1$lld terms; at most %2$lld can be shared. |
+| `share.error.tooMany.breaks` | 1 count, 2 limit | one: This timetable has %1$lld holiday; at most %2$lld can be shared.<br>other: This timetable has %1$lld holidays; at most %2$lld can be shared. |
+| `share.error.tooMany.tasks` | 1 count, 2 limit | one: There is %1$lld task; at most %2$lld can be shared. Share without tasks?<br>other: There are %1$lld tasks; at most %2$lld can be shared. Share without tasks? |
+| `share.error.tooMany.exams` | 1 count, 2 limit | one: There is %1$lld exam; at most %2$lld can be shared. Share without tasks?<br>other: There are %1$lld exams; at most %2$lld can be shared. Share without tasks? |
+| `share.warning.unknownValue` | 1 value (unused in English) | Some details come from a newer version of Tabula and are kept as they are. |
+| `share.warning.unknownColorName` | — | Some colour names aren't available in this version. |
+| `share.warning.overlappingPeriods` | — | Two periods of a bell schedule overlap. |
+| `share.warning.lessonsOnDisabledDays` | 1 count | one: %lld lesson is on a day this timetable doesn't show.<br>other: %lld lessons are on days this timetable doesn't show. |
+| `share.warning.noLessons` | — | This timetable has no lessons yet. |
+| `share.warning.textShortened` | 1 count | one: %lld text was shortened to fit.<br>other: %lld texts were shortened to fit. |
+| `share.warning.charactersRemoved` | 1 count | one: Special characters were removed from %lld text.<br>other: Special characters were removed from %lld texts. |
+| `share.warning.listsShortened` | 1 count | one: %lld list was shortened to fit.<br>other: %lld lists were shortened to fit. |
+| `share.warning.skippedLessons` | 1 count | one: %lld lesson without a subject or period was left out.<br>other: %lld lessons without a subject or period were left out. |
+| `share.warning.valuesDropped` | 1 count | one: %lld detail that can't be shared was left out.<br>other: %lld details that can't be shared were left out. |
+
+Total: 192 keys (A.1–A.6: 105 = 11 + 13 + 5 + 2 + 52 + 22 · A.7: 18 · A.8: 42 · A.9: 27).
 
 ---
 
-## Appendix B — decisions and open questions (Stage 1)
+## Appendix B — decisions and open questions (Phase 1)
 
 Decisions taken in Stage 1 (safer option where the plan was silent or ambiguous):
 
@@ -626,19 +784,9 @@ Decisions taken in Stage 1 (safer option where the plan was silent or ambiguous)
 - B2 `AppSettings` uses a fixed singleton ID so two devices' settings merge instead of duplicating.
 - B3 `PeriodKind`, `LessonField`, `RepeatFrequency`, `PalettePackID` are open vocabularies (the plan listed a
   closed `.lesson|.break|.lunch`); unknown values round-trip.
-- B4 **Unknown object keys are preserved** (decided in Stage 2E; supersedes §7.3 — the orchestrator folds this into
-  §7.3 at integration). While decoding, `TabulaDatabase` records every key that this version's encoding does not
-  produce in `TabulaDatabase.unknownFields` (`UnknownFields`): unknown keys of the **root object** (including whole
-  unknown entity arrays, e.g. a `"notes": [...]` collection added later), of **every entity** (including `settings`;
-  keyed by entity type + ID) and of **child records** (`subtasks`, `attachments`; keyed by collection + child ID).
-  Encoding merges them back; keys this version knows always win, and encoding stays deterministic (sorted keys;
-  unchanged input re-encodes byte for byte). "Known" = `EntityFieldCatalog` (= the `CodingKeys`, checked against the
-  types by a test). Entries of entities/children no longer in the database are dropped. The sync merge treats unknown
-  keys as fields with the clocks the newer version wrote in `fieldClocks`, and set-merges unknown root arrays of
-  records (`id` + `meta`) by ID. **Not preserved:** unknown keys *inside* embedded value objects (e.g. inside
-  `rotation`, `timeSensitivePolicy`, `Period`) — a newer version that needs one must add a top-level field, a new
-  entity array, or an open-union kind instead, or bump `schemaVersion`. Consequence for §7.3: adding an optional
-  top-level field or a new entity array **no longer requires a schema bump**; older apps keep and re-save it.
+- B4 **Unknown object keys are preserved** (decided in Stage 2E). The full guarantee — levels (root, entities incl.
+  settings, children), what is *not* preserved (keys inside embedded value objects) and the consequence that an optional
+  top-level field or a new entity array needs no schema bump — is normative in §7.3 (folded in at Stage 3).
 - B5 `OverrideChange.followDay` has an optional `cycleWeek`; `WeekCycleAnchor.isoWeekParity` has an `offset`
   (A/B swap). Both are additive to the plan.
 - B6 Period-ID convention for variant bell schedules (§3.4) and `span` counting lesson periods only (§3.5).
@@ -646,3 +794,8 @@ Decisions taken in Stage 1 (safer option where the plan was silent or ambiguous)
   anchored to across years); the human's learning-mode contribution (PHASE1_PLAN §10) decides the default.
 - B8 Free/Pro attachment quotas (100 MB / 2 000 MB) are placeholders; the human decides. PRODUCT.md's Free list names
   "grid/day/tile views" but does not assign week time-blocks or Agenda to either tier — currently ungated.
+- B9 (Stage 3, orchestrator decision) Default field clock = `createdAt`, canonical `fieldClocks`, settings singleton at
+  `createdAt = HLCTimestamp.zero` (§2.2). Replaces Stage 1's "missing = `updatedAt`", which forced the stamper to
+  materialise every field's clock (file 8 911 KiB → 4 805 KiB for 5 000 tasks + 2 000 lessons) and let a later,
+  untouched settings default win over an earlier real edit. Data written before this change is pre-freeze test data only.
+- B10 (Stage 3) Instants are limited to years 1…9999 (§1) and validated on decode; out-of-range values were a crash.

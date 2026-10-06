@@ -182,3 +182,12 @@ public struct DayResolution: Hashable, Sendable, Codable {
         changes.first { $0.occurrenceID == occurrenceID }?.reasons ?? []
     }
 }
+
+/// String Catalog keys emitted by the schedule engine (Stage 2B): modification badges and resolution warnings.
+/// None takes arguments. Listed in DOMAIN_MODEL Appendix A.7 and in `Resources/Localizable.xcstrings`.
+public enum ScheduleL10n {
+    /// Every key: `schedule.change.<reason>` then `schedule.warning.<kind>`, in declaration order.
+    public static var allKeys: [String] {
+        ModificationReason.allCases.map(\.l10nKey) + ResolutionWarning.Kind.allCases.map(\.l10nKey)
+    }
+}

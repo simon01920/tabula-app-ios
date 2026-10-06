@@ -1,6 +1,834 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "conflict.invalidTimeRange" : {
+      "comment" : "Schedule conflict. Arg 1 = number of affected lessons.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A lesson ends before it starts."
+          }
+        }
+      }
+    },
+    "conflict.missingSubject" : {
+      "comment" : "Schedule conflict. Arg 1 = number of affected lessons.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A lesson's subject is missing."
+          }
+        }
+      }
+    },
+    "conflict.overlap" : {
+      "comment" : "Schedule conflict. Arg 1 = number of affected lessons.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld lesson overlaps."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld lessons overlap."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "conflict.periodNotInSchedule" : {
+      "comment" : "Schedule conflict. Arg 1 = number of affected lessons.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A lesson's period doesn't exist in today's bell schedule."
+          }
+        }
+      }
+    },
+    "conflict.spanExceedsSchedule" : {
+      "comment" : "Schedule conflict. Arg 1 = number of affected lessons.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A lesson runs past the last period of the day."
+          }
+        }
+      }
+    },
+    "entityType.bellSchedule" : {
+      "comment" : "Entity type name, lower case, used inside validation messages.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bell schedule"
+          }
+        }
+      }
+    },
+    "entityType.calendarBreak" : {
+      "comment" : "Entity type name, lower case, used inside validation messages (a break/holiday date range).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "holiday"
+          }
+        }
+      }
+    },
+    "entityType.exam" : {
+      "comment" : "Entity type name, lower case, used inside validation messages.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "exam"
+          }
+        }
+      }
+    },
+    "entityType.lesson" : {
+      "comment" : "Entity type name, lower case, used inside validation messages.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "lesson"
+          }
+        }
+      }
+    },
+    "entityType.reminderRule" : {
+      "comment" : "Entity type name, lower case, used inside validation messages.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "reminder rule"
+          }
+        }
+      }
+    },
+    "entityType.scheduleOverride" : {
+      "comment" : "Entity type name, lower case, used inside validation messages (a one-off change to one day).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "schedule change"
+          }
+        }
+      }
+    },
+    "entityType.settings" : {
+      "comment" : "Entity type name, lower case, used inside validation messages.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "settings"
+          }
+        }
+      }
+    },
+    "entityType.subject" : {
+      "comment" : "Entity type name, lower case, used inside validation messages.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "subject"
+          }
+        }
+      }
+    },
+    "entityType.task" : {
+      "comment" : "Entity type name, lower case, used inside validation messages (homework/assignment/to-do).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "task"
+          }
+        }
+      }
+    },
+    "entityType.term" : {
+      "comment" : "Entity type name, lower case, used inside validation messages (school term / semester).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "term"
+          }
+        }
+      }
+    },
+    "entityType.timetable" : {
+      "comment" : "Entity type name, lower case, used inside validation messages (noun, lower case, used inside sentences).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "timetable"
+          }
+        }
+      }
+    },
+    "palette.classic.color.blue" : {
+      "comment" : "Accessibility name of a subject colour in the 'classic' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blue"
+          }
+        }
+      }
+    },
+    "palette.classic.color.brown" : {
+      "comment" : "Accessibility name of a subject colour in the 'classic' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brown"
+          }
+        }
+      }
+    },
+    "palette.classic.color.cyan" : {
+      "comment" : "Accessibility name of a subject colour in the 'classic' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cyan"
+          }
+        }
+      }
+    },
+    "palette.classic.color.gray" : {
+      "comment" : "Accessibility name of a subject colour in the 'classic' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grey"
+          }
+        }
+      }
+    },
+    "palette.classic.color.green" : {
+      "comment" : "Accessibility name of a subject colour in the 'classic' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Green"
+          }
+        }
+      }
+    },
+    "palette.classic.color.indigo" : {
+      "comment" : "Accessibility name of a subject colour in the 'classic' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indigo"
+          }
+        }
+      }
+    },
+    "palette.classic.color.orange" : {
+      "comment" : "Accessibility name of a subject colour in the 'classic' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orange"
+          }
+        }
+      }
+    },
+    "palette.classic.color.pink" : {
+      "comment" : "Accessibility name of a subject colour in the 'classic' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pink"
+          }
+        }
+      }
+    },
+    "palette.classic.color.purple" : {
+      "comment" : "Accessibility name of a subject colour in the 'classic' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Purple"
+          }
+        }
+      }
+    },
+    "palette.classic.color.red" : {
+      "comment" : "Accessibility name of a subject colour in the 'classic' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Red"
+          }
+        }
+      }
+    },
+    "palette.classic.color.teal" : {
+      "comment" : "Accessibility name of a subject colour in the 'classic' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teal"
+          }
+        }
+      }
+    },
+    "palette.classic.color.yellow" : {
+      "comment" : "Accessibility name of a subject colour in the 'classic' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yellow"
+          }
+        }
+      }
+    },
+    "palette.classic.name" : {
+      "comment" : "Name of the 'classic' colour palette.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classic"
+          }
+        }
+      }
+    },
+    "palette.ocean.color.abyss" : {
+      "comment" : "Accessibility name of a subject colour in the 'ocean' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abyss"
+          }
+        }
+      }
+    },
+    "palette.ocean.color.aqua" : {
+      "comment" : "Accessibility name of a subject colour in the 'ocean' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aqua"
+          }
+        }
+      }
+    },
+    "palette.ocean.color.coral" : {
+      "comment" : "Accessibility name of a subject colour in the 'ocean' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coral"
+          }
+        }
+      }
+    },
+    "palette.ocean.color.deepSea" : {
+      "comment" : "Accessibility name of a subject colour in the 'ocean' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deep sea"
+          }
+        }
+      }
+    },
+    "palette.ocean.color.harbor" : {
+      "comment" : "Accessibility name of a subject colour in the 'ocean' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Harbour"
+          }
+        }
+      }
+    },
+    "palette.ocean.color.lagoon" : {
+      "comment" : "Accessibility name of a subject colour in the 'ocean' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lagoon"
+          }
+        }
+      }
+    },
+    "palette.ocean.color.mist" : {
+      "comment" : "Accessibility name of a subject colour in the 'ocean' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mist"
+          }
+        }
+      }
+    },
+    "palette.ocean.color.navy" : {
+      "comment" : "Accessibility name of a subject colour in the 'ocean' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navy"
+          }
+        }
+      }
+    },
+    "palette.ocean.color.sand" : {
+      "comment" : "Accessibility name of a subject colour in the 'ocean' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sand"
+          }
+        }
+      }
+    },
+    "palette.ocean.color.seafoam" : {
+      "comment" : "Accessibility name of a subject colour in the 'ocean' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seafoam"
+          }
+        }
+      }
+    },
+    "palette.ocean.color.sky" : {
+      "comment" : "Accessibility name of a subject colour in the 'ocean' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sky"
+          }
+        }
+      }
+    },
+    "palette.ocean.color.teal" : {
+      "comment" : "Accessibility name of a subject colour in the 'ocean' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teal"
+          }
+        }
+      }
+    },
+    "palette.ocean.name" : {
+      "comment" : "Name of the 'ocean' colour palette.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocean"
+          }
+        }
+      }
+    },
+    "palette.pastel.color.aqua" : {
+      "comment" : "Accessibility name of a subject colour in the 'pastel' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aqua"
+          }
+        }
+      }
+    },
+    "palette.pastel.color.blush" : {
+      "comment" : "Accessibility name of a subject colour in the 'pastel' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blush"
+          }
+        }
+      }
+    },
+    "palette.pastel.color.lavender" : {
+      "comment" : "Accessibility name of a subject colour in the 'pastel' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lavender"
+          }
+        }
+      }
+    },
+    "palette.pastel.color.lemon" : {
+      "comment" : "Accessibility name of a subject colour in the 'pastel' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lemon"
+          }
+        }
+      }
+    },
+    "palette.pastel.color.lilac" : {
+      "comment" : "Accessibility name of a subject colour in the 'pastel' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lilac"
+          }
+        }
+      }
+    },
+    "palette.pastel.color.linen" : {
+      "comment" : "Accessibility name of a subject colour in the 'pastel' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Linen"
+          }
+        }
+      }
+    },
+    "palette.pastel.color.mint" : {
+      "comment" : "Accessibility name of a subject colour in the 'pastel' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mint"
+          }
+        }
+      }
+    },
+    "palette.pastel.color.peach" : {
+      "comment" : "Accessibility name of a subject colour in the 'pastel' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peach"
+          }
+        }
+      }
+    },
+    "palette.pastel.color.periwinkle" : {
+      "comment" : "Accessibility name of a subject colour in the 'pastel' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Periwinkle"
+          }
+        }
+      }
+    },
+    "palette.pastel.color.pink" : {
+      "comment" : "Accessibility name of a subject colour in the 'pastel' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pink"
+          }
+        }
+      }
+    },
+    "palette.pastel.color.sage" : {
+      "comment" : "Accessibility name of a subject colour in the 'pastel' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sage"
+          }
+        }
+      }
+    },
+    "palette.pastel.color.sky" : {
+      "comment" : "Accessibility name of a subject colour in the 'pastel' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sky"
+          }
+        }
+      }
+    },
+    "palette.pastel.name" : {
+      "comment" : "Name of the 'pastel' colour palette.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pastel"
+          }
+        }
+      }
+    },
+    "palette.sunset.color.amber" : {
+      "comment" : "Accessibility name of a subject colour in the 'sunset' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amber"
+          }
+        }
+      }
+    },
+    "palette.sunset.color.crimson" : {
+      "comment" : "Accessibility name of a subject colour in the 'sunset' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crimson"
+          }
+        }
+      }
+    },
+    "palette.sunset.color.dusk" : {
+      "comment" : "Accessibility name of a subject colour in the 'sunset' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dusk"
+          }
+        }
+      }
+    },
+    "palette.sunset.color.ember" : {
+      "comment" : "Accessibility name of a subject colour in the 'sunset' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ember"
+          }
+        }
+      }
+    },
+    "palette.sunset.color.gold" : {
+      "comment" : "Accessibility name of a subject colour in the 'sunset' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gold"
+          }
+        }
+      }
+    },
+    "palette.sunset.color.magenta" : {
+      "comment" : "Accessibility name of a subject colour in the 'sunset' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Magenta"
+          }
+        }
+      }
+    },
+    "palette.sunset.color.peach" : {
+      "comment" : "Accessibility name of a subject colour in the 'sunset' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peach"
+          }
+        }
+      }
+    },
+    "palette.sunset.color.plum" : {
+      "comment" : "Accessibility name of a subject colour in the 'sunset' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plum"
+          }
+        }
+      }
+    },
+    "palette.sunset.color.rose" : {
+      "comment" : "Accessibility name of a subject colour in the 'sunset' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rose"
+          }
+        }
+      }
+    },
+    "palette.sunset.color.rust" : {
+      "comment" : "Accessibility name of a subject colour in the 'sunset' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rust"
+          }
+        }
+      }
+    },
+    "palette.sunset.color.tangerine" : {
+      "comment" : "Accessibility name of a subject colour in the 'sunset' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tangerine"
+          }
+        }
+      }
+    },
+    "palette.sunset.color.violet" : {
+      "comment" : "Accessibility name of a subject colour in the 'sunset' palette (VoiceOver).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Violet"
+          }
+        }
+      }
+    },
+    "palette.sunset.name" : {
+      "comment" : "Name of the 'sunset' colour palette.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sunset"
+          }
+        }
+      }
+    },
     "probe.hello" : {
       "comment" : "Phase 0 localization probe shown on the debug screen. Delete after Phase 0.",
       "extractionState" : "manual",
@@ -177,6 +1005,1782 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Test Tabuly"
+          }
+        }
+      }
+    },
+    "reminder.action.markDone" : {
+      "comment" : "Notification action button (title case per Apple HIG). No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mark as Done"
+          }
+        }
+      }
+    },
+    "reminder.action.snoozeOneHour" : {
+      "comment" : "Notification action button. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remind Me in 1 Hour"
+          }
+        }
+      }
+    },
+    "reminder.action.snoozeTomorrow" : {
+      "comment" : "Notification action button. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remind Me Tomorrow"
+          }
+        }
+      }
+    },
+    "reminder.dropped.afterDue" : {
+      "comment" : "Why a reminder is not delivered. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This reminder would arrive after the item is due."
+          }
+        }
+      }
+    },
+    "reminder.dropped.budget" : {
+      "comment" : "Why a reminder is not scheduled yet (iOS limit of pending notifications). No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Too many reminders are coming up; this one will be scheduled later."
+          }
+        }
+      }
+    },
+    "reminder.dropped.duplicate" : {
+      "comment" : "Why a reminder is not delivered. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Another reminder for the same item arrives at the same time."
+          }
+        }
+      }
+    },
+    "reminder.dropped.invalidOffset" : {
+      "comment" : "Why a reminder is not delivered. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This reminder's time isn't valid."
+          }
+        }
+      }
+    },
+    "reminder.dropped.quietHoursAfterDue" : {
+      "comment" : "Why a reminder is not delivered. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quiet hours would delay this reminder until after it's due."
+          }
+        }
+      }
+    },
+    "reminder.dropped.unsupportedOffset" : {
+      "comment" : "Why a reminder is not delivered. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This reminder comes from a newer version of Tabula."
+          }
+        }
+      }
+    },
+    "reminder.exam.inDays" : {
+      "comment" : "Exam reminder body; plural on arg 1 (days), arg 2 = date. Args: 1 days, 2 date.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "In %1$lld day, on %2$@"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "In %1$lld days, on %2$@"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "reminder.exam.inDaysAt" : {
+      "comment" : "Exam reminder body; plural on arg 1 (days), arg 2 = date, arg 3 = start time. Args: 1 days, 2 date, 3 time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "In %1$lld day, on %2$@ at %3$@"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "In %1$lld days, on %2$@ at %3$@"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "reminder.exam.title" : {
+      "comment" : "Notification title for an exam reminder. Args: 1 exam title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exam: %@"
+          }
+        }
+      }
+    },
+    "reminder.exam.today" : {
+      "comment" : "Exam reminder body. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today"
+          }
+        }
+      }
+    },
+    "reminder.exam.todayAt" : {
+      "comment" : "Exam reminder body; arg = start time. Args: 1 time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today at %@"
+          }
+        }
+      }
+    },
+    "reminder.exam.tomorrow" : {
+      "comment" : "Exam reminder body. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tomorrow"
+          }
+        }
+      }
+    },
+    "reminder.exam.tomorrowAt" : {
+      "comment" : "Exam reminder body; arg = start time. Args: 1 time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tomorrow at %@"
+          }
+        }
+      }
+    },
+    "reminder.followUp.title" : {
+      "comment" : "Follow-up notification title when an item is still open. Args: 1 task/exam title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Still to do: %@"
+          }
+        }
+      }
+    },
+    "reminder.lesson.inDaysAt" : {
+      "comment" : "Lesson reminder body; plural on arg 1 (days), arg 2 = date, arg 3 = start time. Args: 1 days, 2 date, 3 time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "In %1$lld day, on %2$@ at %3$@"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "In %1$lld days, on %2$@ at %3$@"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "reminder.lesson.title" : {
+      "comment" : "Notification title: the subject's name (user text). Args: 1 subject name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@"
+          }
+        }
+      }
+    },
+    "reminder.lesson.todayAt" : {
+      "comment" : "Lesson reminder body; arg = start time. Args: 1 time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starts at %@"
+          }
+        }
+      }
+    },
+    "reminder.lesson.tomorrowAt" : {
+      "comment" : "Lesson reminder body; arg = start time. Args: 1 time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tomorrow at %@"
+          }
+        }
+      }
+    },
+    "reminder.notice.alarmLimit" : {
+      "comment" : "In-app notice when too many loud alarms are set; plural on the count. Args: 1 count.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld alarm will arrive as a notification instead."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld alarms will arrive as notifications instead."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "reminder.notice.saturated" : {
+      "comment" : "In-app notice when more reminders are due than iOS allows at once; plural on the count. Args: 1 count.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld reminder couldn't be scheduled yet. Open Tabula regularly to keep reminders up to date."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld reminders couldn't be scheduled yet. Open Tabula regularly to keep reminders up to date."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "reminder.packTonight.inDays" : {
+      "comment" : "Pack-your-bag body. Plural on arg 1 (items); arg 2 = first subject; arg 5 = date; args 3 (other subjects) and 4 (days) unused in English. Args: 1 items, 2 first subject, 3 other subjects, 4 days, 5 date.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$lld item to pack for %5$@: %2$@"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$lld items to pack for %5$@, starting with %2$@"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "reminder.packTonight.title" : {
+      "comment" : "Notification title of the evening 'pack your bag' reminder. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pack your bag"
+          }
+        }
+      }
+    },
+    "reminder.packTonight.today" : {
+      "comment" : "Pack-your-bag body (lock screen: counts and the first subject only). Plural on arg 1 (items); arg 2 = first subject; arg 3 = number of other subjects (not shown in English: the local catalog compiler supports one plural argument per string). Args: 1 items, 2 first subject, 3 other subjects.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$lld item to pack for today: %2$@"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$lld items to pack for today, starting with %2$@"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "reminder.packTonight.tomorrow" : {
+      "comment" : "Pack-your-bag body. Plural on arg 1 (items); arg 2 = first subject; arg 3 = number of other subjects (unused in English). Args: 1 items, 2 first subject, 3 other subjects.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$lld item to pack for tomorrow: %2$@"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$lld items to pack for tomorrow, starting with %2$@"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "reminder.room" : {
+      "comment" : "Notification subtitle with the room (user text). Args: 1 room.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Room %@"
+          }
+        }
+      }
+    },
+    "reminder.task.dueInDays" : {
+      "comment" : "Task reminder body; plural on arg 1 (days), arg 2 = formatted date. Args: 1 days, 2 date.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Due in %1$lld day, on %2$@"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Due in %1$lld days, on %2$@"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "reminder.task.dueInDaysAt" : {
+      "comment" : "Task reminder body; plural on arg 1 (days), arg 2 = date, arg 3 = time. Args: 1 days, 2 date, 3 time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Due in %1$lld day, on %2$@ at %3$@"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Due in %1$lld days, on %2$@ at %3$@"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "reminder.task.dueToday" : {
+      "comment" : "Task reminder body. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Due today"
+          }
+        }
+      }
+    },
+    "reminder.task.dueTodayAt" : {
+      "comment" : "Task reminder body; arg = formatted time. Args: 1 time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Due today at %@"
+          }
+        }
+      }
+    },
+    "reminder.task.dueTomorrow" : {
+      "comment" : "Task reminder body. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Due tomorrow"
+          }
+        }
+      }
+    },
+    "reminder.task.dueTomorrowAt" : {
+      "comment" : "Task reminder body; arg = formatted time. Args: 1 time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Due tomorrow at %@"
+          }
+        }
+      }
+    },
+    "reminder.task.title" : {
+      "comment" : "Notification title: the task's title (user text), shown as is. Args: 1 task title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@"
+          }
+        }
+      }
+    },
+    "reminder.tierChange.alarmLimitReached" : {
+      "comment" : "Explanation in the reminder health check. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Too many alarms are set, so this one arrives as a Time Sensitive notification."
+          }
+        }
+      }
+    },
+    "reminder.tierChange.alarmsDisabled" : {
+      "comment" : "Explanation in the reminder health check. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alarms are turned off in Settings, so this reminder arrives as a Time Sensitive notification."
+          }
+        }
+      }
+    },
+    "reminder.tierChange.alarmsUnavailable" : {
+      "comment" : "Explanation in the reminder health check (AlarmKit permission missing). No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabula isn't allowed to set alarms, so this reminder arrives as a Time Sensitive notification."
+          }
+        }
+      }
+    },
+    "reminder.tierChange.followUpNeverAlarm" : {
+      "comment" : "Explanation in the reminder health check. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Follow-up reminders never ring as alarms."
+          }
+        }
+      }
+    },
+    "reminder.tierChange.leadTimeTooLong" : {
+      "comment" : "Explanation: reminders more than an hour ahead are not Time Sensitive (Apple guideline). No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This reminder comes long before the event, so it arrives as a normal notification."
+          }
+        }
+      }
+    },
+    "reminder.tierChange.presetRuleAlarm" : {
+      "comment" : "Explanation in the reminder health check. 'Time Sensitive' is Apple's notification level name. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggested reminders never ring as alarms, so this one arrives as a Time Sensitive notification."
+          }
+        }
+      }
+    },
+    "reminder.tierChange.timeSensitiveDisabled" : {
+      "comment" : "Explanation in the reminder health check. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time Sensitive notifications are turned off, so this reminder arrives as a normal notification."
+          }
+        }
+      }
+    },
+    "sample.bring.sportsKit" : {
+      "comment" : "Sample data, resolved once into user text: bring-list item for PE.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sports kit"
+          }
+        }
+      }
+    },
+    "sample.exam.title" : {
+      "comment" : "Sample data, resolved once into user text: sample exam title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unit test"
+          }
+        }
+      }
+    },
+    "sample.subject.academicWriting" : {
+      "comment" : "Sample data, resolved once into user text: university course.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Academic Writing"
+          }
+        }
+      }
+    },
+    "sample.subject.art" : {
+      "comment" : "Sample data, resolved once into user text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Art"
+          }
+        }
+      }
+    },
+    "sample.subject.biology" : {
+      "comment" : "Sample data, resolved once into user text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Biology"
+          }
+        }
+      }
+    },
+    "sample.subject.calculus" : {
+      "comment" : "Sample data, resolved once into user text: university course.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calculus"
+          }
+        }
+      }
+    },
+    "sample.subject.chemistry" : {
+      "comment" : "Sample data, resolved once into user text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chemistry"
+          }
+        }
+      }
+    },
+    "sample.subject.databases" : {
+      "comment" : "Sample data, resolved once into user text: university course.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Databases"
+          }
+        }
+      }
+    },
+    "sample.subject.foreignLanguage" : {
+      "comment" : "Sample data, resolved once into user text: a typical first foreign language for the locale (sk/cs/pl/…: English).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "French"
+          }
+        }
+      }
+    },
+    "sample.subject.geography" : {
+      "comment" : "Sample data, resolved once into user text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geography"
+          }
+        }
+      }
+    },
+    "sample.subject.history" : {
+      "comment" : "Sample data, resolved once into user text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "History"
+          }
+        }
+      }
+    },
+    "sample.subject.informatics" : {
+      "comment" : "Sample data, resolved once into user text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Computer Science"
+          }
+        }
+      }
+    },
+    "sample.subject.linearAlgebra" : {
+      "comment" : "Sample data, resolved once into user text: university course.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Linear Algebra"
+          }
+        }
+      }
+    },
+    "sample.subject.mathematics" : {
+      "comment" : "Sample data, resolved once into user text: school subject.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mathematics"
+          }
+        }
+      }
+    },
+    "sample.subject.music" : {
+      "comment" : "Sample data, resolved once into user text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Music"
+          }
+        }
+      }
+    },
+    "sample.subject.nativeLanguage" : {
+      "comment" : "Sample data, resolved once into user text: the country's main language as a school subject (sk: Slovenčina, de: Deutsch, …).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "English"
+          }
+        }
+      }
+    },
+    "sample.subject.physicalEducation" : {
+      "comment" : "Sample data, resolved once into user text: physical education.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PE"
+          }
+        }
+      }
+    },
+    "sample.subject.physics" : {
+      "comment" : "Sample data, resolved once into user text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Physics"
+          }
+        }
+      }
+    },
+    "sample.subject.programming" : {
+      "comment" : "Sample data, resolved once into user text: university course.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Programming"
+          }
+        }
+      }
+    },
+    "sample.subject.science" : {
+      "comment" : "Sample data, resolved once into user text: primary-school subject.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Science"
+          }
+        }
+      }
+    },
+    "sample.subject.statistics" : {
+      "comment" : "Sample data, resolved once into user text: university course.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statistics"
+          }
+        }
+      }
+    },
+    "sample.task.homework" : {
+      "comment" : "Sample data, resolved once into user text: sample homework title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exercises on page 42"
+          }
+        }
+      }
+    },
+    "schedule.change.bringListChanged" : {
+      "comment" : "Badge: the things to bring differ today. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bring list changed"
+          }
+        }
+      }
+    },
+    "schedule.change.buildingChanged" : {
+      "comment" : "Badge: the lesson is in another building today. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Building changed"
+          }
+        }
+      }
+    },
+    "schedule.change.lessonTypeChanged" : {
+      "comment" : "Badge: e.g. a lecture becomes a seminar today. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesson type changed"
+          }
+        }
+      }
+    },
+    "schedule.change.notesChanged" : {
+      "comment" : "Badge: the lesson's notes differ today. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes changed"
+          }
+        }
+      }
+    },
+    "schedule.change.roomChanged" : {
+      "comment" : "Badge: the lesson is in another room today. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Room changed"
+          }
+        }
+      }
+    },
+    "schedule.change.subjectChanged" : {
+      "comment" : "Badge: another subject is taught in this lesson today. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Substitute subject"
+          }
+        }
+      }
+    },
+    "schedule.change.teacherChanged" : {
+      "comment" : "Badge: another teacher teaches this lesson today. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Substitute teacher"
+          }
+        }
+      }
+    },
+    "schedule.change.timeChanged" : {
+      "comment" : "Badge on a lesson whose start or end time differs today. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time changed"
+          }
+        }
+      }
+    },
+    "schedule.warning.followDayKindMismatch" : {
+      "comment" : "Schedule warning: e.g. 'follow Monday' in a timetable that uses numbered cycle days. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This day follows a day that doesn't fit the timetable's rotation."
+          }
+        }
+      }
+    },
+    "schedule.warning.invalidTimeRange" : {
+      "comment" : "Schedule warning. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A lesson ends before it starts, so it isn't shown."
+          }
+        }
+      }
+    },
+    "schedule.warning.missingBellSchedule" : {
+      "comment" : "Schedule warning. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A bell schedule is missing, so the regular one is used."
+          }
+        }
+      }
+    },
+    "schedule.warning.missingSubject" : {
+      "comment" : "Schedule warning. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A lesson's subject is missing."
+          }
+        }
+      }
+    },
+    "schedule.warning.overrideTargetNotScheduled" : {
+      "comment" : "Schedule warning. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This change refers to a lesson that doesn't take place on this day."
+          }
+        }
+      }
+    },
+    "schedule.warning.periodMappedByOrdinal" : {
+      "comment" : "Informational schedule warning. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A lesson was moved to the matching period of this day's bell schedule."
+          }
+        }
+      }
+    },
+    "schedule.warning.periodNotInSchedule" : {
+      "comment" : "Schedule warning (debug/health screen). No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A lesson's period doesn't exist in this day's bell schedule, so it isn't shown."
+          }
+        }
+      }
+    },
+    "schedule.warning.spanExceedsSchedule" : {
+      "comment" : "Schedule warning. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A lesson runs past the last period of the day and was shortened."
+          }
+        }
+      }
+    },
+    "schedule.warning.supersededOverride" : {
+      "comment" : "Schedule warning: two day-level changes target the same date; the later one wins. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Another change for this day replaces this one."
+          }
+        }
+      }
+    },
+    "schedule.warning.unknownOverride" : {
+      "comment" : "Schedule warning. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This change comes from a newer version of Tabula and is ignored."
+          }
+        }
+      }
+    },
+    "share.error.damaged" : {
+      "comment" : "Share import error. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This shared timetable is damaged or incomplete."
+          }
+        }
+      }
+    },
+    "share.error.failed" : {
+      "comment" : "Generic share error. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something went wrong. Try again."
+          }
+        }
+      }
+    },
+    "share.error.invalidCode" : {
+      "comment" : "Share import error (short code). No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check the code: it has 8 letters and digits."
+          }
+        }
+      }
+    },
+    "share.error.invalidContent" : {
+      "comment" : "Share import error. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This shared timetable contains invalid data and can't be imported."
+          }
+        }
+      }
+    },
+    "share.error.invalidLink" : {
+      "comment" : "Share import error. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This isn't a Tabula share link."
+          }
+        }
+      }
+    },
+    "share.error.newerVersion" : {
+      "comment" : "Share import error. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This timetable was shared from a newer version of Tabula. Update the app to open it."
+          }
+        }
+      }
+    },
+    "share.error.timetableNotFound" : {
+      "comment" : "Share export error. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This timetable no longer exists."
+          }
+        }
+      }
+    },
+    "share.error.tooLarge" : {
+      "comment" : "Share export/import error. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This timetable is too large to share. Remove some notes or tasks and try again."
+          }
+        }
+      }
+    },
+    "share.error.tooMany.bellSchedules" : {
+      "comment" : "Share export error; plural on arg 1 (count); arg 2 = the limit (no plural needed in English). Args: 1 count, 2 limit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This timetable has %1$lld bell schedule; at most %2$lld can be shared."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This timetable has %1$lld bell schedules; at most %2$lld can be shared."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "share.error.tooMany.breaks" : {
+      "comment" : "Share export error; plural on arg 1 (count); arg 2 = the limit (no plural needed in English). Args: 1 count, 2 limit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This timetable has %1$lld holiday; at most %2$lld can be shared."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This timetable has %1$lld holidays; at most %2$lld can be shared."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "share.error.tooMany.exams" : {
+      "comment" : "Share export error; plural on arg 1 (count); arg 2 = the limit (no plural needed in English). Args: 1 count, 2 limit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "There is %1$lld exam; at most %2$lld can be shared. Share without tasks?"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "There are %1$lld exams; at most %2$lld can be shared. Share without tasks?"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "share.error.tooMany.lessons" : {
+      "comment" : "Share export error; plural on arg 1 (count); arg 2 = the limit (no plural needed in English). Args: 1 count, 2 limit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This timetable has %1$lld lesson; at most %2$lld can be shared."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This timetable has %1$lld lessons; at most %2$lld can be shared."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "share.error.tooMany.periods" : {
+      "comment" : "Share export error; plural on arg 1 (count); arg 2 = the limit (no plural needed in English). Args: 1 count, 2 limit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "A bell schedule has %1$lld period; at most %2$lld can be shared."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "A bell schedule has %1$lld periods; at most %2$lld can be shared."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "share.error.tooMany.subjects" : {
+      "comment" : "Share export error; plural on arg 1 (count); arg 2 = the limit (no plural needed in English). Args: 1 count, 2 limit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This timetable has %1$lld subject; at most %2$lld can be shared."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This timetable has %1$lld subjects; at most %2$lld can be shared."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "share.error.tooMany.tasks" : {
+      "comment" : "Share export error; plural on arg 1 (count); arg 2 = the limit (no plural needed in English). Args: 1 count, 2 limit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "There is %1$lld task; at most %2$lld can be shared. Share without tasks?"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "There are %1$lld tasks; at most %2$lld can be shared. Share without tasks?"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "share.error.tooMany.terms" : {
+      "comment" : "Share export error; plural on arg 1 (count); arg 2 = the limit (no plural needed in English). Args: 1 count, 2 limit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This timetable has %1$lld term; at most %2$lld can be shared."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This timetable has %1$lld terms; at most %2$lld can be shared."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "share.error.unsupportedVersion" : {
+      "comment" : "Share import error. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This share format isn't supported."
+          }
+        }
+      }
+    },
+    "share.warning.charactersRemoved" : {
+      "comment" : "Share export warning; plural on the count. Args: 1 count.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Special characters were removed from %lld text."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Special characters were removed from %lld texts."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "share.warning.lessonsOnDisabledDays" : {
+      "comment" : "Share import warning; plural on the count. Args: 1 count.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld lesson is on a day this timetable doesn't show."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld lessons are on days this timetable doesn't show."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "share.warning.listsShortened" : {
+      "comment" : "Share export warning; plural on the count. Args: 1 count.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld list was shortened to fit."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld lists were shortened to fit."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "share.warning.noLessons" : {
+      "comment" : "Share import warning. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This timetable has no lessons yet."
+          }
+        }
+      }
+    },
+    "share.warning.overlappingPeriods" : {
+      "comment" : "Share import warning. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Two periods of a bell schedule overlap."
+          }
+        }
+      }
+    },
+    "share.warning.skippedLessons" : {
+      "comment" : "Share export warning; plural on the count. Args: 1 count.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld lesson without a subject or period was left out."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld lessons without a subject or period were left out."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "share.warning.textShortened" : {
+      "comment" : "Share export warning; plural on the count. Args: 1 count.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld text was shortened to fit."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld texts were shortened to fit."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "share.warning.unknownColorName" : {
+      "comment" : "Share import warning. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some colour names aren't available in this version."
+          }
+        }
+      }
+    },
+    "share.warning.unknownValue" : {
+      "comment" : "Share import warning; arg 1 = the raw value (verbatim), not shown in English. Args: 1 value (unused in English).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some details come from a newer version of Tabula and are kept as they are."
+          }
+        }
+      }
+    },
+    "share.warning.valuesDropped" : {
+      "comment" : "Share export warning; plural on the count. Args: 1 count.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld detail that can't be shared was left out."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld details that can't be shared were left out."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "terminology.classLecture" : {
+      "comment" : "Profile terminology: university profile (\"class/lecture\"); choose the natural word per language.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Class"
+          }
+        }
+      }
+    },
+    "terminology.lesson" : {
+      "comment" : "Profile terminology: school profiles.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesson"
+          }
+        }
+      }
+    },
+    "validation.crossTimetableReference" : {
+      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A %1$@ refers to something from another timetable."
+          }
+        }
+      }
+    },
+    "validation.cycleWeekOutOfRange" : {
+      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A %1$@ uses a week that isn't part of the timetable's rotation."
+          }
+        }
+      }
+    },
+    "validation.danglingReference" : {
+      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A %1$@ refers to something that no longer exists."
+          }
+        }
+      }
+    },
+    "validation.duplicateID" : {
+      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A %1$@ appears twice."
+          }
+        }
+      }
+    },
+    "validation.emptyScheduleDay" : {
+      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A school day has no lessons yet."
+          }
+        }
+      }
+    },
+    "validation.invalidDateRange" : {
+      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A %1$@ has an end date before its start date."
+          }
+        }
+      }
+    },
+    "validation.invalidTimeRange" : {
+      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A %1$@ ends before it starts."
+          }
+        }
+      }
+    },
+    "validation.invalidValue" : {
+      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A %1$@ has a value that is out of range."
+          }
+        }
+      }
+    },
+    "validation.overlappingPeriods" : {
+      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Two periods of a bell schedule overlap."
+          }
+        }
+      }
+    },
+    "validation.referencesDeletedEntity" : {
+      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A %1$@ refers to something that was deleted."
+          }
+        }
+      }
+    },
+    "validation.schoolDaysMismatch" : {
+      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The rotation's school days don't match the days this %1$@ shows."
+          }
+        }
+      }
+    },
+    "validation.unknownValue" : {
+      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A %1$@ uses something from a newer app version."
+          }
+        }
+      }
+    },
+    "validation.unsupportedSchemaVersion" : {
+      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This data was created by a different version of the app."
           }
         }
       }
