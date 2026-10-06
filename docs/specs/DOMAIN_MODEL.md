@@ -626,8 +626,19 @@ Decisions taken in Stage 1 (safer option where the plan was silent or ambiguous)
 - B2 `AppSettings` uses a fixed singleton ID so two devices' settings merge instead of duplicating.
 - B3 `PeriodKind`, `LessonField`, `RepeatFrequency`, `PalettePackID` are open vocabularies (the plan listed a
   closed `.lesson|.break|.lunch`); unknown values round-trip.
-- B4 Unknown object keys are not preserved (§7.3). Open: should entities carry an "unknown fields" bag, or should the
-  sync layer only ever upload changed fields? Needs a decision before the freeze.
+- B4 **Unknown object keys are preserved** (decided in Stage 2E; supersedes §7.3 — the orchestrator folds this into
+  §7.3 at integration). While decoding, `TabulaDatabase` records every key that this version's encoding does not
+  produce in `TabulaDatabase.unknownFields` (`UnknownFields`): unknown keys of the **root object** (including whole
+  unknown entity arrays, e.g. a `"notes": [...]` collection added later), of **every entity** (including `settings`;
+  keyed by entity type + ID) and of **child records** (`subtasks`, `attachments`; keyed by collection + child ID).
+  Encoding merges them back; keys this version knows always win, and encoding stays deterministic (sorted keys;
+  unchanged input re-encodes byte for byte). "Known" = `EntityFieldCatalog` (= the `CodingKeys`, checked against the
+  types by a test). Entries of entities/children no longer in the database are dropped. The sync merge treats unknown
+  keys as fields with the clocks the newer version wrote in `fieldClocks`, and set-merges unknown root arrays of
+  records (`id` + `meta`) by ID. **Not preserved:** unknown keys *inside* embedded value objects (e.g. inside
+  `rotation`, `timeSensitivePolicy`, `Period`) — a newer version that needs one must add a top-level field, a new
+  entity array, or an open-union kind instead, or bump `schemaVersion`. Consequence for §7.3: adding an optional
+  top-level field or a new entity array **no longer requires a schema bump**; older apps keep and re-save it.
 - B5 `OverrideChange.followDay` has an optional `cycleWeek`; `WeekCycleAnchor.isoWeekParity` has an `offset`
   (A/B swap). Both are additive to the plan.
 - B6 Period-ID convention for variant bell schedules (§3.4) and `span` counting lesson periods only (§3.5).

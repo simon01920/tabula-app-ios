@@ -15,9 +15,18 @@ public protocol RepositoryFileSystem: Sendable {
     func fileExists(at url: URL) -> Bool
     /// Creates the directory (and intermediate directories) if needed.
     func createDirectory(at url: URL) throws
+    /// Makes `destination` (which must not exist) refer to the same file as `source` — a hard link, or a
+    /// durable copy where links are unsupported. The repository never modifies a file in place, so a link
+    /// is as good as a copy for the backup.
+    func linkItem(at source: URL, to destination: URL) throws
 }
 
 extension RepositoryFileSystem {
+    /// Default: a durable copy.
+    public func linkItem(at source: URL, to destination: URL) throws {
+        try copyItem(at: source, to: destination)
+    }
+
     /// Copies `source` to `destination` (durably); no-op when `source` does not exist.
     func copyItem(at source: URL, to destination: URL) throws {
         if let data = try contents(of: source) { try write(data, to: destination) }
@@ -74,5 +83,14 @@ public struct FoundationFileSystem: RepositoryFileSystem {
 
     public func createDirectory(at url: URL) throws {
         try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+    }
+
+    public func linkItem(at source: URL, to destination: URL) throws {
+        try removeItem(at: destination)
+        do {
+            try FileManager.default.linkItem(at: source, to: destination)
+        } catch {
+            try copyItem(at: source, to: destination)
+        }
     }
 }

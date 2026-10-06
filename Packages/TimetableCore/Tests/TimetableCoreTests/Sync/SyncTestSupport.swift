@@ -61,6 +61,12 @@ final class SyncCrashingFileSystem: RepositoryFileSystem, @unchecked Sendable {
         try base.replaceItem(at: destination, withItemAt: source)
     }
 
+    /// Counted as a write (it creates the backup's temporary file).
+    func linkItem(at source: URL, to destination: URL) throws {
+        try count(\.writeCalls, limit: crashOnWrite)
+        try base.linkItem(at: source, to: destination)
+    }
+
     func removeItem(at url: URL) throws { try base.removeItem(at: url) }
     func fileExists(at url: URL) -> Bool { base.fileExists(at: url) }
     func createDirectory(at url: URL) throws { try base.createDirectory(at: url) }

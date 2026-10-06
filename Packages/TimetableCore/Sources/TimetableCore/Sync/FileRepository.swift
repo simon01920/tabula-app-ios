@@ -57,9 +57,9 @@ enum DatabaseFileDecoder {
 /// - `tabula.corrupt.json` — the last corrupt database file, kept for diagnostics after recovery;
 /// - `tabula.premigration-v<N>.json` — a copy taken before the first migration from version N.
 ///
-/// **Atomic save:** write the new bytes to the temporary file in the same directory and `fsync`, copy the
-/// current good file to the backup (via its own temporary file + rename), then `rename(2)` the temporary file
-/// onto `tabula.json`. A crash at any point leaves `tabula.json` either completely old or completely new.
+/// **Atomic save:** write the new bytes to the temporary file in the same directory and `fsync`, hard-link
+/// (or copy) the current good file to the backup's temporary name and rename it onto the backup, then
+/// `rename(2)` the temporary file onto `tabula.json`. Files are never modified in place. A crash at any point leaves `tabula.json` either completely old or completely new.
 ///
 /// **Load:** the database file, else (missing/corrupt) the backup — which is then written back as the
 /// database and reported as `RecoveryEvent.restoredFromBackup` — else a typed error (never an empty
@@ -247,7 +247,7 @@ public actor FileRepository: TabulaRepository {
             switch primaryState {
             case .good:
                 if fileSystem.fileExists(at: databaseURL) {
-                    try fileSystem.copyItem(at: databaseURL, to: backupTemporaryURL)
+                    try fileSystem.linkItem(at: databaseURL, to: backupTemporaryURL)
                     try fileSystem.replaceItem(at: backupURL, withItemAt: backupTemporaryURL)
                 }
             case .corrupt:
