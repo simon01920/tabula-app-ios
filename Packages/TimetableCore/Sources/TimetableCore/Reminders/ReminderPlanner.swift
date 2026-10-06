@@ -77,6 +77,8 @@ private struct Engine {
 
     var candidates: [Candidate] = []
     var dropped: [DroppedReminder] = []
+    /// Canonical keys already handled; every ID in the plan (scheduled or dropped) is unique.
+    var seenKeys = Set<String>()
 
     init(input: PlannerInput) {
         self.input = input
@@ -219,6 +221,8 @@ private struct Engine {
                 nominal = nil
             }
             let key = ["r1", item.source.rawValue, rule.ruleKey, descriptor, wallClock].joined(separator: "|")
+            // The very same reminder generated twice (an offset listed twice, an item passed twice) is one reminder.
+            guard seenKeys.insert(key).inserted else { continue }
             let id = ReminderID.make(key: key)
             guard let nominal else {
                 if item.anchor <= horizonEnd {
@@ -253,6 +257,7 @@ private struct Engine {
             nominal = context.date(context.localDate(of: primary.fire).adding(days: 1), at)
         }
         let key = primary.key + "|f|" + descriptor
+        guard seenKeys.insert(key).inserted else { return }
         let id = ReminderID.make(key: key)
         guard let nominal else {
             if primary.fire > now && primary.fire <= horizonEnd {
@@ -534,7 +539,13 @@ enum QuietHoursShift {
                 let local = context.local(from: current)
                 guard window.contains(local.time) else { continue }
                 let endDate = window.spansMidnight && local.time >= window.start ? local.date.adding(days: 1) : local.date
-                let end = context.date(endDate, window.end)
+                // In a fall-back overlap the window end can occur twice; take the first occurrence after `current`
+                // (inside the repeated hour the earlier one may already be past).
+                let end: Date
+                switch context.resolve(endDate, window.end) {
+                case .repeated(let earlier, let later): end = earlier > current ? earlier : later
+                case let resolution: end = resolution.date
+                }
                 if end > current {
                     current = end
                     moved = true

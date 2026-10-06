@@ -260,6 +260,14 @@ struct ReminderPlannerBasicsTests {
         #expect(plan.dropped.first?.ruleID == F.ruleID(1))
     }
 
+    @Test func identicalReminderGeneratedTwiceIsPlannedOnce() {
+        let rule = F.rule(1, .homework, [.minutesBefore(30), .minutesBefore(30)], followUp: .afterMinutes(10))
+        let task = F.task(1, due: .dateTime(F.d("2026-10-08"), F.t("08:00")))
+        let plan = ReminderPlanner.plan(F.input(rules: [rule], tasks: [task, task]))
+        #expect(plan.notifications.map(\.localFireTime.time) == [F.t("07:30"), F.t("07:40")])
+        #expect(plan.dropped.isEmpty, "not a drop: it is literally the same reminder")
+    }
+
     @Test func rulesForUnknownTargetsAreIgnored() {
         let rule = F.rule(1, ReminderTarget(rawValue: "club"), [.minutesBefore(5)])
         let plan = ReminderPlanner.plan(F.input(rules: [rule], tasks: [F.task(1, due: .dateTime(F.d("2026-10-08"), F.t("08:00")))]))
