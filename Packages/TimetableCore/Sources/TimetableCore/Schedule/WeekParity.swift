@@ -53,7 +53,8 @@ public enum WeekParity {
                 index = week.week - 1 // before year 1 has no previous school year: fall back to strict
             }
         }
-        return LocalDate.floorMod(index + offset, cycleLength) + 1
+        // `offset` is persisted data: reduce it first so that a hostile `Int.max` cannot overflow the sum.
+        return LocalDate.floorMod(index + LocalDate.floorMod(offset, cycleLength), cycleLength) + 1
     }
 
     /// The ISO week containing the school-year start (1 September) of the school year that `week` belongs to.

@@ -80,12 +80,24 @@ public struct LocalDate: Hashable, Comparable, Strideable, Sendable {
 
     // MARK: Arithmetic
 
-    /// The date `days` days later (earlier when negative). Traps if the result leaves years 1…9999.
+    /// The earliest supported date, 0001-01-01.
+    public static let earliest = LocalDate(unchecked: 1, 1, 1)
+    /// The latest supported date, 9999-12-31.
+    public static let latest = LocalDate(unchecked: 9999, 12, 31)
+
+    /// The date `days` days later (earlier when negative), **saturating** at `earliest`/`latest` when the result
+    /// would leave years 1…9999 (Stage 3: it used to trap, and hostile persisted values — a `daysBefore` offset
+    /// of `Int.max`, a task due 9999-12-31, a reference week on 0001-01-01 — reached it). Real dates never get
+    /// near the bounds; code that must know uses `addingIfValid(days:)`.
     public func adding(days: Int) -> LocalDate {
-        guard let result = LocalDate(daysSinceEpoch: daysSinceEpoch + days) else {
-            preconditionFailure("LocalDate.adding(days:) left the supported year range 1…9999")
-        }
-        return result
+        addingIfValid(days: days) ?? (days < 0 ? .earliest : .latest)
+    }
+
+    /// The date `days` days later (earlier when negative), or `nil` when it would leave years 1…9999
+    /// (overflow-safe for any `days`).
+    public func addingIfValid(days: Int) -> LocalDate? {
+        let (sum, overflow) = daysSinceEpoch.addingReportingOverflow(days)
+        return overflow ? nil : LocalDate(daysSinceEpoch: sum)
     }
 
     /// Signed number of days from `self` to `other` (`other - self`).

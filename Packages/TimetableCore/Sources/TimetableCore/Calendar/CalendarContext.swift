@@ -111,12 +111,17 @@ public struct CalendarContext: Hashable, Sendable {
     // MARK: Instant → wall clock
 
     /// The wall-clock date and time (minute precision; seconds are truncated) of `instant` in this zone.
+    /// Instants whose wall clock falls outside years 1…9999 saturate at 0001-01-01 00:00 / 9999-12-31 23:59
+    /// (Stage 3: this used to trap; hostile reminder offsets could produce such instants).
     public func local(from instant: Date) -> LocalDateTime {
         let localSeconds = Self.floorSeconds(instant) + Int64(timeZone.secondsFromGMT(for: instant))
         let days = Self.floorDiv(localSeconds, 86_400)
         let secondOfDay = localSeconds - days * 86_400
-        guard let date = LocalDate(daysSinceEpoch: Int(days)) else {
-            preconditionFailure("CalendarContext.local(from:) outside years 1…9999")
+        if days < Int64(LocalDate.earliest.daysSinceEpoch) {
+            return LocalDateTime(date: .earliest, time: LocalTime(unchecked: 0))
+        }
+        guard days <= Int64(LocalDate.latest.daysSinceEpoch), let date = LocalDate(daysSinceEpoch: Int(days)) else {
+            return LocalDateTime(date: .latest, time: LocalTime(unchecked: LocalTime.minutesPerDay - 1))
         }
         return LocalDateTime(date: date, time: LocalTime(unchecked: Int(secondOfDay / 60)))
     }
@@ -170,7 +175,12 @@ public struct CalendarContext: Hashable, Sendable {
         return (a % b != 0 && (a < 0) != (b < 0)) ? q - 1 : q
     }
 
+    /// Whole seconds since 1970 (rounded down), clamped to ±10^15 s (±31 million years) so that hostile or
+    /// non-finite instants never trap the `Int64` conversion (NaN maps to the upper bound).
     static func floorSeconds(_ instant: Date) -> Int64 {
-        Int64(instant.timeIntervalSince1970.rounded(.down))
+        let seconds = instant.timeIntervalSince1970.rounded(.down)
+        guard seconds < 1e15 else { return 1_000_000_000_000_000 }
+        guard seconds > -1e15 else { return -1_000_000_000_000_000 }
+        return Int64(seconds)
     }
 }

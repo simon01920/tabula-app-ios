@@ -204,11 +204,10 @@ private struct Engine {
             case .minutesBefore(let minutes):
                 descriptor = "m\(minutes)"
                 wallClock = anchorKey
-                nominal = minutes >= 0 ? item.anchor.addingTimeInterval(-TimeInterval(minutes) * 60) : nil
+                nominal = minutes >= 0 ? Self.representable(item.anchor.addingTimeInterval(-TimeInterval(minutes) * 60)) : nil
             case let .daysBefore(days, at):
                 descriptor = "d\(days)@\(at.isoString)"
-                if days >= 0 {
-                    let date = item.date.adding(days: -days)
+                if days >= 0, let date = item.date.addingIfValid(days: -days) {
                     wallClock = "\(date.isoString)T\(at.isoString)"
                     nominal = context.date(date, at)
                 } else {
@@ -251,10 +250,10 @@ private struct Engine {
         switch followUp {
         case .afterMinutes(let minutes):
             descriptor = "a\(minutes)"
-            nominal = minutes > 0 ? primary.fire.addingTimeInterval(TimeInterval(minutes) * 60) : nil
+            nominal = minutes > 0 ? Self.representable(primary.fire.addingTimeInterval(TimeInterval(minutes) * 60)) : nil
         case .nextMorning(let at):
             descriptor = "n\(at.isoString)"
-            nominal = context.date(context.localDate(of: primary.fire).adding(days: 1), at)
+            nominal = context.localDate(of: primary.fire).addingIfValid(days: 1).map { context.date($0, at) }
         }
         let key = primary.key + "|f|" + descriptor
         guard seenKeys.insert(key).inserted else { return }
@@ -408,6 +407,13 @@ private struct Engine {
                             localFireTime: local,
                             content: candidate.item.content.build(fire: local.date, isFollowUp: false),
                             source: candidate.item.source, ruleID: candidate.ruleID, movedByQuietHours: candidate.moved)
+    }
+
+    /// `date` when it is a persistable instant (`TabulaJSON.millisecondsRange`), else `nil`. Offsets from persisted
+    /// data (`minutesBefore(Int.max)`, a huge `afterMinutes`) then become `invalidOffset` drops instead of
+    /// instants outside the calendar's years 1…9999.
+    static func representable(_ date: Date) -> Date? {
+        TabulaJSON.checkedMilliseconds(from: date) == nil ? nil : date
     }
 
     private static func canonicalJSON(_ value: JSONValue) -> String {

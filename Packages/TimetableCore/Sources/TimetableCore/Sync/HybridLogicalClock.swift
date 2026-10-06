@@ -71,12 +71,16 @@ public struct HybridLogicalClock: TimestampClock, Hashable, Sendable, Codable {
     }
 
     /// The next timestamp after (`physical`, `logical`) on this node, carrying a logical overflow into the
-    /// physical part.
+    /// physical part. At the very end of the representable range (only reachable by receiving a hostile or
+    /// corrupt timestamp near year 33658) it saturates at the maximum instead of trapping (Stage 3); the clock
+    /// then stops advancing, which is reported as a risk, not a crash.
     private func successor(physical: Int64, logical: UInt32) -> HLCTimestamp {
         if logical < UInt32.max {
             return HLCTimestamp(physicalMillis: physical, logical: logical + 1, node: node)
         }
-        precondition(physical < HLCTimestamp.maxPhysicalMillis, "HybridLogicalClock exhausted")
+        guard physical < HLCTimestamp.maxPhysicalMillis else {
+            return HLCTimestamp(physicalMillis: HLCTimestamp.maxPhysicalMillis, logical: UInt32.max, node: node)
+        }
         return HLCTimestamp(physicalMillis: physical + 1, logical: 0, node: node)
     }
 

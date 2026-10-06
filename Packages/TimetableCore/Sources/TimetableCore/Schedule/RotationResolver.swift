@@ -45,7 +45,8 @@ public struct RotationResolver: Hashable, Sendable {
             return WeekParity.cycleWeek(for: week, policy: policy, offset: offset, length: length)
         case let .referenceWeek(referenceDate, referenceCycleWeek):
             let weeks = startOfWeek(containing: referenceDate).days(to: startOfWeek(containing: date)) / 7
-            return LocalDate.floorMod(referenceCycleWeek - 1 + weeks, length) + 1
+            // Persisted values are reduced first, so hostile ones (`Int.min`) cannot overflow the sum.
+            return LocalDate.floorMod(LocalDate.floorMod(referenceCycleWeek, length) - 1 + weeks, length) + 1
         }
     }
 
@@ -61,7 +62,8 @@ public struct RotationResolver: Hashable, Sendable {
         guard case .weekCycle(let cycle) = scheme, (1...max(1, cycle.length)).contains(cycleWeek) else { return nil }
         let first = startOfWeek(containing: date)
         // Every cycle week appears within length + 1 consecutive weeks, even across a strict W53 → W01 repeat.
-        for index in 0...(2 * max(1, cycle.length) + 2) {
+        // Bounded for hostile lengths (validation reports lengths outside 2…6).
+        for index in 0...(2 * min(max(1, cycle.length), 1_000) + 2) {
             let start = first.adding(days: 7 * index)
             if self.cycleWeek(on: start) == cycleWeek { return start }
         }
@@ -97,7 +99,8 @@ public struct RotationResolver: Hashable, Sendable {
         } else {
             steps = -countedDays(from: date, through: cycle.anchorDate.adding(days: -1))
         }
-        return LocalDate.floorMod(cycle.anchorIndex - 1 + steps, cycle.length) + 1
+        // `anchorIndex` is persisted data: reduce it first so that a hostile value cannot overflow the sum.
+        return LocalDate.floorMod(LocalDate.floorMod(cycle.anchorIndex, cycle.length) - 1 + steps, cycle.length) + 1
     }
 
     /// The user label of `cycleDay` (`labels[cycleDay - 1]`), if the day cycle defines one.
