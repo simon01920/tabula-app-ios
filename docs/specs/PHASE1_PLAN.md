@@ -31,6 +31,7 @@ Scope per ROADMAP: models with sync metadata, rotation/override resolver, grid, 
 - `EntityID<Entity>`: a phantom-typed UUID, Codable as a plain UUID string; each entity has `typealias ID = EntityID<Self>`.
 - `HLCTimestamp {physicalMillis: Int64, logical: UInt32, node: UInt64}`: Comparable (lexicographic), Codable as a fixed-width string so string order equals time order. Data type only; the clock algorithm is Stage 2E.
 - `EntityMeta {createdAt: HLCTimestamp, updatedAt: HLCTimestamp, isDeleted: Bool, fieldClocks: [String: HLCTimestamp]}`. An empty `fieldClocks` means every field is at `updatedAt`.
+  - **Superseded (Stage 3, 2026-10-07):** a missing field clock means `createdAt`, not `updatedAt`; canonical `fieldClocks` omit entries equal to `createdAt`; the `AppSettings` singleton starts at `createdAt = HLCTimestamp.zero` (DOMAIN_MODEL §2.2, B9).
 - `protocol SyncEntity: Identifiable, Codable, Hashable, Sendable { var meta: EntityMeta { get set }; static var entityType: EntityType { get } }`.
 - `JSONValue` (Codable enum) in `Support/`. It is used for unknown-case preservation and by Stage 2E for field diffs.
 - **Entities** (all `SyncEntity`):
@@ -122,6 +123,7 @@ Scope per ROADMAP: models with sync metadata, rotation/override resolver, grid, 
   - `nextReplanDate`.
 - `PlannedNotification`:
   - `id`: a deterministic stable hash of source + rule + offset + fire instant, so re-planning can diff.
+    **Superseded (Stage 2C, decision 7):** the hash uses the offset's **wall-clock** time (local fire time for "days before at hh:mm", the item's local time for "minutes before") instead of the fire instant, so IDs survive DST and time-zone changes.
   - `fireDate`, `requestedTier`, `effectiveTier`.
   - Content as l10n keys + args, `threadID`, `categoryID` (actions: mark done, snooze), `sourceRef`, `isFollowUp`.
 - Policies:
@@ -157,6 +159,7 @@ Scope per ROADMAP: models with sync metadata, rotation/override resolver, grid, 
 ## 7. Sync primitives + repository (`Sync/`, Stage 2E — sync-storage-engineer)
 - `HybridLogicalClock` (`tick(now:)`, `receive(_:now:)`, a node ID from injected randomness).
 - `MutationStamper.stamp(old:new:clock:now:)`: diffs top-level fields via `JSONValue` and advances `fieldClocks` and `updatedAt`.
+  **Superseded detail (Stage 3):** only changed keys get clocks; unchanged fields stay at their clock (missing = `createdAt`), so no materialisation of every field is needed.
 - `SyncMerge.merge(local:remote:)`:
   - Field-level last-writer-wins by field clocks, tie broken by node.
   - Tombstones: the later delete wins against an earlier edit, and the reverse; documented.
