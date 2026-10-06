@@ -114,6 +114,26 @@ that settings created independently on two devices merge field by field. It is n
 | `alarmPolicy` | `{"allowsPresetRules":Bool,"isEnabled":Bool}` | | defaults `false`, `false` (decision D7: alarms only from user rules) |
 | `syncEnabled` | Bool | | default `true` |
 
+Example (encoder output, pretty-printed; `meta` abbreviated):
+```json
+{
+  "activeTimetableID": "000000F1-0000-4000-8000-000000000001",
+  "alarmPolicy": { "allowsPresetRules": false, "isEnabled": true },
+  "appearance": "dark",
+  "globalQuietHours": { "end": "06:30", "start": "22:00" },
+  "hourCycle": "h24",
+  "id": "7AB01A00-5E77-4000-8000-000000000001",
+  "meta": {…},
+  "onboardingCompletedAt": 1791280800000,
+  "palettePackID": "ocean",
+  "profile": "secondary",
+  "syncEnabled": true,
+  "timeSensitivePolicy": { "isEnabled": true, "maxLeadMinutes": 45 },
+  "timeZoneMode": { "identifier": "Europe/Bratislava", "kind": "fixed" },
+  "weekStartOverride": 1
+}
+```
+
 ### 3.2 `Timetable` (`timetable`)
 
 | Key | Type | Opt | Notes |
@@ -131,6 +151,31 @@ that settings created independently on two devices merge field by field. It is n
 
 `perWeekday` maps an ISO weekday number (as a string key) to a bell schedule of the same timetable that applies
 on that weekday instead of `defaultID` (e.g. a short Friday). Overrides (`useBellSchedule`) take precedence.
+
+Example:
+```json
+{
+  "defaultView": "grid",
+  "density": "compact",
+  "emoji": "🏫",
+  "enabledDays": [1, 2, 3, 4, 5],
+  "fieldVisibility": ["notes", "room", "teacher"],
+  "id": "000000F1-0000-4000-8000-000000000001",
+  "meta": {…},
+  "name": "Škola",
+  "palettePackID": "classic",
+  "rotation": {
+    "kind": "weekCycle",
+    "weekCycle": { "anchor": { "kind": "isoWeekParity", "offset": 0, "policy": "strict" }, "labels": ["A", "B"], "length": 2 }
+  },
+  "sortIndex": 0,
+  "timeStructure": {
+    "defaultID": "000000F1-0000-4000-8000-000000000003",
+    "kind": "bellSchedule",
+    "perWeekday": { "5": "000000F1-0000-4000-8000-000000000004" }
+  }
+}
+```
 
 ### 3.3 `Subject` (`subject`)
 
@@ -267,6 +312,34 @@ rules as `Lesson`.
 `ReminderOverride`: `{"followUp":{"kind":"inherit"},"isEnabled":true,"offsets":[…],"tier":"timeSensitive"}`.
 `isEnabled: false` = no reminders for the item; `offsets`/`tier` absent = inherit from the rule;
 `followUp` is `{"kind":"inherit"}`, `{"kind":"none"}` or `{"kind":"custom","followUp":{…FollowUp…}}`.
+
+Example:
+```json
+{
+  "attachments": [
+    { "byteCount": 1234567, "contentType": "public.jpeg", "fileName": "board.jpg",
+      "id": "000000F1-0000-4000-8000-000000000021", "kind": "photo", "meta": {…}, "sortIndex": 0, "title": "Board" }
+  ],
+  "due": { "date": "2026-10-08", "kind": "dateTime", "time": "08:00" },
+  "id": "000000F1-0000-4000-8000-00000000001E",
+  "kind": "homework",
+  "linkedLesson": { "date": "2026-10-05", "lessonID": "000000F1-0000-4000-8000-00000000000D" },
+  "meta": {…},
+  "notes": "p. 42",
+  "priority": "high",
+  "reminderOverride": {
+    "followUp": { "followUp": { "kind": "afterMinutes", "minutes": 60 }, "kind": "custom" },
+    "isEnabled": true,
+    "offsets": [ { "kind": "minutesBefore", "minutes": 30 } ],
+    "tier": "timeSensitive"
+  },
+  "repeatRule": { "frequency": "weekly", "interval": 1, "until": "2027-01-31", "weekdays": [1, 3] },
+  "subjectID": "000000F1-0000-4000-8000-00000000000A",
+  "subtasks": [ { "id": "000000F1-0000-4000-8000-000000000020", "meta": {…}, "sortIndex": 0, "title": "Write" } ],
+  "timetableID": "000000F1-0000-4000-8000-000000000001",
+  "title": "Úloha 3"
+}
+```
 
 ### 3.10 `Exam` (`exam`)
 

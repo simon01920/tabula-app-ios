@@ -25,6 +25,7 @@ struct DomainModelDocTests {
         #expect(Set(keys).count == keys.count, "duplicate l10n keys")
         let missing = keys.filter { !doc.contains("`\($0)`") }
         #expect(missing.isEmpty, "missing from DOMAIN_MODEL.md: \(missing)")
+        #expect(doc.contains("Total: \(keys.count) keys"), "Appendix A total must be \(keys.count)")
     }
 
     @Test func everyEntityTypeAndUnionKindIsDocumented() throws {

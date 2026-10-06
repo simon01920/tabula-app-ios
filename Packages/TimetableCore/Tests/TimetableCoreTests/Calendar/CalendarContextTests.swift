@@ -120,6 +120,44 @@ struct CalendarContextTests {
         #expect(apia.local(from: shifted) == LocalDateTime(date: Fixture.date("2011-12-31"), time: Fixture.time("12:00")))
     }
 
+    @Test func halfHourDSTShift() {
+        // Lord Howe Island: +10:30 standard, +11:00 summer; transitions at 02:00 local.
+        let lordHowe = CalendarContext(timeZone: Fixture.zone("Australia/Lord_Howe"), firstWeekday: .monday)
+        #expect(lordHowe.resolve(Fixture.date("2026-10-04"), Fixture.time("02:15"))
+                == .skipped(shifted: Fixture.utc("2026-10-03", "15:45"), gapSeconds: 1800))
+        #expect(lordHowe.local(from: lordHowe.date(Fixture.date("2026-10-04"), Fixture.time("02:15"))).time == Fixture.time("02:45"))
+        #expect(lordHowe.resolve(Fixture.date("2026-04-05"), Fixture.time("01:45"))
+                == .repeated(earlier: Fixture.utc("2026-04-04", "14:45"), later: Fixture.utc("2026-04-04", "15:15")))
+        #expect(lordHowe.secondsInDay(Fixture.date("2026-10-04")) == 86_400 - 1800)
+    }
+
+    /// Property: across zones with unusual offsets/DST rules and random instants 2020–2040, instant → wall clock →
+    /// instant is the identity, except the later copy of a repeated time, which maps to the earlier copy.
+    @Test func randomInstantsRoundTripInManyZones() {
+        let zones = ["Europe/Bratislava", "America/New_York", "America/Santiago", "Australia/Lord_Howe", "Asia/Kathmandu",
+                     "Pacific/Chatham", "America/St_Johns", "Asia/Tehran", "Africa/Casablanca", "UTC"]
+        var rng = TestRNG(seed: 1_234)
+        var budget = FailureBudget()
+        let start = Fixture.utc("2020-01-01", "00:00").timeIntervalSince1970
+        let end = Fixture.utc("2040-12-31", "00:00").timeIntervalSince1970
+        for _ in 0..<5_000 {
+            let zone = zones.randomElement(using: &rng)!
+            let context = CalendarContext(timeZone: Fixture.zone(zone), firstWeekday: .monday)
+            let minute = (Double.random(in: start...end, using: &rng) / 60).rounded(.down) * 60
+            let instant = Date(timeIntervalSince1970: minute)
+            let local = context.local(from: instant)
+            switch context.resolve(local.date, local.time) {
+            case .unique(let date):
+                if date != instant { budget.record("\(zone) \(instant) → \(local) → \(date)") }
+            case .repeated(let earlier, let later):
+                if instant != earlier && instant != later { budget.record("\(zone) \(instant) not in overlap \(earlier)/\(later)") }
+            case .skipped:
+                budget.record("\(zone) \(instant) read back as a skipped local time \(local)")
+            }
+        }
+        #expect(budget.count == 0)
+    }
+
     // MARK: Week start
 
     @Test func startOfWeekHonoursFirstWeekday() {

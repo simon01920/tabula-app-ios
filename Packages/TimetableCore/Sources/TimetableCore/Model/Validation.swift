@@ -535,7 +535,7 @@ private struct Validator {
             if rule.interval < 1 { add(.error, .invalidValue, me, field: "repeatRule", value: String(rule.interval)) }
             unknown(rule.frequency, me, field: "repeatRule.frequency")
         }
-        for attachment in task.attachments where !attachment.isDeletedChild {
+        for attachment in task.attachments where !attachment.meta.isDeleted {
             unknown(attachment.kind, me, child: attachment.id.uuid, field: "attachments.kind")
         }
         if let override = task.reminderOverride, let offsets = override.offsets {
@@ -582,8 +582,4 @@ private struct Validator {
             }
         }
     }
-}
-
-private extension AttachmentRef {
-    var isDeletedChild: Bool { meta.isDeleted }
 }
