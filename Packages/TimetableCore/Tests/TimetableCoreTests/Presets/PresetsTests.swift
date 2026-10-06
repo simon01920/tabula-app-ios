@@ -248,9 +248,36 @@ struct OnboardingBuilderTests {
 
     @Test func timestampsAreStrictlyIncreasing() {
         let db = build(answers(.elementary))
-        var stamps = [db.settings.meta.createdAt] + db.timetables.map(\.meta.createdAt)
+        var stamps = [db.settings.meta.updatedAt] + db.timetables.map(\.meta.createdAt)
         stamps += db.bellSchedules.map(\.meta.createdAt) + db.reminderRules.map(\.meta.createdAt)
         #expect(Set(stamps).count == stamps.count)
+    }
+
+    /// Settings start from the untouched defaults (`createdAt == .zero`); only answers that differ from a default
+    /// get a field clock — exactly what `MutationStamper` writes for the same edit (DOMAIN_MODEL §2.2).
+    @Test(arguments: [false, true])
+    func settingsCarryClocksOnlyForNonDefaultAnswers(customised: Bool) throws {
+        var custom = answers(.other)
+        if customised {
+            custom.hourCycle = .h12
+            custom.palettePackID = .ocean
+            custom.weekStartOverride = .monday
+        }
+        var ids = SequentialIDGenerator(namespace: 1)
+        var clock = TestClock()
+        let db = OnboardingBuilder.makeInitialDatabase(answers: custom, ids: &ids, clock: &clock, now: Fixture.now)
+        let settings = db.settings
+        #expect(settings.meta.createdAt == .zero)
+        var expected: Set<String> = ["onboardingCompletedAt", "activeTimetableID"]
+        if customised { expected.formUnion(["hourCycle", "palettePackID", "weekStartOverride"]) }
+        #expect(Set(settings.meta.fieldClocks.keys) == expected)
+        #expect(settings.meta.fieldClocks.values.allSatisfy { $0 == settings.meta.updatedAt })
+
+        var replay = TestClock()
+        var draft = settings
+        draft.meta = Fixture.meta()
+        let viaStamper = try MutationStamper.stamp(old: nil, new: draft, clock: &replay, now: Fixture.now)
+        #expect(viaStamper == settings)
     }
 }
 

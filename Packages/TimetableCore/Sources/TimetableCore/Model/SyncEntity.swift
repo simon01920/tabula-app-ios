@@ -2,19 +2,25 @@ import Foundation
 
 /// Sync metadata carried by every persisted entity and child.
 ///
-/// - `createdAt` / `updatedAt`: HLC timestamps of creation and of the latest change to any field.
+/// - `createdAt`: HLC timestamp of creation, and the **default field clock**: a field without an entry in
+///   `fieldClocks` was last written at `createdAt` (orchestrator decision, Phase 1 Stage 3; DOMAIN_MODEL §2.2).
+///   The `AppSettings` singleton starts at `createdAt == .zero` (`EntityMeta.untouchedSingleton`), so any real
+///   edit on any device beats the untouched defaults another device created independently.
+/// - `updatedAt`: the latest mutation of the entity (a field write, a delete or a restore); ≥ every field clock.
+///   It is the delete clock of a tombstone and the liveness clock of a live entity (merge rule 3).
 /// - `isDeleted`: tombstone flag. Deleted entities stay in the database (and in sync) until garbage
 ///   collection; every consumer must skip them.
-/// - `fieldClocks`: per-field HLC for field-level last-writer-wins, keyed by the field's JSON key.
-///   **An empty map (or a missing key) means the field is at `updatedAt`.**
+/// - `fieldClocks`: per-field HLC for field-level last-writer-wins, keyed by the field's JSON key. It holds
+///   only fields written after creation. **A missing key means the field is at `createdAt`.** The canonical
+///   form (written by `MutationStamper` and `SyncMerge`) omits entries equal to `createdAt`.
 public struct EntityMeta: Hashable, Sendable, Codable {
-    /// When the entity was created.
+    /// When the entity was created; also the clock of every field without a `fieldClocks` entry.
     public var createdAt: HLCTimestamp
-    /// When any field last changed (≥ every value in `fieldClocks`).
+    /// When the entity last changed (field write, delete or restore); ≥ every value in `fieldClocks`.
     public var updatedAt: HLCTimestamp
     /// Tombstone flag.
     public var isDeleted: Bool
-    /// Per-field clocks keyed by JSON field name; absent keys default to `updatedAt`.
+    /// Per-field clocks keyed by JSON field name; absent keys default to `createdAt`.
     public var fieldClocks: [String: HLCTimestamp]
 
     /// Creates metadata.
@@ -31,8 +37,19 @@ public struct EntityMeta: Hashable, Sendable, Codable {
         EntityMeta(createdAt: timestamp, updatedAt: timestamp)
     }
 
-    /// The effective clock of `field` (its entry in `fieldClocks`, else `updatedAt`).
-    public func clock(for field: String) -> HLCTimestamp { fieldClocks[field] ?? updatedAt }
+    /// Metadata of a fixed-ID singleton (`AppSettings`) that still holds only defaults: every clock is
+    /// `.zero`, so the first real edit on any device wins over defaults created independently elsewhere.
+    public static let untouchedSingleton = EntityMeta(createdAt: .zero, updatedAt: .zero)
+
+    /// The effective clock of `field` (its entry in `fieldClocks`, else `createdAt`).
+    public func clock(for field: String) -> HLCTimestamp { fieldClocks[field] ?? createdAt }
+
+    /// The same metadata in canonical form (`fieldClocks` entries equal to `createdAt` omitted).
+    public func canonicalized() -> EntityMeta {
+        var copy = self
+        copy.fieldClocks = fieldClocks.filter { $0.value != createdAt }
+        return copy
+    }
 }
 
 /// The persisted top-level entity kinds. Raw values are stable record-type names for sync and backups.

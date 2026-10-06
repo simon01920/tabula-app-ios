@@ -9,6 +9,12 @@ public struct AppSettings: SyncEntity {
     /// The fixed identifier of the settings entity on every device.
     public static let singletonID = ID(UUID(uuidString: "7AB01A00-5E77-4000-8000-000000000001")!)
 
+    /// Settings holding only defaults, with `EntityMeta.untouchedSingleton` metadata (`createdAt == .zero`,
+    /// no field clocks). Every device starts from this value; real choices are stamped on top of it
+    /// (`MutationStamper.stamp(old: .untouchedDefaults, new: …)`), so only fields the user actually set get
+    /// clocks and untouched defaults never overwrite another device's edits.
+    public static var untouchedDefaults: AppSettings { AppSettings(meta: .untouchedSingleton) }
+
     /// Always `singletonID`.
     public var id: ID
     /// Sync metadata.

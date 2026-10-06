@@ -79,15 +79,20 @@ enum SyncJSON {
 ///
 /// Rules (documented in `SyncMerge`):
 /// - Every top-level key except `id`/`meta` is a field. Its clock is `meta.clock(for:)` (explicit field clock,
-///   else `updatedAt`). The value with the greater clock wins; an absent key is a value ("unset"). Equal
+///   else `createdAt`). The value with the greater clock wins; an absent key is a value ("unset"). Equal
 ///   clocks with different values (only possible for hand-made data) are decided by the canonical bytes of
 ///   the value (an absent value loses), so the merge stays commutative.
 /// - Keys in `childCollections` are set-merged by child `id` with the same rules per child.
 /// - Tombstones: a deleted version's delete clock is its `updatedAt`; a live version asserts liveness at its
 ///   `updatedAt`. The merged record is deleted iff the greatest delete clock is ≥ the greatest liveness
 ///   clock (a later edit or restore resurrects; an exact tie keeps the delete).
-/// - Merged meta: `createdAt` = min, `updatedAt` = max, `fieldClocks` = per-key max, written canonically
-///   (entries equal to `updatedAt` are omitted, since a missing key means "at `updatedAt`").
+/// - Merged meta: `updatedAt` = max, `fieldClocks` = per-key max of the effective clocks, `createdAt` = **max**,
+///   written canonically (entries equal to the merged `createdAt` omitted, since a missing key means "at
+///   `createdAt`"). Replicas of one entity share `createdAt` (it is set once, at creation), so max = min in
+///   practice; for differing values (hand-made data, or settings written before the singleton got a zero
+///   `createdAt`) max is the only choice that keeps the merge a join: a key mentioned by neither side then
+///   sits at max(createdAtA, createdAtB) = the per-key max of its effective clocks, and every explicit clock
+///   is kept (a clock below the merged `createdAt` stays explicit).
 enum SyncRecordMerger {
     static func merge(_ a: [String: JSONValue], _ b: [String: JSONValue],
                       childCollections: Set<String>) throws -> [String: JSONValue] {
@@ -118,8 +123,9 @@ enum SyncRecordMerger {
         case (true, false): isDeleted = metaA.updatedAt >= metaB.updatedAt
         case (false, true): isDeleted = metaB.updatedAt >= metaA.updatedAt
         }
-        let meta = EntityMeta(createdAt: min(metaA.createdAt, metaB.createdAt), updatedAt: updatedAt,
-                              isDeleted: isDeleted, fieldClocks: clocks.filter { $0.value != updatedAt })
+        let createdAt = max(metaA.createdAt, metaB.createdAt)
+        let meta = EntityMeta(createdAt: createdAt, updatedAt: updatedAt, isDeleted: isDeleted,
+                              fieldClocks: clocks.filter { $0.value != createdAt })
         merged["meta"] = SyncJSON.json(meta)
         return merged
     }

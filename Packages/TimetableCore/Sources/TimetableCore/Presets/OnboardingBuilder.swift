@@ -84,15 +84,17 @@ public enum OnboardingBuilder {
     public static let fallbackTimeStructure = TimeStructureChoice.bellSchedule(.secondary)
 
     /// Creates settings, one timetable, its bell schedule (if any), the optional term and the preset
-    /// reminder rules. IDs and timestamps are drawn in this order: settings, timetable, bell schedule +
-    /// periods, term, rules.
+    /// reminder rules. Timestamps are drawn in this order: settings, timetable, bell schedule, term, rules; IDs:
+    /// timetable, bell schedule + periods, term, rules. The settings singleton is
+    /// `AppSettings.untouchedDefaults` (`createdAt == .zero`) with only the answered fields that differ from
+    /// the defaults stamped (DOMAIN_MODEL §2.2), so an untouched answer never overwrites another device's edit.
     public static func makeInitialDatabase<G: IDGenerator, C: TimestampClock>(
         answers: OnboardingAnswers, ids: inout G, clock: inout C, now: Date
     ) -> TabulaDatabase {
         let preset = ProfilePreset.for(answers.profile)
 
-        let settingsMeta = EntityMeta.created(at: clock.tick(now: now))
         let timetableID: Timetable.ID = ids.next()
+        let settings = makeSettings(answers: answers, activeTimetableID: timetableID, clock: &clock, now: now)
         let timetableMeta = EntityMeta.created(at: clock.tick(now: now))
 
         var bellSchedules: [BellSchedule] = []
@@ -128,12 +130,38 @@ public enum OnboardingBuilder {
             rules.append(rulePreset.makeRule(id: ids.next(), meta: .created(at: clock.tick(now: now)), isEnabled: enabled))
         }
 
-        let settings = AppSettings(
-            meta: settingsMeta, profile: answers.profile, onboardingCompletedAt: now, activeTimetableID: timetableID,
-            weekStartOverride: answers.weekStartOverride, hourCycle: answers.hourCycle,
-            timeZoneMode: answers.timeZoneMode, palettePackID: answers.palettePackID)
-
         return TabulaDatabase(settings: settings, timetables: [timetable], bellSchedules: bellSchedules,
                               terms: terms, reminderRules: rules)
+    }
+
+    /// The settings singleton after onboarding: `AppSettings.untouchedDefaults` with the answered fields, stamped
+    /// at one tick. Only fields whose value differs from the default get a field clock; the others stay at the
+    /// zero `createdAt` (the same metadata `MutationStamper.stamp(old: .untouchedDefaults, new: …)` writes; a
+    /// test checks the equivalence).
+    static func makeSettings<C: TimestampClock>(answers: OnboardingAnswers, activeTimetableID: Timetable.ID,
+                                                clock: inout C, now: Date) -> AppSettings {
+        let defaults = AppSettings.untouchedDefaults
+        var settings = defaults
+        settings.profile = answers.profile
+        settings.onboardingCompletedAt = now
+        settings.activeTimetableID = activeTimetableID
+        settings.weekStartOverride = answers.weekStartOverride
+        settings.hourCycle = answers.hourCycle
+        settings.timeZoneMode = answers.timeZoneMode
+        settings.palettePackID = answers.palettePackID
+
+        var changed: [String] = []
+        if settings.profile != defaults.profile { changed.append("profile") }
+        if settings.onboardingCompletedAt != defaults.onboardingCompletedAt { changed.append("onboardingCompletedAt") }
+        if settings.activeTimetableID != defaults.activeTimetableID { changed.append("activeTimetableID") }
+        if settings.weekStartOverride != defaults.weekStartOverride { changed.append("weekStartOverride") }
+        if settings.hourCycle != defaults.hourCycle { changed.append("hourCycle") }
+        if settings.timeZoneMode != defaults.timeZoneMode { changed.append("timeZoneMode") }
+        if settings.palettePackID != defaults.palettePackID { changed.append("palettePackID") }
+
+        let t = clock.tick(now: now)
+        settings.meta = EntityMeta(createdAt: defaults.meta.createdAt, updatedAt: t,
+                                   fieldClocks: Dictionary(uniqueKeysWithValues: changed.map { ($0, t) }))
+        return settings
     }
 }

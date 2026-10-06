@@ -15,8 +15,8 @@ struct MutationStamperTests {
         #expect(clock.last == t)
     }
 
-    /// Only changed keys get the new clock; every other field keeps its previous clock, including absent
-    /// (nil) fields, which must not silently move to the new `updatedAt`.
+    /// Only changed keys get the new clock; every other field keeps its previous clock (absent → `createdAt`),
+    /// including absent (nil) fields. Canonical form: only keys written after creation are listed.
     @Test func onlyChangedKeysAreBumped() throws {
         var clock = HybridLogicalClock(node: 1)
         let created = try SyncFixture.task(id, clock: &clock, at: 0)
@@ -29,8 +29,7 @@ struct MutationStamperTests {
         for key in EntityFieldCatalog.fieldKeys(for: .task) where key != "title" {
             #expect(first.meta.clock(for: key) == t0, "\(key)")
         }
-        #expect(first.meta.fieldClocks["title"] == nil, "canonical: the clock equal to updatedAt is implicit")
-        #expect(first.meta.fieldClocks.count == EntityFieldCatalog.fieldKeys(for: .task).count - 1)
+        #expect(first.meta.fieldClocks == ["title": t1], "canonical: only the written key; the rest is at createdAt")
 
         var second = first
         second.notes = "p. 12"
@@ -40,7 +39,7 @@ struct MutationStamperTests {
         #expect(stamped.meta.clock(for: "notes") == t2 && stamped.meta.clock(for: "priority") == t2)
         #expect(stamped.meta.clock(for: "title") == t1)
         #expect(stamped.meta.clock(for: "due") == t0)
-        #expect(stamped.meta.fieldClocks.values.allSatisfy { $0 < stamped.meta.updatedAt })
+        #expect(stamped.meta.fieldClocks == ["title": t1, "notes": t2, "priority": t2])
     }
 
     @Test func noChangeReturnsOldWithoutTicking() throws {
@@ -137,7 +136,8 @@ struct MutationStamperTests {
     }
 
     /// Regression for the implicit-clock trap: device B sets `notes` (absent on A) while A edits `title`.
-    /// Without materialised clocks A's absent `notes` would sit at A's new `updatedAt` and erase B's note.
+    /// A's absent `notes` must stay at its old clock (`createdAt`), not move to A's new `updatedAt` and erase
+    /// B's note (the reason the default field clock is `createdAt`, not `updatedAt`).
     @Test func absentFieldDoesNotOverwriteConcurrentRemoteSet() throws {
         var a = HybridLogicalClock(node: 1), b = HybridLogicalClock(node: 2)
         let base = try SyncFixture.task(id, clock: &a, at: 0)
@@ -153,17 +153,35 @@ struct MutationStamperTests {
         #expect(merged.title == "from A")
     }
 
-    @Test func unknownFieldClocksAreMaterialisedToo() throws {
+    /// Unknown keys (from a newer version) need no hint: their clock is `createdAt` (or their explicit entry)
+    /// and a mutation of other fields never moves it.
+    @Test func unknownFieldClocksNeverMove() throws {
         var clock = HybridLogicalClock(node: 1)
-        let created = try SyncFixture.task(id, clock: &clock, at: 0)
+        var created = try SyncFixture.task(id, clock: &clock, at: 0)
+        created.meta.fieldClocks["laterField"] = SyncFixture.hlc(5)
+        created.meta.updatedAt = SyncFixture.hlc(5)
         var edited = created
         edited.title = "t"
-        let unknown = EntityUnknownFields(fields: ["futureField": .integer(1)])
-        let stamped = try MutationStamper.stamp(old: created, new: edited, clock: &clock, now: SyncFixture.at(9),
-                                                unknownFields: unknown)
+        let stamped = try MutationStamper.stamp(old: created, new: edited, clock: &clock, now: SyncFixture.at(9))
         #expect(stamped.meta.clock(for: "futureField") == SyncFixture.hlc(0))
-        let plain = try MutationStamper.stamp(old: created, new: edited, clock: &clock, now: SyncFixture.at(10))
-        #expect(plain.meta.clock(for: "futureField") == plain.meta.updatedAt, "without the hint it would move")
+        #expect(stamped.meta.clock(for: "laterField") == SyncFixture.hlc(5))
+        #expect(stamped.meta.fieldClocks == ["laterField": SyncFixture.hlc(5), "title": SyncFixture.hlc(9)])
+    }
+
+    /// The fixed-ID settings singleton is created on top of the untouched defaults: `createdAt == .zero` and
+    /// clocks only for fields that differ from the defaults; a draft equal to the defaults stays untouched.
+    @Test func settingsAreCreatedOnTopOfUntouchedDefaults() throws {
+        var clock = HybridLogicalClock(node: 7)
+        let untouched = try MutationStamper.stamp(old: nil, new: AppSettings(meta: Fixture.meta()), clock: &clock,
+                                                  now: SyncFixture.at(50))
+        #expect(untouched == .untouchedDefaults)
+        #expect(clock.last == .zero, "no change from the defaults, no tick")
+
+        let draft = AppSettings(meta: Fixture.meta(), hourCycle: .h24, syncEnabled: true)
+        let stamped = try MutationStamper.stamp(old: nil, new: draft, clock: &clock, now: SyncFixture.at(60))
+        let t = SyncFixture.hlc(60, node: 7)
+        #expect(stamped.meta == EntityMeta(createdAt: .zero, updatedAt: t, fieldClocks: ["hourCycle": t]))
+        #expect(stamped.meta.clock(for: "appearance") == .zero)
     }
 
     @Test func worksForEveryEntityType() throws {
@@ -173,11 +191,13 @@ struct MutationStamperTests {
         settings.appearance = .light
         let stampedSettings = try MutationStamper.stamp(old: db.settings, new: settings, clock: &clock, now: SyncFixture.at(1))
         #expect(stampedSettings.meta.clock(for: "appearance") == stampedSettings.meta.updatedAt)
-        #expect(stampedSettings.meta.clock(for: "profile") == db.settings.meta.updatedAt)
+        #expect(stampedSettings.meta.clock(for: "profile") == db.settings.meta.clock(for: "profile"))
+        #expect(stampedSettings.meta.fieldClocks == db.settings.meta.fieldClocks.merging(
+            ["appearance": stampedSettings.meta.updatedAt]) { $1 })
 
         var bell = db.bellSchedules[0]
         bell.periods.removeLast()
         let stampedBell = try MutationStamper.stamp(old: db.bellSchedules[0], new: bell, clock: &clock, now: SyncFixture.at(2))
-        #expect(stampedBell.meta.fieldClocks.keys.sorted() == ["name", "timetableID"])
+        #expect(stampedBell.meta.fieldClocks.keys.sorted() == ["periods"])
     }
 }

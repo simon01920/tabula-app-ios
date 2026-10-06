@@ -16,7 +16,7 @@ import Foundation
 ///
 /// The lists equal the entities' `CodingKeys` (= Swift property names, DOMAIN_MODEL §3). A test checks them
 /// against the types via reflection, so adding a field without updating this catalog fails the build's tests.
-/// The sync layer also uses the catalog to materialise field clocks of absent (nil) fields.
+/// The sync layer also uses the catalog to know which keys of an entity hold child collections.
 public enum EntityFieldCatalog {
     /// Keys every entity and child record carries besides its fields.
     public static let identityKeys: Set<String> = ["id", "meta"]

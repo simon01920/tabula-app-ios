@@ -186,6 +186,45 @@ struct SyncMergeTests {
         #expect(merged.settings.meta.createdAt == onA.meta.createdAt)
     }
 
+    /// Stage 3 decision (default field clock = `createdAt`, settings singleton at `createdAt == .zero`):
+    /// untouched defaults created later on another device — a fresh install, or an onboarding that keeps a
+    /// default — never beat an earlier real edit. Under the old rule ("missing clock = `updatedAt`") device B's
+    /// later onboarding put every settings field at B's time and erased A's 24 h / dark choices.
+    @Test func untouchedSettingsDefaultsNeverBeatAnEarlierRealEdit() throws {
+        var a = HybridLogicalClock(node: 0xA), b = HybridLogicalClock(node: 0xB), c = HybridLogicalClock(node: 0xC)
+        var idsA = SequentialIDGenerator(namespace: 0x51), idsB = SequentialIDGenerator(namespace: 0x52)
+        let onboardedA = OnboardingBuilder.makeInitialDatabase(
+            answers: OnboardingAnswers(profile: .secondary, timetableName: "School", bellScheduleName: "Normal"),
+            ids: &idsA, clock: &a, now: SyncFixture.at(0))
+        var editedSettings = onboardedA.settings
+        editedSettings.hourCycle = .h24
+        editedSettings.appearance = .dark
+        var dbA = onboardedA
+        dbA.settings = try MutationStamper.stamp(old: onboardedA.settings, new: editedSettings, clock: &a,
+                                                 now: SyncFixture.at(100))
+        // Device B never synced; it onboards much later, keeping every default except the profile.
+        let dbB = OnboardingBuilder.makeInitialDatabase(
+            answers: OnboardingAnswers(profile: .university, timetableName: "Uni", bellScheduleName: "Normal"),
+            ids: &idsB, clock: &b, now: SyncFixture.at(50_000))
+        #expect(dbB.settings.meta.createdAt == .zero)
+        #expect(Set(dbB.settings.meta.fieldClocks.keys) == ["profile", "onboardingCompletedAt", "activeTimetableID"])
+
+        let merged = try SyncMerge.merge(local: dbA, remote: dbB)
+        #expect(try merged.encoded() == SyncMerge.merge(local: dbB, remote: dbA).encoded())
+        #expect(merged.settings.hourCycle == .h24 && merged.settings.appearance == .dark,
+                "A's real edits survive B's later, untouched defaults")
+        #expect(merged.settings.profile == .university, "B's later real choice wins")
+        #expect(merged.settings.activeTimetableID == dbB.settings.activeTimetableID)
+        #expect(merged.settings.meta.createdAt == .zero)
+
+        // Device C: a fresh install that has not onboarded yet — its settings are exactly the untouched defaults.
+        let freshC = try MutationStamper.stamp(old: nil, new: AppSettings(meta: Fixture.meta()), clock: &c,
+                                               now: SyncFixture.at(90_000))
+        #expect(freshC == .untouchedDefaults)
+        let withC = try SyncMerge.merge(local: merged, remote: TabulaDatabase(settings: freshC))
+        #expect(withC.settings == merged.settings, "untouched defaults change nothing, however late they were created")
+    }
+
     @Test func databaseMergeUnionsEntitiesAndIsCanonical() throws {
         var a = Fixture.fullDatabase()
         var b = Fixture.fullDatabase()

@@ -5,7 +5,7 @@ import Foundation
 ///
 /// **Conflict rules** (also DOMAIN_MODEL §2.2 / B4):
 /// 1. **Fields — last writer wins per field.** Every top-level JSON key of an entity (except `id`/`meta`) is
-///    a field with clock `meta.clock(for: key)` (explicit field clock, else `updatedAt`). The greater HLC
+///    a field with clock `meta.clock(for: key)` (explicit field clock, else `createdAt`). The greater HLC
 ///    wins; HLC order is (physical ms, logical counter, node), so a tie between devices is decided by the
 ///    higher node ID. An absent (nil) field is a value like any other. `BellSchedule.periods`,
 ///    `Lesson.bringList`, `Exam.topics` etc. are single fields (whole-value LWW).
@@ -18,8 +18,9 @@ import Foundation
 ///    made before it stays deleted; an exact tie keeps the delete. A restore is a liveness assertion
 ///    (`MutationStamper.restore`). Field values are merged even while deleted, so a later restore shows the
 ///    newest data.
-/// 4. **Metadata:** `createdAt` = earlier, `updatedAt` = later, `fieldClocks` = per-field later clock, written
-///    canonically (entries equal to `updatedAt` omitted). Merge never issues new timestamps.
+/// 4. **Metadata:** `updatedAt` = later, `fieldClocks` = per-field later clock, `createdAt` = later (equal on
+///    both sides for real replicas; "later" keeps the merge a join for hand-made data — see `SyncRecordMerger`),
+///    written canonically (entries equal to `createdAt` omitted). Merge never issues new timestamps.
 /// 5. **Unknown keys** (from newer app versions) are merged with the same field rules, using the field
 ///    clocks the newer version wrote. Unknown root arrays of records (`id` + `meta`) are set-merged like
 ///    child collections; other unknown root values: equal values stay, different values keep the one with

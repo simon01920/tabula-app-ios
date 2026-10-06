@@ -98,7 +98,13 @@ struct EntityMetaTests {
         meta.updatedAt = t1
         meta.fieldClocks["name"] = t1
         #expect(meta.clock(for: "name") == t1)
-        #expect(meta.clock(for: "room") == t1)   // absent → updatedAt
+        #expect(meta.clock(for: "room") == t0)   // absent → createdAt (Stage 3 decision), never updatedAt
+        #expect(meta.canonicalized() == meta)
+        meta.fieldClocks["notes"] = t0
+        #expect(meta.canonicalized().fieldClocks == ["name": t1], "entries equal to createdAt are implicit")
+        meta = meta.canonicalized()
+        #expect(EntityMeta.untouchedSingleton == EntityMeta(createdAt: .zero, updatedAt: .zero))
+        #expect(AppSettings.untouchedDefaults.meta == .untouchedSingleton)
         #expect(try Fixture.json(meta) == #"{"createdAt":"000000000000010-0000000000-0000000000000001","fieldClocks":{"name":"000000000000020-0000000000-0000000000000001"},"isDeleted":false,"updatedAt":"000000000000020-0000000000-0000000000000001"}"#)
         #expect(try Fixture.roundTrip(meta) == meta)
     }

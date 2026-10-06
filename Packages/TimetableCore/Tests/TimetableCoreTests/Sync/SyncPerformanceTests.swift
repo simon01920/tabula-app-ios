@@ -5,16 +5,15 @@ import Testing
 /// Decision 6: load + save of a large database (5 000 tasks + 2 000 lessons) under 1 s on Linux.
 @Suite("Sync performance")
 struct SyncPerformanceTests {
-    /// A heavy user's database. Every entity was edited once after creation, so its `fieldClocks` holds the
-    /// materialised clocks the stamper writes (the realistic, larger encoding).
+    /// A heavy user's database. Every subject, lesson and task was edited once after creation, so its
+    /// `fieldClocks` holds the one clock the stamper writes for that edit (canonical form since Stage 3:
+    /// fields without an entry are at `createdAt`).
     static func largeDatabase() -> TabulaDatabase {
         var ids = SequentialIDGenerator(namespace: 0x9E)
         let created = SyncFixture.hlc(0, node: 0xABCDEF)
         let edited = SyncFixture.hlc(60_000, node: 0xABCDEF)
         func meta(_ type: EntityType, changed: String) -> EntityMeta {
-            var clocks: [String: HLCTimestamp] = [:]
-            for key in EntityFieldCatalog.fieldKeys(for: type) where key != changed { clocks[key] = created }
-            return EntityMeta(createdAt: created, updatedAt: edited, fieldClocks: clocks)
+            EntityMeta(createdAt: created, updatedAt: edited, fieldClocks: [changed: edited])
         }
         let timetableID: Timetable.ID = ids.next()
         let timetable = Timetable(id: timetableID, meta: .created(at: created), name: "Uni", enabledDays: Weekday.workweek,
@@ -71,7 +70,7 @@ struct SyncPerformanceTests {
         for index in unedited.lessons.indices { unedited.lessons[index].meta.fieldClocks = [:] }
         let uneditedBytes = try unedited.encoded().count
         print("SyncPerformance: \(db.tasks.count) tasks + \(db.lessons.count) lessons, file \(data.count / 1024) KiB "
-              + "(\(uneditedBytes / 1024) KiB without materialised field clocks); "
+              + "(\(uneditedBytes / 1024) KiB without field clocks); "
               + "save \(save), load \(load), load+save \(save + load) (encode \(encode), decode \(decode))")
         #if DEBUG
         // Unoptimised test builds: generous bound; the < 1 s budget is asserted in release builds
