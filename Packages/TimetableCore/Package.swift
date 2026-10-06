@@ -13,7 +13,10 @@ let package = Package(
         .library(name: "TimetableCore", targets: ["TimetableCore"]),
     ],
     targets: [
-        .target(name: "TimetableCore"),
+        // System zlib (raw DEFLATE) for the share codec; internal, not a product. Not a package dependency:
+        // Linux needs `zlib1g-dev`, Apple SDKs ship zlib.h + libz.tbd. See docs/specs/SHARE_FORMAT.md §6.
+        .systemLibrary(name: "CZlib", path: "Sources/CZlib", pkgConfig: "zlib", providers: [.apt(["zlib1g-dev"])]),
+        .target(name: "TimetableCore", dependencies: ["CZlib"]),
         .testTarget(name: "TimetableCoreTests", dependencies: ["TimetableCore"]),
     ],
     swiftLanguageModes: [.v6]
