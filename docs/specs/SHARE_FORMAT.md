@@ -249,7 +249,11 @@ hand-written DEFLATE encoder is far more than 50 lines.
 Wiring: `Sources/CZlib/module.modulemap` (`module CZlib [system] { header "CZlib.h"; link "z" }`) and `CZlib.h`
 (includes `<zlib.h>` and wraps `deflateInit2`/`inflateInit2` — macros Swift cannot call — and the `next_in` const
 differences in static inline functions). `Package.swift`: `.systemLibrary(name: "CZlib", path: "Sources/CZlib",
-pkgConfig: "zlib", providers: [.apt(["zlib1g-dev"])])`, `TimetableCore` depends on it. Verified: Linux tests (WSL) and
+providers: [.apt(["zlib1g-dev"])])`, `TimetableCore` depends on it. **No `pkgConfig`** (Stage 3): on the xtool path the
+host's pkg-config added `-L/usr/lib/x86_64-linux-gnu` to the iOS link, and ld64.lld then failed on the host `libz.so`
+("unhandled file type") — `link "z"` alone finds the SDK's `libz.tbd` on Apple platforms and the default `libz.so` on
+Linux. The watch type-check script must pass `-I Packages/TimetableCore/Sources/CZlib` (it compiles TimetableCore with
+plain `swiftc`). Verified: Linux tests (WSL) and
 the iOS cross-build `XCODE_EXTRA_PLATFORM_FOLDERS=…/darwin.artifactbundle/Developer/Platforms swift build
 --package-path Packages/TimetableCore --swift-sdk arm64-apple-ios -c release` (links against the SDK's zlib symbols).
 
