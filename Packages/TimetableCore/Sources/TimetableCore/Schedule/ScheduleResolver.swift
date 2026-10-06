@@ -271,6 +271,7 @@ public struct ScheduleResolver: Sendable {
 
         // Regular lessons.
         var occurringLessonIDs = Set<Lesson.ID>()
+        var dayClock: DayClock?
         if let key = dayKey {
             for lesson in lessonsByDayKey[key] ?? [] {
                 guard occurs(lesson, inCycleWeek: cycleWeek) else { continue }
@@ -341,7 +342,7 @@ public struct ScheduleResolver: Sendable {
 
                 let status: ResolvedLesson.Status = isCancelled ? .cancelled : (reasons.isEmpty ? .scheduled : .modified)
                 entries.append(makeEntry(id: occurrenceID, source: .lesson(lesson.id), date: date, subject: subject,
-                                         placement: placement, fields: fields, status: status, applied: applied))
+                                         placement: placement, fields: fields, status: status, applied: applied, clock: &dayClock))
             }
         }
 
@@ -377,7 +378,7 @@ public struct ScheduleResolver: Sendable {
             if case .period = oneOff.slot, let bellOverrideID { applied.append(bellOverrideID) }
             entries.append(makeEntry(id: occurrenceID, source: .oneOff(override.id), date: date, subject: subject,
                                      placement: placement, fields: EffectiveFields(oneOff: oneOff, subject: subject),
-                                     status: .added, applied: applied))
+                                     status: .added, applied: applied, clock: &dayClock))
         }
 
         entries.sort(by: Self.wallClockOrder)
@@ -469,11 +470,12 @@ public struct ScheduleResolver: Sendable {
 
     private func makeEntry(id: OccurrenceID, source: ResolvedLesson.Source, date: LocalDate, subject: Subject,
                            placement: PlacedSlot, fields: EffectiveFields, status: ResolvedLesson.Status,
-                           applied: [ScheduleOverride.ID]) -> ResolvedLesson {
-        ResolvedLesson(
+                           applied: [ScheduleOverride.ID], clock: inout DayClock?) -> ResolvedLesson {
+        if clock == nil { clock = DayClock(context: context, date: date) }
+        return ResolvedLesson(
             id: id, source: source, timetableID: timetable.id, date: date, subject: SubjectSummary(subject),
             startTime: placement.startTime, endTime: placement.endTime,
-            start: context.date(date, placement.startTime), end: context.date(date, placement.endTime),
+            start: clock!.instant(placement.startTime), end: clock!.instant(placement.endTime),
             periodID: placement.periodID, periodLabel: placement.periodLabel, periodNumber: placement.periodNumber,
             periodSpan: placement.periodSpan, room: fields.room, building: fields.building, teacher: fields.teacher,
             lessonType: fields.lessonType, notes: fields.notes, bringList: fields.bringList, status: status,
