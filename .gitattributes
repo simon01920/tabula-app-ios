@@ -1,0 +1,20 @@
+# Force LF everywhere: sources are built inside WSL/Linux and macOS CI.
+* text=auto eol=lf
+*.sh text eol=lf
+*.swift text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.plist text eol=lf
+*.xcstrings text eol=lf
+*.entitlements text eol=lf
+# Binary
+*.png binary
+*.PNG binary
+*.jpg binary
+*.webp binary
+*.pdf binary
+*.zip binary
+*.xip binary
+*.gguf binary
+*.p8 binary
+*.p12 binary

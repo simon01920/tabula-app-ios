@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  iOS app entitlements, used by BOTH paths (xtool.yml entitlementsPath, project.yml CODE_SIGN_ENTITLEMENTS).
+  Keep this to entitlements xtool knows how to provision. xtool 1.20.1 auto-registers only:
+  App Groups (paid teams), Associated Domains, Data Protection, HealthKit, HomeKit, Inter-App Audio,
+  Multipath, Network Extensions, Personal VPN, Push, SiriKit, Wireless Accessory, Wi-Fi Aware.
+  iCloud/CloudKit, Time Sensitive, increased-memory-limit are NOT handled by xtool: adding them here would
+  make xtool-signed installs fail. They go into a CI-only entitlements file when those phases start.
+  On device via xtool this group becomes group.XTL-<ID>.sk.simondev.tabula (see TimetableCore.AppGroup).
+-->
+<plist version="1.0">
+<dict>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.sk.simondev.tabula</string>
+	</array>
+</dict>
+</plist>

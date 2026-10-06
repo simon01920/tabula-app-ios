@@ -1,0 +1,22 @@
+# xtool project config (local WSL build path). Schema: xtool 1.20.1 Sources/PackLib/PackSchema.swift
+# Always build through scripts/xtool-dev.sh: it syncs the repo to ext4, compiles the String Catalog
+# into .build-l10n/*.lproj (xtool cannot compile .xcstrings) and then runs xtool there.
+# `scripts/xtool-dev.sh --macro-probes` builds the macro-probe variant (TABULA_MACRO_PROBES, see Package.swift).
+version: 1
+bundleID: sk.simondev.tabula        # xtool re-signs as XTL-<ID>.sk.simondev.tabula on device
+product: TabulaApp
+infoPath: Config/App-Info.plist     # merged over xtool's defaults (CFBundleIdentifier etc. come from xtool)
+iconPath: Resources/AppIcon.png     # copied as CFBundleIconFile; xtool does not compile .xcassets (PR #219 open)
+entitlementsPath: Config/Tabula.entitlements
+resources:                          # copied verbatim into the .app root (by file/dir name)
+  - .build-l10n/en.lproj
+  - .build-l10n/sk.lproj
+  - Config/Privacy/App/PrivacyInfo.xcprivacy
+extensions:
+  - product: TabulaWidgets          # bundle ID defaults to sk.simondev.tabula.TabulaWidgets
+    infoPath: Config/Widgets-Info.plist
+    entitlementsPath: Config/TabulaWidgets.entitlements
+    resources:
+      - .build-l10n/en.lproj
+      - .build-l10n/sk.lproj
+      - Config/Privacy/Widgets/PrivacyInfo.xcprivacy

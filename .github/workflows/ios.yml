@@ -1,0 +1,288 @@
+# Tabula CI. Status: UNRUN (no GitHub repo yet) — see docs/ENVIRONMENT.md §8 "CI".
+#
+# Jobs
+#   core-linux       Swift 6.4 container: TimetableCore tests + the Linux-runnable checks of scripts/validate.sh.
+#   ios-xcodegen     XcodeGen -> unsigned xcodebuild for generic iOS, incl. widget + embedded watchOS app.
+#                    Builds the MACRO-PROBE variant (project.yml defines TABULA_MACRO_PROBES).
+#   ios-xtool-path   xtool (macOS build) -> unsigned `xtool dev build` of the SwiftPM/xtool path
+#                    (BASE variant, the same default as `scripts/xtool-dev.sh` on WSL).
+#   release-testflight  manual (workflow_dispatch): archive -> export -> upload to TestFlight with an
+#                    App Store Connect API key. Skips cleanly when the secrets are not configured.
+# Either ios-* job failing fails the pipeline (both build paths must stay green).
+#
+# Runner: `xcode-27` (actions/runner-images, macOS 27 + Xcode 27.0 default at /Applications/Xcode_27.app;
+# still marked "preview" as of 2026-10-04 — switch to the GA label once announced).
+# Secrets (Settings > Secrets and variables > Actions), never in the repo or chat:
+#   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8_BASE64 (base64 of the AuthKey_XXXX.p8 file)
+# Variable (not secret): APPLE_TEAM_ID (10-character Team ID)
+# Hardening TODO (later phase): pin third-party actions to full commit SHAs instead of tags
+# (actions/checkout@v4, actions/upload-artifact@v4); downloaded tools are already pinned by SHA-256.
+name: iOS CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ["docs/**", "**/*.md", "examples/**"]
+  pull_request:
+    paths-ignore: ["docs/**", "**/*.md", "examples/**"]
+  workflow_dispatch:
+    inputs:
+      upload:
+        description: "Archive and upload to TestFlight (requires ASC_* secrets)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-ci-${{ github.ref }}
+  # A push must never cancel a running manual TestFlight release.
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
+
+env:
+  XCODE_APP: /Applications/Xcode_27.app
+  XCODEGEN_VERSION: "2.46.0"
+  XCODEGEN_SHA256: 4d9e34b62172d645eed6457cac13fc222569974098ef4ee9c3368bedf0196806
+  XTOOL_VERSION: "1.20.1"
+  XTOOL_MAC_SHA256: 39123efc283528b119fa3567dc1123059d6690aab76c80e6003470d17c333ca2
+
+jobs:
+  core-linux:
+    name: TimetableCore tests + Linux validation (Swift 6.4)
+    runs-on: ubuntu-latest
+    container: swift:6.4.0-noble
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift --version
+      - name: swift test TimetableCore
+        run: swift test --package-path Packages/TimetableCore
+      - name: Tools for scripts/validate.sh
+        run: |
+          apt-get update -qq
+          DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends python3 python3-yaml rsync
+      - name: scripts/validate.sh (Linux-runnable checks; XcodeGen step is skipped here)
+        run: bash scripts/validate.sh
+
+  ios-xcodegen:
+    name: XcodeGen path (unsigned iOS + watchOS build, macro variant)
+    runs-on: xcode-27
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode 27
+        run: |
+          sudo xcode-select -s "$XCODE_APP"
+          xcodebuild -version
+          xcodebuild -showsdks | grep -E 'iphoneos|watchos'
+      - name: Install XcodeGen (pinned + SHA-256)
+        run: |
+          curl -fsSL -o xcodegen.zip "https://github.com/yonaskolb/XcodeGen/releases/download/${XCODEGEN_VERSION}/xcodegen.zip"
+          echo "${XCODEGEN_SHA256}  xcodegen.zip" | shasum -a 256 -c -
+          unzip -q xcodegen.zip -d "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/xcodegen/bin" >> "$GITHUB_PATH"
+      - name: Generate project
+        env:
+          TABULA_DEVELOPMENT_TEAM: ""   # unsigned build; must be set (even empty) or XcodeGen keeps the literal
+        run: |
+          xcodegen --version
+          xcodegen generate --spec project.yml
+      - name: Build (generic iOS device, all architectures, no signing)
+        run: |
+          set -o pipefail
+          mkdir -p build
+          xcodebuild build \
+            -project Tabula.xcodeproj \
+            -scheme TabulaApp \
+            -configuration Debug \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build/DerivedData \
+            ONLY_ACTIVE_ARCH=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            | tee build/xcodebuild.log | xcbeautify --renderer github-actions
+      - name: Verify bundle layout (embedding, compiled catalogs, privacy manifests, watch arch)
+        run: |
+          APP="$(find build/DerivedData/Build/Products -maxdepth 2 -name 'TabulaApp.app' -type d | head -1)"
+          echo "App: $APP"
+          [ -n "$APP" ] || { echo "::error::TabulaApp.app not found"; exit 1; }
+          WIDGET="$APP/PlugIns/TabulaWidgets.appex"
+          WATCH="$APP/Watch/TabulaWatch.app"
+          missing=0
+          need() { if [ -e "$1" ]; then echo "ok   $1"; else echo "::error::missing $1"; missing=1; fi; }
+          need "$WIDGET"
+          need "$WATCH/TabulaWatch"
+          for lang in en sk; do
+            need "$APP/$lang.lproj/Localizable.strings"
+            need "$APP/$lang.lproj/Localizable.stringsdict"
+            need "$WIDGET/$lang.lproj/Localizable.strings"
+          done
+          need "$APP/PrivacyInfo.xcprivacy"
+          need "$WIDGET/PrivacyInfo.xcprivacy"
+          if [ "$missing" -ne 0 ]; then find "$APP" -maxdepth 3 | sort | head -150; exit 1; fi
+          [ "$(plutil -extract ITSAppUsesNonExemptEncryption raw "$APP/Info.plist")" = "false" ] \
+            || { echo "::error::ITSAppUsesNonExemptEncryption must be false"; exit 1; }
+          # Apple Watch Series 7 (S7) is arm64_32: the embedded watch binary must contain that slice.
+          echo "watch archs: $(lipo -archs "$WATCH/TabulaWatch")"
+          lipo -archs "$WATCH/TabulaWatch" | grep -qw arm64_32 \
+            || { echo "::error::TabulaWatch lacks arm64_32 (Series 7). Check WATCHOS_DEPLOYMENT_TARGET/ARCHS."; exit 1; }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: xcodebuild-log
+          path: build/xcodebuild.log
+          retention-days: 7
+
+  ios-xtool-path:
+    name: xtool/SwiftPM path (unsigned xtool dev build, base variant)
+    runs-on: xcode-27
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode 27
+        run: |
+          sudo xcode-select -s "$XCODE_APP"
+          swift --version
+      - name: Install xtool for macOS (pinned + SHA-256)
+        run: |
+          curl -fsSL -o xtool.app.zip "https://github.com/xtool-org/xtool/releases/download/${XTOOL_VERSION}/xtool.app.zip"
+          echo "${XTOOL_MAC_SHA256}  xtool.app.zip" | shasum -a 256 -c -
+          ditto -x -k xtool.app.zip "$RUNNER_TEMP"
+          mkdir -p "$RUNNER_TEMP/bin"
+          ln -s "$RUNNER_TEMP/xtool.app/Contents/MacOS/xtool" "$RUNNER_TEMP/bin/xtool"
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+      - name: Compile String Catalog for the xtool path
+        run: python3 scripts/l10n-compile.py Resources/Localizable.xcstrings .build-l10n
+      - name: xtool dev build (no login needed without --sign; TABULA_MACRO_PROBES unset = base variant)
+        run: |
+          xtool --version
+          xtool dev build
+      - name: Verify bundle layout
+        run: |
+          APP=xtool/TabulaApp.app
+          WIDGET="$APP/PlugIns/TabulaWidgets.appex"
+          missing=0
+          need() { if [ -e "$1" ]; then echo "ok   $1"; else echo "::error::missing $1"; missing=1; fi; }
+          need "$WIDGET"
+          for lang in en sk; do
+            need "$APP/$lang.lproj/Localizable.strings"
+            need "$APP/$lang.lproj/Localizable.stringsdict"
+            need "$WIDGET/$lang.lproj/Localizable.strings"
+          done
+          need "$APP/PrivacyInfo.xcprivacy"
+          need "$WIDGET/PrivacyInfo.xcprivacy"
+          if [ "$missing" -ne 0 ]; then find "$APP" -maxdepth 3 | sort | head -150; exit 1; fi
+          plutil -p "$APP/Info.plist" | grep -E 'CFBundleIdentifier|CFBundleDisplayName|NSAlarmKitUsageDescription|ITSAppUsesNonExemptEncryption'
+
+  release-testflight:
+    name: Archive + upload to TestFlight (manual)
+    if: github.event_name == 'workflow_dispatch' && inputs.upload
+    needs: [core-linux, ios-xcodegen, ios-xtool-path]
+    runs-on: xcode-27
+    timeout-minutes: 60
+    env:
+      APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}   # not a secret
+    # Secrets are mapped only into the steps that need them (least exposure).
+    steps:
+      - name: Check release configuration (sees only booleans, never secret values)
+        id: cfg
+        env:
+          HAS_KEY_ID: ${{ secrets.ASC_KEY_ID != '' }}
+          HAS_ISSUER: ${{ secrets.ASC_ISSUER_ID != '' }}
+          HAS_P8: ${{ secrets.ASC_KEY_P8_BASE64 != '' }}
+        run: |
+          missing=""
+          [ "$HAS_KEY_ID" = "true" ] || missing="$missing ASC_KEY_ID"
+          [ "$HAS_ISSUER" = "true" ] || missing="$missing ASC_ISSUER_ID"
+          [ "$HAS_P8" = "true" ] || missing="$missing ASC_KEY_P8_BASE64"
+          [ -n "$APPLE_TEAM_ID" ] || missing="$missing APPLE_TEAM_ID(variable)"
+          if [ -n "$missing" ]; then
+            echo "::notice::TestFlight upload skipped: not configured:$missing (see docs/ENVIRONMENT.md, Human steps)"
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.cfg.outputs.enabled == 'true'
+      - name: Select Xcode 27 + install XcodeGen
+        if: steps.cfg.outputs.enabled == 'true'
+        run: |
+          sudo xcode-select -s "$XCODE_APP"
+          curl -fsSL -o xcodegen.zip "https://github.com/yonaskolb/XcodeGen/releases/download/${XCODEGEN_VERSION}/xcodegen.zip"
+          echo "${XCODEGEN_SHA256}  xcodegen.zip" | shasum -a 256 -c -
+          unzip -q xcodegen.zip -d "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/xcodegen/bin" >> "$GITHUB_PATH"
+      - name: Install App Store Connect API key (runner-local, removed at the end)
+        if: steps.cfg.outputs.enabled == 'true'
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+        run: |
+          KEY_DIR="$HOME/.appstoreconnect/private_keys"   # altool looks here for AuthKey_<id>.p8
+          mkdir -p "$KEY_DIR"
+          echo "$ASC_KEY_P8_BASE64" | base64 --decode > "$KEY_DIR/AuthKey_${ASC_KEY_ID}.p8"
+          chmod 600 "$KEY_DIR/AuthKey_${ASC_KEY_ID}.p8"
+          echo "ASC_KEY_PATH=$KEY_DIR/AuthKey_${ASC_KEY_ID}.p8" >> "$GITHUB_ENV"
+      - name: Generate project (signed)
+        if: steps.cfg.outputs.enabled == 'true'
+        run: TABULA_DEVELOPMENT_TEAM="$APPLE_TEAM_ID" xcodegen generate --spec project.yml
+      - name: Archive (automatic signing via API key)
+        if: steps.cfg.outputs.enabled == 'true'
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          set -o pipefail
+          xcodebuild archive \
+            -project Tabula.xcodeproj \
+            -scheme TabulaApp \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath build/Tabula.xcarchive \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            CURRENT_PROJECT_VERSION="${{ github.run_number }}" \
+            | xcbeautify --renderer github-actions
+      - name: Export .ipa (app-store-connect)
+        if: steps.cfg.outputs.enabled == 'true'
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          cat > build/ExportOptions.plist <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>export</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>teamID</key><string>${APPLE_TEAM_ID}</string>
+            <key>uploadSymbols</key><true/>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict></plist>
+          EOF
+          set -o pipefail
+          xcodebuild -exportArchive \
+            -archivePath build/Tabula.xcarchive \
+            -exportPath build/export \
+            -exportOptionsPlist build/ExportOptions.plist \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            | xcbeautify --renderer github-actions
+          ls -la build/export
+      - name: Upload to TestFlight (altool + API key)
+        if: steps.cfg.outputs.enabled == 'true'
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          IPA="$(find build/export -name '*.ipa' | head -1)"
+          xcrun altool --upload-app -f "$IPA" -t ios --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
+      - name: Remove API key
+        if: always()
+        run: rm -rf "$HOME/.appstoreconnect/private_keys"

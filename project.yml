@@ -1,0 +1,127 @@
+# XcodeGen spec — the CI (macOS runner) build path: xcodebuild build / archive / TestFlight.
+# Builds the SAME sources and packages as the local xtool path (Package.swift + xtool.yml), plus the watchOS app.
+#   App/Sources              <-> Package.swift target TabulaApp      (path: App/Sources)
+#   WidgetExtension/Sources  <-> Package.swift target TabulaWidgets  (path: WidgetExtension/Sources)
+#   Packages/TimetableCore, Packages/TimetableUI <-> same local packages
+#   Config/*.plist, Config/*.entitlements, Resources/Localizable.xcstrings <-> same files
+# Differences by design (documented in docs/ENVIRONMENT.md): watch app (CI only), asset catalog icon
+# (xtool uses Resources/AppIcon.png), Xcode compiles Localizable.xcstrings itself (xtool path uses
+# scripts/l10n-compile.py), versions come from MARKETING_VERSION/CURRENT_PROJECT_VERSION.
+# Validate locally (Linux): bash scripts/validate.sh   (runs `xcodegen generate` if available)
+name: Tabula
+
+options:
+  bundleIdPrefix: sk.simondev
+  deploymentTarget:
+    iOS: "26.0"
+    watchOS: "26.0"
+  createIntermediateGroups: true
+  developmentLanguage: en
+  groupSortPosition: top
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"          # CI release job overrides with the run number
+    # No secrets here. Team ID comes from the environment at generate time (CI: APPLE_TEAM_ID variable);
+    # unsigned CI builds pass CODE_SIGNING_ALLOWED=NO and ignore it.
+    DEVELOPMENT_TEAM: ${TABULA_DEVELOPMENT_TEAM}
+    CODE_SIGN_STYLE: Automatic
+    GENERATE_INFOPLIST_FILE: YES          # Xcode adds bundle keys; Config/*.plist holds the shared extra keys
+    LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+    SWIFT_EMIT_LOC_STRINGS: YES
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    DEAD_CODE_STRIPPING: YES
+
+packages:
+  TimetableCore:
+    path: Packages/TimetableCore
+  TimetableUI:
+    path: Packages/TimetableUI
+
+targets:
+  TabulaApp:
+    type: application
+    platform: iOS
+    sources:
+      - path: App/Sources
+      - path: Resources/Localizable.xcstrings
+        buildPhase: resources
+      - path: Resources/Assets.xcassets
+        buildPhase: resources
+      - path: Config/Privacy/App/PrivacyInfo.xcprivacy
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_NAME: TabulaApp             # bundle TabulaApp.app, same as xtool; display name "Tabula" from plist
+        PRODUCT_MODULE_NAME: TabulaApp      # same module name as the SwiftPM target on the xtool path
+        PRODUCT_BUNDLE_IDENTIFIER: sk.simondev.tabula
+        INFOPLIST_FILE: Config/App-Info.plist
+        CODE_SIGN_ENTITLEMENTS: Config/Tabula.entitlements
+        TARGETED_DEVICE_FAMILY: "1"         # iPhone only for v1 (iPad is a stretch goal, PRODUCT.md)
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        # CI always builds the macro-probe variant (Xcode ships Apple's macro plugins). The local xtool
+        # default is the macro-free base variant (Package.swift, CLAUDE.md rule 5).
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) TABULA_MACRO_PROBES"
+    dependencies:
+      - package: TimetableCore
+      - package: TimetableUI
+      - target: TabulaWidgets               # app-extension => "Embed Foundation Extensions" (PlugIns/)
+      - target: TabulaWatch                 # watchOS app   => "Embed Watch Content" ($(CONTENTS_FOLDER_PATH)/Watch)
+
+  TabulaWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: WidgetExtension/Sources
+      - path: Resources/Localizable.xcstrings
+        buildPhase: resources
+      - path: Config/Privacy/Widgets/PrivacyInfo.xcprivacy
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_NAME: TabulaWidgets
+        PRODUCT_MODULE_NAME: TabulaWidgets
+        PRODUCT_BUNDLE_IDENTIFIER: sk.simondev.tabula.TabulaWidgets   # identical to xtool's derived ID
+        INFOPLIST_FILE: Config/Widgets-Info.plist
+        CODE_SIGN_ENTITLEMENTS: Config/TabulaWidgets.entitlements
+        TARGETED_DEVICE_FAMILY: "1"
+        APPLICATION_EXTENSION_API_ONLY: YES
+        SKIP_INSTALL: YES
+    dependencies:
+      - package: TimetableCore
+      - package: TimetableUI
+
+  TabulaWatch:
+    type: application
+    platform: watchOS
+    sources:
+      - path: WatchApp/Sources
+      - path: Resources/Assets.xcassets
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_NAME: TabulaWatch
+        PRODUCT_MODULE_NAME: TabulaWatch
+        PRODUCT_BUNDLE_IDENTIFIER: sk.simondev.tabula.watchkitapp
+        INFOPLIST_FILE: Config/Watch-Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        SKIP_INSTALL: YES                   # embedded in the iOS app; must not be installed separately in archives
+        # Do NOT set ARCHS here. Apple Watch Series 7 (S7) is arm64_32. In swift-build's watchOSDevice.xcspec,
+        # ARCHS_STANDARD = (arm64, arm64_32) and arm64_32 has DeploymentTargetRange ("0", "27"), so it is
+        # only built while WATCHOS_DEPLOYMENT_TARGET stays <= 27; keep it at 26.x. CI checks `lipo -archs`.
+    dependencies:
+      - package: TimetableCore
+      - package: TimetableUI
+
+schemes:
+  TabulaApp:
+    build:
+      targets:
+        TabulaApp: all
+    run:
+      config: Debug
+    archive:
+      config: Release

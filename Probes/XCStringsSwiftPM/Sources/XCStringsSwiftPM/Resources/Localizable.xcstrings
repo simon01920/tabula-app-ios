@@ -1,0 +1,23 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "probe.hello" : {
+      "comment" : "Probe string.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Hello from a SwiftPM catalog" } },
+        "sk" : { "stringUnit" : { "state" : "needs_review", "value" : "Ahoj zo SwiftPM katalógu" } }
+      }
+    },
+    "probe.lessons %lld" : {
+      "comment" : "Probe plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "variations" : { "plural" : {
+          "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld lesson" } },
+          "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld lessons" } } } } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

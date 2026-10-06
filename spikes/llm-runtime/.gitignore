@@ -1,0 +1,8 @@
+# Fetched by scripts/fetch-llama.sh -- never commit upstream sources or generated files.
+LlamaSpike/Sources/CLlama/upstream/
+LlamaSpike/Sources/CLlama/generated/
+LlamaSpike/Sources/CLlama/UPSTREAM_PIN
+LlamaSpike/Sources/CLlama/include/*.h
+LlamaSpike/.build/
+LlamaSpike/.swiftpm/
+LlamaSpike/Package.resolved

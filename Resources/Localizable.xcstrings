@@ -1,0 +1,186 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "probe.hello" : {
+      "comment" : "Phase 0 localization probe shown on the debug screen. Delete after Phase 0.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hello from the String Catalog"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ahoj zo String Catalogu"
+          }
+        }
+      }
+    },
+    "probe.intent.description" : {
+      "comment" : "Phase 0 App Intent probe: description shown in the Shortcuts app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Records that the Tabula test shortcut ran."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zaznamená, že testovacia skratka Tabula prebehla."
+          }
+        }
+      }
+    },
+    "probe.intent.dialog" : {
+      "comment" : "Phase 0 App Intent probe: dialog spoken or shown after the intent runs.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabula probe ran."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Test Tabuly prebehol."
+          }
+        }
+      }
+    },
+    "probe.intent.shortTitle" : {
+      "comment" : "Phase 0 App Intent probe: short title of the App Shortcut tile.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabula probe"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Test Tabuly"
+          }
+        }
+      }
+    },
+    "probe.intent.title" : {
+      "comment" : "Phase 0 App Intent probe: action title in the Shortcuts app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run Tabula probe"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Spustiť test Tabuly"
+          }
+        }
+      }
+    },
+    "probe.lessons %lld" : {
+      "comment" : "Phase 0 plural probe: number of lessons. Slovak uses one/few/many/other.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld lesson"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld lessons"
+                }
+              }
+            }
+          }
+        },
+        "sk" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld hodiny"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld hodiny"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld hodina"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld hodín"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "probe.widget.description" : {
+      "comment" : "Phase 0 widget probe: description in the widget gallery.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows the value the app wrote to the shared App Group."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zobrazí hodnotu, ktorú aplikácia zapísala do zdieľanej skupiny App Group."
+          }
+        }
+      }
+    },
+    "probe.widget.name" : {
+      "comment" : "Phase 0 widget probe: widget name in the widget gallery.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabula probe"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Test Tabuly"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

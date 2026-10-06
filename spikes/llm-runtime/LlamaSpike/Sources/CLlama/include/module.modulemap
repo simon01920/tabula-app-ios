@@ -1,0 +1,7 @@
+// Custom module map: only the C API (llama.h pulls in ggml.h / ggml-backend.h / ggml-cpu.h / ggml-opt.h).
+// The *.h files next to this file are symlinks created by scripts/fetch-llama.sh (C++ headers such as
+// llama-cpp.h / ggml-cpp.h are deliberately not part of the module).
+module CLlama {
+    header "llama.h"
+    export *
+}

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Shared by BOTH build paths. Rules:
+  - xtool merges this dict over its generated defaults (CFBundleIdentifier, CFBundleExecutable,
+    CFBundleVersion "1", CFBundleShortVersionString "1.0.0", MinimumOSVersion ...).
+  - XcodeGen/xcodebuild uses it as INFOPLIST_FILE together with GENERATE_INFOPLIST_FILE=YES, so
+    Xcode adds the bundle keys from build settings (PRODUCT_BUNDLE_IDENTIFIER, MARKETING_VERSION ...).
+  - Therefore: NO $(VARIABLE) placeholders and NO bundle id/version keys in this file
+    (xtool would copy "$(PRODUCT_BUNDLE_IDENTIFIER)" literally and break the app).
+  - Usage-description strings are English placeholders; they get localized via InfoPlist.xcstrings
+    in Phase 2 (LOCALIZATION.md).
+-->
+<plist version="1.0">
+<dict>
+	<key>CFBundleDisplayName</key>
+	<string>Tabula</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>UILaunchScreen</key>
+	<dict/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
+	<key>NSAlarmKitUsageDescription</key>
+	<string>Tabula schedules loud alarms only for reminders you explicitly mark as important, such as an exam tomorrow.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Tabula uses the camera to scan a printed timetable so it can be imported.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Tabula reads a photo or screenshot of a timetable you choose so it can be imported.</string>
+</dict>
+</plist>
