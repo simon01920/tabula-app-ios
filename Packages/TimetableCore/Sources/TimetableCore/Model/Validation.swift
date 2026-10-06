@@ -45,6 +45,12 @@ public struct ValidationIssue: Hashable, Sendable, Codable, CustomStringConverti
         case overlappingPeriods
         /// A value is out of its allowed range or inconsistent with its timetable.
         case invalidValue
+        /// A cycle week (`followDay.cycleWeek`, `occurrence.cycleWeeks`) outside 1…length of the timetable's week
+        /// cycle (error): the override or lesson can never apply as intended.
+        case cycleWeekOutOfRange
+        /// A day cycle's `schoolDays` and the timetable's `enabledDays` disagree (warning): a school day that is
+        /// not shown silently consumes a cycle day, and a shown day that is not a school day never has lessons.
+        case schoolDaysMismatch
         /// A value from an open vocabulary / open union this version does not know (preserved as is).
         case unknownValue
         /// An enabled weekday (or cycle day) has no lessons.
@@ -252,7 +258,7 @@ private struct Validator {
                 found.append(ValidationIssue(severity: .warning, code: .invalidValue, entityType: owner.type,
                                              entityID: owner.id, childID: child, field: "meta.updatedAt"))
             }
-            if meta.fieldClocks.values.contains(where: { $0 > meta.updatedAt }) {
+            if meta.fieldClocks.values.contains(where: { $0 > meta.updatedAt || $0 < meta.createdAt }) {
                 found.append(ValidationIssue(severity: .warning, code: .invalidValue, entityType: owner.type,
                                              entityID: owner.id, childID: child, field: "meta.fieldClocks"))
             }
@@ -323,6 +329,7 @@ private struct Validator {
                 add(.error, .invalidValue, me, field: "rotation.anchorIndex", value: String(cycle.anchorIndex))
             }
             if cycle.schoolDays.isEmpty { add(.error, .invalidValue, me, field: "rotation.schoolDays") }
+            checkSchoolDays(cycle, timetable: timetable)
             if let labels = cycle.labels, labels.count != cycle.length {
                 add(.warning, .invalidValue, me, field: "rotation.labels", value: String(labels.count))
             }
@@ -342,6 +349,20 @@ private struct Validator {
         unknown(timetable.defaultView, me, field: "defaultView")
         unknown(timetable.palettePackID, me, field: "palettePackID")
         checkEmptyDays(timetable)
+    }
+
+    /// Day cycle vs. shown weekdays (Phase 1 Stage 3): one warning per weekday that is a school day but not
+    /// enabled (`rotation.schoolDays`) or enabled but not a school day (`enabledDays`). An empty set is reported
+    /// elsewhere.
+    private mutating func checkSchoolDays(_ cycle: DayCycle, timetable: Timetable) {
+        guard !cycle.schoolDays.isEmpty, !timetable.enabledDays.isEmpty else { return }
+        let me = owner(timetable)
+        for day in cycle.schoolDays.subtracting(timetable.enabledDays).sorted() {
+            add(.warning, .schoolDaysMismatch, me, field: "rotation.schoolDays", value: String(day.rawValue))
+        }
+        for day in timetable.enabledDays.subtracting(cycle.schoolDays).sorted() {
+            add(.warning, .schoolDaysMismatch, me, field: "enabledDays", value: String(day.rawValue))
+        }
     }
 
     private mutating func checkEmptyDays(_ timetable: Timetable) {
@@ -436,7 +457,7 @@ private struct Validator {
         }
         if weeks.isEmpty { add(.warning, .invalidValue, owner, field: "occurrence.cycleWeeks") }
         for week in weeks.sorted() where !(1...max(1, cycle.length)).contains(week) {
-            add(.error, .invalidValue, owner, field: "occurrence.cycleWeeks", value: String(week))
+            add(.error, .cycleWeekOutOfRange, owner, field: "occurrence.cycleWeeks", value: String(week))
         }
     }
 
@@ -463,7 +484,7 @@ private struct Validator {
             }
             let lessonPeriods = defaultSchedule.lessonPeriods
             if span >= 1, let index = lessonPeriods.firstIndex(where: { $0.id == periodID }),
-               index + span > lessonPeriods.count {
+               span > lessonPeriods.count - index {   // not `index + span`: a hostile span would overflow
                 add(.warning, .invalidValue, owner, field: field, value: String(span))
             }
         }
@@ -511,7 +532,7 @@ private struct Validator {
                 if let cycleWeek {
                     if case .weekCycle(let cycle) = timetable.rotation {
                         if !(1...max(1, cycle.length)).contains(cycleWeek) {
-                            add(.error, .invalidValue, me, field: "change.cycleWeek", value: String(cycleWeek))
+                            add(.error, .cycleWeekOutOfRange, me, field: "change.cycleWeek", value: String(cycleWeek))
                         }
                     } else {
                         add(.warning, .invalidValue, me, field: "change.cycleWeek", value: String(cycleWeek))

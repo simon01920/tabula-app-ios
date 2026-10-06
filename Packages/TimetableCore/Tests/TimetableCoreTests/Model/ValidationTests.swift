@@ -211,10 +211,61 @@ struct ValidationTests {
         let thursday = index(db.lessons) { $0.occurrence.day == .weekday(.thursday) }
         db.lessons[thursday].slot = .period(db.bellSchedules[0].periods[0].id, span: 4)   // only 3 lesson periods
         db.timetables[0].enabledDays.remove(.friday)
+        #expect(issues(db, .cycleWeekOutOfRange).contains {
+            $0.field == "occurrence.cycleWeeks" && $0.severity == .error && $0.value == "3"
+        })
         let found = issues(db, .invalidValue)
-        #expect(found.contains { $0.field == "occurrence.cycleWeeks" && $0.severity == .error && $0.value == "3" })
         #expect(found.contains { $0.field == "slot" && $0.severity == .warning && $0.value == "4" })
         #expect(found.contains { $0.field == "occurrence" && $0.severity == .warning && $0.value == "5" })
+    }
+
+    /// Stage 3: `followDay.cycleWeek` outside the week cycle (0, length + 1) is an error with its own code; within
+    /// range it is clean; on a timetable without a week cycle it stays an `invalidValue` warning (ignored).
+    @Test func followDayCycleWeekOutOfRange() {
+        let follow = index(base.overrides) { $0.change == .followDay(.weekday(.friday), cycleWeek: 2) }
+        #expect(issues(base, .cycleWeekOutOfRange).isEmpty)
+        for week in [0, 3, -1, Int.max] {
+            var db = base
+            db.overrides[follow].change = .followDay(.weekday(.friday), cycleWeek: week)
+            let found = issues(db, .cycleWeekOutOfRange)
+            #expect(found.count == 1, "week (week)")
+            #expect(found.first?.severity == .error && found.first?.field == "change.cycleWeek")
+            #expect(found.first?.entityType == .scheduleOverride && found.first?.value == String(week))
+            #expect(!db.isValid)
+        }
+        var db = base
+        db.timetables[0].rotation = .weekCycle(WeekCycle(length: 4, anchor: .isoWeekParity(policy: .strict, offset: 0)))
+        db.overrides[follow].change = .followDay(.weekday(.friday), cycleWeek: 4)
+        #expect(issues(db, .cycleWeekOutOfRange).isEmpty, "4 is inside a 4-week cycle")
+        db.timetables[0].rotation = .none
+        db.lessons = db.lessons.map { lesson in
+            var copy = lesson
+            copy.occurrence.cycleWeeks = nil
+            return copy
+        }
+        #expect(issues(db, .cycleWeekOutOfRange).isEmpty)
+        #expect(issues(db, .invalidValue).contains { $0.field == "change.cycleWeek" && $0.severity == .warning })
+    }
+
+    /// Stage 3: a day cycle whose school days differ from the shown weekdays — one warning per weekday, in both
+    /// directions; matching sets (the fixture) are clean.
+    @Test func schoolDaysMismatch() {
+        let collegeIndex = index(base.timetables) { $0.id == college.id }
+        #expect(issues(base, .schoolDaysMismatch).isEmpty)
+        var db = base
+        db.timetables[collegeIndex].enabledDays = [.monday, .tuesday, .wednesday]
+        db.timetables[collegeIndex].rotation = .dayCycle(DayCycle(
+            length: 2, anchorDate: Fixture.date("2026-09-01"), anchorIndex: 1,
+            schoolDays: [.monday, .wednesday, .saturday], skipsBreaks: true, labels: ["A", "B"]))
+        let found = issues(db, .schoolDaysMismatch)
+        #expect(found.count == 2 && found.allSatisfy { $0.severity == .warning && $0.entityID == college.id.uuid })
+        #expect(found.contains { $0.field == "rotation.schoolDays" && $0.value == "6" }, "Saturday advances the cycle unseen")
+        #expect(found.contains { $0.field == "enabledDays" && $0.value == "2" }, "Tuesday is shown but never a cycle day")
+        #expect(db.isValid)
+        // Week-cycle timetables have no school days; empty sets are reported by `invalidValue` only.
+        db.timetables[collegeIndex].rotation = .dayCycle(DayCycle(length: 2, anchorDate: Fixture.date("2026-09-01"),
+                                                                  anchorIndex: 1, schoolDays: []))
+        #expect(issues(db, .schoolDaysMismatch).isEmpty)
     }
 
     @Test func unknownValue() {
