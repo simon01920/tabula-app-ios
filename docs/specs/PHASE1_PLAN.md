@@ -39,6 +39,7 @@ Scope per ROADMAP: models with sync metadata, rotation/override resolver, grid, 
     - `name`, `emoji?`, `enabledDays: Set<Weekday>`, `rotation: RotationScheme`, `timeStructure`.
     - `timeStructure` is `.bellSchedule(defaultID, perWeekday: [Weekday: BellSchedule.ID])` or `.freeForm(defaultDurationMinutes)`.
     - `fieldVisibility: FieldVisibility`, `defaultView: TimetableViewKind` (open), `density`, `palettePackID?`, `sortIndex`.
+    - **Superseded (pre-freeze, 2026-10-08):** `Timetable` also persists `rotationWeekStart: Weekday` (rotation arithmetic never uses the device week start); `density` is an open vocabulary (DOMAIN_MODEL §3.2, §4.3, §5).
   - `Subject`: `timetableID`, `name`, `shortName?`, `color: ColorValue`, `colorName?` (accessibility label key or user text), `symbol?` (emoji or SF Symbol name), `defaultRoom?`, `defaultBuilding?`, `defaultTeacher?`, `notes?`.
   - `BellSchedule`: `timetableID`, `name`, `periods: [Period]`.
     - `Period {id, label, start: LocalTime, end: LocalTime, kind: .lesson|.break|.lunch}`.
@@ -47,6 +48,7 @@ Scope per ROADMAP: models with sync metadata, rotation/override resolver, grid, 
     - `timetableID`, `subjectID`, `occurrence: LessonOccurrenceRule`.
     - `slot`: `.period(Period.ID, span: Int)` or `.time(start, end)`.
     - `validity`: `.always`, `.terms(Set<Term.ID>)` or `.range(LocalDateRange)`.
+    - **Superseded (pre-freeze):** `validity` is an open union with `.unknown(JSONValue)`; such a lesson is never shown (DOMAIN_MODEL §3.5, §5).
     - Optional fields: `room`, `building`, `teacher`, `lessonType: LessonType?` (open), `notes`, `bringList: [String]`.
     - Nil or empty means "inherit the subject default, else absent". The field-visibility rule is applied by the UI, never by storing placeholders.
   - `LessonOccurrenceRule {day: DayKey, cycleWeeks: Set<Int>?}`. `DayKey` is `.weekday(Weekday)` or `.cycleDay(Int)` (1-based). `cycleWeeks == nil` means every week.
@@ -59,6 +61,7 @@ Scope per ROADMAP: models with sync metadata, rotation/override resolver, grid, 
     - `title`, `kind` (open: `homework`, `assignment`, `todo`), `subjectID?`, `timetableID?`.
     - `due: TaskDue?` (`.date(LocalDate)` or `.dateTime(LocalDate, LocalTime)`), `linkedLesson: (Lesson.ID, LocalDate)?`.
     - `priority` (`low`, `normal`, `high`, `urgent`), `notes`, `repeat: RepeatRule?`, `completedAt: Date?`.
+    - **Superseded (pre-freeze):** `due` (`TaskDue`) is an open union with `.unknown(JSONValue)` (task treated as undated); the property is named `repeatRule`, and its next-occurrence semantics and derived IDs are normative in DOMAIN_MODEL §3.9.
     - Child collections `subtasks: [Subtask]` and `attachments: [AttachmentRef]`. Children carry their own `id` and `meta`, for set-merge.
     - `reminderOverride: ReminderOverride?`.
   - `Exam`: `timetableID?`, `subjectID?`, `title`, `kind` (open), `date`, `start?`, `end?`, `room?`, `building?`, `topics`, `reminderOverride?`, `completedAt?`.
@@ -67,13 +70,16 @@ Scope per ROADMAP: models with sync metadata, rotation/override resolver, grid, 
     - `ReminderOffset` is `.minutesBefore(n)`, `.daysBefore(n, at: LocalTime)` or `.unknown`.
     - `followUp`: `.afterMinutes(n)` or `.nextMorning(at:)`; fires only if the item is not completed.
     - `tier: DeliveryTier` (`standard`, `timeSensitive`, `alarm`), `quietHours: QuietHours?`, `isEnabled`, `origin` (`preset` or `user`).
+    - **Superseded (pre-freeze):** `FollowUp` is an open union (`.unknown` plans no follow-up) and `DeliveryTier` an open vocabulary (unknown → planned as `standard`) (DOMAIN_MODEL §5).
   - `AppSettings` (a single entity):
     - `profile: UserProfile`, `onboardingCompletedAt?`, `activeTimetableID?`.
     - `weekStartOverride: Weekday?`, `hourCycle` (`auto`, `h12`, `h24`), `timeZoneMode`, `appearance`, `palettePackID`.
     - `globalQuietHours?`, `timeSensitivePolicy`, `alarmPolicy`, `syncEnabled = true`.
+    - **Superseded (pre-freeze):** `UserProfile`, `HourCycle` and `Appearance` are open vocabularies (unknown → `.other` presets / `.auto`) (DOMAIN_MODEL §5).
 - `FieldVisibility`: `Set<LessonField>`, where `LessonField` is `room`, `building`, `teacher`, `lessonType`, `notes`, `bringList`.
 - **Schema root `TabulaDatabase`:** `schemaVersion: Int` (`current = 1`), with one array per entity type plus `settings`. Encoding is deterministic: arrays sorted by `id`, keys sorted.
   - Also `func validate() -> [ValidationIssue]`. It checks dangling references, end ≤ start, overlapping periods within a bell schedule, duplicate IDs, and enabled days with zero lessons (info level).
+  - **Superseded (pre-freeze):** validation messages use neutral phrasing without arguments; the entity type name is a separate label (`ValidationIssue.entityTypeName`), never inserted into a sentence (DOMAIN_MODEL §6, Appendix A.2).
 - Also write `docs/specs/DOMAIN_MODEL.md`: the schema reference (every type, field, encoding and invariant). This is the document the schema freeze refers to.
 
 ## 3. Theme, presets, entitlements (Stage 1)
@@ -97,6 +103,7 @@ Scope per ROADMAP: models with sync metadata, rotation/override resolver, grid, 
     - `.weekCycle(WeekCycle {length 2…6, anchor: .isoWeekParity(policy) | .referenceWeek(LocalDate, cycleWeek), labels?})`
     - `.dayCycle(DayCycle {length 2…10, anchorDate, anchorIndex, schoolDays, skipsBreaks, labels?})`
   - **ISO 53-week years:** `ISOWeekParityPolicy` is `.strict` or `.continuous`. The function that maps an ISO week to a cycle week is isolated so the human can review it (learning-mode contribution, §10).
+  - **Superseded (pre-freeze):** both policies and the week boundaries (`Timetable.rotationWeekStart`, never the device week start) are now normative in DOMAIN_MODEL §4.3.
   - Day cycles count only school days (enabled weekdays, not in a break if `skipsBreaks`). This must be O(1) or O(breaks) per query, not a day-by-day loop over years.
 - `ScheduleResolver.day(_:in:)` and `days(in range)`:
   - Applies terms, validity, breaks, overrides (followDay, then useBellSchedule, then cancel/modify/add), bell schedules (including per-weekday overrides) and subject defaults.
