@@ -68,7 +68,11 @@ enum SyncJSONParser {
     }
 
     static func parse(_ data: Data) throws -> JSONValue {
-        try data.withUnsafeBytes { raw in
+        // Stack-overflow guard: reject deep input before the recursive descent (TabulaJSON.maxNestingDepth).
+        guard TabulaJSON.nestingDepth(data, limit: Parser.maxDepth) <= Parser.maxDepth else {
+            throw ParseError(offset: 0, reason: "nesting too deep")
+        }
+        return try data.withUnsafeBytes { raw in
             var parser = Parser(bytes: raw.bindMemory(to: UInt8.self))
             parser.skipWhitespace()
             let value = try parser.value(depth: 0)
@@ -81,7 +85,8 @@ enum SyncJSONParser {
     private struct Parser {
         let bytes: UnsafeBufferPointer<UInt8>
         var index = 0
-        static let maxDepth = 512
+        /// Recursion bound (two frames per level); `parse` also pre-checks iteratively.
+        static let maxDepth = TabulaJSON.maxNestingDepth
 
         init(bytes: UnsafeBufferPointer<UInt8>) { self.bytes = bytes }
 
@@ -92,7 +97,7 @@ enum SyncJSONParser {
         }
 
         mutating func value(depth: Int) throws -> JSONValue {
-            guard depth < Self.maxDepth else { throw error("nesting too deep") }
+            guard depth <= Self.maxDepth else { throw error("nesting too deep") }
             guard index < bytes.count else { throw error("unexpected end") }
             switch bytes[index] {
             case UInt8(ascii: "{"): return try object(depth: depth)

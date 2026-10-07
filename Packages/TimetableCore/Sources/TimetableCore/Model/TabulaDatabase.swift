@@ -94,9 +94,10 @@ public struct TabulaDatabase: Hashable, Sendable {
         try TabulaJSON.makeEncoder(pretty: pretty).encode(self)
     }
 
-    /// Decodes a database from JSON produced by `encoded()` (or any compatible writer).
+    /// Decodes a database from JSON produced by `encoded()` (or any compatible writer). Input nesting deeper than
+    /// `TabulaJSON.maxNestingDepth` is rejected before decoding (stack-overflow guard).
     public static func decode(from data: Data) throws -> TabulaDatabase {
-        try TabulaJSON.makeDecoder().decode(TabulaDatabase.self, from: data)
+        try TabulaJSON.decodeUntrusted(TabulaDatabase.self, from: data)
     }
 }
 

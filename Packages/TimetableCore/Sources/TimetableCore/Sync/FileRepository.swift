@@ -15,6 +15,8 @@ enum DatabaseFileDecoder {
 
     static func decode(_ data: Data, migrations: MigrationChain) -> Outcome {
         guard !data.isEmpty else { return .corrupt(.empty) }
+        // Stack-overflow guard before any recursive decoder runs (TabulaJSON.maxNestingDepth).
+        do { try TabulaJSON.checkNestingDepth(data) } catch { return .corrupt(.invalidJSON(String(describing: error))) }
         let target = migrations.targetVersion
         // Fast path: the common case is a current-version file.
         var typedError = ""

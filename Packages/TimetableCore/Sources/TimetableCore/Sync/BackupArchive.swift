@@ -70,7 +70,7 @@ public struct BackupArchive: Hashable, Sendable {
         }
         let manifest: Manifest
         do {
-            manifest = try TabulaJSON.makeDecoder().decode(Manifest.self,
+            manifest = try TabulaJSON.decodeUntrusted(Manifest.self,
                                                           from: Data(bytes[(firstNewline + 1)..<secondNewline]))
         } catch {
             throw BackupArchiveError.malformedManifest(String(describing: error))

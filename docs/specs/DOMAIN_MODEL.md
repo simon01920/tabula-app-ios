@@ -662,7 +662,8 @@ deletion; `LocalTime` never exceeds 23:59 (no lesson spans midnight).
 5. Decoding tolerates: missing root arrays (→ empty), missing `WeekCycleAnchor.offset` (→ 0), missing
    `Timetable.rotationWeekStart` (→ 1, Monday), lowercase UUIDs,
    lowercase hex colours, fractional millisecond instants, non-canonical `fieldClocks`. It rejects (error, never a
-   crash) instants outside the §1 range.
+   crash) instants outside the §1 range and documents nested deeper than **64 levels** (`TabulaJSON.maxNestingDepth`,
+   checked iteratively before any recursive decoder runs; B17).
 6. `TabulaDatabase` decoding accepts any `schemaVersion`; migrations operate on `JSONValue` before typed decoding
    (Stage 2E).
 
@@ -963,6 +964,10 @@ Pre-freeze decisions (orchestrator, after the Phase 1 gate QA "PASS WITH FIXES",
 - B15 Localisation: no core string inserts a translated noun (validation messages are neutral, the entity type is a
   separate label), and every key has at most one count (pack-tonight bodies drop the "other subjects" and "days"
   counts; `share.error.tooMany.*` take only the limit).
+- B17 (pre-freeze, after the macOS CI crash) JSON nesting is limited to 64 levels at every untrusted entry point
+  (database file, backup, `TabulaDatabase.decode`, `SyncJSONParser`; share links stay at 16). Swift-concurrency
+  threads have 512 KiB stacks on Darwin, and the old 512-level parser limit overflowed them (SIGBUS) — a hostile
+  backup could have crashed the app. Real databases nest ≤ 8 levels.
 - B16 Storage/sync hardening: directory `fsync` after the atomic rename (best-effort); duplicate IDs inside one replica
   are folded by the merge join instead of "first copy wins"; the later-`createdAt` rule and the frozen
   `AppSettings.untouchedDefaults` are documented (§2.2); the university preset's 15-minute lesson reminders are off by

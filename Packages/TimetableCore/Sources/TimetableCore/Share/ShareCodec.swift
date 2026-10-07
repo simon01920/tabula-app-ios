@@ -96,7 +96,7 @@ public enum ShareCodec {
     static func decodeJSON(_ json: [UInt8]) throws(ShareError) -> SharePayloadV1 {
         guard json.count <= ShareLimits.maxJSONBytes else { throw .decompressedTooLarge }
         guard isValidUTF8(json) else { throw .invalidUTF8 }
-        guard nestingDepth(json, limit: ShareLimits.maxJSONDepth) <= ShareLimits.maxJSONDepth else {
+        guard TabulaJSON.nestingDepth(json, limit: ShareLimits.maxJSONDepth) <= ShareLimits.maxJSONDepth else {
             throw .malformedPayload(path: "")
         }
         let payload: SharePayloadV1
@@ -128,38 +128,9 @@ public enum ShareCodec {
         }
     }
 
-    /// The maximum nesting depth of JSON arrays/objects in `bytes`, scanning outside strings only. Stops early
-    /// once `limit` is exceeded (returns `limit + 1`). Malformed JSON is left to the decoder.
+    /// The maximum nesting depth of JSON arrays/objects in `bytes` (see `TabulaJSON.nestingDepth`).
     static func nestingDepth(_ bytes: [UInt8], limit: Int) -> Int {
-        var depth = 0
-        var maxDepth = 0
-        var inString = false
-        var escaped = false
-        for byte in bytes {
-            if inString {
-                if escaped {
-                    escaped = false
-                } else if byte == UInt8(ascii: "\\") {
-                    escaped = true
-                } else if byte == UInt8(ascii: "\"") {
-                    inString = false
-                }
-                continue
-            }
-            switch byte {
-            case UInt8(ascii: "\""):
-                inString = true
-            case UInt8(ascii: "["), UInt8(ascii: "{"):
-                depth += 1
-                maxDepth = max(maxDepth, depth)
-                if maxDepth > limit { return limit + 1 }
-            case UInt8(ascii: "]"), UInt8(ascii: "}"):
-                depth -= 1
-            default:
-                break
-            }
-        }
-        return maxDepth
+        TabulaJSON.nestingDepth(bytes, limit: limit)
     }
 
     /// Wire path of a decoding error (diagnostics only).
