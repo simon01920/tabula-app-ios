@@ -7,7 +7,8 @@
 #   changes          Linux, seconds: `git diff --name-only` + scripts/ci_paths.py decide whether the change is
 #                    app-relevant. The macOS jobs below run ONLY when it is (or on workflow_dispatch). Private
 #                    repo: macOS minutes are billed ~10x Linux (orchestrator decision 2026-10-06).
-#   ios-xcodegen     XcodeGen -> unsigned xcodebuild for generic iOS, incl. widget + embedded watchOS app.
+#   ios-xcodegen     TimetableCore `swift test` on macOS (Apple Foundation/tz data), then XcodeGen -> unsigned
+#                    xcodebuild for generic iOS, incl. widget + embedded watchOS app.
 #                    Builds the MACRO-PROBE variant (project.yml defines TABULA_MACRO_PROBES).
 #   ios-xtool-path   xtool (macOS build) -> unsigned `xtool dev build` of the SwiftPM/xtool path
 #                    (BASE variant, the same default as `scripts/xtool-dev.sh` on WSL).
@@ -114,6 +115,13 @@ jobs:
           sudo xcode-select -s "$XCODE_APP"
           xcodebuild -version
           xcodebuild -showsdks | grep -E 'iphoneos|watchos'
+      - name: swift test TimetableCore on macOS (Apple Foundation + Apple tz data)
+        # The core suite otherwise runs only on Linux (swift-corelibs-foundation + Ubuntu tzdata). This run checks
+        # the same tests against Apple's Foundation and time-zone database on the host Mac (arm64, 64-bit Int).
+        # NOT covered: execution on the Apple Watch (arm64_32, 32-bit Int) — scripts/watch-typecheck.sh only
+        # type-checks TimetableCore for arm64_32; no test runs there. Debug build, ~3-5 min of the 15-min job cap.
+        timeout-minutes: 8
+        run: swift test -c debug --package-path Packages/TimetableCore
       - name: Install XcodeGen (pinned + SHA-256)
         run: |
           curl -fsSL -o xcodegen.zip "https://github.com/yonaskolb/XcodeGen/releases/download/${XCODEGEN_VERSION}/xcodegen.zip"
