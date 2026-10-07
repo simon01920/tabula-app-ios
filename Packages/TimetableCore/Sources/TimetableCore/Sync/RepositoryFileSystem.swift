@@ -7,7 +7,8 @@ public protocol RepositoryFileSystem: Sendable {
     /// Creates or truncates the file, writes `data` and flushes it to storage (`fsync`).
     func write(_ data: Data, to url: URL) throws
     /// Atomically renames `source` onto `destination`, replacing `destination` if it exists (`rename(2)`;
-    /// both must be in the same directory/volume).
+    /// both must be in the same directory/volume), then makes the rename durable (directory `fsync`,
+    /// best-effort).
     func replaceItem(at destination: URL, withItemAt source: URL) throws
     /// Deletes the file; no error when it does not exist.
     func removeItem(at url: URL) throws
@@ -70,6 +71,20 @@ public struct FoundationFileSystem: RepositoryFileSystem {
         guard rename(source.path, destination.path) == 0 else {
             throw RepositoryFileSystemError.renameFailed(path: destination.path, errno: errno)
         }
+        // The rename only becomes durable once the directory entry is on storage (POSIX): without this, a
+        // power loss right after a "successful" save could bring back the previous file.
+        Self.syncDirectory(containing: destination)
+    }
+
+    /// `fsync`s the directory that contains `url`, making a completed `rename(2)` in it durable.
+    /// Best-effort on Linux and Darwin: returns `false` (never throws) when the directory cannot be opened or
+    /// the file system rejects `fsync` on a directory; the rename itself has already succeeded atomically.
+    @discardableResult
+    static func syncDirectory(containing url: URL) -> Bool {
+        let descriptor = open(url.deletingLastPathComponent().path, O_RDONLY)
+        guard descriptor >= 0 else { return false }
+        defer { _ = close(descriptor) }
+        return fsync(descriptor) == 0
     }
 
     public func removeItem(at url: URL) throws {

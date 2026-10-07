@@ -18,13 +18,17 @@ import Foundation
 ///    made before it stays deleted; an exact tie keeps the delete. A restore is a liveness assertion
 ///    (`MutationStamper.restore`). Field values are merged even while deleted, so a later restore shows the
 ///    newest data.
-/// 4. **Metadata:** `updatedAt` = later, `fieldClocks` = per-field later clock, `createdAt` = later (equal on
-///    both sides for real replicas; "later" keeps the merge a join for hand-made data — see `SyncRecordMerger`),
-///    written canonically (entries equal to `createdAt` omitted). Merge never issues new timestamps.
+/// 4. **Metadata:** `updatedAt` = later, `fieldClocks` = per-field later clock, `createdAt` = later (both sides
+///    usually agree; they differ after a replace-mode backup restore re-creates entities, or for the same derived
+///    ID created on two devices, e.g. `TaskItem.nextOccurrence`; "later" keeps the merge a join), written
+///    canonically (entries equal to `createdAt` omitted). Merge never issues new timestamps.
 /// 5. **Unknown keys** (from newer app versions) are merged with the same field rules, using the field
-///    clocks the newer version wrote. Unknown root arrays of records (`id` + `meta`) are set-merged like
-///    child collections; other unknown root values: equal values stay, different values keep the one with
-///    the greater canonical bytes (deterministic, rarely meaningful).
+///    clocks the newer version wrote. An unknown entity-level array is one field (whole-value LWW). Unknown
+///    root arrays of records (`id` + `meta`) are set-merged like child collections; other unknown root
+///    values: equal values stay, different values keep the one with the greater canonical bytes
+///    (deterministic, rarely meaningful).
+/// 6. **Duplicate IDs** within one replica (invalid data) are folded together with rules 1–4 before merging,
+///    for entities and children alike, so array order never decides.
 ///
 /// Requirements: every local mutation goes through `MutationStamper`; after merging remote data call
 /// `clock.receive(remote.latestTimestamp, now:)` so later local edits sort after what was received.
@@ -43,7 +47,8 @@ public enum SyncMerge {
     }
 
     /// Merges two databases: every entity array by ID, the settings singleton field by field, unknown keys
-    /// included. Entities present on one side are kept as they are; identical entities are kept unchanged.
+    /// included. Duplicate IDs within one side are folded first (`collapsed`). Entities present on one side
+    /// are kept as they are; identical entities are kept unchanged.
     /// The result is canonical (`canonicalized()`) and has the greater `schemaVersion` of the two
     /// (callers merge only databases of the current version; the repository migrates first).
     public static func merge(local: TabulaDatabase, remote: TabulaDatabase) throws -> TabulaDatabase {
@@ -88,8 +93,7 @@ public enum SyncMerge {
                                                         _ dbB: TabulaDatabase,
                                                         _ unknown: inout UnknownFields) throws -> [E] {
         let type = E.entityType
-        let byIDA = Dictionary(a.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
-        let byIDB = Dictionary(b.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        let byIDA = try collapsed(a, dbA), byIDB = try collapsed(b, dbB)
         var result: [E] = []
         result.reserveCapacity(max(byIDA.count, byIDB.count))
         for id in Set(byIDA.keys).union(byIDB.keys).sorted() {
@@ -108,6 +112,23 @@ public enum SyncMerge {
                 unknown.setFields(unknownB, for: type, id: id.uuid)
             case (nil, nil):
                 break
+            }
+        }
+        return result
+    }
+
+    /// One entity per ID. Duplicates of an ID within one replica (invalid data, reported as `duplicateID`) are
+    /// folded together with the same join as across replicas, so the result does not depend on their order in
+    /// the array (the join is commutative, associative and idempotent). Same rule as for child records.
+    private static func collapsed<E: SyncEntity>(_ items: [E], _ db: TabulaDatabase) throws -> [E.ID: E] {
+        var result: [E.ID: E] = [:]
+        result.reserveCapacity(items.count)
+        for item in items {
+            if let existing = result[item.id] {
+                let unknownFields = db.unknownFields.fields(for: E.entityType, id: item.id.uuid)
+                result[item.id] = try mergeEntity(existing, unknownFields, item, unknownFields).0
+            } else {
+                result[item.id] = item
             }
         }
         return result
