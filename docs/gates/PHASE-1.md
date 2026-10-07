@@ -16,15 +16,17 @@ Plan: `docs/specs/PHASE1_PLAN.md` · Schema reference: `docs/specs/DOMAIN_MODEL.
 ## 2. Evidence
 - **Linux (orchestrator re-run, 2026-10-08):** `bash scripts/validate.sh` → **ALL CHECKS PASSED**. That covers **499 core tests in 76 suites** (agent run after the last touches; orchestrator re-run at 497 before them), 9 TimetableUI tests, manifests, plists, path sync, the catalog and XcodeGen. 0 compiler warnings.
 - **iOS app build (xtool, local):** `Build complete! (7.08 secs)`, iOS app + widget. **Watch type-check (arm64_32, watchOS 26):** OK.
-- **CI on the Phase 1 code** (run [37690335046](https://github.com/simon01920/tabula-app-ios/actions/runs/37690335046) at `1e36a06`): ✓ Linux tests, ✓ XcodeGen iOS+watch build, ✓ xtool path, ✓ simulator screenshots ([37690335073](https://github.com/simon01920/tabula-app-ios/actions/runs/37690335073)). The pre-freeze commits are pushed with this report, and their CI run is the final check.
+- **Final CI** ([37700254831](https://github.com/simon01920/tabula-app-ios/actions/runs/37700254831), `266270d`):
+  - **502 core tests in 77 suites pass on macOS** (Apple Foundation + Apple tz data) and on Linux.
+  - ✓ XcodeGen iOS + watch build; ✓ xtool path.
+  - The first macOS run found a **real stack-overflow crash** (hostile deeply-nested JSON in a backup → app crash on iPhone). It is fixed with a nesting cap of 64 and 512 KiB/256 KiB-stack regression tests (RISKS #44).
+- **Earlier CI on the Phase 1 code** (run [37690335046](https://github.com/simon01920/tabula-app-ios/actions/runs/37690335046) at `1e36a06`): ✓ Linux tests, ✓ XcodeGen iOS+watch build, ✓ xtool path, ✓ simulator screenshots ([37690335073](https://github.com/simon01920/tabula-app-ios/actions/runs/37690335073)). The pre-freeze commits are pushed with this report, and their CI run is the final check.
 - **Performance (release, 5,000 tasks + 2,000 lessons):** file 4.8 MB, load 0.27 s + save 0.31 s = **0.57 s** (budget 1 s). Resolving five years of a 40-lesson timetable: 0.07 s.
 - **Robustness:** share-codec fuzzing (≥ 2,100 counted hostile inputs plus mutated links), hostile-number fuzzing of every date field, 600-seed merge algebra, and 150/40-seed multi-replica convergence. All green.
 - **Independent QA (qa-reviewer):** gate review PASS WITH FIXES, fixes applied, then a delta re-review (see §6).
 
 ## 3. Not done / limits (honest)
-- **Not run on Apple platforms:**
-  - Core logic is tested on Linux; the macOS `swift test` CI step runs from now on.
-  - Nothing runs on the watch's 32-bit CPU; it is type-checked only.
+- **Watch:** nothing runs on its 32-bit CPU yet; it is type-checked only. Core logic runs on both Linux and macOS.
 - **Phase 2/3 items:**
   - **No UI** for any of this yet (Phase 2).
   - The **iOS notification/AlarmKit adapter** (Phase 3).
