@@ -145,7 +145,7 @@ struct ReminderFollowUpAndPackTests {
         #expect(first.source == .packTonight(F.d("2026-10-07")))
         #expect(first.content == ReminderContent(
             title: LocalizedText(key: "reminder.packTonight.title"),
-            body: LocalizedText(key: "reminder.packTonight.tomorrow", args: [.integer(3), .string("Chémia"), .integer(1)])))
+            body: LocalizedText(key: "reminder.packTonight.tomorrow", args: [.integer(3), .string("Chémia")])))
         // Privacy: the item texts never reach the notification.
         let allArgs = plan.notifications.flatMap { [$0.content.title, $0.content.body] }.flatMap(\.args)
         for item in ["Goggles", "Lab coat", "Calculator", "Shoes", "Ruler", "Paint"] {
@@ -161,9 +161,9 @@ struct ReminderFollowUpAndPackTests {
         let plan = ReminderPlanner.plan(F.input(rules: [rule], packTonight: [days[2]]))
         #expect(plan.notifications.map(\.content.body) == [
             LocalizedText(key: "reminder.packTonight.inDays",
-                          args: [.integer(1), .string("Matematika"), .integer(0), .integer(3), .date(F.d("2026-10-12"))]),
-            LocalizedText(key: "reminder.packTonight.today", args: [.integer(1), .string("Matematika"), .integer(0)]),
-            LocalizedText(key: "reminder.packTonight.today", args: [.integer(1), .string("Matematika"), .integer(0)]),
+                          args: [.integer(1), .string("Matematika"), .date(F.d("2026-10-12"))]),
+            LocalizedText(key: "reminder.packTonight.today", args: [.integer(1), .string("Matematika")]),
+            LocalizedText(key: "reminder.packTonight.today", args: [.integer(1), .string("Matematika")]),
         ])
         #expect(plan.notifications.map(\.localFireTime.time) == [F.t("18:00"), F.t("06:30"), F.t("09:00")])
         // 09:00 is before the 09:30 first lesson → allowed; nothing after the first lesson.

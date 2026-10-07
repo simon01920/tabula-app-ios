@@ -333,14 +333,14 @@ Core returns keys only (`ShareError.message`, `ShareWarning.message`); English i
 | `share.error.invalidContent` | — | This shared timetable contains invalid data and can't be imported. |
 | `share.error.timetableNotFound` | — | This timetable no longer exists. |
 | `share.error.failed` | — | Something went wrong. Try again. |
-| `share.error.tooMany.subjects` | count, limit | This timetable has %1$lld subjects; at most %2$lld can be shared. |
-| `share.error.tooMany.lessons` | count, limit | This timetable has %1$lld lessons; at most %2$lld can be shared. |
-| `share.error.tooMany.bellSchedules` | count, limit | This timetable has %1$lld bell schedules; at most %2$lld can be shared. |
-| `share.error.tooMany.periods` | count, limit | A bell schedule has %1$lld periods; at most %2$lld can be shared. |
-| `share.error.tooMany.terms` | count, limit | This timetable has %1$lld terms; at most %2$lld can be shared. |
-| `share.error.tooMany.breaks` | count, limit | This timetable has %1$lld holidays; at most %2$lld can be shared. |
-| `share.error.tooMany.tasks` | count, limit | There are %1$lld tasks; at most %2$lld can be shared. Share without tasks? |
-| `share.error.tooMany.exams` | count, limit | There are %1$lld exams; at most %2$lld can be shared. Share without tasks? |
+| `share.error.tooMany.subjects` | limit | Sharing allows at most %lld subjects; this timetable has more. |
+| `share.error.tooMany.lessons` | limit | Sharing allows at most %lld lessons; this timetable has more. |
+| `share.error.tooMany.bellSchedules` | limit | Sharing allows at most %lld bell schedules; this timetable has more. |
+| `share.error.tooMany.periods` | limit | Sharing allows at most %lld periods per bell schedule; one has more. |
+| `share.error.tooMany.terms` | limit | Sharing allows at most %lld terms; this timetable has more. |
+| `share.error.tooMany.breaks` | limit | Sharing allows at most %lld holidays; this timetable has more. |
+| `share.error.tooMany.tasks` | limit | Sharing allows at most %lld tasks; there are more. Share without tasks? |
+| `share.error.tooMany.exams` | limit | Sharing allows at most %lld exams; there are more. Share without tasks? |
 | `share.warning.unknownValue` | value (verbatim) | Some details come from a newer version of Tabula and are kept as they are. |
 | `share.warning.unknownColorName` | — | Some colour names aren't available in this version. |
 | `share.warning.overlappingPeriods` | — | Two periods of a bell schedule overlap. |
@@ -352,7 +352,8 @@ Core returns keys only (`ShareError.message`, `ShareWarning.message`); English i
 | `share.warning.skippedLessons` | count | %lld lessons without a subject or period were left out. |
 | `share.warning.valuesDropped` | count | %lld details that can't be shared were left out. |
 
-Count arguments need plural variations. Total: 27 keys (17 errors + 10 warnings).
+Count arguments need plural variations. Each key has at most one count (one plural axis): `tooMany.*` take only the
+limit (pre-freeze; the count is not shown, the user sees it in the app). Total: 27 keys (17 errors + 10 warnings).
 
 ## 10. Versioning rules
 

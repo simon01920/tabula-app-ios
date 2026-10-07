@@ -160,7 +160,7 @@ struct ShareImportExportTests {
         #expect(throws: ShareError.tooMany(.lessons, count: 2001)) {
             try ShareExport.makePayload(from: db, timetableID: ShareFixture.secondaryTimetableID, includeTasks: false)
         }
-        #expect(ShareError.tooMany(.lessons, count: 2001).message.args == [.integer(2001), .integer(2000)])
+        #expect(ShareError.tooMany(.lessons, count: 2001).message.args == [.integer(2000)])
     }
 
     @Test func exportOfTheStageOneFullDatabase() throws {

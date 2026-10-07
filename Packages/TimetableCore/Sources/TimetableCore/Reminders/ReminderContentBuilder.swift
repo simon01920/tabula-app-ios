@@ -28,9 +28,9 @@ public enum ReminderL10n {
         .map { "reminder.exam.\($0)" }
     /// Lesson bodies: `todayAt` (time) "Starts at %@"; `tomorrowAt` (time); `inDaysAt` (days, date, time).
     public static let lessonBodies = ["todayAt", "tomorrowAt", "inDaysAt"].map { "reminder.lesson.\($0)" }
-    /// Pack-tonight bodies. Args: (1) item count, (2) first subject name, (3) number of other subjects;
-    /// `inDays` adds (4) days, (5) date. English for `tomorrow`: "%1$lld items for %2$@ tomorrow" with a
-    /// plural variation on arg 3 ("… and %3$lld other subjects").
+    /// Pack-tonight bodies. Args: (1) item count (the only count: one plural axis per key), (2) first subject
+    /// name; `inDays` adds (3) the date. English for `tomorrow`: "%1$lld items to pack for tomorrow, starting
+    /// with %2$@".
     public static let packTonightBodies = ["today", "tomorrow", "inDays"].map { "reminder.packTonight.\($0)" }
 
     /// In-app notice when the window is saturated. Arg: number of reminders that could not be scheduled.
@@ -97,14 +97,15 @@ enum ReminderContentBuilder {
     /// Counts and the first subject name only — never the item texts (lock-screen privacy).
     static func packTonight(_ day: PackTonightDay, fire: LocalDate) -> ReminderContent {
         let first = day.subjects.first?.subject.name ?? ""
-        var args: [LocalizedArgument] = [.integer(day.itemCount), .string(first), .integer(max(0, day.subjects.count - 1))]
+        // At most one count per key (one plural axis): the item count. The day distance is shown as a date.
+        var args: [LocalizedArgument] = [.integer(day.itemCount), .string(first)]
         let key: String
         switch RelativeDay(fire: fire, item: day.date) {
         case .today: key = "reminder.packTonight.today"
         case .tomorrow: key = "reminder.packTonight.tomorrow"
-        case .inDays(let days):
+        case .inDays:
             key = "reminder.packTonight.inDays"
-            args += [.integer(days), .date(day.date)]
+            args.append(.date(day.date))
         }
         return ReminderContent(title: LocalizedText(key: ReminderL10n.packTonightTitle),
                                body: LocalizedText(key: key, args: args))

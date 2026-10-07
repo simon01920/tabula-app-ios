@@ -314,7 +314,7 @@ struct ShareCodecTests {
         #expect(ShareError.decompressedTooLarge.message.key == "share.error.tooLarge")
         #expect(ShareError.danglingReference(path: "l[0].s").message.key == "share.error.invalidContent")
         #expect(ShareError.tooMany(.lessons, count: 2001).message
-                == LocalizedText(key: "share.error.tooMany.lessons", args: [.integer(2001), .integer(2000)]))
+                == LocalizedText(key: "share.error.tooMany.lessons", args: [.integer(2000)]))
         #expect(ShareError.tooMany(.bringList, count: 51).message.key == "share.error.invalidContent")
         #expect(ShareError.idCollision.message.key == "share.error.failed")
         #expect(ShareWarning.lessonsOnDisabledDays(count: 3).message

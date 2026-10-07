@@ -105,6 +105,31 @@ struct StringCatalogTests {
         #expect(missing.isEmpty, "keys missing from Resources/Localizable.xcstrings: \(missing)")
     }
 
+    /// Pre-freeze QA: one plural axis per string (a second count needs its own key), and data-check messages never
+    /// insert a translated noun (they take no arguments; the entity type name is a separate label).
+    @Test func atMostOneCountPerKeyAndNoInsertedNouns() throws {
+        let strings = try catalogStrings()
+        for key in CoreL10n.allKeys {
+            guard let entry = strings[key], let (values, _) = englishValues(entry) else { continue }
+            for value in values {
+                #expect(value.matches(of: Self.integerSpecifier).count <= 1, "\(key): more than one count in \"\(value)\"")
+                if key.hasPrefix("validation.") || key.hasPrefix("entityType.") {
+                    #expect(value.firstMatch(of: Self.anySpecifier) == nil, "\(key): must take no arguments")
+                }
+            }
+        }
+        for code in ValidationIssue.Code.allCases {
+            let issue = ValidationIssue(severity: .error, code: code, entityType: .task, entityID: UUID(uuidString: "00000000-0000-4000-8000-000000000000")!)
+            #expect(issue.message.args.isEmpty, "\(code)")
+        }
+        // Pack-tonight bodies carry exactly one count (the item number).
+        let day = PackTonightDay(date: Fixture.date("2026-10-12"), firstLessonStart: Fixture.time("08:00"), subjects: [])
+        for fire in ["2026-10-12", "2026-10-11", "2026-10-08"] {
+            let body = ReminderContentBuilder.packTonight(day, fire: Fixture.date(fire)).body
+            #expect(body.args.filter { if case .integer = $0 { return true } else { return false } }.count == 1, "\(body.key)")
+        }
+    }
+
     @Test func phaseZeroProbeStringsAreKept() throws {
         let strings = try catalogStrings()
         for key in ["probe.hello", "probe.lessons %lld", "probe.widget.name", "probe.intent.title"] {

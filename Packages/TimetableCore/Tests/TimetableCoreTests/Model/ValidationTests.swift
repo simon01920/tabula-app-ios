@@ -37,7 +37,8 @@ struct ValidationTests {
         #expect(db.validate() == shuffled.validate())
         let issue = db.validate().first { $0.code == .danglingReference }!
         #expect(issue.message.key == "validation.danglingReference")
-        #expect(issue.message.args == [.text(LocalizedText(key: "entityType.lesson")), .string("subjectID"), .string("")])
+        #expect(issue.message.args.isEmpty, "neutral phrasing: no inserted noun")
+        #expect(issue.entityTypeName == LocalizedText(key: "entityType.lesson"))
         #expect(issue.description.contains("danglingReference lesson"))
         #expect(ValidationIssue.Severity.info < .warning && ValidationIssue.Severity.warning < .error)
     }

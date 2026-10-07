@@ -74,133 +74,133 @@
       }
     },
     "entityType.bellSchedule" : {
-      "comment" : "Entity type name, lower case, used inside validation messages.",
+      "comment" : "Entity type name shown as a standalone label (e.g. next to a data-check message); never inserted into a sentence.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "bell schedule"
+            "value" : "Bell schedule"
           }
         }
       }
     },
     "entityType.calendarBreak" : {
-      "comment" : "Entity type name, lower case, used inside validation messages (a break/holiday date range).",
+      "comment" : "Entity type name shown as a standalone label (e.g. next to a data-check message); never inserted into a sentence. A break/holiday date range.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "holiday"
+            "value" : "Holiday"
           }
         }
       }
     },
     "entityType.exam" : {
-      "comment" : "Entity type name, lower case, used inside validation messages.",
+      "comment" : "Entity type name shown as a standalone label (e.g. next to a data-check message); never inserted into a sentence.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "exam"
+            "value" : "Exam"
           }
         }
       }
     },
     "entityType.lesson" : {
-      "comment" : "Entity type name, lower case, used inside validation messages.",
+      "comment" : "Entity type name shown as a standalone label (e.g. next to a data-check message); never inserted into a sentence.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "lesson"
+            "value" : "Lesson"
           }
         }
       }
     },
     "entityType.reminderRule" : {
-      "comment" : "Entity type name, lower case, used inside validation messages.",
+      "comment" : "Entity type name shown as a standalone label (e.g. next to a data-check message); never inserted into a sentence.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "reminder rule"
+            "value" : "Reminder rule"
           }
         }
       }
     },
     "entityType.scheduleOverride" : {
-      "comment" : "Entity type name, lower case, used inside validation messages (a one-off change to one day).",
+      "comment" : "Entity type name shown as a standalone label (e.g. next to a data-check message); never inserted into a sentence. A one-off change to one day.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "schedule change"
+            "value" : "Schedule change"
           }
         }
       }
     },
     "entityType.settings" : {
-      "comment" : "Entity type name, lower case, used inside validation messages.",
+      "comment" : "Entity type name shown as a standalone label (e.g. next to a data-check message); never inserted into a sentence.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "settings"
+            "value" : "Settings"
           }
         }
       }
     },
     "entityType.subject" : {
-      "comment" : "Entity type name, lower case, used inside validation messages.",
+      "comment" : "Entity type name shown as a standalone label (e.g. next to a data-check message); never inserted into a sentence.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "subject"
+            "value" : "Subject"
           }
         }
       }
     },
     "entityType.task" : {
-      "comment" : "Entity type name, lower case, used inside validation messages (homework/assignment/to-do).",
+      "comment" : "Entity type name shown as a standalone label (e.g. next to a data-check message); never inserted into a sentence. Homework/assignment/to-do.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "task"
+            "value" : "Task"
           }
         }
       }
     },
     "entityType.term" : {
-      "comment" : "Entity type name, lower case, used inside validation messages (school term / semester).",
+      "comment" : "Entity type name shown as a standalone label (e.g. next to a data-check message); never inserted into a sentence. School term / semester.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "term"
+            "value" : "Term"
           }
         }
       }
     },
     "entityType.timetable" : {
-      "comment" : "Entity type name, lower case, used inside validation messages (noun, lower case, used inside sentences).",
+      "comment" : "Entity type name shown as a standalone label (e.g. next to a data-check message); never inserted into a sentence.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "timetable"
+            "value" : "Timetable"
           }
         }
       }
@@ -1346,7 +1346,7 @@
       }
     },
     "reminder.packTonight.inDays" : {
-      "comment" : "Pack-your-bag body. Plural on arg 1 (items); arg 2 = first subject; arg 5 = date; args 3 (other subjects) and 4 (days) unused in English. Args: 1 items, 2 first subject, 3 other subjects, 4 days, 5 date.",
+      "comment" : "Pack-your-bag body for a day later than tomorrow. Plural on arg 1 (items), the only count. Args: 1 items, 2 first subject, 3 date (formatted, e.g. 'Mon 12 Oct').",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -1355,13 +1355,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%1$lld item to pack for %5$@: %2$@"
+                  "value" : "%1$lld item to pack for %3$@: %2$@"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%1$lld items to pack for %5$@, starting with %2$@"
+                  "value" : "%1$lld items to pack for %3$@, starting with %2$@"
                 }
               }
             }
@@ -1382,7 +1382,7 @@
       }
     },
     "reminder.packTonight.today" : {
-      "comment" : "Pack-your-bag body (lock screen: counts and the first subject only). Plural on arg 1 (items); arg 2 = first subject; arg 3 = number of other subjects (not shown in English: the local catalog compiler supports one plural argument per string). Args: 1 items, 2 first subject, 3 other subjects.",
+      "comment" : "Pack-your-bag body (lock screen: counts and the first subject only). Plural on arg 1 (items), the only count. Args: 1 items, 2 first subject.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -1406,7 +1406,7 @@
       }
     },
     "reminder.packTonight.tomorrow" : {
-      "comment" : "Pack-your-bag body. Plural on arg 1 (items); arg 2 = first subject; arg 3 = number of other subjects (unused in English). Args: 1 items, 2 first subject, 3 other subjects.",
+      "comment" : "Pack-your-bag body. Plural on arg 1 (items), the only count. Args: 1 items, 2 first subject.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2210,7 +2210,7 @@
       }
     },
     "share.error.tooMany.bellSchedules" : {
-      "comment" : "Share export error; plural on arg 1 (count); arg 2 = the limit (no plural needed in English). Args: 1 count, 2 limit.",
+      "comment" : "Share export error. Plural on arg 1, the only argument: the limit. Args: 1 limit.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2219,13 +2219,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "This timetable has %1$lld bell schedule; at most %2$lld can be shared."
+                  "value" : "Sharing allows at most %lld bell schedule; this timetable has more."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "This timetable has %1$lld bell schedules; at most %2$lld can be shared."
+                  "value" : "Sharing allows at most %lld bell schedules; this timetable has more."
                 }
               }
             }
@@ -2234,7 +2234,7 @@
       }
     },
     "share.error.tooMany.breaks" : {
-      "comment" : "Share export error; plural on arg 1 (count); arg 2 = the limit (no plural needed in English). Args: 1 count, 2 limit.",
+      "comment" : "Share export error. Plural on arg 1, the only argument: the limit. Args: 1 limit.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2243,13 +2243,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "This timetable has %1$lld holiday; at most %2$lld can be shared."
+                  "value" : "Sharing allows at most %lld holiday; this timetable has more."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "This timetable has %1$lld holidays; at most %2$lld can be shared."
+                  "value" : "Sharing allows at most %lld holidays; this timetable has more."
                 }
               }
             }
@@ -2258,7 +2258,7 @@
       }
     },
     "share.error.tooMany.exams" : {
-      "comment" : "Share export error; plural on arg 1 (count); arg 2 = the limit (no plural needed in English). Args: 1 count, 2 limit.",
+      "comment" : "Share export error. Plural on arg 1, the only argument: the limit. Args: 1 limit.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2267,13 +2267,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "There is %1$lld exam; at most %2$lld can be shared. Share without tasks?"
+                  "value" : "Sharing allows at most %lld exam; there are more. Share without tasks?"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "There are %1$lld exams; at most %2$lld can be shared. Share without tasks?"
+                  "value" : "Sharing allows at most %lld exams; there are more. Share without tasks?"
                 }
               }
             }
@@ -2282,7 +2282,7 @@
       }
     },
     "share.error.tooMany.lessons" : {
-      "comment" : "Share export error; plural on arg 1 (count); arg 2 = the limit (no plural needed in English). Args: 1 count, 2 limit.",
+      "comment" : "Share export error. Plural on arg 1, the only argument: the limit. Args: 1 limit.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2291,13 +2291,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "This timetable has %1$lld lesson; at most %2$lld can be shared."
+                  "value" : "Sharing allows at most %lld lesson; this timetable has more."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "This timetable has %1$lld lessons; at most %2$lld can be shared."
+                  "value" : "Sharing allows at most %lld lessons; this timetable has more."
                 }
               }
             }
@@ -2306,7 +2306,7 @@
       }
     },
     "share.error.tooMany.periods" : {
-      "comment" : "Share export error; plural on arg 1 (count); arg 2 = the limit (no plural needed in English). Args: 1 count, 2 limit.",
+      "comment" : "Share export error. Plural on arg 1, the only argument: the limit. Args: 1 limit.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2315,13 +2315,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "A bell schedule has %1$lld period; at most %2$lld can be shared."
+                  "value" : "Sharing allows at most %lld period per bell schedule; one has more."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "A bell schedule has %1$lld periods; at most %2$lld can be shared."
+                  "value" : "Sharing allows at most %lld periods per bell schedule; one has more."
                 }
               }
             }
@@ -2330,7 +2330,7 @@
       }
     },
     "share.error.tooMany.subjects" : {
-      "comment" : "Share export error; plural on arg 1 (count); arg 2 = the limit (no plural needed in English). Args: 1 count, 2 limit.",
+      "comment" : "Share export error. Plural on arg 1, the only argument: the limit. Args: 1 limit.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2339,13 +2339,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "This timetable has %1$lld subject; at most %2$lld can be shared."
+                  "value" : "Sharing allows at most %lld subject; this timetable has more."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "This timetable has %1$lld subjects; at most %2$lld can be shared."
+                  "value" : "Sharing allows at most %lld subjects; this timetable has more."
                 }
               }
             }
@@ -2354,7 +2354,7 @@
       }
     },
     "share.error.tooMany.tasks" : {
-      "comment" : "Share export error; plural on arg 1 (count); arg 2 = the limit (no plural needed in English). Args: 1 count, 2 limit.",
+      "comment" : "Share export error. Plural on arg 1, the only argument: the limit. Args: 1 limit.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2363,13 +2363,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "There is %1$lld task; at most %2$lld can be shared. Share without tasks?"
+                  "value" : "Sharing allows at most %lld task; there are more. Share without tasks?"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "There are %1$lld tasks; at most %2$lld can be shared. Share without tasks?"
+                  "value" : "Sharing allows at most %lld tasks; there are more. Share without tasks?"
                 }
               }
             }
@@ -2378,7 +2378,7 @@
       }
     },
     "share.error.tooMany.terms" : {
-      "comment" : "Share export error; plural on arg 1 (count); arg 2 = the limit (no plural needed in English). Args: 1 count, 2 limit.",
+      "comment" : "Share export error. Plural on arg 1, the only argument: the limit. Args: 1 limit.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2387,13 +2387,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "This timetable has %1$lld term; at most %2$lld can be shared."
+                  "value" : "Sharing allows at most %lld term; this timetable has more."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "This timetable has %1$lld terms; at most %2$lld can be shared."
+                  "value" : "Sharing allows at most %lld terms; this timetable has more."
                 }
               }
             }
@@ -2630,55 +2630,55 @@
       }
     },
     "validation.crossTimetableReference" : {
-      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "comment" : "Data-check message (debug/health screen). Neutral phrasing, no arguments: the UI shows the entity type name (entityType.*) as a separate label, so no translated noun is inserted into this sentence.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A %1$@ refers to something from another timetable."
+            "value" : "This item refers to something from another timetable."
           }
         }
       }
     },
     "validation.cycleWeekOutOfRange" : {
-      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "comment" : "Data-check message (debug/health screen). Neutral phrasing, no arguments: the UI shows the entity type name (entityType.*) as a separate label, so no translated noun is inserted into this sentence.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A %1$@ uses a week that isn't part of the timetable's rotation."
+            "value" : "This item uses a week that isn't part of the timetable's rotation."
           }
         }
       }
     },
     "validation.danglingReference" : {
-      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "comment" : "Data-check message (debug/health screen). Neutral phrasing, no arguments: the UI shows the entity type name (entityType.*) as a separate label, so no translated noun is inserted into this sentence.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A %1$@ refers to something that no longer exists."
+            "value" : "This item refers to something that no longer exists."
           }
         }
       }
     },
     "validation.duplicateID" : {
-      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "comment" : "Data-check message (debug/health screen). Neutral phrasing, no arguments: the UI shows the entity type name (entityType.*) as a separate label, so no translated noun is inserted into this sentence.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A %1$@ appears twice."
+            "value" : "This item appears twice."
           }
         }
       }
     },
     "validation.emptyScheduleDay" : {
-      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "comment" : "Data-check message (debug/health screen). Neutral phrasing, no arguments: the UI shows the entity type name (entityType.*) as a separate label, so no translated noun is inserted into this sentence.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2690,43 +2690,43 @@
       }
     },
     "validation.invalidDateRange" : {
-      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "comment" : "Data-check message (debug/health screen). Neutral phrasing, no arguments: the UI shows the entity type name (entityType.*) as a separate label, so no translated noun is inserted into this sentence.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A %1$@ has an end date before its start date."
+            "value" : "This item's end date is before its start date."
           }
         }
       }
     },
     "validation.invalidTimeRange" : {
-      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "comment" : "Data-check message (debug/health screen). Neutral phrasing, no arguments: the UI shows the entity type name (entityType.*) as a separate label, so no translated noun is inserted into this sentence.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A %1$@ ends before it starts."
+            "value" : "This item ends before it starts."
           }
         }
       }
     },
     "validation.invalidValue" : {
-      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "comment" : "Data-check message (debug/health screen). Neutral phrasing, no arguments: the UI shows the entity type name (entityType.*) as a separate label, so no translated noun is inserted into this sentence.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A %1$@ has a value that is out of range."
+            "value" : "This item has a value that is out of range."
           }
         }
       }
     },
     "validation.overlappingPeriods" : {
-      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "comment" : "Data-check message (debug/health screen). Neutral phrasing, no arguments: the UI shows the entity type name (entityType.*) as a separate label, so no translated noun is inserted into this sentence.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2738,43 +2738,43 @@
       }
     },
     "validation.referencesDeletedEntity" : {
-      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "comment" : "Data-check message (debug/health screen). Neutral phrasing, no arguments: the UI shows the entity type name (entityType.*) as a separate label, so no translated noun is inserted into this sentence.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A %1$@ refers to something that was deleted."
+            "value" : "This item refers to something that was deleted."
           }
         }
       }
     },
     "validation.schoolDaysMismatch" : {
-      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "comment" : "Data-check message (debug/health screen). Neutral phrasing, no arguments: the UI shows the entity type name (entityType.*) as a separate label, so no translated noun is inserted into this sentence.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The rotation's school days don't match the days this %1$@ shows."
+            "value" : "The rotation's school days don't match the days this timetable shows."
           }
         }
       }
     },
     "validation.unknownValue" : {
-      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "comment" : "Data-check message (debug/health screen). Neutral phrasing, no arguments: the UI shows the entity type name (entityType.*) as a separate label, so no translated noun is inserted into this sentence.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A %1$@ uses something from a newer app version."
+            "value" : "This item uses something from a newer version of Tabula."
           }
         }
       }
     },
     "validation.unsupportedSchemaVersion" : {
-      "comment" : "Data-check message. %1$@ = entity type name (lower case, from entityType.*); args 2 (field) and 3 (value) are technical and unused in English.",
+      "comment" : "Data-check message (debug/health screen). Neutral phrasing, no arguments: the UI shows the entity type name (entityType.*) as a separate label, so no translated noun is inserted into this sentence.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {

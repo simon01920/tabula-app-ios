@@ -90,15 +90,13 @@ public struct ValidationIssue: Hashable, Sendable, Codable, CustomStringConverti
         self.value = value
     }
 
-    /// Localisable message `validation.<code>` with arguments (entity type name, field name, value) — always
-    /// three arguments; absent ones are empty strings.
-    public var message: LocalizedText {
-        LocalizedText(key: code.l10nKey, args: [
-            .text(LocalizedText(key: entityType.l10nKey)),
-            .string(field ?? ""),
-            .string(value ?? ""),
-        ])
-    }
+    /// Localisable message `validation.<code>`: neutral phrasing ("This item …") with **no arguments**, so no
+    /// translated noun is ever inserted into a sentence (grammatical gender/case differ per language). Show
+    /// `entityTypeName` as a separate label; `field`/`value` are technical (debug screen only).
+    public var message: LocalizedText { LocalizedText(key: code.l10nKey) }
+
+    /// Display name of the entity type (`entityType.<type>`), a standalone label next to `message`.
+    public var entityTypeName: LocalizedText { LocalizedText(key: entityType.l10nKey) }
 
     /// Debug rendering.
     public var description: String {

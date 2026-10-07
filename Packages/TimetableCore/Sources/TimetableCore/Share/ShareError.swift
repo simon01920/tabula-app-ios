@@ -76,11 +76,11 @@ public enum ShareError: Error, Hashable, Sendable, CustomStringConvertible {
         }
     }
 
-    /// The localisable message. `tooMany.<collection>` keys take (1) the count and (2) the limit (plural
-    /// variations on both); every other key takes no arguments.
+    /// The localisable message. `tooMany.<collection>` keys take one argument, the limit (plural variations on
+    /// it; one count per key, so no second plural axis); every other key takes no arguments.
     public var message: LocalizedText {
-        if case let .tooMany(collection, count) = self, collection.hasOwnLimitMessage {
-            return LocalizedText(key: l10nKey, args: [.integer(count), .integer(collection.limit)])
+        if case let .tooMany(collection, _) = self, collection.hasOwnLimitMessage {
+            return LocalizedText(key: l10nKey, args: [.integer(collection.limit)])
         }
         return LocalizedText(key: l10nKey)
     }
