@@ -1,84 +1,84 @@
 # Phase 1 gate report — TimetableCore
 
-Status: **DRAFT — Stage 3 integration running** · Plan: `docs/specs/PHASE1_PLAN.md` · Schema reference: `docs/specs/DOMAIN_MODEL.md`
+Date: 2026-10-08 · Status: **STOPPED AT GATE: awaiting human approval.** Approving this gate **freezes the persisted schema** (CLAUDE.md: later changes need your approval).
+Plan: `docs/specs/PHASE1_PLAN.md` · Schema reference: `docs/specs/DOMAIN_MODEL.md` · Share wire format: `docs/specs/SHARE_FORMAT.md`
 
-## Stages
-| Stage | Owner | Branch / commit | Tests | Status |
-|---|---|---|---|---|
-| 1 Model foundation | core-domain-engineer | `4237def` (ff-merged to main) | 142 in 30 suites, independently re-run by the orchestrator | merged |
-| 2B Schedule engine | core-domain-engineer | merged `a3c60bb` | 318 on main after merge (92 new), independently re-run | merged |
-| 2C Reminder planner | notifications-engineer | `9843b24` (ff-merged) | 226 total (84 new), independently re-run | merged |
-| 2D Share codec | core-domain-engineer | merged `61e78bc` | 384 on main after merge (66 new), independently re-run | merged |
-| 2E Sync + repository | sync-storage-engineer | merged `085bfbf` | 458 on main after merge (74 new), independently re-run | merged |
-| 3 Integration | core-domain-engineer | main | — | running |
+## 1. Done
+| Part | What it gives the app | Tests (new) |
+|---|---|---|
+| Stage 1 model foundation | Calendar primitives with an explicit DST policy; schema v1 (12 entity types, sync metadata, open vocabularies, deterministic JSON); validation; colour contrast (WCAG) + 4 palette packs; onboarding presets per profile; the Free/Pro table as data; `EntitlementsProvider` | 142 |
+| 2B schedule engine | Week cycles (odd/even, N-week), day cycles (A/B…) counted over school days and breaks; terms, holidays, overrides (cancel/modify/add/cancelDay/followDay/bell swap); subject defaults; conflicts; now & next; grid and time-block layouts | 92 |
+| 2C reminder planner | Rules → prioritised plan within the 64-notification cap; Time Sensitive and alarm policies; quiet hours; follow-ups; pack-tonight; stable IDs plus diffing for the iOS adapter | 84 |
+| 2D share codec | Versioned JSON → DEFLATE (system zlib) → base64url; inline link vs 8-char short code; strict validation and limits; import preview and materialise with fresh IDs | 66 |
+| 2E sync + storage | Hybrid logical clock; field-level merge with tombstones and child set-merge; unknown-field preservation; file repository (atomic, backup, recovery, read-only on newer schema, migrations); backup archive with SHA-256 | 74 |
+| 3 integration + pre-freeze fixes | `createdAt` field-clock default (file 8.9 → 4.8 MB); hostile-number hardening (8 crash paths); validation gaps; all vocabularies open; `rotationWeekStart` persisted; repeat-task semantics; 192 l10n keys in the catalog + docs; macOS `swift test` in CI | 41 |
 
-## Orchestrator decisions taken during Phase 1 (reviewable)
-1. Stage 1 deviations accepted:
-   - dates encoded as integer milliseconds;
-   - `LocalDateTime` struct;
-   - fixed singleton UUID for `AppSettings`;
-   - more vocabularies made open;
-   - `followDay.cycleWeek`, `isoWeekParity.offset`, `Exam.notes`, `[String]` topics;
-   - `repeatRule` naming;
-   - "Other" profile falls back to the secondary bell template.
-2. Period mapping across bell-schedule variants: match by `Period.ID`, else the same ordinal among lesson periods, else omit with a warning.
-3. `ISOWeekParityPolicy.continuous` defined as: parity fixed by the ISO week at the school-year start (1 Sept), then strict alternation within the school year. The default for new timetables is `.strict`.
-4. `useBellSchedule` override marks lessons whose times change as `.modified`.
-5. Forward compatibility: unknown JSON keys are preserved through re-saves (collection-level side table). This is done before the schema freeze.
-6. Reminder planner defaults follow the Phase 0 recommendations D6/D7 (Time Sensitive lead ≤ 60 min; alarms only from user rules), as policies in `AppSettings`.
+## 2. Evidence
+- **Linux (orchestrator re-run, 2026-10-08):** `bash scripts/validate.sh` → **ALL CHECKS PASSED**. That covers **499 core tests in 76 suites** (agent run after the last touches; orchestrator re-run at 497 before them), 9 TimetableUI tests, manifests, plists, path sync, the catalog and XcodeGen. 0 compiler warnings.
+- **iOS app build (xtool, local):** `Build complete! (7.08 secs)`, iOS app + widget. **Watch type-check (arm64_32, watchOS 26):** OK.
+- **CI on the Phase 1 code** (run [37690335046](https://github.com/simon01920/tabula-app-ios/actions/runs/37690335046) at `1e36a06`): ✓ Linux tests, ✓ XcodeGen iOS+watch build, ✓ xtool path, ✓ simulator screenshots ([37690335073](https://github.com/simon01920/tabula-app-ios/actions/runs/37690335073)). The pre-freeze commits are pushed with this report, and their CI run is the final check.
+- **Performance (release, 5,000 tasks + 2,000 lessons):** file 4.8 MB, load 0.27 s + save 0.31 s = **0.57 s** (budget 1 s). Resolving five years of a 40-lesson timetable: 0.07 s.
+- **Robustness:** share-codec fuzzing (≥ 2,100 counted hostile inputs plus mutated links), hostile-number fuzzing of every date field, 600-seed merge algebra, and 150/40-seed multi-replica convergence. All green.
+- **Independent QA (qa-reviewer):** gate review PASS WITH FIXES, fixes applied, then a delta re-review (see §6).
 
-7. Reminder IDs (2C): `rem.` + FNV-1a 64 of source + rule + offset + **wall-clock** time. Offsets in "days before at hh:mm" use the local fire time; "minutes before" use the item's local time, so IDs survive DST and time-zone changes. This supersedes PHASE1_PLAN §5's "fire instant".
-8. Planner defaults (2C):
-   - Time Sensitive is kept at exactly 60 min lead, measured after the quiet-hours shift.
-   - Alarm gate order: follow-ups never ring, then preset rules, then policy, then device capability. Anything that fails the gate falls back to Time Sensitive.
-   - Global quiet hours don't move alarms.
-   - Date-only items anchor at 08:00, fixed for now. Making it user-configurable later would be a schema change.
-   - Pack-tonight shows counts and the first subject only on the lock screen (privacy).
+## 3. Not done / limits (honest)
+- **Not run on Apple platforms:**
+  - Core logic is tested on Linux; the macOS `swift test` CI step runs from now on.
+  - Nothing runs on the watch's 32-bit CPU; it is type-checked only.
+- **Phase 2/3 items:**
+  - **No UI** for any of this yet (Phase 2).
+  - The **iOS notification/AlarmKit adapter** (Phase 3).
+  - **CloudKit** transport (Phase 6).
+  - **Share Worker** (Phase 7).
+- **Known accepted limits:**
+  - Lessons can't end exactly at 24:00.
+  - Unknown keys *inside* embedded value objects are not preserved.
+  - Schedule overrides and completed tasks are not shared in v1.
+  - Date-only items remind relative to 08:00.
 
-9. Schedule engine (2B):
-   - **Week parity:** `.strict` is the default and is isolated in `WeekParity.defaultPolicy(for:regionCode:)`. `.continuous` assigns the whole week containing 1 Sept to the new school year. Sun/Sat week starts use the ISO week of the week's middle day.
-   - **`followDay`:**
-     - It keeps the actual date's bell schedule; stack `useBellSchedule` for the followed day's times.
-     - It works on disabled weekdays and during breaks (make-up Saturdays).
-     - It never shifts the rotation.
-   - **Override replay order:** `meta.updatedAt`, then ID.
-     - A later `modifyLesson` revives a cancelled lesson.
-     - `cancelDay` beats lesson-level changes; added one-off lessons survive it.
-   - **Period mapping:** a span running past the last period is shortened and flagged, not dropped.
-   - **Performance:** 5 years × 40 lessons resolves in 0.07 s (release) / 0.5 s (debug).
-   - **Known gaps:**
-     - A zone with two DST changes within 5 days would break the fast path; no such zone exists.
-     - A day schedule with more periods than the default shows the extra lessons as "unplaced" in the grid.
-     - Validation doesn't yet check `followDay.cycleWeek` against the cycle length, or day-cycle school days against enabled days. The resolver tolerates both.
+## 4. Orchestrator decisions taken in Phase 1 (please skim; all reversible until you approve the freeze)
+1. **Data format:** integer-millisecond dates; a singleton UUID for settings; most vocabularies **open** (unknown values round-trip and degrade safely).
+2. **Sync:** a field with no clock counts as written at `createdAt`; settings start at time zero; the merged `createdAt` is the later one.
+3. **Odd/even weeks:** default `.strict` (ISO week number parity). `.continuous` = re-anchor at the week containing 1 September, then alternate. The rotation week start is stored per timetable, so all devices agree on A/B.
+4. **Overrides:** replayed in edit order. A later modify revives a cancelled lesson; `cancelDay` wins over lesson changes; added one-off lessons survive it.
+5. **Reminders:**
+   - Time Sensitive is used only when the lead is ≤ 60 min, per Apple's HIG (Phase 0 D6).
+   - Alarms come only from user rules (Phase 0 D7).
+   - University lesson reminders are off by default, so the 64 cap isn't hit.
+   - The lock screen shows counts, never bring-list text.
+6. **Last closed vocabulary opened:** `ISOWeekParityPolicy` (unknown → `.strict`).
+7. **Repeating tasks:** completing one creates its successor with an ID derived from the finished task, so two devices completing it don't duplicate it. Monthly repeats skip months without that day (31 Jan → 31 Mar).
+8. **Sharing:** no UUIDs in payloads; IDs are remapped on import; completed tasks/exams and overrides are excluded.
+9. **Dependencies:** none added. zlib is a system library; SHA-256 is our own ~150 lines.
 
-10. Share codec (2D):
-   - Payload size: typical secondary school 1.4 KB (inline link); university with 360 lessons 7.6 KB (short code).
-   - Fuzz: 5,200 hostile inputs, no crash.
-   - The payload contains no UUIDs; entities are referenced by index.
-   - Completed tasks/exams and schedule overrides are **not shared** in v1.
-   - Global breaks become breaks of the imported timetable.
-   - `CZlib` is a system library, not a package dependency.
-   - iOS cross-compile verified (release); a debug-link quirk was seen under xtool.
+## 5. Decisions needed from you
+| # | Decision | Recommendation |
+|---|---|---|
+| **P1-1** | **Approve the schema freeze** (DOMAIN_MODEL v1) | Approve |
+| P1-2 | Default odd/even policy `.strict` (ISO weeks) vs `.continuous` (from 1 Sept) for Slovak/Czech schools | See §7: your call, as the person who knows how your schools count |
+| P1-3 | Attachment quotas, free vs Pro (placeholders 100 MB / 2,000 MB) | Keep the placeholders until Phase 10 |
+| P1-4 | Time-block and Agenda views: Free or Pro? (PRODUCT.md silent; currently free) | Free (core promise: a usable timetable) |
+| P1-5 | Free tier = 1 timetable: what happens on share-import or a second device's onboarding? | Allow viewing/importing; editing a second timetable prompts the paywall (Phase 10) |
+| P1-6 | Share completed tasks/exams? | No (privacy, size) |
+| P1-9 | Monthly repeats on the 31st: skip short months (current) or use the month's last day? The second needs a `RepeatRule.monthDay` field, **before** the freeze | Skip (current) |
+| P1-7 | Tombstone garbage collection vs merging old backups | Defer to Phase 6 with a rule: keep tombstones ≥ 1 year |
+| P1-8 | Phase 0 D6/D7 confirmation (Time Sensitive ≤ 60 min; alarms only at user-chosen times) | Confirm |
 
-11. Sync + storage (2E):
-   - **Merge:** field-level last-writer-wins; children set-merged; tombstone rule "newest delete ≥ newest liveness → deleted".
-   - **Proofs:** 600-seed algebraic properties; 150/40-seed convergence across replicas.
-   - **Unknown fields** preserved at the root, on entities, settings and children; not inside embedded value objects.
-   - **Hashing:** pure-Swift SHA-256 (FIPS vectors) to avoid a dependency.
-12. **Pre-freeze schema change (orchestrator):**
-   - A missing field clock now means `createdAt` (was `updatedAt`), so the stamper writes clocks only for keys that changed.
-   - Why: with the old rule, per-field clocks doubled the saved file (8.9 MB vs 4.4 MB for 5k tasks + 2k lessons), and load+save sat at 0.91 s against the 1 s budget.
-   - The `AppSettings` singleton gets a zero `createdAt`, so untouched defaults never beat a real edit from another device.
+## 6. Risks (see `docs/RISKS.md`)
+- **Debug-build performance tests are machine-load sensitive.** One run of a < 1 s debug assertion exceeded it; QA delta review comments below.
+- **Core logic hasn't yet executed on Apple Foundation;** the new CI step closes this from the next run.
+- **Pre-freeze changes landed late** (open vocabularies, `rotationWeekStart`). They are covered by tests, but the UI phase is the first real consumer.
 
-**Integration to-do:**
-- Add `ReminderL10n.allKeys` (42) to DOMAIN_MODEL Appendix A and `DomainModelDocTests`.
-- Do the same for 2B's 18 keys (`schedule.warning.*` and `schedule.change.*`) and the keys from 2D/2E.
-- Add validation for the two gaps above.
-- **Fix the crash:** `TabulaJSON.makeDecoder()` traps on out-of-range numeric dates (e.g. `1e300`) through an unchecked `Int64(...)`. A hostile backup could crash the app. Range-check it and throw.
-- Add 2D's 27 keys (`share.error.*`, `share.warning.*`).
+**QA delta review: PASS.** All earlier items are closed. Its three minor follow-ups are applied (`6ef2f62`, `bd90ab7`):
+- debug performance limits relaxed (the 1 s budget stays in release);
+- `ISOWeekParityPolicy` opened;
+- an unknown reminder tier now keeps its raw value and records `unknownTier`.
 
-## Decisions needed from the human (collected so far)
-- Attachment quotas, free vs Pro (placeholders: 100 MB / 2,000 MB).
-- Are the **time-block** and **Agenda** views Free or Pro? PRODUCT.md doesn't say. Currently ungated (free).
-- D6/D7 from Phase 0 (implemented as defaults above).
-- Should sharing include **completed** tasks/exams? Currently not.
+The QA reviewer also documented the successor-resurrection edge case (B14).
+
+## 7. Your turn (learning mode, optional, ~5 lines)
+`Packages/TimetableCore/Sources/TimetableCore/Schedule/WeekParity.swift:28`, `defaultPolicy(for:regionCode:)`, returns `.strict` for everyone. It decides how odd/even ("lichý/sudý", "nepárny/párny") weeks are counted for new timetables:
+- **`.strict`:** week parity = the ISO week number's parity. Simple to explain ("week 41 is odd"), but 2026 has 53 weeks, so W53 and the next W01 are both odd: two "odd" weeks in a row around New Year.
+- **`.continuous`:** anchors at the week containing 1 September and then strictly alternates. It never repeats inside a school year, but it can disagree with the printed week number after a 53-week year.
+
+You know how Slovak schools and universities actually announce these weeks. If, for example, schools follow the calendar week number but universities run continuously, write the rule with a `switch profile` (and optionally `regionCode`). The tests pin both policies, so any choice stays safe.
