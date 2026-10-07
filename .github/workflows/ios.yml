@@ -122,6 +122,39 @@ jobs:
         # type-checks TimetableCore for arm64_32; no test runs there. Debug build, ~3-5 min of the 15-min job cap.
         timeout-minutes: 8
         run: swift test -c debug --package-path Packages/TimetableCore
+      - name: Crash reports of the core tests (only on failure)
+        # A crashed test helper (e.g. the SIGBUS stack overflow of 2026-10-08) prints no stack in the log; the
+        # .ips report does. Prints exception, termination reason and the faulting thread's top frames.
+        if: failure()
+        timeout-minutes: 2
+        run: |
+          python3 - <<'PY'
+          import glob, json, os
+          paths = glob.glob(os.path.expanduser("~/Library/Logs/DiagnosticReports/*.ips"))
+          paths += glob.glob("/Library/Logs/DiagnosticReports/*.ips")
+          paths = sorted(paths, key=os.path.getmtime, reverse=True)[:3]
+          if not paths:
+              print("no .ips crash reports found")
+          for path in paths:
+              print(f"=== {path}")
+              text = open(path, encoding="utf-8", errors="replace").read()
+              header, _, body = text.partition("\n")
+              try:
+                  report = json.loads(body)
+              except ValueError:
+                  print(text[:4000]); continue
+              print("process:", report.get("procName"), "| exception:", json.dumps(report.get("exception")))
+              print("termination:", json.dumps(report.get("termination")))
+              images = report.get("usedImages", [])
+              threads = report.get("threads", [])
+              index = report.get("faultingThread", 0)
+              if index < len(threads):
+                  frames = threads[index].get("frames", [])
+                  print(f"faulting thread {index}: {len(frames)} frames (top 40)")
+                  for number, frame in enumerate(frames[:40]):
+                      image = images[frame.get("imageIndex", 0)].get("name", "?") if images else "?"
+                      print(f"  {number:3} {image:30} {frame.get('symbol', '?')} +{frame.get('symbolLocation', 0)}")
+          PY
       - name: Install XcodeGen (pinned + SHA-256)
         run: |
           curl -fsSL -o xcodegen.zip "https://github.com/yonaskolb/XcodeGen/releases/download/${XCODEGEN_VERSION}/xcodegen.zip"
