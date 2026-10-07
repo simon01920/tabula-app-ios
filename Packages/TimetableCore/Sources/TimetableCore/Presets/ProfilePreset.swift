@@ -133,7 +133,9 @@ public struct ProfilePreset: Hashable, Sendable {
             ReminderRulePreset(target: .homework, offsets: [.daysBefore(1, at: time(18))]),
             ReminderRulePreset(target: .exam, offsets: [.daysBefore(7, at: time(18)), .daysBefore(3, at: time(18)),
                                                         .daysBefore(1, at: time(18))]),
-            ReminderRulePreset(target: .lesson, offsets: [.minutesBefore(15)], tier: .timeSensitive),
+            // Off by default (pre-freeze QA): 15-min lesson reminders for ~15 lessons a week would eat the
+            // 64-notification budget; homework/assignment/exam reminders stay on.
+            ReminderRulePreset(target: .lesson, offsets: [.minutesBefore(15)], tier: .timeSensitive, isEnabled: false),
         ]
     )
 
