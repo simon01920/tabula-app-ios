@@ -33,7 +33,8 @@ if [ -z "$WATCH_SDK" ] || [ ! -d "$RESOURCE_DIR" ]; then
 fi
 rm -rf "$OUT"; mkdir -p "$OUT/modcache"
 COMMON=(-target "$TARGET" -sdk "$WATCH_SDK" -resource-dir "$RESOURCE_DIR" -swift-version 6
-        -module-cache-path "$OUT/modcache" -I "$OUT" -parse-as-library)
+        -module-cache-path "$OUT/modcache" -I "$OUT" -parse-as-library
+        -I "$REPO_ROOT/Packages/TimetableCore/Sources/CZlib")   # system zlib module map (Stage 2D share codec)
 echo "+ watchOS SDK: $WATCH_SDK"
 echo "+ target:      $TARGET"
 
