@@ -77,7 +77,7 @@ struct ReminderSupportTypesTests {
     @Test func l10nKeysAreUniqueAndCoverEverythingEmitted() {
         let keys = ReminderL10n.allKeys
         #expect(Set(keys).count == keys.count)
-        #expect(keys.count == 42)
+        #expect(keys.count == 43)
         #expect(keys.allSatisfy { $0.hasPrefix("reminder.") })
         let maths = F.subject(1, "Math")
         let lessons = [F.lesson(1, date: "2026-10-08", start: "08:00", end: "08:45", subject: maths, room: "1", bring: ["x"]),
@@ -111,7 +111,7 @@ struct ReminderSupportTypesTests {
     @Test func tierAndDropReasonKeys() {
         #expect(TierChangeReason.leadTimeTooLong.l10nKey == "reminder.tierChange.leadTimeTooLong")
         #expect(DropReason.quietHoursAfterDue.l10nKey == "reminder.dropped.quietHoursAfterDue")
-        #expect(TierChangeReason.allCases.count == 7)
+        #expect(TierChangeReason.allCases.count == 8)
         #expect(DropReason.allCases.count == 6)
     }
 }

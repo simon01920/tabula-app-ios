@@ -90,7 +90,9 @@ struct OpenVocabularyDegradationTests {
         #expect(plan.notifications.count == 1)
         let only = plan.notifications.first
         #expect(only?.source == .task(dated.id) && only?.isFollowUp == false)
-        #expect(only?.requestedTier == .standard && only?.effectiveTier == .standard)
+        // The raw value is kept; the degradation is an explained tier change.
+        #expect(only?.requestedTier == DeliveryTier(rawValue: "critical") && only?.effectiveTier == .standard)
+        #expect(only?.tierChanges == [.unknownTier])
         #expect(plan.alarms.isEmpty)
         // The unknown follow-up is reported once, as coming from a newer version; the undated task plans nothing.
         #expect(plan.dropped.map(\.reason) == [.unsupportedOffset])
@@ -102,6 +104,8 @@ struct OpenVocabularyDegradationTests {
         let timed = F.task(3, due: .dateTime(F.d("2026-10-08"), F.t("09:00")), override: override)
         let overridden = ReminderPlanner.plan(F.input(rules: [], tasks: [timed]))
         #expect(overridden.notifications.map(\.effectiveTier) == [.standard])
+        #expect(overridden.notifications.map(\.requestedTier) == [DeliveryTier(rawValue: "siren")])
+        #expect(overridden.notifications.map(\.tierChanges) == [[.unknownTier]])
     }
 
     @Test func lessonWithUnknownValidityIsNeverShown() {
@@ -130,5 +134,41 @@ struct OpenVocabularyDegradationTests {
         #expect(result.warnings.contains { if case .valuesDropped(let count) = $0 { return count >= 2 } else { return false } })
         #expect(try result.payload.validate().contains(.unknownValue(field: "density", value: "spacious")))
         _ = lessonID
+    }
+}
+
+/// Pre-freeze delta: `ISOWeekParityPolicy` is open; an unknown policy round-trips and is applied as `.strict`.
+@Suite("Open vocabularies: ISO week parity policy")
+struct ParityPolicyOpenVocabularyTests {
+    @Test func unknownPolicyRoundTripsAndDegradesToStrict() throws {
+        let json = #"{"kind":"isoWeekParity","offset":1,"policy":"schoolTerm"}"#
+        let anchor = try Fixture.decode(WeekCycleAnchor.self, json)
+        #expect(anchor == .isoWeekParity(policy: ISOWeekParityPolicy(rawValue: "schoolTerm"), offset: 1))
+        #expect(try Fixture.json(anchor) == json)
+        let unknown = ISOWeekParityPolicy(rawValue: "schoolTerm")
+        #expect(!unknown.isKnown && unknown.effective == .strict && ISOWeekParityPolicy.continuous.effective == .continuous)
+        var date = Fixture.date("2026-08-01")
+        while date < Fixture.date("2028-01-01") {
+            let week = date.isoWeek
+            for length in 2...6 {
+                #expect(WeekParity.cycleWeek(for: week, policy: unknown, offset: 1, length: length)
+                        == WeekParity.cycleWeek(for: week, policy: .strict, offset: 1, length: length), "\(week) \(length)")
+            }
+            date = date.adding(days: 7)
+        }
+    }
+
+    @Test func validationAndShareReportTheUnknownPolicy() throws {
+        var db = Fixture.fullDatabase()
+        let policy = ISOWeekParityPolicy(rawValue: "schoolTerm")
+        db.timetables[0].rotation = .weekCycle(WeekCycle(length: 2, anchor: .isoWeekParity(policy: policy, offset: 0),
+                                                         labels: ["A", "B"]))
+        let issue = db.validate().first { $0.code == .unknownValue && $0.field == "rotation.anchor.policy" }
+        #expect(issue?.severity == .info && issue?.value == "schoolTerm")
+        #expect(db.isValid)
+        let payload = try ShareExport.makePayload(from: db, timetableID: db.timetables[0].id, includeTasks: false).payload
+        let decoded = try ShareCodec.decode(ShareCodec.encode(payload).text)
+        #expect(decoded.timetable.rotation == db.timetables[0].rotation)
+        #expect(try decoded.validate().contains(.unknownValue(field: "parityPolicy", value: "schoolTerm")))
     }
 }

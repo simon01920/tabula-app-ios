@@ -1633,6 +1633,18 @@
         }
       }
     },
+    "reminder.tierChange.unknownTier" : {
+      "comment" : "Explanation in the reminder health check / rule editor: the rule asks for a delivery type from a newer app version, so this version uses a normal notification. No arguments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This reminder uses a setting from a newer version of Tabula, so it arrives as a normal notification."
+          }
+        }
+      }
+    },
     "sample.bring.sportsKit" : {
       "comment" : "Sample data, resolved once into user text: bring-list item for PE.",
       "extractionState" : "manual",

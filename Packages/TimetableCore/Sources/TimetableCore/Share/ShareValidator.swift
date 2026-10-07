@@ -97,15 +97,16 @@ struct ShareValidator {
         if let pack = timetable.palettePackID { try vocabulary(pack, field: "palettePack", path: "t.pp") }
     }
 
-    private func checkRotation(_ rotation: RotationScheme) throws(ShareError) {
+    private mutating func checkRotation(_ rotation: RotationScheme) throws(ShareError) {
         switch rotation {
         case .none:
             break
         case .weekCycle(let cycle):
             guard WeekCycle.validLengths.contains(cycle.length) else { throw .invalidValue(path: "t.ro.n") }
             switch cycle.anchor {
-            case .isoWeekParity(_, let offset):
+            case let .isoWeekParity(policy, offset):
                 guard (0..<cycle.length).contains(offset) else { throw .invalidValue(path: "t.ro.a.o") }
+                try vocabulary(policy, field: "parityPolicy", path: "t.ro.a.p")
             case let .referenceWeek(date, cycleWeek):
                 try checkDate(date, path: "t.ro.a.d")
                 guard (1...cycle.length).contains(cycleWeek) else { throw .invalidValue(path: "t.ro.a.w") }

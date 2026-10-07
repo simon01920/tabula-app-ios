@@ -323,6 +323,7 @@ private struct Validator {
             if case .referenceWeek(_, let week) = cycle.anchor, !(1...max(1, cycle.length)).contains(week) {
                 add(.error, .invalidValue, me, field: "rotation.anchor", value: String(week))
             }
+            if case .isoWeekParity(let policy, _) = cycle.anchor { unknown(policy, me, field: "rotation.anchor.policy") }
         case .dayCycle(let cycle):
             if !DayCycle.validLengths.contains(cycle.length) {
                 add(.error, .invalidValue, me, field: "rotation", value: String(cycle.length))

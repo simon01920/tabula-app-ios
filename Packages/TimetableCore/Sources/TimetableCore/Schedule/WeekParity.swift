@@ -43,15 +43,11 @@ public enum WeekParity {
     public static func cycleWeek(for week: ISOWeek, policy: ISOWeekParityPolicy, offset: Int, length: Int = 2) -> Int {
         let cycleLength = max(1, length)
         let index: Int
-        switch policy {
-        case .strict:
-            index = week.week - 1
-        case .continuous:
-            if let start = schoolYearStartWeek(for: week) {
-                index = (start.week - 1) + start.monday.days(to: week.monday) / 7
-            } else {
-                index = week.week - 1 // before year 1 has no previous school year: fall back to strict
-            }
+        // An unknown policy (newer app version) is applied as `.strict` (`ISOWeekParityPolicy.effective`).
+        if policy.effective == .continuous, let start = schoolYearStartWeek(for: week) {
+            index = (start.week - 1) + start.monday.days(to: week.monday) / 7
+        } else {
+            index = week.week - 1 // strict; also `continuous` before year 1 (no previous school year)
         }
         // `offset` is persisted data: reduce it first so that a hostile `Int.max` cannot overflow the sum.
         return LocalDate.floorMod(index + LocalDate.floorMod(offset, cycleLength), cycleLength) + 1

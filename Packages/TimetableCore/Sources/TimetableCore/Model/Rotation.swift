@@ -52,12 +52,22 @@ public enum WeekCycleAnchor: Hashable, Sendable {
     case referenceWeek(date: LocalDate, cycleWeek: Int)
 }
 
-/// What happens to ISO-week parity across a 53-week ISO year (2026, 2032 …).
-public enum ISOWeekParityPolicy: String, CaseIterable, Codable, Sendable {
+/// What happens to ISO-week parity across a 53-week ISO year (2026, 2032 …). Open vocabulary (opened
+/// pre-freeze): an unknown policy round-trips and is applied as `.strict` (`effective`), the literal reading of
+/// the printed week number (DOMAIN_MODEL §4.3, §5).
+public struct ISOWeekParityPolicy: OpenVocabulary {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
     /// Use the ISO week number literally: W53 and the following W01 are both odd, so the cycle repeats a week.
-    case strict
+    public static let strict = ISOWeekParityPolicy(rawValue: "strict")
     /// Keep alternating across the year boundary as if weeks were counted continuously (no repeated week).
-    case continuous
+    public static let continuous = ISOWeekParityPolicy(rawValue: "continuous")
+
+    public static let knownValues: [ISOWeekParityPolicy] = [.strict, .continuous]
+
+    /// The policy the resolver applies: `self` when known, else `.strict`.
+    public var effective: ISOWeekParityPolicy { isKnown ? self : .strict }
 }
 
 /// A repeating cycle of school days. Cycle days are numbered 1…`length`.

@@ -12,7 +12,8 @@ import Foundation
 ///      date-only task linked to a lesson occurrence present in `lessons`): anchor = deadline = that instant;
 ///    - date-only items: anchor = the date at `dateOnlyAnchorTime` (08:00), deadline = end of that date.
 /// 2. **Rules.** Enabled, non-deleted rules whose `target` matches. An unknown `DeliveryTier` (rule or
-///    override) is planned as `.standard` (`DeliveryTier.effective`). A `ReminderOverride` with
+///    override) is planned as `.standard` (`DeliveryTier.effective`), keeping the raw value in `requestedTier` and
+///    recording `TierChangeReason.unknownTier`. A `ReminderOverride` with
 ///    `isEnabled == false` silences the item; otherwise its `offsets`/`tier`/`followUp` replace the rule's.
 ///    Override offsets with no matching rule still plan (a "virtual" user rule, `ruleID == nil`). An override
 ///    `tier` counts as a user choice (origin `.user`).
@@ -180,7 +181,7 @@ private struct Engine {
             guard let override, let offsets = override.offsets else { return [] }
             var followUp: FollowUp?
             if case .custom(let custom) = override.followUp { followUp = custom }
-            return [AppliedRule(ruleID: nil, offsets: offsets, tier: override.tier?.effective ?? .standard, followUp: followUp,
+            return [AppliedRule(ruleID: nil, offsets: offsets, requestedTier: override.tier ?? .standard, followUp: followUp,
                                 quietHours: nil, origin: .user)]
         }
         return matching.map { rule in
@@ -191,7 +192,7 @@ private struct Engine {
             case .custom(let custom)?: followUp = custom
             }
             return AppliedRule(ruleID: rule.id, offsets: override?.offsets ?? rule.offsets,
-                               tier: (override?.tier ?? rule.tier).effective, followUp: followUp, quietHours: rule.quietHours,
+                               requestedTier: override?.tier ?? rule.tier, followUp: followUp, quietHours: rule.quietHours,
                                origin: override?.tier != nil ? .user : rule.origin)
         }
     }
@@ -235,7 +236,7 @@ private struct Engine {
                 continue
             }
             var tier = rule.tier
-            var changes: [TierChangeReason] = []
+            var changes = rule.initialChanges
             if tier == .alarm, let reason = alarmBlocker(isFollowUp: false, origin: rule.origin) {
                 tier = .timeSensitive
                 changes.append(reason)
@@ -272,7 +273,7 @@ private struct Engine {
             return
         }
         var tier = rule.tier
-        var changes: [TierChangeReason] = []
+        var changes = rule.initialChanges
         if tier == .alarm, let reason = alarmBlocker(isFollowUp: true, origin: rule.origin) {
             tier = .timeSensitive
             changes.append(reason)
@@ -295,7 +296,7 @@ private struct Engine {
             }
             return nil
         }
-        let candidate = Candidate(id: id, key: key, item: item, ruleID: rule.ruleID, requestedTier: rule.tier,
+        let candidate = Candidate(id: id, key: key, item: item, ruleID: rule.ruleID, requestedTier: rule.requestedTier,
                                   tier: tier, changes: changes, fire: fire, moved: moved, isFollowUp: isFollowUp)
         candidates.append(candidate)
         return candidate
@@ -473,10 +474,16 @@ private enum ContentSpec {
 private struct AppliedRule {
     let ruleID: ReminderRule.ID?
     let offsets: [ReminderOffset]
-    let tier: DeliveryTier
+    /// The tier as persisted (kept in `PlannedNotification.requestedTier`, also when unknown).
+    let requestedTier: DeliveryTier
     let followUp: FollowUp?
     let quietHours: QuietHours?
     let origin: RuleOrigin
+
+    /// The tier planned with: an unknown requested tier degrades to `.standard`.
+    var tier: DeliveryTier { requestedTier.effective }
+    /// `[.unknownTier]` when the requested tier comes from a newer app version, else empty.
+    var initialChanges: [TierChangeReason] { requestedTier.isKnown ? [] : [.unknownTier] }
 
     var ruleKey: String { ruleID?.uuidString ?? "override" }
 }

@@ -207,6 +207,8 @@ public enum TierChangeReason: String, CaseIterable, Hashable, Sendable, Codable 
     case timeSensitiveDisabled
     /// Fires more than `timeSensitivePolicy.maxLeadMinutes` before the item (decision D6, HIG) → Standard.
     case leadTimeTooLong
+    /// The rule or override asks for a tier from a newer app version (kept in `requestedTier`) → Standard.
+    case unknownTier
 
     /// Catalog key of an explanation for the rule editor / health check.
     public var l10nKey: String { "reminder.tierChange.\(rawValue)" }

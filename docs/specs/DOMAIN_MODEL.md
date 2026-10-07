@@ -501,7 +501,7 @@ entries (user text).
 
 `WeekCycleAnchor` (closed):
 - `{"kind":"isoWeekParity","offset":0,"policy":"strict"}` — cycle week from the ISO week number; `offset` shifts the
-  mapping (swap A/B; missing on decode = 0); `policy` is `ISOWeekParityPolicy` (`strict` or `continuous`, below).
+  mapping (swap A/B; missing on decode = 0); `policy` is `ISOWeekParityPolicy` (`strict` or `continuous`, below; open vocabulary — an unknown policy is kept and applied as `strict`).
 - `{"cycleWeek":1,"date":"2026-09-01","kind":"referenceWeek"}` — the rotation week containing `date` is cycle week
   `cycleWeek` (1…length); counting is continuous in both directions.
 
@@ -567,6 +567,7 @@ on users' devices, so it is a breaking change).** Let `L = max(1, length)`, `mod
 | `HourCycle` | `auto`, `h12`, `h24` (opened pre-freeze) |
 | `Appearance` | `auto`, `light`, `dark` (opened pre-freeze) |
 | `DeliveryTier` | `standard`, `timeSensitive`, `alarm` (opened pre-freeze; ordered by rank, ties by raw value) |
+| `ISOWeekParityPolicy` | `strict`, `continuous` (opened pre-freeze) |
 
 **Open unions:** `OverrideChange`, `ReminderOffset`, and (opened pre-freeze, B11) `FollowUp`, `TaskDue`,
 `LessonValidity`. An unknown `kind`, a missing `kind`, or a non-object value is preserved as `.unknown(JSONValue)` and
@@ -581,7 +582,8 @@ unknown case as follows; each is also reported by validation as `unknownValue`:
 | `Density` | `comfortable` (`Density.effective`) | info | UI; share export keeps a well-formed value (the recipient warns) |
 | `HourCycle` | `auto` — follow the locale (`HourCycle.effective`) | info | UI |
 | `Appearance` | `auto` — follow the system (`Appearance.effective`) | info | UI |
-| `DeliveryTier` (rule or `ReminderOverride.tier`) | `standard` (`DeliveryTier.effective`): never escalates | info | `ReminderPlanner` |
+| `DeliveryTier` (rule or `ReminderOverride.tier`) | `standard` (`DeliveryTier.effective`): never escalates; the plan keeps the raw value in `requestedTier` and records `TierChangeReason.unknownTier` | info | `ReminderPlanner` |
+| `ISOWeekParityPolicy` | `strict` (`ISOWeekParityPolicy.effective`): the printed ISO week number | info | `WeekParity`; share import keeps it with an `unknownValue` warning |
 | `FollowUp` (rule or override `custom`) | no follow-up; reported as dropped `unsupportedOffset` | info | `ReminderPlanner` |
 | `TaskDue` | the task is **undated**: no reminders, no next repetition (§3.9), shared without due date | info | `ReminderPlanner`, `TaskItem.nextOccurrence`, `ShareExport` |
 | `LessonValidity` | the lesson is **not shown on any date** (also not in template views), no conflicts, left out of share exports | **warning** | `ScheduleResolver`, `ConflictDetector`, `ShareExport` |
@@ -590,7 +592,7 @@ unknown case as follows; each is also reported by validation as `unknownValue`:
 | other open vocabularies | kept; UI shows a generic label | info | UI |
 
 **Closed** (Swift enums; an unknown value fails decoding of the whole database): `TaskPriority` (`low`, `normal`,
-`high`, `urgent`), `RuleOrigin` (`preset`, `user`), `ISOWeekParityPolicy` (`strict`, `continuous`), `Weekday` (1…7),
+`high`, `urgent`), `RuleOrigin` (`preset`, `user`), `Weekday` (1…7),
 and the closed unions `RotationScheme`, `WeekCycleAnchor`, `DayKey`, `TimeStructure`, `LessonSlot`,
 `FollowUpOverride` (`"inherit"`, `"none"`, `"custom"`), `SubjectSymbol`, `TextValue` (`"key"`, `"literal"`),
 `TimeZoneMode`.
@@ -866,6 +868,7 @@ A.1–A.6 are Stage 1 (A.2 gained `validation.cycleWeekOutOfRange` and `validati
 | `reminder.tierChange.alarmLimitReached` | — | Too many alarms are set, so this one arrives as a Time Sensitive notification. |
 | `reminder.tierChange.timeSensitiveDisabled` | — | Time Sensitive notifications are turned off, so this reminder arrives as a normal notification. |
 | `reminder.tierChange.leadTimeTooLong` | — | This reminder comes long before the event, so it arrives as a normal notification. |
+| `reminder.tierChange.unknownTier` | — | This reminder uses a setting from a newer version of Tabula, so it arrives as a normal notification. |
 | `reminder.dropped.budget` | — | Too many reminders are coming up; this one will be scheduled later. |
 | `reminder.dropped.quietHoursAfterDue` | — | Quiet hours would delay this reminder until after it's due. |
 | `reminder.dropped.afterDue` | — | This reminder would arrive after the item is due. |
@@ -908,7 +911,7 @@ A.1–A.6 are Stage 1 (A.2 gained `validation.cycleWeekOutOfRange` and `validati
 | `share.warning.skippedLessons` | 1 count | one: %lld lesson without a subject or period was left out.<br>other: %lld lessons without a subject or period were left out. |
 | `share.warning.valuesDropped` | 1 count | one: %lld detail that can't be shared was left out.<br>other: %lld details that can't be shared were left out. |
 
-Total: 192 keys (A.1–A.6: 105 = 11 + 13 + 5 + 2 + 52 + 22 · A.7: 18 · A.8: 42 · A.9: 27).
+Total: 193 keys (A.1–A.6: 105 = 11 + 13 + 5 + 2 + 52 + 22 · A.7: 18 · A.8: 43 · A.9: 27).
 
 ---
 
@@ -952,6 +955,11 @@ Pre-freeze decisions (orchestrator, after the Phase 1 gate QA "PASS WITH FIXES",
   ("series root ID + occurrence due date"): the predecessor ID alone needs no new persisted field (no series root to
   store), and a task has at most one successor, so it dedups concurrent completions equally and also survives a due
   date edited on one device while the other completes.
+  Residual cases (accepted, tombstone and LWW rules of §2.2): (a) device A deletes the successor while device B,
+  offline, later completes the predecessor (again) and re-creates the successor — B's creation asserts liveness after
+  A's delete, so the successor is **resurrected** on merge; (b) two devices create the successor from different
+  predecessor states (e.g. B edited the title or due date first) — both copies have only creation clocks, so the copy
+  with the **later `createdAt` wins whole** (every field), not field by field.
 - B15 Localisation: no core string inserts a translated noun (validation messages are neutral, the entity type is a
   separate label), and every key has at most one count (pack-tonight bodies drop the "other subjects" and "days"
   counts; `share.error.tooMany.*` take only the limit).

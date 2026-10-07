@@ -29,7 +29,7 @@ struct DomainModelDocTests {
         #expect(Set(all).count == all.count, "duplicate l10n keys")
         #expect(doc.contains("Total: \(all.count) keys"), "Appendix A total must be \(all.count)")
         // Sizes the orchestrator tracks per stage (a change here must be reflected in Appendix A).
-        #expect(ScheduleL10n.allKeys.count == 18 && ReminderL10n.allKeys.count == 42 && CoreL10n.shareKeys.count == 27)
+        #expect(ScheduleL10n.allKeys.count == 18 && ReminderL10n.allKeys.count == 43 && CoreL10n.shareKeys.count == 27)
     }
 
     @Test func everyEntityTypeAndUnionKindIsDocumented() throws {
