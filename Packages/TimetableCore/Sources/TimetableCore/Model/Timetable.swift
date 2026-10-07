@@ -17,6 +17,12 @@ public struct Timetable: SyncEntity {
     public var enabledDays: Set<Weekday>
     /// Week/day rotation.
     public var rotation: RotationScheme
+    /// First day of the week **for rotation arithmetic** (`referenceWeek` counting, the ISO-parity week lookup),
+    /// fixed when the timetable is created (onboarding: `weekStartOverride ?? locale first weekday`; share import:
+    /// the payload's value; sample data: the timetable's). Never the device's current week start, so changing the
+    /// device locale or `AppSettings.weekStartOverride` never moves an A/B week. Missing in data written before
+    /// the field existed → `.monday` (decode default).
+    public var rotationWeekStart: Weekday
     /// Bell schedule or free-form times.
     public var timeStructure: TimeStructure
     /// Which optional lesson fields are shown (disabled → hidden everywhere, including the editor).
@@ -33,7 +39,8 @@ public struct Timetable: SyncEntity {
     /// Creates a timetable.
     public init(id: ID, meta: EntityMeta, name: String, emoji: String? = nil,
                 enabledDays: Set<Weekday> = Weekday.workweek, rotation: RotationScheme = .none,
-                timeStructure: TimeStructure, fieldVisibility: FieldVisibility = FieldVisibility(),
+                rotationWeekStart: Weekday = .monday, timeStructure: TimeStructure,
+                fieldVisibility: FieldVisibility = FieldVisibility(),
                 defaultView: TimetableViewKind = .grid, density: Density = .comfortable,
                 palettePackID: PalettePackID? = nil, sortIndex: Int = 0) {
         self.id = id
@@ -42,6 +49,7 @@ public struct Timetable: SyncEntity {
         self.emoji = emoji
         self.enabledDays = enabledDays
         self.rotation = rotation
+        self.rotationWeekStart = rotationWeekStart
         self.timeStructure = timeStructure
         self.fieldVisibility = fieldVisibility
         self.defaultView = defaultView
@@ -51,8 +59,26 @@ public struct Timetable: SyncEntity {
     }
 
     private enum CodingKeys: String, CodingKey {
-        case id, meta, name, emoji, enabledDays, rotation, timeStructure, fieldVisibility, defaultView, density,
-             palettePackID, sortIndex
+        case id, meta, name, emoji, enabledDays, rotation, rotationWeekStart, timeStructure, fieldVisibility, defaultView,
+             density, palettePackID, sortIndex
+    }
+
+    /// Decodes; a missing `rotationWeekStart` (data written before the field existed) decodes as `.monday`.
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(ID.self, forKey: .id)
+        meta = try container.decode(EntityMeta.self, forKey: .meta)
+        name = try container.decode(String.self, forKey: .name)
+        emoji = try container.decodeIfPresent(String.self, forKey: .emoji)
+        enabledDays = try container.decode(Set<Weekday>.self, forKey: .enabledDays)
+        rotation = try container.decode(RotationScheme.self, forKey: .rotation)
+        rotationWeekStart = try container.decodeIfPresent(Weekday.self, forKey: .rotationWeekStart) ?? .monday
+        timeStructure = try container.decode(TimeStructure.self, forKey: .timeStructure)
+        fieldVisibility = try container.decode(FieldVisibility.self, forKey: .fieldVisibility)
+        defaultView = try container.decode(TimetableViewKind.self, forKey: .defaultView)
+        density = try container.decode(Density.self, forKey: .density)
+        palettePackID = try container.decodeIfPresent(PalettePackID.self, forKey: .palettePackID)
+        sortIndex = try container.decode(Int.self, forKey: .sortIndex)
     }
 
     /// Encodes with `enabledDays` as an ascending array.
@@ -64,6 +90,7 @@ public struct Timetable: SyncEntity {
         try container.encodeIfPresent(emoji, forKey: .emoji)
         try container.encodeSorted(enabledDays, forKey: .enabledDays)
         try container.encode(rotation, forKey: .rotation)
+        try container.encode(rotationWeekStart, forKey: .rotationWeekStart)
         try container.encode(timeStructure, forKey: .timeStructure)
         try container.encode(fieldVisibility, forKey: .fieldVisibility)
         try container.encode(defaultView, forKey: .defaultView)

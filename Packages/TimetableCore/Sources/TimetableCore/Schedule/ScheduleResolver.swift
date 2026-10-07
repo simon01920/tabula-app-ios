@@ -41,7 +41,8 @@ public struct ScheduleResolver: Sendable {
     public let timetable: Timetable
     /// Time zone and week start used for instants and week arithmetic.
     public let context: CalendarContext
-    /// The timetable's rotation, bound to the breaks that apply to it.
+    /// The timetable's rotation, bound to the breaks that apply to it and to `timetable.rotationWeekStart` (never
+    /// `context.firstWeekday`: the device's week start must not move an A/B week).
     public let rotation: RotationResolver
 
     let subjectsByID: [Subject.ID: Subject]
@@ -96,7 +97,7 @@ public struct ScheduleResolver: Sendable {
         self.breaks = ownBreaks
         self.overridesByDate = Dictionary(grouping: overrides.filter { !$0.isDeleted && $0.timetableID == ttID },
                                           by: \.date)
-        self.rotation = RotationResolver(scheme: timetable.rotation, firstWeekday: context.firstWeekday,
+        self.rotation = RotationResolver(scheme: timetable.rotation, firstWeekday: timetable.rotationWeekStart,
                                          breaks: ownBreaks.map(\.range))
     }
 
@@ -275,7 +276,8 @@ public struct ScheduleResolver: Sendable {
         if let key = dayKey {
             for lesson in lessonsByDayKey[key] ?? [] {
                 guard occurs(lesson, inCycleWeek: cycleWeek) else { continue }
-                if options.appliesValidity, !isValid(lesson.validity, on: date) { continue }
+                // An unknown validity (newer app version) hides the lesson everywhere, also in template views.
+                if !lesson.validity.isKnown || (options.appliesValidity && !isValid(lesson.validity, on: date)) { continue }
                 occurringLessonIDs.insert(lesson.id)
                 let occurrenceID = OccurrenceID.lesson(lesson.id, on: date)
 
@@ -452,10 +454,11 @@ public struct ScheduleResolver: Sendable {
         return weeks.contains(cycleWeek)
     }
 
-    /// `true` when `validity` admits `date` (deleted or unknown terms admit nothing).
+    /// `true` when `validity` admits `date` (deleted or unknown terms and unknown validity kinds admit nothing).
     func isValid(_ validity: LessonValidity, on date: LocalDate) -> Bool {
         switch validity {
         case .always: return true
+        case .unknown: return false
         case .range(let range): return range.contains(date)
         case .terms(let ids): return ids.contains { termsByID[$0]?.range.contains(date) ?? false }
         }

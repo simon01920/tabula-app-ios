@@ -99,7 +99,7 @@ extension SharePayloadV1: Codable {
 // MARK: - Timetable
 
 extension ShareTimetable: Codable {
-    enum CodingKeys: String, CodingKey { case n, e, d, ro, ts, fv, dv, de, pp }
+    enum CodingKeys: String, CodingKey { case n, e, d, ro, ws, ts, fv, dv, de, pp }
 
     public init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -107,6 +107,7 @@ extension ShareTimetable: Codable {
         emoji = try c.decodeIfPresent(String.self, forKey: .e)
         enabledDays = try c.decodeShareSet(Weekday.self, forKey: .d) ?? []
         rotation = try c.decodeIfPresent(WireRotation.self, forKey: .ro)?.value ?? .none
+        rotationWeekStart = try c.decodeIfPresent(Weekday.self, forKey: .ws) ?? .monday
         timeStructure = try c.decode(ShareTimeStructure.self, forKey: .ts)
         fieldVisibility = try c.decodeShareSet(LessonField.self, forKey: .fv) ?? []
         defaultView = try c.decode(TimetableViewKind.self, forKey: .dv)
@@ -120,6 +121,7 @@ extension ShareTimetable: Codable {
         try c.encodeIfPresent(emoji, forKey: .e)
         try c.encodeSorted(enabledDays, forKey: .d)
         if rotation != .none { try c.encode(WireRotation(value: rotation), forKey: .ro) }
+        if rotationWeekStart != .monday { try c.encode(rotationWeekStart, forKey: .ws) }
         try c.encode(timeStructure, forKey: .ts)
         if !fieldVisibility.isEmpty { try c.encodeSorted(fieldVisibility, forKey: .fv) }
         try c.encode(defaultView, forKey: .dv)

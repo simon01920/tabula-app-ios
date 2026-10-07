@@ -176,7 +176,6 @@ struct ShareValidationTests {
                 == .malformedPayload(path: "k[0].dt"))
         #expect(ShareFixture.error(decoding: try ShareFixture.envelope(json: json.replacingOccurrences(of: #""n":"T""#, with: #""n":"T","pr":"critical""#)))
                 == .malformedPayload(path: "k[0].pr"))
-        #expect(try error(replacing: #""de":"comfortable""#, with: #""de":"spacious""#) == .malformedPayload(path: "t.de"))
         #expect(try error(replacing: #""w":1}"#, with: #""w":8}"#) == .malformedPayload(path: "l[0].w"))
         #expect(try error(replacing: ##""c":"#E53935""##, with: #""c":"red""#) == .malformedPayload(path: "s[0].c"))
     }

@@ -98,38 +98,55 @@ extension ReminderOffset: Codable {
 
 /// A second reminder for items still incomplete.
 ///
-/// JSON: `{"kind":"afterMinutes","minutes":120}` or `{"kind":"nextMorning","at":"07:00"}`. Closed union.
+/// JSON: `{"kind":"afterMinutes","minutes":120}` or `{"kind":"nextMorning","at":"07:00"}`.
+/// **Open union** (since the pre-freeze QA): an unknown kind, a missing kind or a non-object decodes as
+/// `.unknown` and re-encodes unchanged; the planner plans no follow-up for it (reported as
+/// `DropReason.unsupportedOffset`). A known kind with a malformed payload is a decoding error.
 public enum FollowUp: Hashable, Sendable {
     /// `minutes` after the first reminder.
     case afterMinutes(Int)
     /// The next morning at `at`.
     case nextMorning(at: LocalTime)
+    /// A follow-up kind from a newer app version; preserved, never planned.
+    case unknown(JSONValue)
+
+    /// `false` for `.unknown`.
+    public var isKnown: Bool {
+        if case .unknown = self { return false }
+        return true
+    }
 }
 
 extension FollowUp: Codable {
     private enum CodingKeys: String, CodingKey { case kind, minutes, at }
 
-    /// Decodes the tagged union; an unknown kind is a decoding error (closed union).
+    /// Decodes a known kind, or preserves the whole value as `.unknown`.
     public init(from decoder: any Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let kind = try container.decodeKind(forKey: .kind)
+        guard let container = try? decoder.container(keyedBy: CodingKeys.self),
+              let kind = (try? container.decodeIfPresent(String.self, forKey: .kind)) ?? nil else {
+            self = .unknown(try JSONValue(from: decoder))
+            return
+        }
         switch kind {
         case "afterMinutes": self = .afterMinutes(try container.decode(Int.self, forKey: .minutes))
         case "nextMorning": self = .nextMorning(at: try container.decode(LocalTime.self, forKey: .at))
-        default: throw TabulaCodingError.unknownKind(kind, key: .kind, in: container, type: "FollowUp")
+        default: self = .unknown(try JSONValue(from: decoder))
         }
     }
 
-    /// Encodes the tagged union.
+    /// Encodes the tagged union; `.unknown` re-encodes its JSON unchanged.
     public func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {
         case .afterMinutes(let minutes):
+            var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode("afterMinutes", forKey: .kind)
             try container.encode(minutes, forKey: .minutes)
         case .nextMorning(let at):
+            var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode("nextMorning", forKey: .kind)
             try container.encode(at, forKey: .at)
+        case .unknown(let raw):
+            try raw.encode(to: encoder)
         }
     }
 }

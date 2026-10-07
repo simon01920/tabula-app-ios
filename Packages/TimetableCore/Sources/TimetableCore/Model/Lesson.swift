@@ -107,6 +107,10 @@ extension LessonSlot: Codable {
 ///
 /// JSON: `{"kind":"always"}`, `{"kind":"terms","termIDs":[…ascending…]}` or
 /// `{"kind":"range","range":{"end":"…","start":"…"}}`.
+/// **Open union** (since the pre-freeze QA): an unknown kind, a missing kind or a non-object decodes as
+/// `.unknown` and re-encodes unchanged. Such a lesson is **not shown** on any date (it may be a narrower
+/// restriction this version cannot evaluate), validation reports `unknownValue` as a **warning**, and share
+/// export leaves the lesson out. A known kind with a malformed payload is a decoding error.
 public enum LessonValidity: Hashable, Sendable {
     /// Every date.
     case always
@@ -114,25 +118,40 @@ public enum LessonValidity: Hashable, Sendable {
     case terms(Set<Term.ID>)
     /// Only on dates inside this inclusive range.
     case range(LocalDateRange)
+    /// A validity kind from a newer app version; preserved, admits no date.
+    case unknown(JSONValue)
+
+    /// `false` for `.unknown`.
+    public var isKnown: Bool {
+        if case .unknown = self { return false }
+        return true
+    }
 }
 
 extension LessonValidity: Codable {
     private enum CodingKeys: String, CodingKey { case kind, termIDs, range }
 
-    /// Decodes the tagged union; an unknown kind is a decoding error (closed union).
+    /// Decodes a known kind, or preserves the whole value as `.unknown`.
     public init(from decoder: any Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let kind = try container.decodeKind(forKey: .kind)
+        guard let container = try? decoder.container(keyedBy: CodingKeys.self),
+              let kind = (try? container.decodeIfPresent(String.self, forKey: .kind)) ?? nil else {
+            self = .unknown(try JSONValue(from: decoder))
+            return
+        }
         switch kind {
         case "always": self = .always
         case "terms": self = .terms(Set(try container.decode([Term.ID].self, forKey: .termIDs)))
         case "range": self = .range(try container.decode(LocalDateRange.self, forKey: .range))
-        default: throw TabulaCodingError.unknownKind(kind, key: .kind, in: container, type: "LessonValidity")
+        default: self = .unknown(try JSONValue(from: decoder))
         }
     }
 
-    /// Encodes the tagged union (`termIDs` ascending).
+    /// Encodes the tagged union (`termIDs` ascending); `.unknown` re-encodes its JSON unchanged.
     public func encode(to encoder: any Encoder) throws {
+        if case .unknown(let raw) = self {
+            try raw.encode(to: encoder)
+            return
+        }
         var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {
         case .always:
@@ -143,6 +162,8 @@ extension LessonValidity: Codable {
         case .range(let range):
             try container.encode("range", forKey: .kind)
             try container.encode(range, forKey: .range)
+        case .unknown:
+            break
         }
     }
 }

@@ -158,31 +158,107 @@ public struct PalettePackID: OpenVocabulary {
     public static let knownValues: [PalettePackID] = [.classic, .ocean, .sunset, .pastel]
 }
 
-// MARK: - Closed enums (adding a case requires a schemaVersion bump)
+// MARK: - Settings-like open vocabularies (opened before the Phase 1 freeze)
+//
+// These were closed enums until the pre-freeze QA. Opening them lets a newer app version add a value without a
+// schema bump: an older app keeps and re-encodes the unknown string, reports it as `unknownValue` (info) and
+// behaves as `effective` says (DOMAIN_MODEL §5 "Degradation of unknown values").
 
-/// Visual density of timetable views. Closed.
-public enum Density: String, CaseIterable, Codable, Sendable {
-    case compact, comfortable
+/// Visual density of timetable views. Open; an unknown value is applied as `.comfortable` (`effective`).
+public struct Density: OpenVocabulary {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let compact = Density(rawValue: "compact")
+    public static let comfortable = Density(rawValue: "comfortable")
+
+    public static let knownValues: [Density] = [.compact, .comfortable]
+
+    /// The density to apply: `self` when known, else the default `.comfortable`.
+    public var effective: Density { isKnown ? self : .comfortable }
 }
 
-/// Who the user is; drives onboarding presets. Closed.
-public enum UserProfile: String, CaseIterable, Codable, Sendable {
-    case elementary, secondary, university, other
+/// Who the user is; drives onboarding presets. Open; an unknown profile uses the `.other` presets (`effective`).
+public struct UserProfile: OpenVocabulary {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let elementary = UserProfile(rawValue: "elementary")
+    public static let secondary = UserProfile(rawValue: "secondary")
+    public static let university = UserProfile(rawValue: "university")
+    public static let other = UserProfile(rawValue: "other")
+
+    public static let knownValues: [UserProfile] = [.elementary, .secondary, .university, .other]
+
+    /// The profile whose presets apply: `self` when known, else `.other`.
+    public var effective: UserProfile { isKnown ? self : .other }
 }
 
-/// 12/24-hour clock preference. Closed.
-public enum HourCycle: String, CaseIterable, Codable, Sendable {
+/// 12/24-hour clock preference. Open; an unknown value follows the locale like `.auto` (`effective`).
+public struct HourCycle: OpenVocabulary {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
     /// Follow the locale.
-    case auto
-    case h12, h24
+    public static let auto = HourCycle(rawValue: "auto")
+    public static let h12 = HourCycle(rawValue: "h12")
+    public static let h24 = HourCycle(rawValue: "h24")
+
+    public static let knownValues: [HourCycle] = [.auto, .h12, .h24]
+
+    /// The preference to apply: `self` when known, else `.auto` (system default).
+    public var effective: HourCycle { isKnown ? self : .auto }
 }
 
-/// Light/dark appearance preference. Closed.
-public enum Appearance: String, CaseIterable, Codable, Sendable {
+/// Light/dark appearance preference. Open; an unknown value follows the system like `.auto` (`effective`).
+public struct Appearance: OpenVocabulary {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
     /// Follow the system.
-    case auto
-    case light, dark
+    public static let auto = Appearance(rawValue: "auto")
+    public static let light = Appearance(rawValue: "light")
+    public static let dark = Appearance(rawValue: "dark")
+
+    public static let knownValues: [Appearance] = [.auto, .light, .dark]
+
+    /// The appearance to apply: `self` when known, else `.auto` (system default).
+    public var effective: Appearance { isKnown ? self : .auto }
 }
+
+/// Notification delivery tier, ordered `standard < timeSensitive < alarm`. Open.
+///
+/// `alarm` = AlarmKit loud alarm. Presets never use it; only user-created rules may (NOTIFICATIONS.md).
+/// An unknown tier (from a newer app version) is preserved and **planned as `.standard`** (`effective`): the
+/// quietest delivery, so an older app never escalates a reminder it does not understand.
+/// Order: by the rank of `effective`, ties by raw value (a total order consistent with `==`).
+public struct DeliveryTier: OpenVocabulary {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    public static let standard = DeliveryTier(rawValue: "standard")
+    public static let timeSensitive = DeliveryTier(rawValue: "timeSensitive")
+    public static let alarm = DeliveryTier(rawValue: "alarm")
+
+    public static let knownValues: [DeliveryTier] = [.standard, .timeSensitive, .alarm]
+
+    /// The tier the planner uses: `self` when known, else `.standard`.
+    public var effective: DeliveryTier { isKnown ? self : .standard }
+
+    private var rank: Int {
+        switch effective.rawValue {
+        case "timeSensitive": return 1
+        case "alarm": return 2
+        default: return 0
+        }
+    }
+
+    public static func < (lhs: DeliveryTier, rhs: DeliveryTier) -> Bool {
+        (lhs.rank, lhs.rawValue) < (rhs.rank, rhs.rawValue)
+    }
+}
+
+// MARK: - Closed enums (adding a case requires a schemaVersion bump)
 
 /// Task priority, ordered `low < normal < high < urgent`. Closed.
 public enum TaskPriority: String, CaseIterable, Codable, Comparable, Sendable {
@@ -198,23 +274,6 @@ public enum TaskPriority: String, CaseIterable, Codable, Comparable, Sendable {
     }
 
     public static func < (lhs: TaskPriority, rhs: TaskPriority) -> Bool { lhs.rank < rhs.rank }
-}
-
-/// Notification delivery tier, ordered `standard < timeSensitive < alarm`. Closed.
-///
-/// `alarm` = AlarmKit loud alarm. Presets never use it; only user-created rules may (NOTIFICATIONS.md).
-public enum DeliveryTier: String, CaseIterable, Codable, Comparable, Sendable {
-    case standard, timeSensitive, alarm
-
-    private var rank: Int {
-        switch self {
-        case .standard: return 0
-        case .timeSensitive: return 1
-        case .alarm: return 2
-        }
-    }
-
-    public static func < (lhs: DeliveryTier, rhs: DeliveryTier) -> Bool { lhs.rank < rhs.rank }
 }
 
 /// Whether a reminder rule came from a profile preset or was created/edited by the user. Closed.

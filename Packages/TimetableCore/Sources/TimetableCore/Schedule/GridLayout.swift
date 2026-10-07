@@ -109,13 +109,16 @@ public struct GridLayout: Hashable, Sendable, Codable {
     /// columns of `weekdays` (default: the timetable's enabled days) in week order.
     public static func week(containing date: LocalDate, resolver: ScheduleResolver, options: ResolutionOptions = .actual,
                             weekdays: Set<Weekday>? = nil, includeBreakRows: Bool = true) -> GridLayout {
-        let start = resolver.rotation.startOfWeek(containing: date)
+        let start = resolver.context.startOfWeek(containing: date)
         let shown = weekdays ?? resolver.timetable.enabledDays
         let dates = (0..<7).map { start.adding(days: $0) }.filter { shown.contains($0.weekday) }
         var layout = make(days: dates.map { resolver.day($0, options: options) }, resolver: resolver,
                           includeBreakRows: includeBreakRows)
         layout.weekStart = start
-        layout.cycleWeek = resolver.rotation.cycleWeek(on: start)
+        // The week's label is the cycle week of its middle day: when the display week start differs from the
+        // timetable's `rotationWeekStart`, an edge column may belong to a neighbouring cycle week (each column
+        // carries its own `cycleWeek`).
+        layout.cycleWeek = resolver.rotation.cycleWeek(on: start.adding(days: 3))
         layout.cycleLabel = layout.cycleWeek.flatMap(resolver.rotation.label(forCycleWeek:))
         return layout
     }
@@ -142,7 +145,7 @@ public struct GridLayout: Hashable, Sendable, Codable {
     /// The week a week grid should open on: the week containing `today`, or the next one once `today` is after
     /// the last enabled weekday of its week (weekend → next week).
     public static func displayWeekStart(today: LocalDate, resolver: ScheduleResolver) -> LocalDate {
-        let start = resolver.rotation.startOfWeek(containing: today)
+        let start = resolver.context.startOfWeek(containing: today)
         let lastEnabled = (0..<7).map { start.adding(days: $0) }.last { resolver.timetable.enabledDays.contains($0.weekday) }
         if let lastEnabled, today > lastEnabled { return start.adding(days: 7) }
         return start

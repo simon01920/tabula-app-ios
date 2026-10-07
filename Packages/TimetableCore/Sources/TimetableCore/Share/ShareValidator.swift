@@ -93,6 +93,7 @@ struct ShareValidator {
             try vocabulary(field, field: "lessonField", path: "t.fv")
         }
         try vocabulary(timetable.defaultView, field: "timetableView", path: "t.dv")
+        try vocabulary(timetable.density, field: "density", path: "t.de")
         if let pack = timetable.palettePackID { try vocabulary(pack, field: "palettePack", path: "t.pp") }
     }
 
@@ -237,7 +238,7 @@ struct ShareValidator {
         if let subject = task.subject, !payload.subjects.indices.contains(subject) {
             throw .danglingReference(path: "\(path).s")
         }
-        if let due = task.due { try checkDate(due.date, path: "\(path).dd") }
+        if let date = task.due?.date { try checkDate(date, path: "\(path).dd") }
         if let link = task.linkedLesson {
             guard payload.lessons.indices.contains(link.lesson) else { throw .danglingReference(path: "\(path).ll") }
             try checkDate(link.date, path: "\(path).ll.d")

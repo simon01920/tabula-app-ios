@@ -5,13 +5,14 @@ import Foundation
 /// plan, byte for byte); the iOS adapters (Phase 3) only diff and apply the result.
 ///
 /// ## Pipeline (per item × matching rule × offset)
-/// 1. **Items.** Tasks (not deleted, not completed, with a due date; target = task kind), exams (not deleted,
+/// 1. **Items.** Tasks (not deleted, not completed, with a known due date; target = task kind), exams (not deleted,
 ///    not completed), lesson occurrences (not cancelled) and pack-tonight days (≥ 1 item). Each item has an
 ///    *anchor* (the instant offsets count back from) and a *deadline* (no reminder may fire after it):
 ///    - timed items (task `dateTime`, exam with `start`, lesson start, first lesson of a pack-tonight day, a
 ///      date-only task linked to a lesson occurrence present in `lessons`): anchor = deadline = that instant;
 ///    - date-only items: anchor = the date at `dateOnlyAnchorTime` (08:00), deadline = end of that date.
-/// 2. **Rules.** Enabled, non-deleted rules whose `target` matches. A `ReminderOverride` with
+/// 2. **Rules.** Enabled, non-deleted rules whose `target` matches. An unknown `DeliveryTier` (rule or
+///    override) is planned as `.standard` (`DeliveryTier.effective`). A `ReminderOverride` with
 ///    `isEnabled == false` silences the item; otherwise its `offsets`/`tier`/`followUp` replace the rule's.
 ///    Override offsets with no matching rule still plan (a "virtual" user rule, `ruleID == nil`). An override
 ///    `tier` counts as a user choice (origin `.user`).
@@ -30,8 +31,8 @@ import Foundation
 ///    else `afterDue`).
 /// 7. **Follow-ups** (tasks and exams only; they are the only completable items): one per surviving primary
 ///    reminder, `.afterMinutes(n)` after its (quiet-hours-adjusted) time or `.nextMorning(at:)` on the next
-///    local day; then steps 5–6 again. Completed items plan nothing, so re-planning after completion removes
-///    their follow-ups.
+///    local day; then steps 5–6 again. An unknown follow-up kind plans nothing (dropped as `unsupportedOffset`).
+///    Completed items plan nothing, so re-planning after completion removes their follow-ups.
 /// 8. **Window.** Reminders at or before `now` are elapsed (skipped silently); after `horizonEnd` they are
 ///    deferred to a later plan (skipped silently). Drops are reported only when the nominal time is inside
 ///    `(now, horizonEnd]`.
@@ -116,9 +117,10 @@ private struct Engine {
     private func collectItems() -> [PlanItem] {
         var items: [PlanItem] = []
         for task in input.tasks where !task.isDeleted && !task.isCompleted {
-            guard let due = task.due else { continue }
+            // No due date, or a due kind from a newer version (`TaskDue.unknown`): undated, no reminders.
+            guard let due = task.due, let dueDate = due.date else { continue }
             let source = ReminderSource.task(task.id)
-            let content = ContentSpec.task(title: task.title, due: due.date, time: due.time)
+            let content = ContentSpec.task(title: task.title, due: dueDate, time: due.time)
             let target = ReminderTarget(rawValue: task.kind.rawValue)
             switch due {
             case let .dateTime(date, time):
@@ -130,6 +132,8 @@ private struct Engine {
                 } else {
                     items.append(dateOnlyItem(source, target, date, task.reminderOverride, content))
                 }
+            case .unknown:
+                continue
             }
         }
         for exam in input.exams where !exam.isDeleted && !exam.isCompleted {
@@ -176,7 +180,7 @@ private struct Engine {
             guard let override, let offsets = override.offsets else { return [] }
             var followUp: FollowUp?
             if case .custom(let custom) = override.followUp { followUp = custom }
-            return [AppliedRule(ruleID: nil, offsets: offsets, tier: override.tier ?? .standard, followUp: followUp,
+            return [AppliedRule(ruleID: nil, offsets: offsets, tier: override.tier?.effective ?? .standard, followUp: followUp,
                                 quietHours: nil, origin: .user)]
         }
         return matching.map { rule in
@@ -187,7 +191,7 @@ private struct Engine {
             case .custom(let custom)?: followUp = custom
             }
             return AppliedRule(ruleID: rule.id, offsets: override?.offsets ?? rule.offsets,
-                               tier: override?.tier ?? rule.tier, followUp: followUp, quietHours: rule.quietHours,
+                               tier: (override?.tier ?? rule.tier).effective, followUp: followUp, quietHours: rule.quietHours,
                                origin: override?.tier != nil ? .user : rule.origin)
         }
     }
@@ -254,13 +258,16 @@ private struct Engine {
         case .nextMorning(let at):
             descriptor = "n\(at.isoString)"
             nominal = context.localDate(of: primary.fire).addingIfValid(days: 1).map { context.date($0, at) }
+        case .unknown(let raw):
+            descriptor = "u:" + Self.canonicalJSON(raw)
+            nominal = nil
         }
         let key = primary.key + "|f|" + descriptor
         guard seenKeys.insert(key).inserted else { return }
         let id = ReminderID.make(key: key)
         guard let nominal else {
             if primary.fire > now && primary.fire <= horizonEnd {
-                drop(id, item, rule, fire: nil, isFollowUp: true, .invalidOffset)
+                drop(id, item, rule, fire: nil, isFollowUp: true, followUp.isKnown ? .invalidOffset : .unsupportedOffset)
             }
             return
         }

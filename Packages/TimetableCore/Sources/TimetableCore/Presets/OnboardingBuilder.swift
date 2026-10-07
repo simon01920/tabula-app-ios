@@ -44,6 +44,9 @@ public struct OnboardingAnswers: Hashable, Sendable {
     public var enabledReminderTargets: Set<ReminderTarget>?
     /// Week start override.
     public var weekStartOverride: Weekday?
+    /// The locale's first weekday at onboarding (the UI passes `Locale.current`'s; core never reads it).
+    /// Fixes the new timetable's `rotationWeekStart` = `weekStartOverride ?? localeFirstWeekday`.
+    public var localeFirstWeekday: Weekday
     /// 12/24 h.
     public var hourCycle: HourCycle
     /// Time-zone mode.
@@ -57,6 +60,7 @@ public struct OnboardingAnswers: Hashable, Sendable {
                 timeStructure: TimeStructureChoice? = nil, visibleFields: Set<LessonField>? = nil,
                 enabledDays: Set<Weekday>? = nil, defaultView: TimetableViewKind? = nil, term: TermAnswer? = nil,
                 enabledReminderTargets: Set<ReminderTarget>? = nil, weekStartOverride: Weekday? = nil,
+                localeFirstWeekday: Weekday = .monday,
                 hourCycle: HourCycle = .auto, timeZoneMode: TimeZoneMode = .followDevice,
                 palettePackID: PalettePackID = .classic) {
         self.profile = profile
@@ -71,6 +75,7 @@ public struct OnboardingAnswers: Hashable, Sendable {
         self.term = term
         self.enabledReminderTargets = enabledReminderTargets
         self.weekStartOverride = weekStartOverride
+        self.localeFirstWeekday = localeFirstWeekday
         self.hourCycle = hourCycle
         self.timeZoneMode = timeZoneMode
         self.palettePackID = palettePackID
@@ -114,6 +119,7 @@ public enum OnboardingBuilder {
         let timetable = Timetable(
             id: timetableID, meta: timetableMeta, name: answers.timetableName, emoji: answers.timetableEmoji,
             enabledDays: answers.enabledDays ?? preset.enabledDays, rotation: answers.rotation,
+            rotationWeekStart: answers.weekStartOverride ?? answers.localeFirstWeekday,
             timeStructure: timeStructure, fieldVisibility: FieldVisibility(answers.visibleFields ?? preset.visibleFields),
             defaultView: answers.defaultView ?? preset.defaultView, density: .comfortable, palettePackID: nil,
             sortIndex: 0)

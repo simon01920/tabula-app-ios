@@ -7,19 +7,25 @@ import Foundation
 /// week arithmetic plus a correction per break range — never a loop over the days since the anchor).
 /// Overrides never move the rotation: a `followDay` changes which lessons a date runs, not the cycle.
 ///
-/// **Week boundaries.** `referenceWeek` counts whole weeks that start on `firstWeekday`. A school with
-/// Sunday–Thursday weeks must therefore use a Sunday (or Saturday) week start: with a Monday week start its
-/// Sunday would be counted with the *previous* week and get the previous cycle week. `isoWeekParity` uses the
-/// ISO week of the middle day of the user's week (`WeekParity.representativeISOWeek`), so all days of a
-/// displayed week share one cycle week for every week start.
+/// **Week boundaries.** `firstWeekday` is the timetable's persisted `Timetable.rotationWeekStart` — never the
+/// device's or user's current week start, so a locale or settings change never moves an A/B week.
+/// `referenceWeek` counts whole weeks that start on it. A school with Sunday–Thursday weeks must therefore use a
+/// Sunday (or Saturday) rotation week start: with a Monday one its Sunday would be counted with the *previous*
+/// week and get the previous cycle week. `isoWeekParity` uses the ISO week of the middle day of the rotation
+/// week (`WeekParity.representativeISOWeek`), so all days of a rotation week share one cycle week.
 public struct RotationResolver: Hashable, Sendable {
     /// The timetable's rotation.
     public let scheme: RotationScheme
-    /// First day of the week (from `CalendarContext.firstWeekday`).
+    /// First day of a rotation week (`Timetable.rotationWeekStart`; never the device week start).
     public let firstWeekday: Weekday
     /// Merged, ascending, non-overlapping date ranges that pause a day cycle (empty unless the scheme is a
     /// day cycle with `skipsBreaks`).
     public let pausingRanges: [LocalDateRange]
+
+    /// A resolver for `timetable`'s rotation, counted in weeks that start on `timetable.rotationWeekStart`.
+    public init(timetable: Timetable, breaks: [LocalDateRange] = []) {
+        self.init(scheme: timetable.rotation, firstWeekday: timetable.rotationWeekStart, breaks: breaks)
+    }
 
     /// Creates a resolver. `breaks` are the date ranges of the calendar breaks that apply to the timetable;
     /// they only matter for a day cycle with `skipsBreaks == true`. Empty ranges are ignored.

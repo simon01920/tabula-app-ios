@@ -88,7 +88,7 @@ struct ProfilePresetTests {
             .university: (.extended, .timeBlocks, .prominentWithExamPeriod, "terminology.classLecture"),
             .other: (.ask, .grid, .simple, "terminology.lesson"),
         ]
-        for profile in UserProfile.allCases {
+        for profile in UserProfile.knownValues {
             let preset = ProfilePreset.for(profile)
             let row = expected[profile]!
             #expect(preset.profile == profile)
@@ -101,7 +101,7 @@ struct ProfilePresetTests {
     }
 
     @Test func noPresetRuleEverUsesTheAlarmTier() {
-        for profile in UserProfile.allCases {
+        for profile in UserProfile.knownValues {
             let rules = ProfilePreset.for(profile).reminderRules
             #expect(!rules.isEmpty)
             #expect(rules.allSatisfy { $0.tier != .alarm }, "\(profile)")
@@ -112,7 +112,7 @@ struct ProfilePresetTests {
 
     @Test func timeSensitivePresetsHaveShortLeadTimes() {
         // The planner downgrades Time Sensitive reminders with lead > 60 min; presets should not rely on that.
-        for profile in UserProfile.allCases {
+        for profile in UserProfile.knownValues {
             for rule in ProfilePreset.for(profile).reminderRules where rule.tier == .timeSensitive {
                 for offset in rule.offsets {
                     guard case .minutesBefore(let minutes) = offset else {
@@ -180,7 +180,7 @@ struct OnboardingBuilderTests {
         return OnboardingBuilder.makeInitialDatabase(answers: answers, ids: &ids, clock: &clock, now: Fixture.now)
     }
 
-    @Test(arguments: UserProfile.allCases)
+    @Test(arguments: UserProfile.knownValues)
     func producesValidDatabaseForEveryProfile(profile: UserProfile) {
         let db = build(answers(profile))
         let problems = db.validate().filter { $0.severity != .info }
@@ -301,7 +301,7 @@ struct SampleDataTests {
         return db
     }
 
-    @Test(arguments: UserProfile.allCases)
+    @Test(arguments: UserProfile.knownValues)
     func sampleDatabaseIsCleanForEveryProfile(profile: UserProfile) {
         let db = sample(profile)
         #expect(db.validate().isEmpty, "\(db.validate())")
@@ -336,7 +336,7 @@ struct SampleDataTests {
 
     @Test func localizerReceivesOnlyDeclaredKeys() {
         var requested = Set<String>()
-        for profile in UserProfile.allCases {
+        for profile in UserProfile.knownValues {
             _ = sample(profile) { requested.insert($0.key); return $0.key }
         }
         #expect(requested.isSubset(of: Set(SampleData.allKeys)))

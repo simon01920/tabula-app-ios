@@ -93,16 +93,24 @@ public struct TaskItem: SyncEntity {
 }
 
 /// When a task is due. JSON: `{"kind":"date","date":"…"}` or `{"kind":"dateTime","date":"…","time":"…"}`.
+///
+/// **Open union** (since the pre-freeze QA): an unknown kind, a missing kind or a non-object decodes as
+/// `.unknown` and re-encodes unchanged. Consumers treat such a task as **undated**: no reminders, no due
+/// date in lists, no next repetition; share export leaves the due date out. A known kind with a malformed
+/// payload is a decoding error.
 public enum TaskDue: Hashable, Sendable {
     /// Due some time on `date` (reminders use rule times).
     case date(LocalDate)
     /// Due at a wall-clock time.
     case dateTime(LocalDate, LocalTime)
+    /// A due kind from a newer app version; preserved, treated as "no due date".
+    case unknown(JSONValue)
 
-    /// The due date.
-    public var date: LocalDate {
+    /// The due date; `nil` for `.unknown` (treat the task as undated).
+    public var date: LocalDate? {
         switch self {
         case .date(let date), .dateTime(let date, _): return date
+        case .unknown: return nil
         }
     }
 
@@ -111,35 +119,47 @@ public enum TaskDue: Hashable, Sendable {
         if case .dateTime(_, let time) = self { return time }
         return nil
     }
+
+    /// `false` for `.unknown`.
+    public var isKnown: Bool {
+        if case .unknown = self { return false }
+        return true
+    }
 }
 
 extension TaskDue: Codable {
     private enum CodingKeys: String, CodingKey { case kind, date, time }
 
-    /// Decodes the tagged union; an unknown kind is a decoding error (closed union).
+    /// Decodes a known kind, or preserves the whole value as `.unknown`.
     public init(from decoder: any Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let kind = try container.decodeKind(forKey: .kind)
+        guard let container = try? decoder.container(keyedBy: CodingKeys.self),
+              let kind = (try? container.decodeIfPresent(String.self, forKey: .kind)) ?? nil else {
+            self = .unknown(try JSONValue(from: decoder))
+            return
+        }
         switch kind {
         case "date": self = .date(try container.decode(LocalDate.self, forKey: .date))
         case "dateTime":
             self = .dateTime(try container.decode(LocalDate.self, forKey: .date),
                              try container.decode(LocalTime.self, forKey: .time))
-        default: throw TabulaCodingError.unknownKind(kind, key: .kind, in: container, type: "TaskDue")
+        default: self = .unknown(try JSONValue(from: decoder))
         }
     }
 
-    /// Encodes the tagged union.
+    /// Encodes the tagged union; `.unknown` re-encodes its JSON unchanged.
     public func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {
         case .date(let date):
+            var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode("date", forKey: .kind)
             try container.encode(date, forKey: .date)
         case let .dateTime(date, time):
+            var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode("dateTime", forKey: .kind)
             try container.encode(date, forKey: .date)
             try container.encode(time, forKey: .time)
+        case .unknown(let raw):
+            try raw.encode(to: encoder)
         }
     }
 }

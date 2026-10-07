@@ -233,7 +233,7 @@ struct FileRepositoryTests {
         defer { dir.remove() }
         var tree = try JSONValue(encoding: Fixture.fullDatabase())
         tree = SyncJSONPatch.set(tree, [.key("schemaVersion")], .integer(3))
-        tree = SyncJSONPatch.set(tree, [.key("settings"), .key("hourCycle")], .string("h36"))   // closed enum grew
+        tree = SyncJSONPatch.set(tree, [.key("settings"), .key("syncEnabled")], .string("sometimes")) // a type changed
         let bytes = try TabulaJSON.makeEncoder().encode(tree)
         try dir.write(bytes, to: "tabula.json")
         let repository = FileRepository(directory: dir.url)

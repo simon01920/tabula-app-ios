@@ -182,6 +182,7 @@ struct SchedulePropertyTests {
             case .always: return true
             case .range(let range): return range.contains(date)
             case .terms(let ids): return liveTerms.contains { ids.contains($0.id) && $0.range.contains(date) }
+            case .unknown: return false
             }
         }
         var failures = FailureBudget()

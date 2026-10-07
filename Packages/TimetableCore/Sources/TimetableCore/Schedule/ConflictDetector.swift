@@ -95,6 +95,7 @@ public enum ConflictDetector {
         func ranges(_ validity: LessonValidity) -> [LocalDateRange]? { // nil = unbounded
             switch validity {
             case .always: return nil
+            case .unknown: return [] // never shown
             case .range(let range): return range.isEmpty ? [] : [range]
             case .terms(let ids): return ids.compactMap { terms[$0]?.range }.filter { !$0.isEmpty }
             }

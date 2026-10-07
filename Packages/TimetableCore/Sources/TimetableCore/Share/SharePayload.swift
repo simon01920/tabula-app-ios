@@ -60,6 +60,9 @@ public struct ShareTimetable: Hashable, Sendable {
     public var enabledDays: Set<Weekday>
     /// Rotation (`ro`, omitted for `.none`).
     public var rotation: RotationScheme
+    /// First day of a rotation week (`ws`, ISO weekday; omitted when Monday; absent = Monday). Optional key added
+    /// within `v` = 1 (pre-freeze); see `Timetable.rotationWeekStart`.
+    public var rotationWeekStart: Weekday
     /// Bell schedules or free-form times (`ts`).
     public var timeStructure: ShareTimeStructure
     /// Visible optional lesson fields (`fv`, ascending, omitted when empty).
@@ -73,13 +76,14 @@ public struct ShareTimetable: Hashable, Sendable {
 
     /// Creates the timetable part of a payload.
     public init(name: String, emoji: String? = nil, enabledDays: Set<Weekday> = Weekday.workweek,
-                rotation: RotationScheme = .none, timeStructure: ShareTimeStructure,
+                rotation: RotationScheme = .none, rotationWeekStart: Weekday = .monday, timeStructure: ShareTimeStructure,
                 fieldVisibility: Set<LessonField> = [], defaultView: TimetableViewKind = .grid,
                 density: Density = .comfortable, palettePackID: PalettePackID? = nil) {
         self.name = name
         self.emoji = emoji
         self.enabledDays = enabledDays
         self.rotation = rotation
+        self.rotationWeekStart = rotationWeekStart
         self.timeStructure = timeStructure
         self.fieldVisibility = fieldVisibility
         self.defaultView = defaultView

@@ -37,7 +37,7 @@ public enum SampleData {
     /// Sample subjects per profile (catalog key suffixes after `sample.subject.`, plus an emoji).
     static func seeds(for profile: UserProfile) -> [SubjectSeed] {
         func seed(_ name: String, _ symbol: String) -> SubjectSeed { SubjectSeed(name: name, symbol: symbol) }
-        switch profile {
+        switch profile.effective {
         case .elementary:
             return [seed("mathematics", "➗"), seed("nativeLanguage", "📖"), seed("foreignLanguage", "🗣️"),
                     seed("science", "🔬"), seed("art", "🎨"), seed("music", "🎵"), seed("physicalEducation", "⚽")]
@@ -48,7 +48,7 @@ public enum SampleData {
         case .university:
             return [seed("calculus", "📈"), seed("linearAlgebra", "🧮"), seed("programming", "💻"),
                     seed("databases", "🗄️"), seed("statistics", "📊"), seed("academicWriting", "✍️")]
-        case .other:
+        default: // .other and (never reached) unknown profiles
             return [seed("mathematics", "➗"), seed("nativeLanguage", "📖"), seed("foreignLanguage", "🗣️"),
                     seed("history", "🏛️"), seed("physicalEducation", "⚽")]
         }
@@ -65,17 +65,17 @@ public enum SampleData {
 
     /// Every catalog key `make` may request, sorted (for the String Catalog and DOMAIN_MODEL.md).
     public static var allKeys: [String] {
-        let subjects = UserProfile.allCases.flatMap { seeds(for: $0) }.map { subjectKey($0.name) }
+        let subjects = UserProfile.knownValues.flatMap { seeds(for: $0) }.map { subjectKey($0.name) }
         return Array(Set(subjects + [homeworkTitleKey, examTitleKey, sportsKitKey])).sorted()
     }
 
     /// Lessons per school day in the sample timetable.
     static func lessonsPerDay(for profile: UserProfile) -> Int {
-        switch profile {
+        switch profile.effective {
         case .elementary: return 5
         case .secondary: return 6
         case .university: return 3
-        case .other: return 5
+        default: return 5 // .other
         }
     }
 

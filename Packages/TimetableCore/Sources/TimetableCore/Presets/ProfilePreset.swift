@@ -66,11 +66,11 @@ public struct ProfilePreset: Hashable, Sendable {
 
     /// The preset for `profile`.
     public static func `for`(_ profile: UserProfile) -> ProfilePreset {
-        switch profile {
+        switch profile.effective {
         case .elementary: return elementary
         case .secondary: return secondary
         case .university: return university
-        case .other: return other
+        default: return other // .other; `effective` maps unknown profiles here
         }
     }
 

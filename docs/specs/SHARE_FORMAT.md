@@ -76,7 +76,7 @@ Measured sizes (Linux zlib, `ShareCodecTests.sizeBudgetRoutesSecondaryInlineAndU
 
 | Shared | Not shared (v1) |
 |---|---|
-| the live timetable: name, emoji, enabled days, rotation, time structure, field visibility, default view, density, palette pack | IDs and sync metadata (`meta`, `fieldClocks`), the timetable's `sortIndex` |
+| the live timetable: name, emoji, enabled days, rotation, rotation week start, time structure, field visibility, default view, density, palette pack | IDs and sync metadata (`meta`, `fieldClocks`), the timetable's `sortIndex` |
 | its live subjects, bell schedules, terms, lessons | schedule overrides (one-off, date-specific, usually personal; may come in a later `v`) |
 | live breaks of the timetable **and global breaks** (imported as breaks of the new timetable — never global) | reminder rules, settings |
 | with "Include tasks": live, **open** tasks and exams of the timetable (by `timetableID`, or with none but linked to one of its subjects) | completed tasks/exams, completion state, attachments, reminder overrides |
@@ -113,9 +113,12 @@ weekdays ISO 1…7 — as in DOMAIN_MODEL §1. "a/z" always means start/end.
 
 ### 4.2 `ShareTimetable` (`t`)
 
-`n` name · `e` emoji? · `d` enabled weekdays (set) · `ro` rotation (omitted for none) · `ts` time structure ·
+`n` name · `e` emoji? · `d` enabled weekdays (set) · `ro` rotation (omitted for none) · `ws` rotation week start (ISO
+weekday 1…7 = `Timetable.rotationWeekStart`; **omitted when Monday; absent = Monday**, so payloads written before the key
+existed keep their meaning — optional key added within `v` = 1 before the Phase 1 freeze) · `ts` time structure ·
 `fv` visible lesson fields (set of `LessonField`, omitted when empty) · `dv` default view (`TimetableViewKind`) ·
-`de` density (`compact`/`comfortable`) · `pp` palette pack?
+`de` density (`Density`, open vocabulary: `compact`/`comfortable`; an unknown value is kept with an `unknownValue`
+warning and displayed as `comfortable`) · `pp` palette pack?
 
 Rotation `ro` (closed union):
 - `{"k":"w","n":2,"a":{…},"lb":["A","B"]}` week cycle; `n` length 2…6; `lb` labels?
@@ -357,8 +360,8 @@ Count arguments need plural variations. Total: 27 keys (17 errors + 10 warnings)
   show `newerVersion` ("update the app") for a higher number.
 - **Payload version** (`v`): the JSON shape. Within `v` = 1 it is allowed to add **optional** keys (old apps ignore
   them) and new open-vocabulary values (old apps keep them and warn). Bump `v` for anything else: renamed keys, changed
-  meaning, new cases of a closed union (rotation, time structure, slot, validity, anchors) or closed enum (density,
-  priority, parity policy), tightened rules, overrides or other new collections whose loss would matter.
+  meaning, new cases of a closed union (rotation, time structure, slot, validity, anchors) or closed enum (priority,
+  parity policy), tightened rules, overrides or other new collections whose loss would matter.
 - Apps keep decoding every older `v` they ever wrote (add `SharePayloadV2` + a converter, never edit V1 in place).
 - `ShareCodecTests.goldenCanonicalJSON` pins the v1 wire format; changing it is a format change.
 
@@ -376,5 +379,7 @@ Count arguments need plural variations. Total: 27 keys (17 errors + 10 warnings)
   the recipient's other timetables.
 - D2D-6 Dates limited to 1970…2199 and ISO-parity offsets to 0..<length in the wire format (defence for Stage 2B
   arithmetic). Export normalises offsets modulo the length.
+- D2D-7 (pre-freeze, 2026-10-08) Optional `t.ws` (rotation week start, default Monday) added within `v` = 1, and `t.de`
+  is an open vocabulary like the persisted `Density`; neither changes the golden payload.
 - Open: overrides in a later `v`; whether the Worker should re-validate payloads with the same rules (port of §5/§7);
   App Attest for uploads (SHARING.md).

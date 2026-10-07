@@ -38,7 +38,7 @@ struct ReminderPlannerPropertyTests {
         let rules: [ReminderRule] = (1...int(1...6)).map { n in
             let followUp: FollowUp? = chance(40) ? (chance(50) ? .afterMinutes(int(0...600)) : .nextMorning(at: time())) : nil
             return F.rule(UInt64(n), targets[int(0...targets.count - 1)], (1...int(1...3)).map { _ in offset() },
-                          tier: DeliveryTier.allCases[int(0...2)], followUp: followUp,
+                          tier: DeliveryTier.knownValues[int(0...2)], followUp: followUp,
                           quiet: chance(20) ? QuietHours(start: time(), end: time()) : nil,
                           origin: chance(50) ? .user : .preset, enabled: chance(90), deleted: chance(5))
         }
@@ -46,7 +46,7 @@ struct ReminderPlannerPropertyTests {
             guard chance(15) else { return nil }
             let follows: [FollowUpOverride] = [.inherit, .none, .custom(.afterMinutes(int(1...120)))]
             return ReminderOverride(isEnabled: chance(80), offsets: chance(50) ? [offset()] : nil,
-                                    tier: chance(50) ? DeliveryTier.allCases[int(0...2)] : nil, followUp: follows[int(0...2)])
+                                    tier: chance(50) ? DeliveryTier.knownValues[int(0...2)] : nil, followUp: follows[int(0...2)])
         }
         let kinds: [TaskKind] = [.homework, .assignment, .todo]
         let tasks: [TaskItem] = (0..<int(0...80)).map { n in
@@ -192,5 +192,5 @@ struct ReminderPlannerPropertyTests {
 
 extension DeliveryTier {
     /// Numeric rank for property-test ordering checks.
-    fileprivate var planRank: Int { DeliveryTier.allCases.firstIndex(of: self)! }
+    fileprivate var planRank: Int { DeliveryTier.knownValues.firstIndex(of: self)! }
 }

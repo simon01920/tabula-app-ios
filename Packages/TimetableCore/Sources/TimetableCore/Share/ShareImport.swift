@@ -216,7 +216,8 @@ public enum ShareImport {
             timeStructure = .freeForm(defaultDurationMinutes: minutes)
         }
         let timetable = Timetable(id: timetableID, meta: timetableMeta, name: source.name, emoji: source.emoji,
-                                  enabledDays: source.enabledDays, rotation: source.rotation, timeStructure: timeStructure,
+                                  enabledDays: source.enabledDays, rotation: source.rotation,
+                                  rotationWeekStart: source.rotationWeekStart, timeStructure: timeStructure,
                                   fieldVisibility: FieldVisibility(source.fieldVisibility), defaultView: source.defaultView,
                                   density: source.density, palettePackID: source.palettePackID, sortIndex: sortIndex)
 

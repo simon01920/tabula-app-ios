@@ -93,7 +93,7 @@ public struct TimeBlockLayout: Hashable, Sendable, Codable {
     public static func week(containing date: LocalDate, resolver: ScheduleResolver, options: ResolutionOptions = .actual,
                             weekdays: Set<Weekday>? = nil, bounds: Bounds = .standard,
                             includeCancelled: Bool = true) -> TimeBlockLayout {
-        let start = resolver.rotation.startOfWeek(containing: date)
+        let start = resolver.context.startOfWeek(containing: date)
         let shown = weekdays ?? resolver.timetable.enabledDays
         let dates = (0..<7).map { start.adding(days: $0) }.filter { shown.contains($0.weekday) }
         return make(days: dates.map { resolver.day($0, options: options) }, bounds: bounds,

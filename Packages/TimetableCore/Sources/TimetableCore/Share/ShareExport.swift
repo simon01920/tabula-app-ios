@@ -113,6 +113,11 @@ public enum ShareExport {
                 case .always: validity = .always
                 case .terms(let ids): validity = .terms(Set(ids.compactMap { termIndex[$0] }))
                 case .range(let range): validity = .range(range)
+                case .unknown:
+                    // A validity kind from a newer version cannot be expressed in v1 and must not widen to
+                    // "always": the lesson is left out (counted in `valuesDropped`).
+                    sanitizer.dropped += 1
+                    continue
                 }
                 lessonIndex[lesson.id] = sharedLessons.count
                 sharedLessons.append(ShareLesson(
@@ -137,9 +142,10 @@ public enum ShareExport {
             let timetable = ShareTimetable(
                 name: sanitizer.name(source.name), emoji: source.emoji.flatMap { sanitizer.emoji($0) },
                 enabledDays: source.enabledDays, rotation: sanitizer.rotation(source.rotation),
-                timeStructure: timeStructure,
+                rotationWeekStart: source.rotationWeekStart, timeStructure: timeStructure,
                 fieldVisibility: Set(source.fieldVisibility.visibleFields.compactMap { sanitizer.vocabulary($0) }),
-                defaultView: sanitizer.vocabulary(source.defaultView) ?? .grid, density: source.density,
+                defaultView: sanitizer.vocabulary(source.defaultView) ?? .grid,
+                density: sanitizer.vocabulary(source.density) ?? .comfortable,
                 palettePackID: source.palettePackID.flatMap { sanitizer.vocabulary($0) })
 
             let sharedSubjects = subjects.map { sanitizer.subject($0) }
@@ -167,7 +173,7 @@ public enum ShareExport {
                     let repeatRule = task.repeatRule.flatMap { sanitizer.vocabulary($0.frequency) == nil ? nil : $0 }
                     return ShareTask(
                         title: sanitizer.name(task.title), kind: sanitizer.vocabulary(task.kind) ?? .homework,
-                        subject: task.subjectID.flatMap { subjectIndex[$0] }, due: task.due,
+                        subject: task.subjectID.flatMap { subjectIndex[$0] }, due: sanitizer.due(task.due),
                         linkedLesson: task.linkedLesson.flatMap { link in
                             lessonIndex[link.lessonID].map { ShareLessonLink(lesson: $0, date: link.date) }
                         },
@@ -227,6 +233,13 @@ public enum ShareExport {
 
         mutating func vocabulary<V: OpenVocabulary>(_ value: V) -> V? {
             if ShareText.isValidVocabulary(value.rawValue) { return value }
+            dropped += 1
+            return nil
+        }
+
+        /// The due date, or `nil` (counted as dropped) for a due kind from a newer version.
+        mutating func due(_ value: TaskDue?) -> TaskDue? {
+            guard let value, !value.isKnown else { return value }
             dropped += 1
             return nil
         }

@@ -104,7 +104,11 @@ struct EncodingShapeTests {
         #expect(try Fixture.json(FollowUpOverride.custom(.afterMinutes(5))) == #"{"followUp":{"kind":"afterMinutes","minutes":5},"kind":"custom"}"#)
         #expect(try Fixture.json(ReminderOverride()) == #"{"followUp":{"kind":"inherit"},"isEnabled":true}"#)
         #expect(try Fixture.json(QuietHours(start: Fixture.time("22:00"), end: Fixture.time("07:00"))) == #"{"end":"07:00","start":"22:00"}"#)
-        #expect(throws: DecodingError.self) { try Fixture.decode(FollowUp.self, #"{"kind":"never"}"#) }
+        // Open union since the pre-freeze QA: an unknown kind round-trips; a known kind with a bad payload throws.
+        let unknownFollowUp = try Fixture.decode(FollowUp.self, #"{"after":"lesson","kind":"never"}"#)
+        #expect(unknownFollowUp == .unknown(.object(["after": .string("lesson"), "kind": .string("never")])))
+        #expect(try Fixture.json(unknownFollowUp) == #"{"after":"lesson","kind":"never"}"#)
+        #expect(throws: DecodingError.self) { try Fixture.decode(FollowUp.self, #"{"kind":"afterMinutes"}"#) }
 
         #expect(try Fixture.json(TaskDue.date(Fixture.date("2026-10-08"))) == #"{"date":"2026-10-08","kind":"date"}"#)
         #expect(try Fixture.json(TaskDue.dateTime(Fixture.date("2026-10-08"), Fixture.time("08:00")))

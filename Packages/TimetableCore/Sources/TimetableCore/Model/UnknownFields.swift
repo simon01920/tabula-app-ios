@@ -29,8 +29,8 @@ public enum EntityFieldCatalog {
                     "timeZoneMode", "appearance", "palettePackID", "globalQuietHours", "timeSensitivePolicy",
                     "alarmPolicy", "syncEnabled"]
         case .timetable:
-            return ["name", "emoji", "enabledDays", "rotation", "timeStructure", "fieldVisibility", "defaultView",
-                    "density", "palettePackID", "sortIndex"]
+            return ["name", "emoji", "enabledDays", "rotation", "rotationWeekStart", "timeStructure", "fieldVisibility",
+                    "defaultView", "density", "palettePackID", "sortIndex"]
         case .subject:
             return ["timetableID", "name", "shortName", "color", "colorName", "symbol", "defaultRoom",
                     "defaultBuilding", "defaultTeacher", "notes"]

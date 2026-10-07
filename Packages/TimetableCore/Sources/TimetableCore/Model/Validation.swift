@@ -295,6 +295,9 @@ private struct Validator {
             add(.warning, .invalidValue, me, field: "timeZoneMode", value: identifier)
         }
         unknown(settings.palettePackID, me, field: "palettePackID")
+        unknown(settings.profile, me, field: "profile")
+        unknown(settings.hourCycle, me, field: "hourCycle")
+        unknown(settings.appearance, me, field: "appearance")
         if let quiet = settings.globalQuietHours, quiet.start == quiet.end {
             add(.warning, .invalidTimeRange, me, field: "globalQuietHours")
         }
@@ -308,6 +311,7 @@ private struct Validator {
     private mutating func check(_ timetable: Timetable) {
         let me = owner(timetable)
         if timetable.enabledDays.isEmpty { add(.warning, .invalidValue, me, field: "enabledDays") }
+        unknown(timetable.density, me, field: "density")
         switch timetable.rotation {
         case .none:
             break
@@ -431,6 +435,9 @@ private struct Validator {
             }
         case .range(let range):
             if range.isEmpty { add(.error, .invalidDateRange, me, field: "validity") }
+        case .unknown(let raw):
+            // Warning, not info: the lesson is hidden on every date until the app is updated.
+            add(.warning, .unknownValue, me, field: "validity", value: raw["kind"]?.stringValue)
         }
         unknown(lesson.lessonType, me, field: "lessonType")
     }
@@ -552,6 +559,7 @@ private struct Validator {
         if let timetableID = task.timetableID { reference(timetableID, timetables, owner: me, field: "timetableID") }
         if let link = task.linkedLesson { reference(link.lessonID, lessons, owner: me, field: "linkedLesson") }
         unknown(task.kind, me, field: "kind")
+        if case .unknown(let raw)? = task.due { add(.info, .unknownValue, me, field: "due", value: raw["kind"]?.stringValue) }
         if let rule = task.repeatRule {
             if rule.interval < 1 { add(.error, .invalidValue, me, field: "repeatRule", value: String(rule.interval)) }
             unknown(rule.frequency, me, field: "repeatRule.frequency")
@@ -559,9 +567,7 @@ private struct Validator {
         for attachment in task.attachments where !attachment.meta.isDeleted {
             unknown(attachment.kind, me, child: attachment.id.uuid, field: "attachments.kind")
         }
-        if let override = task.reminderOverride, let offsets = override.offsets {
-            checkOffsets(offsets, owner: me, field: "reminderOverride.offsets")
-        }
+        if let override = task.reminderOverride { checkOverride(override, owner: me) }
     }
 
     private mutating func check(_ exam: Exam) {
@@ -570,9 +576,7 @@ private struct Validator {
         if let timetableID = exam.timetableID { reference(timetableID, timetables, owner: me, field: "timetableID") }
         if let start = exam.start, let end = exam.end, end <= start { add(.error, .invalidTimeRange, me, field: "end") }
         unknown(exam.kind, me, field: "kind")
-        if let override = exam.reminderOverride, let offsets = override.offsets {
-            checkOffsets(offsets, owner: me, field: "reminderOverride.offsets")
-        }
+        if let override = exam.reminderOverride { checkOverride(override, owner: me) }
     }
 
     private mutating func check(_ rule: ReminderRule) {
@@ -580,12 +584,30 @@ private struct Validator {
         unknown(rule.target, me, field: "target")
         if rule.offsets.isEmpty { add(.warning, .invalidValue, me, field: "offsets") }
         checkOffsets(rule.offsets, owner: me, field: "offsets")
-        if case .afterMinutes(let minutes) = rule.followUp, minutes <= 0 {
-            add(.error, .invalidValue, me, field: "followUp", value: String(minutes))
-        }
+        if let followUp = rule.followUp { checkFollowUp(followUp, owner: me, field: "followUp") }
+        unknown(rule.tier, me, field: "tier")
         if let quiet = rule.quietHours, quiet.start == quiet.end { add(.warning, .invalidTimeRange, me, field: "quietHours") }
         if rule.origin == .preset && rule.tier == .alarm {
             add(.warning, .invalidValue, me, field: "tier", value: rule.tier.rawValue)
+        }
+    }
+
+    private mutating func checkOverride(_ override: ReminderOverride, owner: Owner) {
+        if let offsets = override.offsets { checkOffsets(offsets, owner: owner, field: "reminderOverride.offsets") }
+        unknown(override.tier, owner, field: "reminderOverride.tier")
+        if case .custom(let followUp) = override.followUp {
+            checkFollowUp(followUp, owner: owner, field: "reminderOverride.followUp")
+        }
+    }
+
+    private mutating func checkFollowUp(_ followUp: FollowUp, owner: Owner, field: String) {
+        switch followUp {
+        case .afterMinutes(let minutes) where minutes <= 0:
+            add(.error, .invalidValue, owner, field: field, value: String(minutes))
+        case .unknown(let raw):
+            add(.info, .unknownValue, owner, field: field, value: raw["kind"]?.stringValue)
+        default:
+            break
         }
     }
 
