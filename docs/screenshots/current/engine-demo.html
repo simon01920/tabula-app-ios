@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tabula Engine Demo</title>
+<style>:root{--bg:#f6f7f9;--surface:#ffffff;--text:#16181d;--muted:#5b6270;--line:#d9dde4;--accent:#1e5bd8;
+--banner-bg:#fff4d6;--banner-line:#e0b44c;--gap:#eef0f4;--off:#f1f2f5;--ok:#1b7a3a;--bad:#b3261e;
+--badge-bg:#e8ebf1;--badge-text:#16181d;--mod:#8a4b00;--mod-bg:#ffe7c2;--add:#0b5e3b;--add-bg:#cdf3df;
+--cancel:#8f1d17;--cancel-bg:#ffd9d6;--today:#1e5bd8;color-scheme:light}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#111317;--surface:#1a1d23;--text:#e9ecf1;
+--muted:#a2a9b6;--line:#2e333c;--accent:#7aa7ff;--banner-bg:#3a2e0f;--banner-line:#8a6d22;--gap:#16191e;--off:#15181d;
+--ok:#6fd38f;--bad:#ff8a80;--badge-bg:#2a2f38;--badge-text:#e9ecf1;--mod:#ffcf8a;--mod-bg:#4a3210;--add:#8ff0bd;
+--add-bg:#11402b;--cancel:#ffb3ac;--cancel-bg:#4d1915;--today:#7aa7ff;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#111317;--surface:#1a1d23;--text:#e9ecf1;--muted:#a2a9b6;--line:#2e333c;--accent:#7aa7ff;
+--banner-bg:#3a2e0f;--banner-line:#8a6d22;--gap:#16191e;--off:#15181d;--ok:#6fd38f;--bad:#ff8a80;--badge-bg:#2a2f38;
+--badge-text:#e9ecf1;--mod:#ffcf8a;--mod-bg:#4a3210;--add:#8ff0bd;--add-bg:#11402b;--cancel:#ffb3ac;--cancel-bg:#4d1915;
+--today:#7aa7ff;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:1180px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:1.6rem;line-height:1.25;margin:.2rem 0 .6rem}
+h2{font-size:1.25rem;margin:0 0 .5rem;display:flex;align-items:center;gap:.5rem}
+h3{font-size:1rem;margin:1.2rem 0 .4rem}
+.num{display:inline-grid;place-items:center;width:1.7rem;height:1.7rem;border-radius:50%;background:var(--accent);color:var(--surface);font-size:.9rem}
+section,.banner,footer{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:0 0 18px}
+.banner{background:var(--banner-bg);border:2px solid var(--banner-line)}
+.eyebrow{text-transform:uppercase;letter-spacing:.06em;font-size:.75rem;color:var(--muted);margin:0}
+.lead{margin:.2rem 0 .8rem}.note{color:var(--muted);font-size:.9rem}.muted{color:var(--muted)}
+.small{font-size:.78rem;color:var(--muted)}.facts{font-size:.9rem}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.85em}
+code.wrap{word-break:break-all}
+code,table.kv td,h2,.lead,.note,li{overflow-wrap:anywhere}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+thead th{background:var(--gap);font-weight:600}
+table.kv th{width:210px;background:var(--gap);font-weight:600}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;background:none;border:0;padding:0}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px}
+.tile-label{font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.tile-value{font-size:1.15rem;font-weight:650;margin:.15rem 0}.tile-note{font-size:.8rem;color:var(--muted)}
+.swatch{display:inline-block;min-width:3.2rem;text-align:center;border-radius:6px;padding:3px 6px;font-weight:650}
+.dot{display:inline-block;width:.7rem;height:.7rem;border-radius:50%;margin-right:.4rem;vertical-align:baseline}
+.ok{color:var(--ok);font-weight:600}.bad{color:var(--bad);font-weight:600}
+.grid-wrap{margin:0 0 20px}.grid-wrap figcaption{font-weight:600;margin:0 0 6px}
+table.grid{table-layout:fixed;min-width:760px}
+table.grid th.period,table.grid th.gap{width:92px;background:var(--gap)}
+table.grid thead th{text-align:center}table.grid thead th.is-today{box-shadow:inset 0 -3px 0 var(--today)}
+table.grid td{padding:3px;height:62px}
+table.grid tr.gap td,table.grid tr.gap th{height:auto;padding:2px 6px;background:var(--gap);font-size:.75rem}
+td.off{background:var(--off)}td.free{text-align:center;color:var(--muted)}
+.card{border-radius:8px;padding:5px 7px;height:100%;min-height:54px;display:flex;flex-direction:column;gap:1px;margin-bottom:3px}
+.card .subj{font-weight:700}.card .meta{font-size:.75rem;opacity:.92}.card .bring{font-size:.75rem;float:right}
+.status-cancelled{opacity:.55;text-decoration:line-through}
+.badges{display:flex;flex-wrap:wrap;gap:3px;margin-top:2px;text-decoration:none}
+.badge{display:inline-block;font-size:.7rem;line-height:1.3;padding:1px 6px;border-radius:999px;background:var(--badge-bg);color:var(--badge-text);font-weight:600;text-decoration:none}
+.badge.mod{background:var(--mod-bg);color:var(--mod)}.badge.add{background:var(--add-bg);color:var(--add)}
+.badge.cancel{background:var(--cancel-bg);color:var(--cancel)}.badge.today{background:var(--today);color:var(--surface)}
+.badge.reason{background:var(--surface);color:var(--text);border:1px solid var(--line)}
+.nownext{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:0 0 10px}
+.nownext>div{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.big{font-size:1.05rem;font-weight:650}
+tr.current td{background:var(--mod-bg)}
+ul.overrides{margin:.2rem 0 .6rem;padding-left:1.2rem}
+.tb{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:6px 0 10px}
+.tb-head{font-weight:600;margin:0 0 4px;padding-left:48px}
+.tb-body{position:relative;border:1px solid var(--line);border-radius:8px;margin-left:48px;background:var(--gap)}
+.hourline{position:absolute;left:0;right:0;border-top:1px dashed var(--line)}
+.hourline span{position:absolute;left:-48px;top:-.6rem;font-size:.72rem;color:var(--muted);width:44px;text-align:right}
+.block{position:absolute;border-radius:6px;padding:2px 6px;font-size:.75rem;overflow:hidden;border:1px solid rgba(0,0,0,.15)}
+details{margin-top:8px}summary{cursor:pointer;color:var(--accent)}
+.nowrap{white-space:nowrap}
+table.reminders td{font-size:.85rem}table.reminders td:nth-child(3){min-width:190px}
+footer{font-size:.85rem;color:var(--muted)}
+@media (max-width:600px){main{padding:16px 16px 32px}section,.banner,footer{padding:14px}table.kv th{width:120px}}</style>
+</head>
+<body>
+<main>
+<header class="banner" role="note">
+  <p class="eyebrow">Phase 1 · TimetableCore · engine demo</p>
+  <h1>Engine output rendered for inspection — <em>not the app's UI</em></h1>
+  <p>This page is produced by <code>Tools/EngineDemo</code>, which runs the real <code>TimetableCore</code>
+  code (public API only) on fixed sample data and prints the results as HTML. The layout, colours and
+  wording here are a debugging view. The iPhone/Watch UI is built in <strong>Phase 2</strong> and will look
+  different. Strings are shown as String Catalog keys; English text next to them is read from
+  <code>Resources/Localizable.xcstrings</code> by this tool (201 keys loaded).</p>
+  <p class="facts">Fixed “now”: <strong>Tue 13 Oct 2026 10:20 (UTC+02:00)</strong> · zone <code>Europe/Bratislava</code>
+  · week starts Monday · schema v1 · IDs from <code>SequentialIDGenerator</code>
+  · timestamps from <code>HybridLogicalClock</code>. Re-running produces the same file.</p>
+</header>
+<section class="tiles" aria-label="At a glance"><div class="tile"><div class="tile-label">This week</div><div class="tile-value">Week B</div><div class="tile-note">cycle week 2 · ISO W42</div></div><div class="tile"><div class="tile-label">Next week</div><div class="tile-value">Week A</div><div class="tile-note">cycle week 1 · ISO W43</div></div><div class="tile"><div class="tile-label">Now</div><div class="tile-value">SJL until 10:45</div><div class="tile-note">25 min remaining</div></div><div class="tile"><div class="tile-label">Next</div><div class="tile-value">BIO at 10:55</div><div class="tile-note">in 35 min</div></div><div class="tile"><div class="tile-label">Reminders planned</div><div class="tile-value">16</div><div class="tile-note">next 14 days · 1 dropped · budget 60</div></div><div class="tile"><div class="tile-label">Share</div><div class="tile-value">1498 B</div><div class="tile-note">compressed · route inline</div></div><div class="tile"><div class="tile-label">Validation</div><div class="tile-value">valid</div><div class="tile-note">0 issues total</div></div></section>
+<section>
+  <h2><span class="num">1</span> Onboarding</h2>
+  <p class="lead">A secondary-school profile with odd/even weeks. The builder creates settings, the timetable,
+  the preset bell schedule, the term and the preset reminder rules; the demo then adds 12
+  subjects and 32 lessons (27 every week, 3 only in week A, 2 only in week B,
+  4 with a bring-list).</p>
+  <table class="kv"><tr><th scope=row>API</th><td><code>OnboardingBuilder.makeInitialDatabase(answers:ids:clock:now:)</code> at Tue 1 Sep 2026 18:00 (UTC+02:00)</td></tr><tr><th scope=row>Profile</th><td><code>secondary</code> → <code>ProfilePreset.secondary</code></td></tr><tr><th scope=row>Timetable</th><td>🏫 Gymnázium – 2.B · id <code>7AB0DE30-0000-4000-8000-000000000001</code></td></tr><tr><th scope=row>Rotation</th><td>week cycle of 2 (ISO-week parity, policy <code>strict</code>, offset 0); labels A / B · <code>rotationWeekStart</code> = Mon</td></tr><tr><th scope=row>Enabled days</th><td>Mon, Tue, Wed, Thu, Fri</td></tr><tr><th scope=row>Time structure</th><td>preset bell schedule template: 8 × 45 min from 08:00, breaks 10 / 20 / 10 min → “Bežný deň”</td></tr><tr><th scope=row>Visible fields (preset)</th><td><code>notes</code> <code>room</code> <code>teacher</code></td></tr><tr><th scope=row>Default view</th><td><code>grid</code> · exams prominent · rotation prompt standard</td></tr><tr><th scope=row>Term</th><td>1. polrok 2026/27 (2026-09-02…2027-01-31)</td></tr><tr><th scope=row>Palette</th><td><code>PalettePack.classic</code> (12 colours), text colour from <code>ColorValue.preferredTextColor</code></td></tr></table>
+  <h3>Preset reminder rules (homework, exam and pack-tonight enabled in the answers)</h3>
+  <div class="scroll"><table><thead><tr><th>Target</th><th>Offsets</th><th>Follow-up</th><th>Tier</th><th>Enabled</th><th>Origin</th></tr></thead><tbody><tr><td><code>homework</code></td><td>1 day before at 17:00</td><td>next morning at 07:00</td><td><code>standard</code></td><td>on</td><td>preset</td></tr><tr><td><code>exam</code></td><td>3 days before at 17:00; 1 day before at 17:00</td><td>—</td><td><code>standard</code></td><td>on</td><td>preset</td></tr><tr><td><code>lesson</code></td><td>5 min before</td><td>—</td><td><code>timeSensitive</code></td><td><span class=muted>off</span></td><td>preset</td></tr><tr><td><code>packTonight</code></td><td>1 day before at 20:00</td><td>—</td><td><code>standard</code></td><td>on</td><td>preset</td></tr></tbody></table></div>
+  <h3>Bell schedules</h3>
+  <p class="note">The preset generates lesson periods only; breaks are gaps between them. The second column is the
+  “Skrátené vyučovanie” schedule used by the override in section 4 (same period IDs, 30-minute lessons).</p>
+  <div class="scroll"><table><thead><tr><th>#</th><th>Bežný deň</th><th>Length</th><th>Skrátené vyučovanie</th><th>Period ID (tail)</th></tr></thead><tbody><tr><td>1</td><td>08:00–08:45</td><td>45 min</td><td>08:00–08:30</td><td><code class=small>000000000003</code></td></tr><tr><td>2</td><td>08:55–09:40</td><td>45 min</td><td>08:35–09:05</td><td><code class=small>000000000004</code></td></tr><tr><td>3</td><td>10:00–10:45</td><td>45 min</td><td>09:15–09:45</td><td><code class=small>000000000005</code></td></tr><tr><td>4</td><td>10:55–11:40</td><td>45 min</td><td>09:50–10:20</td><td><code class=small>000000000006</code></td></tr><tr><td>5</td><td>11:50–12:35</td><td>45 min</td><td>10:25–10:55</td><td><code class=small>000000000007</code></td></tr><tr><td>6</td><td>12:45–13:30</td><td>45 min</td><td>11:00–11:30</td><td><code class=small>000000000008</code></td></tr><tr><td>7</td><td>13:40–14:25</td><td>45 min</td><td>11:35–12:05</td><td><code class=small>000000000009</code></td></tr><tr><td>8</td><td>14:35–15:20</td><td>45 min</td><td>12:10–12:40</td><td><code class=small>00000000000A</code></td></tr></tbody></table></div>
+  <h3>Subjects, palette colours and computed text colours</h3>
+  <div class="scroll"><table><thead><tr><th>Cell</th><th>Subject</th><th>Colour name key</th><th>Colour</th><th>Text</th><th>Contrast</th><th>Default room</th><th>Default teacher</th></tr></thead><tbody><tr><td><span class="swatch" style="background:#E53935;color:#000000">SJL</span></td>
+<td>📖 Slovenský jazyk a literatúra</td><td><code>palette.classic.color.red</code></td><td><code>#E53935</code></td>
+<td><code>#000000</code></td><td>4.97:1 <span class=ok>AA</span></td>
+<td>214</td><td>Mgr. Kováčová</td></tr><tr><td><span class="swatch" style="background:#FB8C00;color:#000000">MAT</span></td>
+<td>➗ Matematika</td><td><code>palette.classic.color.orange</code></td><td><code>#FB8C00</code></td>
+<td><code>#000000</code></td><td>8.85:1 <span class=ok>AA</span></td>
+<td>214</td><td>Mgr. Horváth</td></tr><tr><td><span class="swatch" style="background:#FDD835;color:#000000">ANJ</span></td>
+<td>🗣️ Anglický jazyk</td><td><code>palette.classic.color.yellow</code></td><td><code>#FDD835</code></td>
+<td><code>#000000</code></td><td>15.05:1 <span class=ok>AA</span></td>
+<td>JAZ-2</td><td>Mgr. Baláž</td></tr><tr><td><span class="swatch" style="background:#43A047;color:#000000">FYZ</span></td>
+<td>⚛️ Fyzika</td><td><code>palette.classic.color.green</code></td><td><code>#43A047</code></td>
+<td><code>#000000</code></td><td>6.36:1 <span class=ok>AA</span></td>
+<td>Lab FYZ</td><td>RNDr. Tóth</td></tr><tr><td><span class="swatch" style="background:#00897B;color:#000000">CHE</span></td>
+<td>🧪 Chémia</td><td><code>palette.classic.color.teal</code></td><td><code>#00897B</code></td>
+<td><code>#000000</code></td><td>4.86:1 <span class=ok>AA</span></td>
+<td>Lab CHE</td><td>Ing. Vargová</td></tr><tr><td><span class="swatch" style="background:#00ACC1;color:#000000">BIO</span></td>
+<td>🧬 Biológia</td><td><code>palette.classic.color.cyan</code></td><td><code>#00ACC1</code></td>
+<td><code>#000000</code></td><td>7.67:1 <span class=ok>AA</span></td>
+<td>214</td><td>Mgr. Lukáčová</td></tr><tr><td><span class="swatch" style="background:#1E88E5;color:#000000">DEJ</span></td>
+<td>🏛️ Dejepis</td><td><code>palette.classic.color.blue</code></td><td><code>#1E88E5</code></td>
+<td><code>#000000</code></td><td>5.71:1 <span class=ok>AA</span></td>
+<td>214</td><td>PhDr. Molnár</td></tr><tr><td><span class="swatch" style="background:#3949AB;color:#FFFFFF">GEO</span></td>
+<td>🌍 Geografia</td><td><code>palette.classic.color.indigo</code></td><td><code>#3949AB</code></td>
+<td><code>#FFFFFF</code></td><td>7.73:1 <span class=ok>AA</span></td>
+<td>214</td><td>Mgr. Szabová</td></tr><tr><td><span class="swatch" style="background:#8E24AA;color:#FFFFFF">INF</span></td>
+<td>💻 Informatika</td><td><code>palette.classic.color.purple</code></td><td><code>#8E24AA</code></td>
+<td><code>#FFFFFF</code></td><td>7.04:1 <span class=ok>AA</span></td>
+<td>INF-1</td><td>Ing. Kollár</td></tr><tr><td><span class="swatch" style="background:#D81B60;color:#FFFFFF">TSV</span></td>
+<td>⚽ Telesná a športová výchova</td><td><code>palette.classic.color.pink</code></td><td><code>#D81B60</code></td>
+<td><code>#FFFFFF</code></td><td>4.95:1 <span class=ok>AA</span></td>
+<td>Telocvičňa</td><td>Mgr. Hudák</td></tr><tr><td><span class="swatch" style="background:#6D4C41;color:#FFFFFF">NEJ</span></td>
+<td>💬 Nemecký jazyk</td><td><code>palette.classic.color.brown</code></td><td><code>#6D4C41</code></td>
+<td><code>#FFFFFF</code></td><td>7.61:1 <span class=ok>AA</span></td>
+<td>JAZ-1</td><td>Mgr. Németh</td></tr><tr><td><span class="swatch" style="background:#757575;color:#FFFFFF">ETV</span></td>
+<td>🤝 Etická výchova</td><td><code>palette.classic.color.gray</code></td><td><code>#757575</code></td>
+<td><code>#FFFFFF</code></td><td>4.61:1 <span class=ok>AA</span></td>
+<td>214</td><td>Mgr. Králová</td></tr></tbody></table></div>
+</section>
+<section>
+  <h2><span class="num">2</span> Week grids (<code>GridLayout.week(containing:resolver:)</code>)</h2>
+  <p class="lead">Rows are the periods of the default bell schedule, columns the enabled days. The week label is
+  <code>GridLayout.cycleLabel</code> (the rotation resolver's label for the week's cycle week). Hover a lesson to
+  see its WCAG contrast ratio. Break rows are drawn by this page from the gaps between periods.</p>
+  <figure class="grid-wrap">
+  <figcaption>This week: week of Mon 12 Oct · <strong>Week B</strong> (cycle week 2) · 30 cells, 9 empty slots</figcaption>
+  <div class="scroll"><table class="grid"><thead><tr><th></th><th scope=col class="">Mon<br><span class=small>12 Oct</span><br><span class=small>Week B</span></th><th scope=col class="is-today">Tue<br><span class=small>13 Oct</span><br><span class=small>Week B <span class="badge today">today</span></span></th><th scope=col class="">Wed<br><span class=small>14 Oct</span><br><span class=small>Week B</span></th><th scope=col class="">Thu<br><span class=small>15 Oct</span><br><span class=small>Week B <span class="badge mod">Skrátené vyučovanie</span></span></th><th scope=col class="">Fri<br><span class=small>16 Oct</span><br><span class=small>Week B</span></th></tr></thead><tbody><tr><th scope=row class=period>1.<br><span class=small>08:00–08:45</span></th><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#E53935;color:#000000" title="Slovenský jazyk a literatúra · 08:00–08:45 · text #000000 on #E53935 = contrast 4.97:1 (AA) · status scheduled">
+  <span class=subj>📖 SJL</span>
+  <span class=meta>214 · Mgr. Kováčová</span>
+  <span class=meta>08:00–08:45</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#FB8C00;color:#000000" title="Matematika · 08:00–08:45 · text #000000 on #FB8C00 = contrast 8.85:1 (AA) · status scheduled">
+  <span class=subj>➗ MAT</span>
+  <span class=meta>214 · Mgr. Horváth</span>
+  <span class=meta>08:00–08:45</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#FDD835;color:#000000" title="Anglický jazyk · 08:00–08:45 · text #000000 on #FDD835 = contrast 15.05:1 (AA) · status scheduled">
+  <span class=subj>🗣️ ANJ</span>
+  <span class=meta>JAZ-2 · Mgr. Baláž</span>
+  <span class=meta>08:00–08:45</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-modified" style="background:#43A047;color:#000000" title="Fyzika · 08:00–08:30 · text #000000 on #43A047 = contrast 6.36:1 (AA) · status modified">
+  <span class=subj>⚛️ FYZ</span>
+  <span class=meta>Lab FYZ · RNDr. Tóth</span>
+  <span class=meta>08:00–08:30</span>
+  <span class=badges><span class="badge mod">modified</span><span class="badge reason" title="schedule.change.timeChanged">Time changed</span></span>
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#00ACC1;color:#000000" title="Biológia · 08:00–08:45 · text #000000 on #00ACC1 = contrast 7.67:1 (AA) · status scheduled">
+  <span class=subj>🧬 BIO</span>
+  <span class=meta>214 · Mgr. Lukáčová</span>
+  <span class=meta>08:00–08:45</span>
+  
+</div></td></tr><tr class=gap><th scope=row class=gap>break<br><span class=small>10 min</span></th><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td></tr><tr><th scope=row class=period>2.<br><span class=small>08:55–09:40</span></th><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#FB8C00;color:#000000" title="Matematika · 08:55–09:40 · text #000000 on #FB8C00 = contrast 8.85:1 (AA) · status scheduled">
+  <span class=subj>➗ MAT</span>
+  <span class=meta>214 · Mgr. Horváth</span>
+  <span class=meta>08:55–09:40</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#00897B;color:#000000" title="Chémia · 08:55–09:40 · text #000000 on #00897B = contrast 4.86:1 (AA) · status scheduled">
+  <span class=subj>🧪 CHE</span>
+  <span class=meta>Lab CHE · Ing. Vargová</span>
+  <span class=meta>08:55–09:40</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#E53935;color:#000000" title="Slovenský jazyk a literatúra · 08:55–09:40 · text #000000 on #E53935 = contrast 4.97:1 (AA) · status scheduled">
+  <span class=subj>📖 SJL</span>
+  <span class=meta>214 · Mgr. Kováčová</span>
+  <span class=meta>08:55–09:40</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-modified" style="background:#FB8C00;color:#000000" title="Matematika · 08:35–09:05 · text #000000 on #FB8C00 = contrast 8.85:1 (AA) · status modified">
+  <span class=subj>➗ MAT</span>
+  <span class=meta>Aula · Mgr. Novák (suplovanie)</span>
+  <span class=meta>08:35–09:05</span>
+  <span class=badges><span class="badge mod">modified</span><span class="badge reason" title="schedule.change.timeChanged">Time changed</span><span class="badge reason" title="schedule.change.roomChanged">Room changed</span><span class="badge reason" title="schedule.change.teacherChanged">Substitute teacher</span></span>
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#3949AB;color:#FFFFFF" title="Geografia · 08:55–09:40 · text #FFFFFF on #3949AB = contrast 7.73:1 (AA) · status scheduled">
+  <span class=subj>🌍 GEO</span>
+  <span class=meta>214 · Mgr. Szabová</span>
+  <span class=meta>08:55–09:40</span>
+  
+</div></td></tr><tr class=gap><th scope=row class=gap>break<br><span class=small>20 min</span></th><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td></tr><tr><th scope=row class=period>3.<br><span class=small>10:00–10:45</span></th><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#FDD835;color:#000000" title="Anglický jazyk · 10:00–10:45 · text #000000 on #FDD835 = contrast 15.05:1 (AA) · status scheduled">
+  <span class=subj>🗣️ ANJ</span>
+  <span class=meta>JAZ-2 · Mgr. Baláž</span>
+  <span class=meta>10:00–10:45</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#E53935;color:#000000" title="Slovenský jazyk a literatúra · 10:00–10:45 · text #000000 on #E53935 = contrast 4.97:1 (AA) · status scheduled">
+  <span class=subj>📖 SJL</span>
+  <span class=meta>214 · Mgr. Kováčová</span>
+  <span class=meta>10:00–10:45</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#FB8C00;color:#000000" title="Matematika · 10:00–10:45 · text #000000 on #FB8C00 = contrast 8.85:1 (AA) · status scheduled">
+  <span class=subj>➗ MAT</span>
+  <span class=meta>214 · Mgr. Horváth</span>
+  <span class=meta>10:00–10:45</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-modified" style="background:#00897B;color:#000000" title="Chémia · 09:15–09:45 · text #000000 on #00897B = contrast 4.86:1 (AA) · status modified">
+  <span class=subj>🧪 CHE</span><span class=bring>🎒 2</span>
+  <span class=meta>Lab CHE · Ing. Vargová</span>
+  <span class=meta>09:15–09:45</span>
+  <span class=badges><span class="badge mod">modified</span><span class="badge reason" title="schedule.change.timeChanged">Time changed</span></span>
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#6D4C41;color:#FFFFFF" title="Nemecký jazyk · 10:00–10:45 · text #FFFFFF on #6D4C41 = contrast 7.61:1 (AA) · status scheduled">
+  <span class=subj>💬 NEJ</span>
+  <span class=meta>JAZ-1 · Mgr. Németh</span>
+  <span class=meta>10:00–10:45</span>
+  
+</div></td></tr><tr class=gap><th scope=row class=gap>break<br><span class=small>10 min</span></th><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td></tr><tr><th scope=row class=period>4.<br><span class=small>10:55–11:40</span></th><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#43A047;color:#000000" title="Fyzika · 10:55–11:40 · text #000000 on #43A047 = contrast 6.36:1 (AA) · status scheduled">
+  <span class=subj>⚛️ FYZ</span>
+  <span class=meta>Lab FYZ · RNDr. Tóth</span>
+  <span class=meta>10:55–11:40</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#00ACC1;color:#000000" title="Biológia · 10:55–11:40 · text #000000 on #00ACC1 = contrast 7.67:1 (AA) · status scheduled">
+  <span class=subj>🧬 BIO</span>
+  <span class=meta>214 · Mgr. Lukáčová</span>
+  <span class=meta>10:55–11:40</span>
+  
+</div></td><td rowspan="3" class=lesson-td><div class="card status-scheduled" style="background:#8E24AA;color:#FFFFFF" title="Informatika · 10:55–12:35 · text #FFFFFF on #8E24AA = contrast 7.04:1 (AA) · status scheduled">
+  <span class=subj>💻 INF</span>
+  <span class=meta>INF-1 · Ing. Kollár</span>
+  <span class=meta>10:55–12:35</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-cancelled" style="background:#FDD835;color:#000000" title="Anglický jazyk · 09:50–10:20 · text #000000 on #FDD835 = contrast 15.05:1 (AA) · status cancelled">
+  <span class=subj>🗣️ ANJ</span>
+  <span class=meta>JAZ-2 · Mgr. Baláž</span>
+  <span class=meta>09:50–10:20</span>
+  <span class=badges><span class="badge cancel">cancelled</span><span class="badge reason" title="schedule.change.timeChanged">Time changed</span></span>
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#FB8C00;color:#000000" title="Matematika · 10:55–11:40 · text #000000 on #FB8C00 = contrast 8.85:1 (AA) · status scheduled">
+  <span class=subj>➗ MAT</span>
+  <span class=meta>214 · Mgr. Horváth</span>
+  <span class=meta>10:55–11:40</span>
+  
+</div></td></tr><tr class=gap><th scope=row class=gap>break<br><span class=small>10 min</span></th><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td></tr><tr><th scope=row class=period>5.<br><span class=small>11:50–12:35</span></th><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#1E88E5;color:#000000" title="Dejepis · 11:50–12:35 · text #000000 on #1E88E5 = contrast 5.71:1 (AA) · status scheduled">
+  <span class=subj>🏛️ DEJ</span>
+  <span class=meta>214 · PhDr. Molnár</span>
+  <span class=meta>11:50–12:35</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#6D4C41;color:#FFFFFF" title="Nemecký jazyk · 11:50–12:35 · text #FFFFFF on #6D4C41 = contrast 7.61:1 (AA) · status scheduled">
+  <span class=subj>💬 NEJ</span>
+  <span class=meta>JAZ-1 · Mgr. Németh</span>
+  <span class=meta>11:50–12:35</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-modified" style="background:#E53935;color:#000000" title="Slovenský jazyk a literatúra · 10:25–10:55 · text #000000 on #E53935 = contrast 4.97:1 (AA) · status modified">
+  <span class=subj>📖 SJL</span>
+  <span class=meta>214 · Mgr. Kováčová</span>
+  <span class=meta>10:25–10:55</span>
+  <span class=badges><span class="badge mod">modified</span><span class="badge reason" title="schedule.change.timeChanged">Time changed</span></span>
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#43A047;color:#000000" title="Fyzika · 11:50–12:35 · text #000000 on #43A047 = contrast 6.36:1 (AA) · status scheduled">
+  <span class=subj>⚛️ FYZ</span>
+  <span class=meta>Lab FYZ · RNDr. Tóth</span>
+  <span class=meta>11:50–12:35</span>
+  
+</div></td></tr><tr class=gap><th scope=row class=gap>break<br><span class=small>10 min</span></th><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td></tr><tr><th scope=row class=period>6.<br><span class=small>12:45–13:30</span></th><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#D81B60;color:#FFFFFF" title="Telesná a športová výchova · 12:45–13:30 · text #FFFFFF on #D81B60 = contrast 4.95:1 (AA) · status scheduled">
+  <span class=subj>⚽ TSV</span><span class=bring>🎒 2</span>
+  <span class=meta>Telocvičňa · Mgr. Hudák</span>
+  <span class=meta>12:45–13:30</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#3949AB;color:#FFFFFF" title="Geografia · 12:45–13:30 · text #FFFFFF on #3949AB = contrast 7.73:1 (AA) · status scheduled">
+  <span class=subj>🌍 GEO</span>
+  <span class=meta>214 · Mgr. Szabová</span>
+  <span class=meta>12:45–13:30</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#1E88E5;color:#000000" title="Dejepis · 12:45–13:30 · text #000000 on #1E88E5 = contrast 5.71:1 (AA) · status scheduled">
+  <span class=subj>🏛️ DEJ</span>
+  <span class=meta>214 · PhDr. Molnár</span>
+  <span class=meta>12:45–13:30</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-modified" style="background:#D81B60;color:#FFFFFF" title="Telesná a športová výchova · 11:00–11:30 · text #FFFFFF on #D81B60 = contrast 4.95:1 (AA) · status modified">
+  <span class=subj>⚽ TSV</span><span class=bring>🎒 2</span>
+  <span class=meta>Telocvičňa · Mgr. Hudák</span>
+  <span class=meta>11:00–11:30</span>
+  <span class=badges><span class="badge mod">modified</span><span class="badge reason" title="schedule.change.timeChanged">Time changed</span></span>
+</div></td><td class=free title="empty slot (GridLayout.emptySlots)">·</td></tr><tr class=gap><th scope=row class=gap>break<br><span class=small>10 min</span></th><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td></tr><tr><th scope=row class=period>7.<br><span class=small>13:40–14:25</span></th><td class=free title="empty slot (GridLayout.emptySlots)">·</td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#757575;color:#FFFFFF" title="Etická výchova · 13:40–14:25 · text #FFFFFF on #757575 = contrast 4.61:1 (AA) · status scheduled">
+  <span class=subj>🤝 ETV</span>
+  <span class=meta>214 · Mgr. Králová</span>
+  <span class=meta>13:40–14:25</span>
+  
+</div></td><td class=free title="empty slot (GridLayout.emptySlots)">·</td><td rowspan="1" class=lesson-td><div class="card status-added" style="background:#8E24AA;color:#FFFFFF" title="Informatika · 11:35–12:05 · text #FFFFFF on #8E24AA = contrast 7.04:1 (AA) · status added">
+  <span class=subj>💻 INF</span>
+  <span class=meta>INF-1 · Ing. Kollár</span>
+  <span class=meta>11:35–12:05</span>
+  <span class=badges><span class="badge add">added</span></span>
+</div></td><td class=free title="empty slot (GridLayout.emptySlots)">·</td></tr><tr class=gap><th scope=row class=gap>break<br><span class=small>10 min</span></th><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td></tr><tr><th scope=row class=period>8.<br><span class=small>14:35–15:20</span></th><td class=free title="empty slot (GridLayout.emptySlots)">·</td><td class=free title="empty slot (GridLayout.emptySlots)">·</td><td class=free title="empty slot (GridLayout.emptySlots)">·</td><td class=free title="empty slot (GridLayout.emptySlots)">·</td><td class=free title="empty slot (GridLayout.emptySlots)">·</td></tr></tbody></table></div>
+  
+</figure>
+  <figure class="grid-wrap">
+  <figcaption>Next week: week of Mon 19 Oct · <strong>Week A</strong> (cycle week 1) · 30 cells, 9 empty slots</figcaption>
+  <div class="scroll"><table class="grid"><thead><tr><th></th><th scope=col class="">Mon<br><span class=small>19 Oct</span><br><span class=small>Week A</span></th><th scope=col class="">Tue<br><span class=small>20 Oct</span><br><span class=small>Week A</span></th><th scope=col class="">Wed<br><span class=small>21 Oct</span><br><span class=small>Week A</span></th><th scope=col class="">Thu<br><span class=small>22 Oct</span><br><span class=small>Week A</span></th><th scope=col class="">Fri<br><span class=small>23 Oct</span><br><span class=small>Week A</span></th></tr></thead><tbody><tr><th scope=row class=period>1.<br><span class=small>08:00–08:45</span></th><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#E53935;color:#000000" title="Slovenský jazyk a literatúra · 08:00–08:45 · text #000000 on #E53935 = contrast 4.97:1 (AA) · status scheduled">
+  <span class=subj>📖 SJL</span>
+  <span class=meta>214 · Mgr. Kováčová</span>
+  <span class=meta>08:00–08:45</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#FB8C00;color:#000000" title="Matematika · 08:00–08:45 · text #000000 on #FB8C00 = contrast 8.85:1 (AA) · status scheduled">
+  <span class=subj>➗ MAT</span>
+  <span class=meta>214 · Mgr. Horváth</span>
+  <span class=meta>08:00–08:45</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#FDD835;color:#000000" title="Anglický jazyk · 08:00–08:45 · text #000000 on #FDD835 = contrast 15.05:1 (AA) · status scheduled">
+  <span class=subj>🗣️ ANJ</span>
+  <span class=meta>JAZ-2 · Mgr. Baláž</span>
+  <span class=meta>08:00–08:45</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#43A047;color:#000000" title="Fyzika · 08:00–08:45 · text #000000 on #43A047 = contrast 6.36:1 (AA) · status scheduled">
+  <span class=subj>⚛️ FYZ</span>
+  <span class=meta>Lab FYZ · RNDr. Tóth</span>
+  <span class=meta>08:00–08:45</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#00ACC1;color:#000000" title="Biológia · 08:00–08:45 · text #000000 on #00ACC1 = contrast 7.67:1 (AA) · status scheduled">
+  <span class=subj>🧬 BIO</span>
+  <span class=meta>214 · Mgr. Lukáčová</span>
+  <span class=meta>08:00–08:45</span>
+  
+</div></td></tr><tr class=gap><th scope=row class=gap>break<br><span class=small>10 min</span></th><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td></tr><tr><th scope=row class=period>2.<br><span class=small>08:55–09:40</span></th><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#FB8C00;color:#000000" title="Matematika · 08:55–09:40 · text #000000 on #FB8C00 = contrast 8.85:1 (AA) · status scheduled">
+  <span class=subj>➗ MAT</span>
+  <span class=meta>214 · Mgr. Horváth</span>
+  <span class=meta>08:55–09:40</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#00897B;color:#000000" title="Chémia · 08:55–09:40 · text #000000 on #00897B = contrast 4.86:1 (AA) · status scheduled">
+  <span class=subj>🧪 CHE</span>
+  <span class=meta>Lab CHE · Ing. Vargová</span>
+  <span class=meta>08:55–09:40</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#E53935;color:#000000" title="Slovenský jazyk a literatúra · 08:55–09:40 · text #000000 on #E53935 = contrast 4.97:1 (AA) · status scheduled">
+  <span class=subj>📖 SJL</span>
+  <span class=meta>214 · Mgr. Kováčová</span>
+  <span class=meta>08:55–09:40</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#FB8C00;color:#000000" title="Matematika · 08:55–09:40 · text #000000 on #FB8C00 = contrast 8.85:1 (AA) · status scheduled">
+  <span class=subj>➗ MAT</span>
+  <span class=meta>214 · Mgr. Horváth</span>
+  <span class=meta>08:55–09:40</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#3949AB;color:#FFFFFF" title="Geografia · 08:55–09:40 · text #FFFFFF on #3949AB = contrast 7.73:1 (AA) · status scheduled">
+  <span class=subj>🌍 GEO</span>
+  <span class=meta>214 · Mgr. Szabová</span>
+  <span class=meta>08:55–09:40</span>
+  
+</div></td></tr><tr class=gap><th scope=row class=gap>break<br><span class=small>20 min</span></th><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td></tr><tr><th scope=row class=period>3.<br><span class=small>10:00–10:45</span></th><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#FDD835;color:#000000" title="Anglický jazyk · 10:00–10:45 · text #000000 on #FDD835 = contrast 15.05:1 (AA) · status scheduled">
+  <span class=subj>🗣️ ANJ</span>
+  <span class=meta>JAZ-2 · Mgr. Baláž</span>
+  <span class=meta>10:00–10:45</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#E53935;color:#000000" title="Slovenský jazyk a literatúra · 10:00–10:45 · text #000000 on #E53935 = contrast 4.97:1 (AA) · status scheduled">
+  <span class=subj>📖 SJL</span>
+  <span class=meta>214 · Mgr. Kováčová</span>
+  <span class=meta>10:00–10:45</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#FB8C00;color:#000000" title="Matematika · 10:00–10:45 · text #000000 on #FB8C00 = contrast 8.85:1 (AA) · status scheduled">
+  <span class=subj>➗ MAT</span>
+  <span class=meta>214 · Mgr. Horváth</span>
+  <span class=meta>10:00–10:45</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#00897B;color:#000000" title="Chémia · 10:00–10:45 · text #000000 on #00897B = contrast 4.86:1 (AA) · status scheduled">
+  <span class=subj>🧪 CHE</span><span class=bring>🎒 2</span>
+  <span class=meta>Lab CHE · Ing. Vargová</span>
+  <span class=meta>10:00–10:45</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#6D4C41;color:#FFFFFF" title="Nemecký jazyk · 10:00–10:45 · text #FFFFFF on #6D4C41 = contrast 7.61:1 (AA) · status scheduled">
+  <span class=subj>💬 NEJ</span>
+  <span class=meta>JAZ-1 · Mgr. Németh</span>
+  <span class=meta>10:00–10:45</span>
+  
+</div></td></tr><tr class=gap><th scope=row class=gap>break<br><span class=small>10 min</span></th><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td></tr><tr><th scope=row class=period>4.<br><span class=small>10:55–11:40</span></th><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#43A047;color:#000000" title="Fyzika · 10:55–11:40 · text #000000 on #43A047 = contrast 6.36:1 (AA) · status scheduled">
+  <span class=subj>⚛️ FYZ</span>
+  <span class=meta>Lab FYZ · RNDr. Tóth</span>
+  <span class=meta>10:55–11:40</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#00ACC1;color:#000000" title="Biológia · 10:55–11:40 · text #000000 on #00ACC1 = contrast 7.67:1 (AA) · status scheduled">
+  <span class=subj>🧬 BIO</span>
+  <span class=meta>214 · Mgr. Lukáčová</span>
+  <span class=meta>10:55–11:40</span>
+  
+</div></td><td rowspan="3" class=lesson-td><div class="card status-scheduled" style="background:#8E24AA;color:#FFFFFF" title="Informatika · 10:55–12:35 · text #FFFFFF on #8E24AA = contrast 7.04:1 (AA) · status scheduled">
+  <span class=subj>💻 INF</span>
+  <span class=meta>INF-1 · Ing. Kollár</span>
+  <span class=meta>10:55–12:35</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#FDD835;color:#000000" title="Anglický jazyk · 10:55–11:40 · text #000000 on #FDD835 = contrast 15.05:1 (AA) · status scheduled">
+  <span class=subj>🗣️ ANJ</span>
+  <span class=meta>JAZ-2 · Mgr. Baláž</span>
+  <span class=meta>10:55–11:40</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#FB8C00;color:#000000" title="Matematika · 10:55–11:40 · text #000000 on #FB8C00 = contrast 8.85:1 (AA) · status scheduled">
+  <span class=subj>➗ MAT</span>
+  <span class=meta>214 · Mgr. Horváth</span>
+  <span class=meta>10:55–11:40</span>
+  
+</div></td></tr><tr class=gap><th scope=row class=gap>break<br><span class=small>10 min</span></th><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td></tr><tr><th scope=row class=period>5.<br><span class=small>11:50–12:35</span></th><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#1E88E5;color:#000000" title="Dejepis · 11:50–12:35 · text #000000 on #1E88E5 = contrast 5.71:1 (AA) · status scheduled">
+  <span class=subj>🏛️ DEJ</span>
+  <span class=meta>214 · PhDr. Molnár</span>
+  <span class=meta>11:50–12:35</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#6D4C41;color:#FFFFFF" title="Nemecký jazyk · 11:50–12:35 · text #FFFFFF on #6D4C41 = contrast 7.61:1 (AA) · status scheduled">
+  <span class=subj>💬 NEJ</span>
+  <span class=meta>JAZ-1 · Mgr. Németh</span>
+  <span class=meta>11:50–12:35</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#E53935;color:#000000" title="Slovenský jazyk a literatúra · 11:50–12:35 · text #000000 on #E53935 = contrast 4.97:1 (AA) · status scheduled">
+  <span class=subj>📖 SJL</span>
+  <span class=meta>214 · Mgr. Kováčová</span>
+  <span class=meta>11:50–12:35</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#00ACC1;color:#000000" title="Biológia · 11:50–12:35 · text #000000 on #00ACC1 = contrast 7.67:1 (AA) · status scheduled">
+  <span class=subj>🧬 BIO</span><span class=bring>🎒 1</span>
+  <span class=meta>Lab BIO · Mgr. Lukáčová</span>
+  <span class=meta>11:50–12:35</span>
+  
+</div></td></tr><tr class=gap><th scope=row class=gap>break<br><span class=small>10 min</span></th><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td></tr><tr><th scope=row class=period>6.<br><span class=small>12:45–13:30</span></th><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#D81B60;color:#FFFFFF" title="Telesná a športová výchova · 12:45–13:30 · text #FFFFFF on #D81B60 = contrast 4.95:1 (AA) · status scheduled">
+  <span class=subj>⚽ TSV</span><span class=bring>🎒 2</span>
+  <span class=meta>Telocvičňa · Mgr. Hudák</span>
+  <span class=meta>12:45–13:30</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#3949AB;color:#FFFFFF" title="Geografia · 12:45–13:30 · text #FFFFFF on #3949AB = contrast 7.73:1 (AA) · status scheduled">
+  <span class=subj>🌍 GEO</span>
+  <span class=meta>214 · Mgr. Szabová</span>
+  <span class=meta>12:45–13:30</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#1E88E5;color:#000000" title="Dejepis · 12:45–13:30 · text #000000 on #1E88E5 = contrast 5.71:1 (AA) · status scheduled">
+  <span class=subj>🏛️ DEJ</span>
+  <span class=meta>214 · PhDr. Molnár</span>
+  <span class=meta>12:45–13:30</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#D81B60;color:#FFFFFF" title="Telesná a športová výchova · 12:45–13:30 · text #FFFFFF on #D81B60 = contrast 4.95:1 (AA) · status scheduled">
+  <span class=subj>⚽ TSV</span><span class=bring>🎒 2</span>
+  <span class=meta>Telocvičňa · Mgr. Hudák</span>
+  <span class=meta>12:45–13:30</span>
+  
+</div></td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#757575;color:#FFFFFF" title="Etická výchova · 12:45–13:30 · text #FFFFFF on #757575 = contrast 4.61:1 (AA) · status scheduled">
+  <span class=subj>🤝 ETV</span>
+  <span class=meta>214 · Mgr. Králová</span>
+  <span class=meta>12:45–13:30</span>
+  
+</div></td></tr><tr class=gap><th scope=row class=gap>break<br><span class=small>10 min</span></th><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td></tr><tr><th scope=row class=period>7.<br><span class=small>13:40–14:25</span></th><td class=free title="empty slot (GridLayout.emptySlots)">·</td><td rowspan="1" class=lesson-td><div class="card status-scheduled" style="background:#8E24AA;color:#FFFFFF" title="Informatika · 13:40–14:25 · text #FFFFFF on #8E24AA = contrast 7.04:1 (AA) · status scheduled">
+  <span class=subj>💻 INF</span>
+  <span class=meta>INF-1 · Ing. Kollár</span>
+  <span class=meta>13:40–14:25</span>
+  
+</div></td><td class=free title="empty slot (GridLayout.emptySlots)">·</td><td class=free title="empty slot (GridLayout.emptySlots)">·</td><td class=free title="empty slot (GridLayout.emptySlots)">·</td></tr><tr class=gap><th scope=row class=gap>break<br><span class=small>10 min</span></th><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td><td class=gap></td></tr><tr><th scope=row class=period>8.<br><span class=small>14:35–15:20</span></th><td class=free title="empty slot (GridLayout.emptySlots)">·</td><td class=free title="empty slot (GridLayout.emptySlots)">·</td><td class=free title="empty slot (GridLayout.emptySlots)">·</td><td class=free title="empty slot (GridLayout.emptySlots)">·</td><td class=free title="empty slot (GridLayout.emptySlots)">·</td></tr></tbody></table></div>
+  
+</figure>
+</section>
+<section>
+  <h2><span class="num">3</span> Day view for “now” + Now &amp; Next (<code>ScheduleResolver.nowAndNext(at:)</code>)</h2>
+  <div class="nownext">
+    <div><div class="tile-label">State</div><div class="big">inLesson</div></div>
+    <div><div class="tile-label">Current</div><div class="big">Slovenský jazyk a literatúra · Tue 13 Oct 10:00–10:45 · 214</div>
+      <div class="tile-note">remaining: 25 min (1500 s)</div></div>
+    <div><div class="tile-label">Next</div><div class="big">Biológia · Tue 13 Oct 10:55–11:40 · 214</div>
+      <div class="tile-note">starts in: 35 min</div></div>
+  </div>
+  <p class="note">Tue 13 Oct: day key <code>.weekday(Tue)</code>,
+  cycle week 2 (label “B”),
+  school day: true, term: 1. polrok 2026/27.</p>
+  <div class="scroll"><table><thead><tr><th>#</th><th>Time</th><th>Subject</th><th>Room</th><th>Teacher</th><th>Notes / bring</th><th>Status</th></tr></thead><tbody><tr class=""><td>1.</td><td>08:00–08:45</td><td><span class=dot style="background:#FB8C00"></span>Matematika</td><td>214</td><td>Mgr. Horváth</td><td></td><td>scheduled </td></tr><tr class=""><td>2.</td><td>08:55–09:40</td><td><span class=dot style="background:#00897B"></span>Chémia</td><td>Lab CHE</td><td>Ing. Vargová</td><td></td><td>scheduled </td></tr><tr class="current"><td>3.</td><td>10:00–10:45</td><td><span class=dot style="background:#E53935"></span>Slovenský jazyk a literatúra</td><td>214</td><td>Mgr. Kováčová</td><td></td><td>scheduled <span class="badge today">now</span></td></tr><tr class=""><td>4.</td><td>10:55–11:40</td><td><span class=dot style="background:#00ACC1"></span>Biológia</td><td>214</td><td>Mgr. Lukáčová</td><td></td><td>scheduled <span class="badge add">next</span></td></tr><tr class=""><td>5.</td><td>11:50–12:35</td><td><span class=dot style="background:#6D4C41"></span>Nemecký jazyk</td><td>JAZ-1</td><td>Mgr. Németh</td><td></td><td>scheduled </td></tr><tr class=""><td>6.</td><td>12:45–13:30</td><td><span class=dot style="background:#3949AB"></span>Geografia</td><td>214</td><td>Mgr. Szabová</td><td></td><td>scheduled </td></tr><tr class=""><td>7.</td><td>13:40–14:25</td><td><span class=dot style="background:#757575"></span>Etická výchova</td><td>214</td><td>Mgr. Králová</td><td>Len v týždni B</td><td>scheduled </td></tr></tbody></table></div>
+</section>
+<section>
+  <h2><span class="num">4</span> One-off overrides on Thu 15 Oct</h2>
+  <p class="lead">Four <code>ScheduleOverride</code>s on one date of this week. The table is
+  <code>ScheduleResolver.resolution(for:)</code>: status and modification reasons exactly as the resolver reports them.</p>
+  <ul class="overrides"><li><code>useBellSchedule</code> — “Skrátené vyučovanie” <span class=small>(id …003E)</span></li><li><code>cancelLesson</code> — ANJ (period 4) <span class=small>(id …003F)</span></li><li><code>modifyLesson</code> — MAT (period 2): room = “Aula”, teacher = “Mgr. Novák (suplovanie)” <span class=small>(id …0040)</span></li><li><code>addLesson</code> — INF in period 7 — “Konzultácia k projektu” <span class=small>(id …0041)</span></li></ul>
+  <p class="note">Bell schedule used: “Skrátené vyučovanie” (via <code>bellScheduleOverrideID</code>
+  set) · resolution warnings: none · conflicts: 0</p>
+  <div class="scroll"><table><thead><tr><th>#</th><th>Time</th><th>Subject</th><th>Room</th><th>Teacher</th><th>Status</th><th>Modification reasons (key → English)</th><th>Applied overrides</th></tr></thead><tbody><tr><td>1.</td><td>08:00–08:30</td><td><span class=dot style="background:#43A047"></span>FYZ</td><td>Lab FYZ</td><td>RNDr. Tóth</td><td><span class="badge mod">modified</span></td><td><code>schedule.change.timeChanged</code> “Time changed”</td><td>useBellSchedule</td></tr><tr><td>2.</td><td>08:35–09:05</td><td><span class=dot style="background:#FB8C00"></span>MAT</td><td>Aula</td><td>Mgr. Novák (suplovanie)</td><td><span class="badge mod">modified</span></td><td><code>schedule.change.timeChanged</code> “Time changed”<br><code>schedule.change.roomChanged</code> “Room changed”<br><code>schedule.change.teacherChanged</code> “Substitute teacher”</td><td>useBellSchedule, modifyLesson</td></tr><tr><td>3.</td><td>09:15–09:45</td><td><span class=dot style="background:#00897B"></span>CHE</td><td>Lab CHE</td><td>Ing. Vargová</td><td><span class="badge mod">modified</span></td><td><code>schedule.change.timeChanged</code> “Time changed”</td><td>useBellSchedule</td></tr><tr><td>4.</td><td>09:50–10:20</td><td><span class=dot style="background:#FDD835"></span>ANJ</td><td>JAZ-2</td><td>Mgr. Baláž</td><td><span class="badge cancel">cancelled</span></td><td><code>schedule.change.timeChanged</code> “Time changed”</td><td>useBellSchedule, cancelLesson</td></tr><tr><td>5.</td><td>10:25–10:55</td><td><span class=dot style="background:#E53935"></span>SJL</td><td>214</td><td>Mgr. Kováčová</td><td><span class="badge mod">modified</span></td><td><code>schedule.change.timeChanged</code> “Time changed”</td><td>useBellSchedule</td></tr><tr><td>6.</td><td>11:00–11:30</td><td><span class=dot style="background:#D81B60"></span>TSV</td><td>Telocvičňa</td><td>Mgr. Hudák</td><td><span class="badge mod">modified</span></td><td><code>schedule.change.timeChanged</code> “Time changed”</td><td>useBellSchedule</td></tr><tr><td>7.</td><td>11:35–12:05</td><td><span class=dot style="background:#8E24AA"></span>INF</td><td>INF-1</td><td>Ing. Kollár</td><td><span class="badge add">added</span></td><td>—</td><td>useBellSchedule, addLesson</td></tr></tbody></table></div>
+</section>
+<section>
+  <h2><span class="num">5</span> Time-block layout (<code>TimeBlockLayout.make(days:)</code>)</h2>
+  <p class="lead">Today next to the short day. Visible range 08:00–15:00
+  (automatic bounds snapped to full hours). Box <code>top</code>/<code>height</code> are the engine's fractions of that range, used directly as CSS percentages.</p>
+  <div class="tb"><div class=tb-col><div class=tb-head>Tue 13 Oct</div><div class=tb-body style="height:560px"><div class=hourline style="top:0.000%"><span>08:00</span></div><div class=hourline style="top:14.286%"><span>09:00</span></div><div class=hourline style="top:28.571%"><span>10:00</span></div><div class=hourline style="top:42.857%"><span>11:00</span></div><div class=hourline style="top:57.143%"><span>12:00</span></div><div class=hourline style="top:71.429%"><span>13:00</span></div><div class=hourline style="top:85.714%"><span>14:00</span></div><div class=hourline style="top:100.000%"><span>15:00</span></div><div class="block status-scheduled" style="top:0.000%;height:10.714%;left:0.00%;width:100.00%;background:#FB8C00;color:#000000" title="Matematika 08:00–08:45 · top 0.0000 · height 0.1071 · lane 0/1"><strong>MAT</strong> 08:00</div><div class="block status-scheduled" style="top:13.095%;height:10.714%;left:0.00%;width:100.00%;background:#00897B;color:#000000" title="Chémia 08:55–09:40 · top 0.1310 · height 0.1071 · lane 0/1"><strong>CHE</strong> 08:55</div><div class="block status-scheduled" style="top:28.571%;height:10.714%;left:0.00%;width:100.00%;background:#E53935;color:#000000" title="Slovenský jazyk a literatúra 10:00–10:45 · top 0.2857 · height 0.1071 · lane 0/1"><strong>SJL</strong> 10:00</div><div class="block status-scheduled" style="top:41.667%;height:10.714%;left:0.00%;width:100.00%;background:#00ACC1;color:#000000" title="Biológia 10:55–11:40 · top 0.4167 · height 0.1071 · lane 0/1"><strong>BIO</strong> 10:55</div><div class="block status-scheduled" style="top:54.762%;height:10.714%;left:0.00%;width:100.00%;background:#6D4C41;color:#FFFFFF" title="Nemecký jazyk 11:50–12:35 · top 0.5476 · height 0.1071 · lane 0/1"><strong>NEJ</strong> 11:50</div><div class="block status-scheduled" style="top:67.857%;height:10.714%;left:0.00%;width:100.00%;background:#3949AB;color:#FFFFFF" title="Geografia 12:45–13:30 · top 0.6786 · height 0.1071 · lane 0/1"><strong>GEO</strong> 12:45</div><div class="block status-scheduled" style="top:80.952%;height:10.714%;left:0.00%;width:100.00%;background:#757575;color:#FFFFFF" title="Etická výchova 13:40–14:25 · top 0.8095 · height 0.1071 · lane 0/1"><strong>ETV</strong> 13:40</div></div></div><div class=tb-col><div class=tb-head>Thu 15 Oct · short day</div><div class=tb-body style="height:560px"><div class=hourline style="top:0.000%"><span>08:00</span></div><div class=hourline style="top:14.286%"><span>09:00</span></div><div class=hourline style="top:28.571%"><span>10:00</span></div><div class=hourline style="top:42.857%"><span>11:00</span></div><div class=hourline style="top:57.143%"><span>12:00</span></div><div class=hourline style="top:71.429%"><span>13:00</span></div><div class=hourline style="top:85.714%"><span>14:00</span></div><div class=hourline style="top:100.000%"><span>15:00</span></div><div class="block status-modified" style="top:0.000%;height:7.143%;left:0.00%;width:100.00%;background:#43A047;color:#000000" title="Fyzika 08:00–08:30 · top 0.0000 · height 0.0714 · lane 0/1"><strong>FYZ</strong> 08:00 · modified</div><div class="block status-modified" style="top:8.333%;height:7.143%;left:0.00%;width:100.00%;background:#FB8C00;color:#000000" title="Matematika 08:35–09:05 · top 0.0833 · height 0.0714 · lane 0/1"><strong>MAT</strong> 08:35 · modified</div><div class="block status-modified" style="top:17.857%;height:7.143%;left:0.00%;width:100.00%;background:#00897B;color:#000000" title="Chémia 09:15–09:45 · top 0.1786 · height 0.0714 · lane 0/1"><strong>CHE</strong> 09:15 · modified</div><div class="block status-cancelled" style="top:26.190%;height:7.143%;left:0.00%;width:100.00%;background:#FDD835;color:#000000" title="Anglický jazyk 09:50–10:20 · top 0.2619 · height 0.0714 · lane 0/1"><strong>ANJ</strong> 09:50 · cancelled</div><div class="block status-modified" style="top:34.524%;height:7.143%;left:0.00%;width:100.00%;background:#E53935;color:#000000" title="Slovenský jazyk a literatúra 10:25–10:55 · top 0.3452 · height 0.0714 · lane 0/1"><strong>SJL</strong> 10:25 · modified</div><div class="block status-modified" style="top:42.857%;height:7.143%;left:0.00%;width:100.00%;background:#D81B60;color:#FFFFFF" title="Telesná a športová výchova 11:00–11:30 · top 0.4286 · height 0.0714 · lane 0/1"><strong>TSV</strong> 11:00 · modified</div><div class="block status-added" style="top:51.190%;height:7.143%;left:0.00%;width:100.00%;background:#8E24AA;color:#FFFFFF" title="Informatika 11:35–12:05 · top 0.5119 · height 0.0714 · lane 0/1"><strong>INF</strong> 11:35 · added</div></div></div></div>
+  <details><summary>Fractions returned by the engine (14 blocks)</summary>
+  <div class="scroll"><table><thead><tr><th>Date</th><th>Subject</th><th>Time</th><th>top</th><th>height</th><th>lane</th><th>status</th></tr></thead><tbody><tr><td>Tue 13 Oct</td><td>MAT</td><td>08:00–08:45</td><td>0.0000</td><td>0.1071</td><td>0/1</td><td>scheduled</td></tr><tr><td>Tue 13 Oct</td><td>CHE</td><td>08:55–09:40</td><td>0.1310</td><td>0.1071</td><td>0/1</td><td>scheduled</td></tr><tr><td>Tue 13 Oct</td><td>SJL</td><td>10:00–10:45</td><td>0.2857</td><td>0.1071</td><td>0/1</td><td>scheduled</td></tr><tr><td>Tue 13 Oct</td><td>BIO</td><td>10:55–11:40</td><td>0.4167</td><td>0.1071</td><td>0/1</td><td>scheduled</td></tr><tr><td>Tue 13 Oct</td><td>NEJ</td><td>11:50–12:35</td><td>0.5476</td><td>0.1071</td><td>0/1</td><td>scheduled</td></tr><tr><td>Tue 13 Oct</td><td>GEO</td><td>12:45–13:30</td><td>0.6786</td><td>0.1071</td><td>0/1</td><td>scheduled</td></tr><tr><td>Tue 13 Oct</td><td>ETV</td><td>13:40–14:25</td><td>0.8095</td><td>0.1071</td><td>0/1</td><td>scheduled</td></tr><tr><td>Thu 15 Oct</td><td>FYZ</td><td>08:00–08:30</td><td>0.0000</td><td>0.0714</td><td>0/1</td><td>modified</td></tr><tr><td>Thu 15 Oct</td><td>MAT</td><td>08:35–09:05</td><td>0.0833</td><td>0.0714</td><td>0/1</td><td>modified</td></tr><tr><td>Thu 15 Oct</td><td>CHE</td><td>09:15–09:45</td><td>0.1786</td><td>0.0714</td><td>0/1</td><td>modified</td></tr><tr><td>Thu 15 Oct</td><td>ANJ</td><td>09:50–10:20</td><td>0.2619</td><td>0.0714</td><td>0/1</td><td>cancelled</td></tr><tr><td>Thu 15 Oct</td><td>SJL</td><td>10:25–10:55</td><td>0.3452</td><td>0.0714</td><td>0/1</td><td>modified</td></tr><tr><td>Thu 15 Oct</td><td>TSV</td><td>11:00–11:30</td><td>0.4286</td><td>0.0714</td><td>0/1</td><td>modified</td></tr><tr><td>Thu 15 Oct</td><td>INF</td><td>11:35–12:05</td><td>0.5119</td><td>0.0714</td><td>0/1</td><td>added</td></tr></tbody></table></div></details>
+</section>
+<section>
+  <h2><span class="num">6</span> Reminder plan (<code>ReminderPlanner.plan</code>, next 14 days)</h2>
+  <p class="lead">Input: 4 tasks (one completed), 2 exams, the enabled preset rules,
+  71 resolved lesson occurrences and 5 pack-tonight days
+  (<code>PackTonightDay.days(from:)</code>). <code>canScheduleAlarms = false</code> (no AlarmKit here); the biology exam
+  asks for a loud alarm through its reminder override, the essay asks for Time Sensitive.</p>
+  <p class="note">Planned: <strong>16</strong> notifications, 0 alarms ·
+  dropped: 1 · budget 60 of 64 · saturated: false
+  · horizon end Tue 27 Oct 2026 10:20 (UTC+01:00) · next re-plan Wed 14 Oct 2026 00:00 (UTC+02:00). The window crosses the end of summer time (Sun 25 Oct 2026, 03:00 CEST → 02:00 CET): reminders after it show UTC+01:00 at the same wall-clock time.</p>
+  
+  <div class="scroll"><table class="reminders"><thead><tr><th>#</th><th>Fires (local)</th><th>Source</th><th>Tier requested → effective</th><th>Tier change</th><th>Title (key → English)</th><th>Body / subtitle</th></tr></thead><tbody><tr><td>1</td><td class=nowrap>Tue 13 Oct 2026 17:00 (UTC+02:00)</td><td>task “Slovná zásoba – Unit 4”<br><span class=small>rule <code>homework</code></span></td>
+<td><code>standard</code></td><td>—</td><td><code class=small>reminder.task.title(&quot;Slovná zásoba – Unit 4&quot;)</code><br>Slovná zásoba – Unit 4</td><td><code class=small>reminder.task.dueTomorrow</code><br>Due tomorrow</td></tr><tr><td>2</td><td class=nowrap>Wed 14 Oct 2026 07:00 (UTC+02:00)</td><td>task “Slovná zásoba – Unit 4” <span class="badge mod">follow-up</span><br><span class=small>rule <code>homework</code></span></td>
+<td><code>standard</code></td><td>—</td><td><code class=small>reminder.followUp.title(&quot;Slovná zásoba – Unit 4&quot;)</code><br>Still to do: Slovná zásoba – Unit 4</td><td><code class=small>reminder.task.dueToday</code><br>Due today</td></tr><tr><td>3</td><td class=nowrap>Wed 14 Oct 2026 17:00 (UTC+02:00)</td><td>task “Pracovný list – kvadratické rovnice”<br><span class=small>rule <code>homework</code></span></td>
+<td><code>standard</code></td><td>—</td><td><code class=small>reminder.task.title(&quot;Pracovný list – kvadratické rovnice&quot;)</code><br>Pracovný list – kvadratické rovnice</td><td><code class=small>reminder.task.dueTomorrow</code><br>Due tomorrow</td></tr><tr><td>4</td><td class=nowrap>Wed 14 Oct 2026 20:00 (UTC+02:00)</td><td>pack tonight for Thu 15 Oct<br><span class=small>rule <code>packTonight</code></span></td>
+<td><code>standard</code></td><td>—</td><td><code class=small>reminder.packTonight.title</code><br>Pack your bag</td><td><code class=small>reminder.packTonight.tomorrow(4, &quot;Chémia&quot;)</code><br>4 items to pack for tomorrow, starting with Chémia</td></tr><tr><td>5</td><td class=nowrap>Thu 15 Oct 2026 07:00 (UTC+02:00)</td><td>task “Pracovný list – kvadratické rovnice” <span class="badge mod">follow-up</span><br><span class=small>rule <code>homework</code></span></td>
+<td><code>standard</code></td><td>—</td><td><code class=small>reminder.followUp.title(&quot;Pracovný list – kvadratické rovnice&quot;)</code><br>Still to do: Pracovný list – kvadratické rovnice</td><td><code class=small>reminder.task.dueToday</code><br>Due today</td></tr><tr><td>6</td><td class=nowrap>Sun 18 Oct 2026 17:00 (UTC+02:00)</td><td>task “Slohová práca: úvaha”<br><span class=small>rule <code>homework</code></span></td>
+<td><code>timeSensitive</code> → <code>standard</code></td><td><code>leadTimeTooLong</code><br><span class=small>This reminder comes long before the event, so it arrives as a normal notification.</span></td><td><code class=small>reminder.task.title(&quot;Slohová práca: úvaha&quot;)</code><br>Slohová práca: úvaha</td><td><code class=small>reminder.task.dueTomorrowAt(08:00)</code><br>Due tomorrow at 08:00</td></tr><tr><td>7</td><td class=nowrap>Sun 18 Oct 2026 20:00 (UTC+02:00)</td><td>pack tonight for Mon 19 Oct<br><span class=small>rule <code>packTonight</code></span></td>
+<td><code>standard</code></td><td>—</td><td><code class=small>reminder.packTonight.title</code><br>Pack your bag</td><td><code class=small>reminder.packTonight.tomorrow(2, &quot;Telesná a športová výchova&quot;)</code><br>2 items to pack for tomorrow, starting with Telesná a športová výchova</td></tr><tr><td>8</td><td class=nowrap>Mon 19 Oct 2026 07:00 (UTC+02:00)</td><td>task “Slohová práca: úvaha” <span class="badge mod">follow-up</span><br><span class=small>rule <code>homework</code></span></td>
+<td><code>timeSensitive</code></td><td>—</td><td><code class=small>reminder.followUp.title(&quot;Slohová práca: úvaha&quot;)</code><br>Still to do: Slohová práca: úvaha</td><td><code class=small>reminder.task.dueTodayAt(08:00)</code><br>Due today at 08:00</td></tr><tr><td>9</td><td class=nowrap>Mon 19 Oct 2026 07:30 (UTC+02:00)</td><td>task “Slohová práca: úvaha”<br><span class=small>rule <code>homework</code></span></td>
+<td><code>timeSensitive</code></td><td>—</td><td><code class=small>reminder.task.title(&quot;Slohová práca: úvaha&quot;)</code><br>Slohová práca: úvaha</td><td><code class=small>reminder.task.dueTodayAt(08:00)</code><br>Due today at 08:00</td></tr><tr><td>10</td><td class=nowrap>Mon 19 Oct 2026 17:00 (UTC+02:00)</td><td>exam “Písomka – organická chémia”<br><span class=small>rule <code>exam</code></span></td>
+<td><code>standard</code></td><td>—</td><td><code class=small>reminder.exam.title(&quot;Písomka – organická chémia&quot;)</code><br>Exam: Písomka – organická chémia</td><td><code class=small>reminder.exam.inDaysAt(3, 2026-10-22, 10:00)</code><br>In 3 days, on Thu 22 Oct at 10:00<br><code class=small>reminder.room(&quot;Lab CHE&quot;)</code><br>Room Lab CHE</td></tr><tr><td>11</td><td class=nowrap>Wed 21 Oct 2026 17:00 (UTC+02:00)</td><td>exam “Písomka – organická chémia”<br><span class=small>rule <code>exam</code></span></td>
+<td><code>standard</code></td><td>—</td><td><code class=small>reminder.exam.title(&quot;Písomka – organická chémia&quot;)</code><br>Exam: Písomka – organická chémia</td><td><code class=small>reminder.exam.tomorrowAt(10:00)</code><br>Tomorrow at 10:00<br><code class=small>reminder.room(&quot;Lab CHE&quot;)</code><br>Room Lab CHE</td></tr><tr><td>12</td><td class=nowrap>Wed 21 Oct 2026 20:00 (UTC+02:00)</td><td>pack tonight for Thu 22 Oct<br><span class=small>rule <code>packTonight</code></span></td>
+<td><code>standard</code></td><td>—</td><td><code class=small>reminder.packTonight.title</code><br>Pack your bag</td><td><code class=small>reminder.packTonight.tomorrow(4, &quot;Chémia&quot;)</code><br>4 items to pack for tomorrow, starting with Chémia</td></tr><tr><td>13</td><td class=nowrap>Thu 22 Oct 2026 20:00 (UTC+02:00)</td><td>pack tonight for Fri 23 Oct<br><span class=small>rule <code>packTonight</code></span></td>
+<td><code>standard</code></td><td>—</td><td><code class=small>reminder.packTonight.title</code><br>Pack your bag</td><td><code class=small>reminder.packTonight.tomorrow(1, &quot;Biológia&quot;)</code><br>1 item to pack for tomorrow: Biológia</td></tr><tr><td>14</td><td class=nowrap>Sat 24 Oct 2026 17:00 (UTC+02:00)</td><td>exam “Test – stavba bunky”<br><span class=small>rule <code>exam</code></span></td>
+<td><code>alarm</code> → <code>standard</code></td><td><code>alarmsDisabled</code><br><span class=small>Alarms are turned off in Settings, so this reminder arrives as a Time Sensitive notification.</span><br><code>leadTimeTooLong</code><br><span class=small>This reminder comes long before the event, so it arrives as a normal notification.</span></td><td><code class=small>reminder.exam.title(&quot;Test – stavba bunky&quot;)</code><br>Exam: Test – stavba bunky</td><td><code class=small>reminder.exam.inDaysAt(3, 2026-10-27, 08:00)</code><br>In 3 days, on Tue 27 Oct at 08:00</td></tr><tr><td>15</td><td class=nowrap>Sun 25 Oct 2026 20:00 (UTC+01:00)</td><td>pack tonight for Mon 26 Oct<br><span class=small>rule <code>packTonight</code></span></td>
+<td><code>standard</code></td><td>—</td><td><code class=small>reminder.packTonight.title</code><br>Pack your bag</td><td><code class=small>reminder.packTonight.tomorrow(2, &quot;Telesná a športová výchova&quot;)</code><br>2 items to pack for tomorrow, starting with Telesná a športová výchova</td></tr><tr><td>16</td><td class=nowrap>Mon 26 Oct 2026 17:00 (UTC+01:00)</td><td>exam “Test – stavba bunky”<br><span class=small>rule <code>exam</code></span></td>
+<td><code>alarm</code> → <code>standard</code></td><td><code>alarmsDisabled</code><br><span class=small>Alarms are turned off in Settings, so this reminder arrives as a Time Sensitive notification.</span><br><code>leadTimeTooLong</code><br><span class=small>This reminder comes long before the event, so it arrives as a normal notification.</span></td><td><code class=small>reminder.exam.title(&quot;Test – stavba bunky&quot;)</code><br>Exam: Test – stavba bunky</td><td><code class=small>reminder.exam.tomorrowAt(08:00)</code><br>Tomorrow at 08:00</td></tr></tbody></table></div>
+  <h3>Dropped</h3>
+  <div class="scroll"><table><thead><tr><th>Would fire</th><th>Source</th><th>Reason</th></tr></thead><tbody><tr><td>Tue 20 Oct 2026 07:00 (UTC+02:00)</td><td>task “Slohová práca: úvaha” (follow-up)</td><td><code>reminder.dropped.afterDue</code><br><span class=small>This reminder would arrive after the item is due.</span></td></tr></tbody></table></div>
+</section>
+<section>
+  <h2><span class="num">7</span> Share (<code>ShareCodec</code>)</h2>
+  <p class="lead">The timetable with open tasks and exams. Per SHARE_FORMAT v1, overrides, reminder rules, settings, IDs and
+  completed items are not shared (the completed task is absent from the decoded payload).</p>
+  <table class="kv"><tr><th scope=row>API</th><td><code>ShareExport.encode(from:timetableID:includeTasks: true)</code> → <code>ShareCodec.decode</code> round-trip</td></tr><tr><th scope=row>Canonical JSON</th><td>3931 bytes</td></tr><tr><th scope=row>Compressed (raw DEFLATE)</th><td><strong>1498 bytes</strong> (38.11 % of JSON) · inline limit 2048 bytes</td></tr><tr><th scope=row>Envelope</th><td>2000 characters (<code>1.rVfNbttGEH4Vgr1KKrkk9X…</code>)</td></tr><tr><th scope=row>Route</th><td><strong><code>inline</code></strong> → link length 2029 characters</td></tr><tr><th scope=row>Inline link</th><td><code class=wrap>https://tabula.simondev.sk/t#1.rVfNbttGEH4Vgr1KKrkk9XeTLDmxE7tG7QZoAh1W1EZiSHGFJSVHCgL0mEODAA3QAC3aQmiLwP05-VKkcC6MXiQv0D5CZ5d_u7FiXQoDAj2zs…</code> (2029 characters)</td></tr><tr><th scope=row>Sample short code</th><td><code>AVQZTWKU</code> · display <code>AVQZ-TWKU</code> · <code>https://tabula.simondev.sk/c/AVQZTWKU</code> (37 characters; seeded RNG, not registered anywhere)</td></tr><tr><th scope=row>Link parse round-trip</th><td><span class=ok>ShareLink.parse returns the same link</span></td></tr><tr><th scope=row>Decoded payload</th><td>“Gymnázium – 2.B”: 12 subjects, 32 lessons, 2 bell schedules, 1 terms, 1 breaks, 3 tasks, 2 exams</td></tr><tr><th scope=row>Export warnings</th><td>none</td></tr></table>
+</section>
+<section>
+  <h2><span class="num">8</span> Validation &amp; persistence</h2>
+  <p class="lead"><code>TabulaDatabase.validate()</code>: <strong>no issues</strong>
+  · schema version 1 · canonical JSON 32277 bytes (pretty 49128 bytes)
+  · encode → decode round-trip equal: <span class=ok>yes</span></p>
+  
+  <div class="scroll"><table><thead><tr><th>Collection</th><th>Entities</th><th>Tombstoned</th></tr></thead><tbody><tr><td><code>timetables</code></td><td>1</td><td>0</td></tr><tr><td><code>subjects</code></td><td>12</td><td>0</td></tr><tr><td><code>bellSchedules</code></td><td>2</td><td>0</td></tr><tr><td><code>lessons</code></td><td>32</td><td>0</td></tr><tr><td><code>terms</code></td><td>1</td><td>0</td></tr><tr><td><code>breaks</code></td><td>1</td><td>0</td></tr><tr><td><code>overrides</code></td><td>4</td><td>0</td></tr><tr><td><code>tasks</code></td><td>4</td><td>0</td></tr><tr><td><code>exams</code></td><td>2</td><td>0</td></tr><tr><td><code>reminderRules</code></td><td>4</td><td>0</td></tr></tbody></table></div>
+  <h3>Sync metadata (sample)</h3>
+  <ul class="overrides"><li>timetable <code>7AB0DE30-0000-4000-8000-000000000001</code>: createdAt <code>001788278400000-0000000001-000000000000de30</code>, updatedAt <code>001788278400000-0000000001-000000000000de30</code>, isDeleted false</li><li>override <code>7AB0DE30-0000-4000-8000-00000000003E</code>: createdAt <code>001791783000000-0000000001-000000000000de30</code>, isDeleted false</li></ul>
+</section>
+<footer>
+  <p>Generated by <code>bash scripts/engine-demo.sh</code> (SwiftPM package <code>Tools/EngineDemo</code>, depends on
+  <code>Packages/TimetableCore</code> by path). Inputs live in <code>Tools/EngineDemo/Sources/EngineDemo/Scenario.swift</code>.
+  No JavaScript, no external resources. Reminder: this is an inspection view of engine output, not the app's UI.</p>
+</footer>
+</main>
+</body>
+</html>
