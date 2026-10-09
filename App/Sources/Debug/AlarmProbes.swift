@@ -35,6 +35,8 @@
 // AlarmLiveActivity() (needed for the countdown and snooze probes); Time Sensitive needs the entitlement
 // com.apple.developer.usernotifications.time-sensitive = true (paid Developer Program only).
 
+// Compiled only in DEBUG builds (PHASE2_PLAN §0.2): Release archives/TestFlight contain no probe code.
+#if DEBUG
 import AlarmKit
 import Combine
 import SwiftUI
@@ -768,3 +770,4 @@ nonisolated enum AlarmProbeActions {
         value < 10 ? "0\(value)" : "\(value)"
     }
 }
+#endif // DEBUG

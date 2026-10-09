@@ -14,6 +14,8 @@
 // No macros in the default build (CLAUDE.md rule 5): `@State` is a SwiftUI macro in the Xcode 27 SDK, so state
 // lives in an ObservableObject owned via `@StateObject` (property wrappers only).
 
+// Compiled only in DEBUG builds (PHASE2_PLAN §0.2): Release archives/TestFlight contain no probe code.
+#if DEBUG
 import Combine
 import FoundationModels
 import ImageIO
@@ -471,3 +473,4 @@ nonisolated private func rangeText(_ range: ClosedRange<Int>) -> String {
 nonisolated private func confidenceText(_ value: Float?) -> String {
     value.map { String(format: "%.2f", $0) } ?? "n/a"
 }
+#endif // DEBUG

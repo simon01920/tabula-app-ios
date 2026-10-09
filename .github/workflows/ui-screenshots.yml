@@ -1,7 +1,7 @@
 # UI screenshots on the iOS Simulator: the replacement for on-device UI checks while no physical device is
 # available (human decision 2026-10-06). Builds the XcodeGen/CI path for the simulator (no signing, no Apple
 # account), boots the largest available iPhone "Pro Max" simulator, launches each screen via the launch-argument
-# router (`-TabulaScreen <id>`, App/Sources/Routing/AppScreen.swift) and captures light, dark and largest
+# router (`-TabulaScreen <id>`, App/Sources/Routing/RouteRegistry.swift) and captures light, dark and largest
 # accessibility Dynamic Type screenshots. Also a launch smoke test: the job fails if the app is not running
 # after launch (crash on start).
 #
@@ -28,7 +28,7 @@ on:
   workflow_dispatch:
     inputs:
       screens:
-        description: "Space-separated -TabulaScreen ids (see AppScreen.swift)"
+        description: "Space-separated -TabulaScreen ids (see the *Routes.swift providers)"
         type: string
         default: "debug debug-localization debug-macros debug-import debug-alarms"
       device:

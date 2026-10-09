@@ -6,6 +6,8 @@
 // No model inference here (SystemLanguageModel availability is the import-ml agent's probe).
 // APIs (docs checked): Generable(description:) iOS 26, Guide(description:) iOS 26,
 //   Generable.generationSchema iOS 26.
+// Compiled only in DEBUG builds (PHASE2_PLAN §0.2): Release archives/TestFlight contain no probe code.
+#if DEBUG
 #if TABULA_MACRO_PROBES
 import FoundationModels
 
@@ -36,3 +38,4 @@ enum GenerableProbe {
     }
 }
 #endif
+#endif // DEBUG

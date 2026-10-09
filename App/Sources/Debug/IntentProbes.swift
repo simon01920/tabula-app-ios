@@ -10,6 +10,8 @@
 //   IntentResult.result(dialog:), ProvidesDialog, IntentDialog, AppShortcutsProvider.appShortcuts,
 //   AppShortcut.init(intent:phrases:shortTitle:systemImageName:) (iOS 17+, non-deprecated overload),
 //   AppShortcutPhrase with \(.applicationName). `openAppWhenRun` is deprecated in iOS 26: not used.
+// Compiled only in DEBUG builds (PHASE2_PLAN §0.2): Release archives/TestFlight contain no probe code.
+#if DEBUG
 import AppIntents
 import Foundation
 import TimetableCore
@@ -60,3 +62,4 @@ enum IntentProbe {
         }
     }
 }
+#endif // DEBUG

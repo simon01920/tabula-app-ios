@@ -27,6 +27,8 @@
 //   WidgetCenter.reloadAllTimelines() · Bundle.bundleIdentifier/localizations/preferredLocalizations ·
 //   Bundle.localizedString(forKey:value:table:) · String(format:locale:_:) ·
 //   String(localized:table:bundle:locale:comment:) iOS 15 · Date.ISO8601Format(_:) · URL.appending(path:)
+// Compiled only in DEBUG builds (PHASE2_PLAN §0.2): Release archives/TestFlight contain no probe code.
+#if DEBUG
 import Combine
 import Foundation
 import SwiftUI
@@ -364,3 +366,4 @@ struct PlatformProbesSection: View {
         .onAppear { model.refreshReadBacks() }
     }
 }
+#endif // DEBUG

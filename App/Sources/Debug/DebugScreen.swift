@@ -1,40 +1,48 @@
-// Phase 0 debug screen: composes the probe sections owned by different agents.
-// Developer-facing only; strings are verbatim on purpose.
-// NOTE: in Phase 0 this screen IS the app, so it also ships in Release archives/TestFlight builds.
-// Phase 2 task: gate it behind `#if DEBUG` or a hidden toggle (docs/ENVIRONMENT.md §11).
+// Phase 0 probe screen: composes the probe sections owned by different agents.
+// Developer-facing only; strings are verbatim on purpose (DEBUG builds only, not shipped).
 //   PlatformProbesSection  -> Debug/PlatformProbes.swift  (env-ci-engineer)
 //   ImportProbesSection    -> Debug/ImportProbes.swift    (import-ml-engineer)
 //   AlarmProbesSection     -> Debug/AlarmProbes.swift     (notifications-engineer)
 // `-TabulaScreen debug-<area>` shows a single area so CI simulator screenshots can cover every probe
-// (simctl cannot scroll a List); `-TabulaScreen debug` (default) shows everything.
+// (simctl cannot scroll a List); `-TabulaScreen debug` shows everything. Routes: Debug/DebugRoutes.swift.
+// Compiled only in DEBUG builds (PHASE2_PLAN §0.2); reachable from Settings → Developer.
+#if DEBUG
 import SwiftUI
 import TimetableUI
 
+/// Which probe areas a debug route shows.
+enum DebugArea: String, CaseIterable, Sendable {
+    case all = "debug"
+    case platform = "debug-platform"
+    case localization = "debug-localization"
+    case macros = "debug-macros"
+    case importing = "debug-import"
+    case alarms = "debug-alarms"
+}
+
 struct DebugScreen: View {
-    /// How this screen was reached (`-TabulaScreen`); shown first so CI screenshots prove the router works.
-    let launchRoute: ScreenRoute<AppScreen>
+    let area: DebugArea
 
     private var platformParts: Set<PlatformProbePart> {
-        switch launchRoute.screen {
-        case .debug: Set(PlatformProbePart.allCases)
-        case .debugPlatform: [.platform, .appGroup]
-        case .debugLocalization: [.localization]
-        case .debugMacros: [.macros]
-        case .debugImport, .debugAlarms: []
+        switch area {
+        case .all: Set(PlatformProbePart.allCases)
+        case .platform: [.platform, .appGroup]
+        case .localization: [.localization]
+        case .macros: [.macros]
+        case .importing, .alarms: []
         }
     }
 
-    private var showsImport: Bool { [.debug, .debugImport].contains(launchRoute.screen) }
-    private var showsAlarms: Bool { [.debug, .debugAlarms].contains(launchRoute.screen) }
+    private var showsImport: Bool { [.all, .importing].contains(area) }
+    private var showsAlarms: Bool { [.all, .alarms].contains(area) }
 
     var body: some View {
         List {
             Section {
-                ProbeRow(
-                    "Launch route (-TabulaScreen)",
-                    value: launchRoute.summary,
-                    status: launchRoute.isUnknown ? .fail : .info
-                )
+                let resolution = RouteRegistry.resolve(LaunchContext.options.screen).resolution
+                let isUnknown: Bool = { if case .unknown = resolution { return true } else { return false } }()
+                ProbeRow("Launch route (-TabulaScreen)", value: RouteTable.summary(resolution),
+                         status: isUnknown ? .fail : .info)
             } header: {
                 Text(verbatim: "Launch")
             }
@@ -55,3 +63,4 @@ struct DebugScreen: View {
         .environment(\.phase0ProbeToken, PlatformProbeConstants.injectedEntryToken)
     }
 }
+#endif // DEBUG

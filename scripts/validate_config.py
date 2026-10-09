@@ -142,21 +142,33 @@ check("TABULA_MACRO_PROBES" in str(base("TabulaApp").get("SWIFT_ACTIVE_COMPILATI
       "project.yml: CI builds the macro variant (SWIFT_ACTIVE_COMPILATION_CONDITIONS)",
       "project.yml TabulaApp must define TABULA_MACRO_PROBES")
 
-# Macros used anywhere outside `#if TABULA_MACRO_PROBES` in code linked into the apps.
-# `@State` counts: it is a SwiftUI macro in the Xcode 27 SDK (OpenAppleMacros README, "SwiftUI: @State ✅").
+# Macro policy (PHASE2_PLAN §0.1, 2026-10-09). @Observable/@State/@Entry/@Environment are allowed in real app code
+# (App/Sources outside Debug, WidgetExtension, WatchApp): VERIFIED to compile on both paths in Phase 0.
+# Still guarded (macro outside `#if TABULA_MACRO_PROBES` = FAIL):
+#   - App/Sources/Debug/**: the Phase 0 probes keep their base/macro variants (one unsupported macro must not
+#     break the debug screen); new debug UI uses property wrappers (@StateObject/@Published) instead.
+#   - Packages/TimetableCore, Packages/TimetableUI: Linux `swift test` and scripts/watch-typecheck.sh (plain swiftc,
+#     no SwiftUI macro plugins) must keep compiling them.
+# Banned everywhere (SwiftData macros FAILED under xtool, ENVIRONMENT §4): `import SwiftData`, @Model, @Query,
+# @Attribute, @Relationship, @Transient, @ModelActor.
+# `@State` counts as a macro: it is a SwiftUI macro in the Xcode 27 SDK (OpenAppleMacros README).
 MACRO = re.compile(r"^\s*(@(Observable|ObservationTracked|ObservationIgnored|Entry|State|Animatable|AnimatableIgnored|"
                    r"Generable|Guide|SessionPropertyEntry|Model|Query|Attribute|Relationship|Transient|ModelActor|"
                    r"Previewable|AppIntent|AppEntity|AppEnum|AssistantIntent|AssistantEntity|AssistantEnum)\b|#Preview\b)")
-# Files owned by other agents that still use a macro in the base variant. Reported as WARN, not FAIL,
-# until their owner fixes them; remove entries as they get fixed.
-KNOWN: dict[str, str] = {}
-for folder in ("App/Sources", "WidgetExtension/Sources", "WatchApp/Sources", "Packages/TimetableUI/Sources",
-               "Packages/TimetableCore/Sources"):
+SWIFTDATA = re.compile(r"^\s*(import\s+SwiftData\b|@(Model|Query|Attribute|Relationship|Transient|ModelActor)\b)")
+GUARDED = ("App/Sources/Debug", "Packages/TimetableUI/Sources", "Packages/TimetableCore/Sources")
+macro_fails_before = FAILS
+ALL_APP_CODE = ("App/Sources", "WidgetExtension/Sources", "WatchApp/Sources", "Packages/TimetableUI/Sources",
+                "Packages/TimetableCore/Sources")
+for folder in ALL_APP_CODE:
     for f in sorted((ROOT / folder).rglob("*.swift")):
         rel = f.relative_to(ROOT).as_posix()
-        stack, hits = [], []
+        guarded = rel.startswith(GUARDED)
+        stack, hits, swiftdata = [], [], []
         for no, line in enumerate(f.read_text(encoding="utf-8").splitlines(), 1):
             s = line.strip()
+            if SWIFTDATA.match(line):
+                swiftdata.append(f"{no}: {s[:60]}")
             if s.startswith("#if"):
                 stack.append("TABULA_MACRO_PROBES" in s and "!" not in s)
             elif s.startswith("#elseif") or s.startswith("#else"):
@@ -165,13 +177,75 @@ for folder in ("App/Sources", "WidgetExtension/Sources", "WatchApp/Sources", "Pa
             elif s.startswith("#endif"):
                 if stack:
                     stack.pop()
-            elif MACRO.match(line) and not any(stack):
+            elif guarded and MACRO.match(line) and not any(stack):
                 hits.append(f"{no}: {s[:60]}")
-        if hits and rel in KNOWN:
-            warn(f"{rel}: {len(hits)} macro use(s) in the base variant: {KNOWN[rel]} (first: {hits[0]})")
-        elif hits:
-            fail(f"{rel}: macro outside #if TABULA_MACRO_PROBES -> {hits}")
-ok("macro scan finished (App, Widget, Watch, TimetableUI, TimetableCore sources)")
+        if swiftdata:
+            fail(f"{rel}: SwiftData is banned (macros fail under xtool) -> {swiftdata}")
+        if hits:
+            fail(f"{rel}: macro outside #if TABULA_MACRO_PROBES in a guarded folder -> {hits}")
+if FAILS == macro_fails_before:
+    ok("macro policy: no SwiftData anywhere; Debug/, TimetableUI, TimetableCore macro-free outside TABULA_MACRO_PROBES")
+
+# Debug gating (PHASE2_PLAN §0.2): every file in App/Sources/Debug compiles only in DEBUG builds.
+ungated = []
+for f in sorted((ROOT / "App/Sources/Debug").rglob("*.swift")):
+    code = [ln.strip() for ln in f.read_text(encoding="utf-8").splitlines() if ln.strip() and not ln.strip().startswith("//")]
+    if not code or code[0] != "#if DEBUG" or not code[-1].startswith("#endif"):
+        ungated.append(f.relative_to(ROOT).as_posix())
+check(not ungated, "App/Sources/Debug/**: every file is wrapped in #if DEBUG … #endif",
+      f"debug files not wrapped in #if DEBUG … #endif: {ungated}")
+
+# Launch-route ids (App/Sources/Routing/RouteRegistry.swift): unique and well-formed across all feature providers.
+ROUTE_ID = re.compile(r"^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$")
+route_ids = []
+for f in sorted((ROOT / "App/Sources").rglob("*Routes.swift")):
+    code = "\n".join(ln for ln in f.read_text(encoding="utf-8").splitlines() if not ln.strip().startswith("//"))
+    for rid in re.findall(r'AppRoute\(\s*"([^"]*)"', code):
+        route_ids.append((rid, f.relative_to(ROOT).as_posix()))
+debug_screen = (ROOT / "App/Sources/Debug/DebugScreen.swift").read_text(encoding="utf-8")
+area_block = re.search(r"enum DebugArea[^{]*\{(.*?)\n\}", debug_screen, re.S)
+for rid in re.findall(r'case \w+ = "([^"]+)"', area_block.group(1) if area_block else ""):
+    route_ids.append((rid, "App/Sources/Debug/DebugScreen.swift"))
+bad_ids = [r for r in route_ids if not ROUTE_ID.match(r[0])]
+seen, dup_ids = {}, []
+for rid, where in route_ids:
+    if rid in seen:
+        dup_ids.append(f"{rid} ({seen[rid]}, {where})")
+    seen.setdefault(rid, where)
+check(route_ids and not bad_ids and not dup_ids,
+      f"route ids: {len(route_ids)} unique, well-formed ({', '.join(sorted(seen))})",
+      f"route ids: malformed {bad_ids} / duplicates {dup_ids}")
+
+# Strings: every literal catalog key used in UI code exists in the String Catalog, and no hard-coded user-facing
+# literal text (CLAUDE.md "All user-facing strings in String Catalogs"). Debug/ is developer-only (verbatim allowed).
+catalog = json.loads((ROOT / "Resources/Localizable.xcstrings").read_text(encoding="utf-8"))["strings"]
+incomplete = [k for k, v in catalog.items()
+              if not str(v.get("comment", "")).strip() or "en" not in v.get("localizations", {})]
+check(not incomplete, f"String Catalog: all {len(catalog)} keys have an English value and a context comment",
+      f"String Catalog keys without English value or comment: {incomplete}")
+KEY_USE = re.compile(r'(?:(?<![A-Za-z_.])(?:Text|Label|Button|Toggle|Picker|Section|Tab|navigationTitle|LocalizedStringKey|'
+                     r'LocalizedStringResource)\(\s*|String\(localized:\s*|(?:forKey|key):\s*)"((?:[^"\\]|\\.)*)"')
+VERBATIM_LITERAL = re.compile(r'Text\(\s*verbatim:\s*"')
+unknown_keys, verbatim = [], []
+for folder in ("App/Sources", "Packages/TimetableUI/Sources", "WidgetExtension/Sources"):
+    for f in sorted((ROOT / folder).rglob("*.swift")):
+        rel = f.relative_to(ROOT).as_posix()
+        if rel.startswith("App/Sources/Debug/"):
+            continue
+        for no, line in enumerate(f.read_text(encoding="utf-8").splitlines(), 1):
+            if line.strip().startswith("//"):
+                continue
+            for key in KEY_USE.findall(line):
+                if "\\(" in key:
+                    continue   # interpolated keys ("probe.lessons %lld") are checked by Xcode's extraction
+                if key not in catalog:
+                    unknown_keys.append(f"{rel}:{no} \"{key}\"")
+            if rel.startswith("App/Sources/") and VERBATIM_LITERAL.search(line):
+                verbatim.append(f"{rel}:{no}")
+check(not unknown_keys, "UI code: every literal localisation key exists in Resources/Localizable.xcstrings",
+      f"keys missing from the String Catalog (add with scripts/l10n-add.py): {unknown_keys}")
+check(not verbatim, "App code: no Text(verbatim: \"literal\") outside App/Sources/Debug (hard-coded text)",
+      f"hard-coded verbatim text (use a catalog key): {verbatim}")
 
 # --- privacy manifests + export compliance --------------------------------------------------------------------
 VALID_UD_REASONS = {"CA92.1", "1C8F.1", "C56D.1", "AC6B.1"}   # NSPrivacyAccessedAPITypeReasons doc (2026-10-04)

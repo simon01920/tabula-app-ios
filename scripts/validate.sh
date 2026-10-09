@@ -120,7 +120,7 @@ if (cd "$TMP" && swiftc -o plistcheck plistcheck.swift >/dev/null 2>&1) \
    && "$TMP/plistcheck" "$REPO_ROOT"/Config/*.plist "$REPO_ROOT"/Config/*.entitlements "$REPO_ROOT"/Config/Privacy/*/PrivacyInfo.xcprivacy; then :
 else bad "Foundation plist parse"; fi
 
-step "Cross-path consistency, macro isolation, privacy manifests, workflow (scripts/validate_config.py)"
+step "Cross-path consistency, macro policy, debug gating, route ids, string keys, privacy manifests, workflow (scripts/validate_config.py)"
 if [ -s "$TMP/dump-default.json" ] && [ -s "$TMP/dump-macro.json" ]; then
   python3 "$REPO_ROOT/scripts/validate_config.py" "$REPO_ROOT" \
     "$TMP/dump-default.json" "$TMP/dump-macro.json" "$TMP/dump-core.json" "$TMP/dump-ui.json" || FAILS=$((FAILS + 1))
@@ -135,6 +135,7 @@ else
   cat "$TMP/l10n-self.log"; bad "l10n-compile --self-test"
 fi
 if python3 "$REPO_ROOT/scripts/l10n-compile.py" "$REPO_ROOT/Resources/Localizable.xcstrings" "$TMP/l10n"; then ok "l10n-compile Resources/Localizable.xcstrings"; else bad "l10n-compile"; fi
+if python3 -B "$REPO_ROOT/scripts/l10n-add.py" --check; then :; else bad "Localizable.xcstrings not in canonical (Xcode) form: add strings with scripts/l10n-add.py"; fi
 
 step "CI helper self-tests (macOS-job path gate, simulator picker)"
 for helper in ci_paths.py sim_pick.py; do
