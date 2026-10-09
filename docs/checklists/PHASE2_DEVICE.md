@@ -126,3 +126,41 @@ Root sections: Profile, Calendar & time, Appearance, Timetables (only if B3 regi
 | Stress | empty seed (onboarding), normal, AX5 (rows wrap, 44 pt, nothing clipped), dark, German (`-AppleLanguages "(de)"`, English fallback until C1), CJK (`ja`), VoiceOver (palette row reads "Ocean, Pro, Abyss, Navy, ...", selected trait, swatches not read separately) |
 
 Not verifiable without a device: Form/menu Picker look and Liquid Glass; target page of `UIApplication.openSettingsURLString`; searchable pushed list; sheet presentation of `editor.timetables` (the B3 view must bring its own NavigationStack).
+## B1. Onboarding (`App/Sources/Onboarding`, logic in `TimetableUI/Onboarding`)
+Nobody has seen this UI: it compiles (xtool build) and its logic is unit-tested on Linux, nothing more.
+Routes: `onboarding` (welcome), `onboarding.profile|rotation|time|fields|reminders|start` (each pre-filled: secondary profile; rotation = odd/even + term; start = sample).
+
+### B1.1 Flow (fresh install or `-TabulaSeed empty`)
+- [ ] Welcome shows the language card; "Open language settings" opens this app's page in iOS Settings (Language row visible there).
+- [ ] Next is disabled on Profile until a card is chosen; chosen card shows checkmark + outline.
+- [ ] Profile presets: Elementary -> rotation offers only None / Odd-even / Day A-B, fields Room+Teacher+What to bring, 6 lessons; Secondary -> 5 rotation choices, 8 lessons from 08:00, fields Room+Teacher+Notes; University -> "Free times" selected (90 min), term switch already on, "class" wording (Class times, Class length, Before a class); Other -> all fields off, bell schedule 8 x 45.
+- [ ] Changing profile on the way back resets answers to that preset; re-tapping the same profile keeps edits.
+- [ ] Rotation: "Cycle" shows 2-6 stepper + note; "Different per semester" turns the term switch on; term end before start shows the error line (icon + text) and Next is disabled; switching the term off re-enables Next.
+- [ ] Time: preview rows update live (first start, lesson length, count, breaks; long break after row 2). Start 22:00 with 14 lessons shows the "left out after midnight" note; 23:59 shows the error and disables Next.
+- [ ] Fields: toggles match the preset; turn Building on and Room off, finish with sample data: Room is absent, Building shown (field rule).
+- [ ] Reminders: toggles only for the preset's kinds; no permission prompt appears anywhere in onboarding; the three delivery texts match real behaviour (silent switch, Focus, alarms).
+- [ ] Start: "Import from a photo" and "Import with a QR or share code" are dimmed, not selectable, VoiceOver says "Coming soon".
+- [ ] Get started with Blank -> tabs appear with empty states; with Sample -> a filled timetable in the profile's style, dates relative to today (homework due next school day, exam next week).
+- [ ] Kill and relaunch after finishing: no onboarding, data still there.
+
+### B1.2 Existing data is never lost (important)
+- [ ] With data present (`-TabulaSeed secondary`), delete the only timetable so the shell returns to onboarding, finish onboarding: old tasks and exams are still in the app (debug screen counts), the new timetable is active.
+- [ ] `-TabulaScreen onboarding.start` on a seeded DB and "Get started": adds a second timetable, does not replace.
+
+### B1.3 State matrix
+| State | How | Expected |
+|---|---|---|
+| Dynamic Type AX5 | Settings -> Larger Text | every step scrolls; Back/Next keep 44 pt, labels wrap, steppers and date pickers usable |
+| Dark mode | Appearance Dark | cards visible against background; outline of selected row visible; red error text legible |
+| German | `-AppleLanguages "(de)"` | long labels wrap (English fallback / raw keys until C1 is expected) |
+| Slovak plurals | `-AppleLanguages "(sk)"` | cycle value "2 týždne / 5 týždňov" (after C1) |
+| CJK | `-AppleLanguages "(ja)"` | times and dates in Japanese format; no clipping |
+| VoiceOver | on | step title is a header and is announced on step change; progress read "Step X of 7"; choice rows read title, detail, "selected"; preview rows read "Lesson 3, 10:00 to 10:45"; decorative icons silent |
+| Reduce Motion | on | step change is an immediate swap, no fade |
+| 12/24 h | Settings -> 12-hour | preview times and first-start picker follow it |
+| Small phone / landscape | iPhone SE size | content scrolls above the fixed button bar |
+
+### B1.4 Not verifiable without a device
+- Visual quality of every step (spacing, bar material, Liquid Glass on `.borderedProminent`/`.bordered`).
+- `UIApplication.openSettingsURLString` landing on the per-app language page; time-only `DatePicker` with a `\.timeZone` override; compact `DatePicker` popovers at AX sizes.
+- Plural form of the cycle-length value through `String(format:)` + catalog (Darwin path).
