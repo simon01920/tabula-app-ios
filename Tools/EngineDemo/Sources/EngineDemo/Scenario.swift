@@ -1,19 +1,13 @@
 import Foundation
 import TimetableCore
+import TimetableUI
 
-/// A fixed, deterministic sample scenario built and evaluated with the public `TimetableCore` API only:
+/// A fixed, deterministic sample scenario (data: `TimetableUI.SampleScenarios.secondary()`, shared with the app's
+/// `-TabulaSeed secondary`) evaluated with the public `TimetableCore` API only:
 /// a Slovak secondary school (gymnázium) with odd/even (A/B) weeks in Europe/Bratislava, evaluated at a fixed
 /// "now" (Tue 2026-10-13 10:20). Every ID comes from `SequentialIDGenerator`, every timestamp from a
 /// `HybridLogicalClock` fed with fixed instants, so the report is byte-for-byte reproducible.
 struct Scenario {
-    struct SubjectSeed {
-        let short: String
-        let name: String
-        let emoji: String
-        let room: String?
-        let teacher: String
-    }
-
     // Inputs
     let zone: TimeZone
     let context: CalendarContext
@@ -51,154 +45,25 @@ struct Scenario {
     let prettyJSONBytes: Int
     let roundTripEqual: Bool
 
-    static let seeds: [SubjectSeed] = [
-        SubjectSeed(short: "SJL", name: "Slovenský jazyk a literatúra", emoji: "📖", room: "214", teacher: "Mgr. Kováčová"),
-        SubjectSeed(short: "MAT", name: "Matematika", emoji: "➗", room: "214", teacher: "Mgr. Horváth"),
-        SubjectSeed(short: "ANJ", name: "Anglický jazyk", emoji: "🗣️", room: "JAZ-2", teacher: "Mgr. Baláž"),
-        SubjectSeed(short: "FYZ", name: "Fyzika", emoji: "⚛️", room: "Lab FYZ", teacher: "RNDr. Tóth"),
-        SubjectSeed(short: "CHE", name: "Chémia", emoji: "🧪", room: "Lab CHE", teacher: "Ing. Vargová"),
-        SubjectSeed(short: "BIO", name: "Biológia", emoji: "🧬", room: "214", teacher: "Mgr. Lukáčová"),
-        SubjectSeed(short: "DEJ", name: "Dejepis", emoji: "🏛️", room: "214", teacher: "PhDr. Molnár"),
-        SubjectSeed(short: "GEO", name: "Geografia", emoji: "🌍", room: "214", teacher: "Mgr. Szabová"),
-        SubjectSeed(short: "INF", name: "Informatika", emoji: "💻", room: "INF-1", teacher: "Ing. Kollár"),
-        SubjectSeed(short: "TSV", name: "Telesná a športová výchova", emoji: "⚽", room: "Telocvičňa", teacher: "Mgr. Hudák"),
-        SubjectSeed(short: "NEJ", name: "Nemecký jazyk", emoji: "💬", room: "JAZ-1", teacher: "Mgr. Németh"),
-        SubjectSeed(short: "ETV", name: "Etická výchova", emoji: "🤝", room: "214", teacher: "Mgr. Králová"),
-    ]
-
     // swiftlint:disable:next function_body_length
     static func build() throws -> Scenario {
-        guard let zone = TimeZone(identifier: "Europe/Bratislava") else { throw DemoError.noTimeZone }
-        func d(_ y: Int, _ m: Int, _ day: Int) -> LocalDate { LocalDate(year: y, month: m, day: day)! }
-        func t(_ h: Int, _ m: Int = 0) -> LocalTime { LocalTime(hour: h, minute: m)! }
-
-        // Only used to turn the fixed wall-clock instants of the scenario into `Date`s; the engine itself gets the
-        // settings-derived context below (asserted equal).
-        let bootstrap = CalendarContext(timeZone: zone, firstWeekday: .monday)
-        let onboardingInstant = bootstrap.date(d(2026, 9, 1), t(18))
-        let editInstant = bootstrap.date(d(2026, 10, 12), t(7, 30))
-        let today = d(2026, 10, 13)
-        let now = bootstrap.date(today, t(10, 20))
-        let overrideDate = d(2026, 10, 15)
-
-        var ids = SequentialIDGenerator(namespace: 0x7AB0_DE30)
-        var clock = HybridLogicalClock(node: 0xDE30)
-
-        // 1. Onboarding ---------------------------------------------------------------------------------------
-        let rotation = RotationScheme.weekCycle(WeekCycle(
-            length: 2,
-            anchor: .isoWeekParity(policy: WeekParity.defaultPolicy(for: .secondary, regionCode: "SK"), offset: 0),
-            labels: ["A", "B"]))
-        let answers = OnboardingAnswers(
-            profile: .secondary, timetableName: "Gymnázium – 2.B", timetableEmoji: "🏫",
-            bellScheduleName: "Bežný deň", rotation: rotation,
-            term: .init(name: "1. polrok 2026/27", range: LocalDateRange(start: d(2026, 9, 2), end: d(2027, 1, 31))),
-            enabledReminderTargets: [.homework, .exam, .packTonight],
-            localeFirstWeekday: .monday, hourCycle: .h24, timeZoneMode: .followDevice, palettePackID: .classic)
-        let onboarded = OnboardingBuilder.makeInitialDatabase(answers: answers, ids: &ids, clock: &clock,
-                                                              now: onboardingInstant)
-        var db = onboarded
-        let context = CalendarContext(settings: db.settings, deviceTimeZone: zone, localeFirstWeekday: .monday)
-        precondition(context == bootstrap, "settings-derived context differs from the bootstrap context")
-
-        let timetable = db.timetables[0]
-        let regularBell = db.bellSchedules[0]
-        let periods = regularBell.lessonPeriods
-
-        // Subjects: colours from the Classic palette pack, in order.
-        let palette = PalettePack.classic
-        var subjects: [String: Subject] = [:]
-        for (index, seed) in seeds.enumerated() {
-            let colour = palette.colors[index % palette.colors.count]
-            let subject = Subject(
-                id: ids.next(), meta: .created(at: clock.tick(now: onboardingInstant)), timetableID: timetable.id,
-                name: seed.name, shortName: seed.short, color: colour.value, colorName: .key(colour.nameKey),
-                symbol: .emoji(seed.emoji), defaultRoom: seed.room, defaultTeacher: seed.teacher)
-            subjects[seed.short] = subject
-            db.subjects.append(subject)
-        }
-
-        // Lessons (a realistic gymnázium week; a few only in week A = cycle week 1 or week B = 2).
-        var keyed: [String: Lesson] = [:]
-        func lesson(_ weekday: Weekday, _ period: Int, _ short: String, span: Int = 1, weeks: Set<Int>? = nil,
-                    room: String? = nil, bring: [String] = [], notes: String? = nil) {
-            let value = Lesson(
-                id: ids.next(), meta: .created(at: clock.tick(now: onboardingInstant)), timetableID: timetable.id,
-                subjectID: subjects[short]!.id, occurrence: LessonOccurrenceRule(day: .weekday(weekday), cycleWeeks: weeks),
-                slot: .period(periods[period - 1].id, span: span), room: room, notes: notes, bringList: bring)
-            db.lessons.append(value)
-            keyed["\(weekday.rawValue)-\(period)-\(short)"] = value
-        }
-        let sportsKit = ["športový úbor", "prezuvky do telocvične"]
-        // Monday
-        lesson(.monday, 1, "SJL"); lesson(.monday, 2, "MAT"); lesson(.monday, 3, "ANJ"); lesson(.monday, 4, "FYZ")
-        lesson(.monday, 5, "DEJ"); lesson(.monday, 6, "TSV", bring: sportsKit)
-        // Tuesday
-        lesson(.tuesday, 1, "MAT"); lesson(.tuesday, 2, "CHE"); lesson(.tuesday, 3, "SJL"); lesson(.tuesday, 4, "BIO")
-        lesson(.tuesday, 5, "NEJ"); lesson(.tuesday, 6, "GEO")
-        lesson(.tuesday, 7, "INF", weeks: [1], notes: "Len v týždni A")
-        lesson(.tuesday, 7, "ETV", weeks: [2], notes: "Len v týždni B")
-        // Wednesday (double Informatika)
-        lesson(.wednesday, 1, "ANJ"); lesson(.wednesday, 2, "SJL"); lesson(.wednesday, 3, "MAT")
-        lesson(.wednesday, 4, "INF", span: 2, notes: "Projekt: webová stránka triedy"); lesson(.wednesday, 6, "DEJ")
-        // Thursday
-        lesson(.thursday, 1, "FYZ"); lesson(.thursday, 2, "MAT")
-        lesson(.thursday, 3, "CHE", bring: ["laboratórny plášť", "ochranné okuliare"])
-        lesson(.thursday, 4, "ANJ"); lesson(.thursday, 5, "SJL"); lesson(.thursday, 6, "TSV", bring: sportsKit)
-        // Friday (labs alternate by week)
-        lesson(.friday, 1, "BIO"); lesson(.friday, 2, "GEO"); lesson(.friday, 3, "NEJ"); lesson(.friday, 4, "MAT")
-        lesson(.friday, 5, "BIO", weeks: [1], room: "Lab BIO", bring: ["zošit na laboratórne práce"])
-        lesson(.friday, 5, "FYZ", weeks: [2], notes: "Laboratórne cvičenie")
-        lesson(.friday, 6, "ETV", weeks: [1])
-
-        // Autumn holidays (outside the shown weeks; counted in the entity totals and the share payload).
-        db.breaks.append(CalendarBreak(id: ids.next(), meta: .created(at: clock.tick(now: onboardingInstant)),
-                                       timetableID: nil, name: "Jesenné prázdniny",
-                                       range: LocalDateRange(start: d(2026, 10, 29), end: d(2026, 10, 30)),
-                                       kind: .holiday))
-
-        // 4. Overrides ------------------------------------------------------------------------------------------
-        // Short-day schedule: a copy of the regular schedule *with the same period IDs* (BellSchedule docs) and
-        // 30-minute lessons.
-        let shortTimes = BellScheduleTemplate(firstStart: t(8), lessonMinutes: 30, breakMinutes: [5, 10, 5],
-                                              count: periods.count).lessonTimes()
-        let shortPeriods = zip(periods, shortTimes).map { period, time in
-            Period(id: period.id, label: period.label, start: time.start, end: time.end, kind: .lesson)
-        }
-        let shortBell = BellSchedule(id: ids.next(), meta: .created(at: clock.tick(now: editInstant)),
-                                     timetableID: timetable.id, name: "Skrátené vyučovanie", periods: shortPeriods)
-        db.bellSchedules.append(shortBell)
-        func override(_ change: OverrideChange) {
-            db.overrides.append(ScheduleOverride(id: ids.next(), meta: .created(at: clock.tick(now: editInstant)),
-                                                 timetableID: timetable.id, date: overrideDate, change: change))
-        }
-        override(.useBellSchedule(shortBell.id))
-        override(.cancelLesson(keyed["4-4-ANJ"]!.id))
-        override(.modifyLesson(keyed["4-2-MAT"]!.id, LessonPatch(room: "Aula", teacher: "Mgr. Novák (suplovanie)")))
-        override(.addLesson(OneOffLesson(subjectID: subjects["INF"]!.id, slot: .period(periods[6].id, span: 1),
-                                         notes: "Konzultácia k projektu")))
-
-        // 6. Tasks, exams ---------------------------------------------------------------------------------------
-        func meta() -> EntityMeta { .created(at: clock.tick(now: editInstant)) }
-        db.tasks.append(TaskItem(id: ids.next(), meta: meta(), title: "Slovná zásoba – Unit 4", kind: .homework,
-                                 subjectID: subjects["ANJ"]!.id, timetableID: timetable.id, due: .date(d(2026, 10, 14))))
-        db.tasks.append(TaskItem(id: ids.next(), meta: meta(), title: "Pracovný list – kvadratické rovnice",
-                                 kind: .homework, subjectID: subjects["MAT"]!.id, timetableID: timetable.id,
-                                 due: .date(d(2026, 10, 15))))
-        db.tasks.append(TaskItem(
-            id: ids.next(), meta: meta(), title: "Slohová práca: úvaha", kind: .homework,
-            subjectID: subjects["SJL"]!.id, timetableID: timetable.id, due: .dateTime(d(2026, 10, 19), t(8)),
-            reminderOverride: ReminderOverride(offsets: [.daysBefore(1, at: t(17)), .minutesBefore(30)],
-                                               tier: .timeSensitive)))
-        db.tasks.append(TaskItem(id: ids.next(), meta: meta(), title: "Referát – Veľká Morava", kind: .homework,
-                                 subjectID: subjects["DEJ"]!.id, timetableID: timetable.id, due: .date(d(2026, 10, 16)),
-                                 completedAt: editInstant))
-        db.exams.append(Exam(id: ids.next(), meta: meta(), timetableID: timetable.id, subjectID: subjects["CHE"]!.id,
-                             title: "Písomka – organická chémia", kind: .test, date: d(2026, 10, 22),
-                             start: t(10), end: t(10, 45), room: "Lab CHE", topics: ["alkány", "alkény"]))
-        db.exams.append(Exam(id: ids.next(), meta: meta(), timetableID: timetable.id, subjectID: subjects["BIO"]!.id,
-                             title: "Test – stavba bunky", kind: .test, date: d(2026, 10, 27), start: t(8),
-                             reminderOverride: ReminderOverride(tier: .alarm)))
+        guard TimeZone(identifier: SampleScenarios.timeZoneIdentifier) != nil else { throw DemoError.noTimeZone }
+        // The data (onboarding, subjects, lessons, overrides, tasks, exams) is the shared secondary scenario
+        // (Packages/TimetableUI/Sources/TimetableUI/Samples/SecondaryScenario.swift), so the app's
+        // `-TabulaSeed secondary` screenshots show exactly what this report shows.
+        let sample = SampleScenarios.secondary()
+        let zone = SampleScenarios.timeZone
+        let context = sample.context
+        let today = SampleScenarios.today
+        let now = SampleScenarios.referenceNow
+        let onboardingInstant = sample.onboardingInstant
+        let overrideDate = sample.overrideDate
+        let db = sample.database
+        let onboarded = sample.onboardedDatabase
+        let answers = sample.answers
+        let timetable = sample.timetable
+        let regularBell = sample.regularBell
+        let shortBell = sample.shortBell
 
         // 2./3./5. Schedule engine ------------------------------------------------------------------------------
         guard let resolver = ScheduleResolver(database: db, timetableID: timetable.id, context: context) else {
