@@ -8,7 +8,7 @@
 
 /// Read-only view over the process arguments.
 public struct LaunchArguments: Sendable, Equatable {
-    /// `-TabulaScreen <screen id>` selects the first screen (see the app's `AppScreen`).
+    /// `-TabulaScreen <route id>` selects the first screen (see App/Sources/Routing/RouteRegistry.swift).
     public static let screenKey = "TabulaScreen"
 
     public let arguments: [String]
@@ -41,6 +41,8 @@ public struct LaunchArguments: Sendable, Equatable {
 
 /// Outcome of resolving `-TabulaScreen`: which screen to show and what was asked for, so a typo is visible
 /// on screen (and therefore in CI screenshots) instead of silently showing the default.
+/// Phase 0 enum-based router; the app uses `RouteTable` + the route registry since Phase 2 Stage A. Kept for
+/// enum-keyed callers (the watch app or widgets may use it); delete when nothing references it.
 public struct ScreenRoute<Screen: RawRepresentable & Sendable & Equatable>: Sendable, Equatable
 where Screen.RawValue == String {
     public let screen: Screen

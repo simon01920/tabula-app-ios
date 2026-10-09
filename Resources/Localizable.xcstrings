@@ -1,6 +1,162 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "a11y.lesson.added" : {
+      "comment" : "VoiceOver phrase at the end of a lesson description: one-off lesson added for this day.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "extra lesson"
+          }
+        }
+      }
+    },
+    "a11y.lesson.bring" : {
+      "comment" : "Phrase for things to bring to the lesson (VoiceOver and lesson rows). Arg 1 = a formatted list, e.g. 'sports kit and water'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bring %@"
+          }
+        }
+      }
+    },
+    "a11y.lesson.building" : {
+      "comment" : "VoiceOver phrase: the lesson's building or faculty. Arg 1 = user text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "building %@"
+          }
+        }
+      }
+    },
+    "a11y.lesson.cancelled" : {
+      "comment" : "VoiceOver phrase at the end of a lesson description: the lesson does not take place.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cancelled"
+          }
+        }
+      }
+    },
+    "a11y.lesson.modified" : {
+      "comment" : "VoiceOver phrase at the end of a lesson description: the lesson differs from the regular timetable today.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "changed"
+          }
+        }
+      }
+    },
+    "a11y.lesson.modifiedReasons" : {
+      "comment" : "VoiceOver phrase: what changed for this lesson today. Arg 1 = a formatted list of changes, e.g. 'Room changed and Teacher changed'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "changed: %@"
+          }
+        }
+      }
+    },
+    "a11y.lesson.notes" : {
+      "comment" : "VoiceOver phrase: the lesson's note. Arg 1 = note text entered by the user.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "note: %@"
+          }
+        }
+      }
+    },
+    "a11y.lesson.period" : {
+      "comment" : "VoiceOver phrase in a lesson description: the lesson's period number, e.g. 'period 2' (Slovak: '2. hodina'). Arg 1 = number. Lowercase unless the language capitalises mid-sentence.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "period %lld"
+          }
+        }
+      }
+    },
+    "a11y.lesson.periodLabel" : {
+      "comment" : "VoiceOver phrase: the lesson's period with a custom label from the bell schedule. Arg 1 = label text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "period %@"
+          }
+        }
+      }
+    },
+    "a11y.lesson.room" : {
+      "comment" : "Phrase for the lesson's room (VoiceOver and lesson rows). Arg 1 = room name/number entered by the user.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "room %@"
+          }
+        }
+      }
+    },
+    "a11y.lesson.teacher" : {
+      "comment" : "VoiceOver phrase: the lesson's teacher. Arg 1 = teacher name entered by the user.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "teacher %@"
+          }
+        }
+      }
+    },
+    "a11y.lesson.time" : {
+      "comment" : "VoiceOver phrase: lesson time range. Arg 1 = start time, arg 2 = end time (already formatted, e.g. '8:55', '9:40').",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ to %2$@"
+          }
+        }
+      }
+    },
+    "a11y.separator" : {
+      "comment" : "VoiceOver: separator between the phrases describing one lesson (subject, period, time, room…). Use the language's list separator, e.g. '、' in Japanese. Keep the trailing space where the language uses one.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ", "
+          }
+        }
+      }
+    },
     "conflict.invalidTimeRange" : {
       "comment" : "Schedule conflict. Arg 1 = number of affected lessons.",
       "extractionState" : "manual",
@@ -201,6 +357,150 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Timetable"
+          }
+        }
+      }
+    },
+    "lesson.status.added" : {
+      "comment" : "Status badge on a one-off lesson added for this day only. Short (badge).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extra lesson"
+          }
+        }
+      }
+    },
+    "lesson.status.cancelled" : {
+      "comment" : "Status badge on a lesson that does not take place on this day. Short (badge).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelled"
+          }
+        }
+      }
+    },
+    "lesson.status.modified" : {
+      "comment" : "Status badge on a lesson that differs from the regular timetable today in several ways (room, teacher, time…). Short (badge).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changed"
+          }
+        }
+      }
+    },
+    "lessonType.lab" : {
+      "comment" : "Lesson type (university): laboratory session.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lab"
+          }
+        }
+      }
+    },
+    "lessonType.lecture" : {
+      "comment" : "Lesson type (university): lecture. Shown on lesson tiles and read by VoiceOver.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lecture"
+          }
+        }
+      }
+    },
+    "lessonType.seminar" : {
+      "comment" : "Lesson type (university): seminar / exercise class.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seminar"
+          }
+        }
+      }
+    },
+    "lessonType.tutorial" : {
+      "comment" : "Lesson type (university): tutorial / consultation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tutorial"
+          }
+        }
+      }
+    },
+    "onboarding.default.bellScheduleName" : {
+      "comment" : "Default name of the first bell schedule (list of periods with times) created at onboarding. Saved as data.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bell schedule"
+          }
+        }
+      }
+    },
+    "onboarding.default.timetableName" : {
+      "comment" : "Default name of the first timetable created at onboarding (the user can rename it). Saved as data.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "School"
+          }
+        }
+      }
+    },
+    "onboarding.placeholder.message" : {
+      "comment" : "First-launch welcome text under 'Welcome to Tabula'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your timetable, homework and exams in one place."
+          }
+        }
+      }
+    },
+    "onboarding.placeholder.start" : {
+      "comment" : "First-launch button that creates the first timetable (title case per Apple HIG).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Started"
+          }
+        }
+      }
+    },
+    "onboarding.placeholder.title" : {
+      "comment" : "First-launch welcome title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welcome to Tabula"
           }
         }
       }
@@ -2125,6 +2425,66 @@
         }
       }
     },
+    "settings.appearance.dark" : {
+      "comment" : "Appearance option: always dark.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dark"
+          }
+        }
+      }
+    },
+    "settings.appearance.light" : {
+      "comment" : "Appearance option: always light.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Light"
+          }
+        }
+      }
+    },
+    "settings.appearance.system" : {
+      "comment" : "Appearance option: follow the iPhone's light/dark setting.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System"
+          }
+        }
+      }
+    },
+    "settings.appearance.title" : {
+      "comment" : "Settings section and picker title: light/dark mode.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appearance"
+          }
+        }
+      }
+    },
+    "settings.developer" : {
+      "comment" : "Settings row (only in development builds) opening diagnostic tools. Not shown in the App Store version.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Developer"
+          }
+        }
+      }
+    },
     "share.error.damaged" : {
       "comment" : "Share import error. No arguments.",
       "extractionState" : "manual",
@@ -2617,6 +2977,258 @@
         }
       }
     },
+    "shell.loading" : {
+      "comment" : "Shown for a moment at launch while the timetable data is read from storage.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading…"
+          }
+        }
+      }
+    },
+    "shell.tab.settings" : {
+      "comment" : "Tab bar item and screen title: app settings. Short.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        }
+      }
+    },
+    "shell.tab.timetable" : {
+      "comment" : "Tab bar item: the timetable views (grid, week, day). Short.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timetable"
+          }
+        }
+      }
+    },
+    "shell.tab.today" : {
+      "comment" : "Tab bar item: today's lessons (Now & Next). Short.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today"
+          }
+        }
+      }
+    },
+    "store.banner.changeRejected.message" : {
+      "comment" : "Banner text under 'Change not applied'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "That change would have left your timetable in an inconsistent state, so nothing was changed."
+          }
+        }
+      }
+    },
+    "store.banner.changeRejected.title" : {
+      "comment" : "Banner title: a change was refused because it would have made the timetable data inconsistent.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change not applied"
+          }
+        }
+      }
+    },
+    "store.banner.discardedWrite.message" : {
+      "comment" : "Banner text under 'Last change not saved'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabula was closed while saving. Your data is safe, but the very last change may be missing."
+          }
+        }
+      }
+    },
+    "store.banner.discardedWrite.title" : {
+      "comment" : "Banner title at launch: the app was closed while saving and that last save was discarded.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last change not saved"
+          }
+        }
+      }
+    },
+    "store.banner.dismiss" : {
+      "comment" : "VoiceOver label of the close (x) button on a notice banner at the top of the app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dismiss"
+          }
+        }
+      }
+    },
+    "store.banner.readOnly.message" : {
+      "comment" : "Banner text under 'Update Tabula to make changes'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This data was saved by a newer version of Tabula. You can view it, but changes are turned off until you update the app."
+          }
+        }
+      }
+    },
+    "store.banner.readOnly.title" : {
+      "comment" : "Banner title: the data was saved by a newer version of the app; it can be viewed but not edited.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update Tabula to make changes"
+          }
+        }
+      }
+    },
+    "store.banner.restored.message" : {
+      "comment" : "Banner text under 'Data restored from a backup'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your timetable was damaged, so the last good copy was loaded. Changes made just before may be missing."
+          }
+        }
+      }
+    },
+    "store.banner.restored.title" : {
+      "comment" : "Banner title at launch: the saved data was damaged or missing and the last good backup was loaded.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data restored from a backup"
+          }
+        }
+      }
+    },
+    "store.banner.saveFailed.message" : {
+      "comment" : "Banner text under 'Couldn't save'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your changes are kept while Tabula is open and saving is retried with your next change. Check that your iPhone has free storage."
+          }
+        }
+      }
+    },
+    "store.banner.saveFailed.title" : {
+      "comment" : "Banner title: writing the data to storage failed (e.g. device full).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't save"
+          }
+        }
+      }
+    },
+    "store.problem.newerVersion.message" : {
+      "comment" : "Text under 'Update Tabula' (full-screen error).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your data was saved by a newer version of Tabula. Update the app from the App Store to open it."
+          }
+        }
+      }
+    },
+    "store.problem.newerVersion.title" : {
+      "comment" : "Full-screen error at launch: the data was saved by a newer app version that this version cannot read.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update Tabula"
+          }
+        }
+      }
+    },
+    "store.problem.other.message" : {
+      "comment" : "Text under 'Your data can't be loaded'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something went wrong while reading your timetable. Nothing was deleted. Try restarting Tabula."
+          }
+        }
+      }
+    },
+    "store.problem.other.title" : {
+      "comment" : "Full-screen error at launch for any other storage failure (e.g. permissions).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your data can't be loaded"
+          }
+        }
+      }
+    },
+    "store.problem.unrecoverable.message" : {
+      "comment" : "Text under 'Your data can't be opened'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabula couldn't read your timetable or its backup. Nothing was deleted. Restoring from iCloud or a backup file will be possible in a later version."
+          }
+        }
+      }
+    },
+    "store.problem.unrecoverable.title" : {
+      "comment" : "Full-screen error at launch: neither the data file nor its backup can be read. Nothing was deleted.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your data can't be opened"
+          }
+        }
+      }
+    },
     "terminology.classLecture" : {
       "comment" : "Profile terminology: university profile (\"class/lecture\"); choose the natural word per language.",
       "extractionState" : "manual",
@@ -2637,6 +3249,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lesson"
+          }
+        }
+      }
+    },
+    "timetable.placeholder.title" : {
+      "comment" : "Temporary placeholder on the Timetable tab during development; the timetable's name is shown below it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timetable views are on the way"
+          }
+        }
+      }
+    },
+    "today.placeholder.empty.title" : {
+      "comment" : "Today screen when the selected timetable has no lessons on this date. The date is shown below it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No lessons today"
+          }
+        }
+      }
+    },
+    "today.placeholder.noTimetable.title" : {
+      "comment" : "Today screen when no timetable exists.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No timetable yet"
           }
         }
       }
