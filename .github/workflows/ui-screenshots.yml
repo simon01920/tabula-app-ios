@@ -28,9 +28,9 @@ on:
   workflow_dispatch:
     inputs:
       screens:
-        description: "Space-separated -TabulaScreen ids (see the *Routes.swift providers)"
+        description: "Space-separated entries id[@seed[@lang]] — id = -TabulaScreen route, seed = -TabulaSeed (empty|blank|elementary|secondary|university), lang = -AppleLanguages code (e.g. sk, de)"
         type: string
-        default: "debug debug-localization debug-macros debug-import debug-alarms"
+        default: "today@secondary timetable@secondary settings@secondary onboarding@empty today@secondary@sk debug"
       device:
         description: "Simulator device type name, e.g. 'iPhone 17 Pro Max' (empty = largest available Pro Max)"
         type: string
@@ -51,7 +51,7 @@ env:
   XCODE_APP: /Applications/Xcode_27.app
   XCODEGEN_VERSION: "2.46.0"
   XCODEGEN_SHA256: 4d9e34b62172d645eed6457cac13fc222569974098ef4ee9c3368bedf0196806
-  SCREENS: ${{ inputs.screens || 'debug debug-localization debug-macros debug-import debug-alarms' }}
+  SCREENS: ${{ inputs.screens || 'today@secondary timetable@secondary settings@secondary onboarding@empty today@secondary@sk debug' }}
   DEVICE_OVERRIDE: ${{ inputs.device || '' }}
   OUT: screenshots
 
@@ -125,19 +125,24 @@ jobs:
           xcrun simctl install "$SIM_UDID" "$APP"
 
           shoot() { # shoot <screen> <variant>
-            local screen="$1" variant="$2" pid
+            local entry="$1" variant="$2" pid screen seed lang
+            IFS='@' read -r screen seed lang <<< "$entry"
+            local args=(-TabulaScreen "$screen")
+            [ -n "$seed" ] && args+=(-TabulaSeed "$seed")
+            [ -n "$lang" ] && args+=(-AppleLanguages "($lang)" -AppleLocale "$lang")
+            local name="${entry//@/_}"
             xcrun simctl terminate "$SIM_UDID" "$BUNDLE_ID" >/dev/null 2>&1 || true
-            pid="$(xcrun simctl launch "$SIM_UDID" "$BUNDLE_ID" -TabulaScreen "$screen" | awk -F': ' '{print $2}')"
+            pid="$(xcrun simctl launch "$SIM_UDID" "$BUNDLE_ID" "${args[@]}" | awk -F': ' '{print $2}')"
             sleep 8
             # Simulator apps are host processes: if it is gone, the app crashed on launch.
             if ! kill -0 "$pid" 2>/dev/null; then
-              echo "::error::$BUNDLE_ID ($screen, $variant) is not running 8 s after launch: crash on start?"
+              echo "::error::$BUNDLE_ID ($entry, $variant) is not running 8 s after launch: crash on start?"
               xcrun simctl spawn "$SIM_UDID" log show --last 2m --style compact \
-                --predicate "process == \"TabulaApp\"" > "logs/crash-$screen-$variant.log" 2>&1 || true
+                --predicate "process == \"TabulaApp\"" > "logs/crash-$name-$variant.log" 2>&1 || true
               return 1
             fi
-            xcrun simctl io "$SIM_UDID" screenshot --type=png "$OUT/$screen-$variant.png"
-            echo "captured $OUT/$screen-$variant.png"
+            xcrun simctl io "$SIM_UDID" screenshot --type=png "$OUT/$name-$variant.png"
+            echo "captured $OUT/$name-$variant.png"
           }
 
           failed=0
