@@ -21,7 +21,7 @@ through the CI iOS Simulator job (§19). Log files of the runs quoted here: `/ro
 | Simulator build | VERIFIED (local build) / CI pipeline UNRUN | `xtool dev build --triple arm64-apple-ios-simulator` works (Mach-O platform 7); no simulator exists on Windows. UI checks run on the CI iOS Simulator (`ui-screenshots.yml`, §19) |
 | XcodeGen spec | VERIFIED | locally `xcodegen generate`; in CI run 37449454629 `xcodebuild` **Build Succeeded** (Xcode 27.0 27A266a): app + widget + watch (`watch archs: arm64 arm64_32`), all bundle checks `ok` |
 | Both build paths use the same sources | VERIFIED (compiled on both) | xtool on WSL + XcodeGen in CI; `scripts/validate.sh` → `ALL CHECKS PASSED` (123 OK) incl. identity single-source + paid-switch checks |
-| Macro isolation (CLAUDE.md rule 5) | VERIFIED (compiled) | base variant: 0 macro symbols (`ObservationTickProbe`/`Phase0GenerableSlot` absent); macro variant: present. `ImportProbes.swift` no longer uses `@State` (no WARN) |
+| Macro policy (PHASE2_PLAN §0.1, since 2026-10-09) | VERIFIED (compiled, both variants + xtool Release) | `@Observable`/`@State`/`@Entry`/`@Environment` allowed in app code (AppModel is `@Observable`); guard narrowed to `App/Sources/Debug/**` + TimetableUI/TimetableCore; SwiftData banned everywhere (§4). Phase 0 history: | base variant: 0 macro symbols (`ObservationTickProbe`/`Phase0GenerableSlot` absent); macro variant: present. `ImportProbes.swift` no longer uses `@State` (no WARN) |
 | Macros under xtool | **VERIFIED (compile)**: `@Observable`, `@Entry`, `@State`, `@Generable`/`@Guide` · **FAILED**: SwiftData | `--macro-probes` build 0 errors/0 warnings; binary has 64 `ObservationTickProbe` + 118 `Phase0GenerableSlot` symbols. SwiftData probe: `plugin for module 'SwiftDataMacros' not found`. Runtime behaviour = device/simulator check |
 | App Intents under xtool | VERIFIED (compiles) / metadata absent (VERIFIED) | links; the xtool bundle has **no** `Metadata.appintents` → Shortcuts listing expected only on the Xcode/TestFlight path |
 | String Catalogs under xtool | **FAILED (executed, iOS cross-build)** / mitigated | `.xcstrings` as SwiftPM resource = hard build error (`xtool/.xtool-tmp/xcstringstool … is not an executable file`); `scripts/l10n-compile.py` `.lproj` tables are in the bundle (app + widget, en + sk); validate.sh forbids `.xcstrings` SwiftPM resources |
@@ -120,12 +120,19 @@ Differences by design: watch app (`WatchApp/Sources`, CI only; local type-check 
 
 | `@State` | VERIFIED (macro in the Xcode 27 SDK; compiles via OAM) | In the Xcode 27 SDK `@State` is a SwiftUI **macro** (OAM README; xtool PR #101). Compiles under xtool in the macro variant. `@StateObject`, `@Published`, `@Environment` are not macros | base variant uses `@StateObject`/`@Published`; `ImportProbes.swift` no longer uses `@State` (validate.sh: no WARN) |
 
-**Macro isolation (qa-reviewer item 3).** The default (BASE) build contains no Swift macros in env-ci files, so one unsupported macro cannot block every device check. All macro probes (`@Observable`, `@Entry`, `@State`, `@Generable`/`@Guide`) sit behind `#if TABULA_MACRO_PROBES` with non-macro fallbacks (ObservableObject/@Published, plain `EnvironmentKey`, Generable row "not built").
-- xtool path: `Package.swift` reads `Context.environment["TABULA_MACRO_PROBES"]`; `scripts/xtool-dev.sh --macro-probes` sets it and builds in a separate work dir (`…/work-macro`).
-- VERIFIED on Linux: `swift package dump-package` → TabulaApp settings `[]` without the variable, `[{"kind": {"define": {"_0": "TABULA_MACRO_PROBES"}}, "tool": "swift"}]` with `TABULA_MACRO_PROBES=1`, and `[]` again after unsetting (SwiftPM's manifest cache honours the environment; same scratch path).
-- XcodeGen/CI path: `SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) TABULA_MACRO_PROBES"` on TabulaApp (Xcode ships Apple's own macro plugins) — VERIFIED in the generated pbxproj.
-- `validate.sh` scans App/Widget/Watch/TimetableUI/TimetableCore sources for macro attributes outside the guard (FAIL). Negative test with an injected unguarded `@Observable` and an `@Entry` in the `#else` branch → `FAIL … ['40: @Observable', '45: @Entry var leak2 = 1']`. The former `ImportProbes.swift` exception is gone (no WARN).
-- Compiled proof (2026-10-06): base-variant binary has 0 `ObservationTickProbe` / 0 `Phase0GenerableSlot` symbols, macro variant 64 / 118.
+**Macro policy since Phase 2 (PHASE2_PLAN §0.1, Stage A 2026-10-09).** `@Observable`, `@State`, `@Entry` and `@Environment` are allowed in real app code (`App/Sources` outside `Debug/`, `WidgetExtension`, `WatchApp`); in the Xcode 27 SDK a macro-free SwiftUI app is impossible anyway (`@State` is a macro). `validate.sh` (`scripts/validate_config.py`) now enforces:
+
+| Rule | Scope | Why |
+|---|---|---|
+| Macro outside `#if TABULA_MACRO_PROBES` = FAIL | `App/Sources/Debug/**` | the Phase 0 probes keep their base/macro variants; new debug UI uses `@StateObject`/`@Published` |
+| Macro outside `#if TABULA_MACRO_PROBES` = FAIL | `Packages/TimetableUI/Sources`, `Packages/TimetableCore/Sources` | Linux `swift test` and `scripts/watch-typecheck.sh` (plain `swiftc`, no SwiftUI macro plugins) must keep compiling them |
+| `import SwiftData`, `@Model`, `@Query`, `@Attribute`, `@Relationship`, `@Transient`, `@ModelActor` = FAIL | App, Widget, Watch, TimetableUI, TimetableCore | SwiftData macros FAILED under xtool (table above) |
+| Every file in `App/Sources/Debug/**` is wrapped in `#if DEBUG … #endif` | Debug | PHASE2_PLAN §0.2 (debug code never ships) |
+
+- VERIFIED 2026-10-09: base variant `bash scripts/xtool-dev.sh build` (AppModel `@Observable` + `@State` in the shell, without `TABULA_MACRO_PROBES`) → `Build complete!`, 0 errors / 0 compiler warnings; `--macro-probes` → `Build complete!`; `xtool dev build -c release` → `Build complete!`, `DeveloperScreen` symbols 0 (Debug folder compiled out) vs 176 in the Debug build.
+- Negative tests (throwaway copy, 2026-10-09), each produced the intended FAIL: `@State` in `Debug/DebugRoutes.swift`; `import SwiftData` in `Today/TodayRoutes.swift`; `@Observable` in TimetableUI; an unwrapped file in `Debug/`. (Limitation kept from Phase 0: only attributes at the start of a line are detected.)
+- The `TABULA_MACRO_PROBES` define itself is unchanged: `Package.swift` reads `Context.environment["TABULA_MACRO_PROBES"]`, `scripts/xtool-dev.sh --macro-probes` sets it (work dir `…/work-macro`); the XcodeGen/CI path always defines it.
+- Phase 0 history: the base variant used to contain no macros at all (0 `ObservationTickProbe` / 0 `Phase0GenerableSlot` symbols vs 64 / 118 in the macro variant, 2026-10-06).
 
 Decision input for ARCHITECTURE: keep the **versioned Codable store** default; SwiftData is not viable on the local path (now executed, not just predicted). `@Observable` **is** viable on both paths (compile-verified; runtime check pending), so Phase 2 may use it, subject to the CLAUDE.md rule-5 gate decision by the orchestrator/human.
 
@@ -248,7 +255,7 @@ App-relevant list = `scripts/ci_paths.py` (`--self-test`, 31 cases). Two documen
 7. "watchOS can be built locally with xtool" — false (no watchOS triples/packaging).
 8. "App Store Connect key with App Manager role is enough for CI distribution signing" — likely false (Admin needed for cloud signing per Apple forums).
 9. "`@State` is a property wrapper" — false in the Xcode 27 SDK: it is a SwiftUI macro (OAM README). The base variant now avoids it in env-ci files.
-10. Known gap, not a failure: in Phase 0 the debug screen *is* the app, so it ships in Release archives/TestFlight builds. **Phase 2 task:** gate `DebugScreen` behind `#if DEBUG` or a hidden toggle, **together with the launch-argument router** (`App/Sources/Routing/AppScreen.swift`, `-TabulaScreen`) and its "Launch route" row, which also run in Release builds today (qa-reviewer 2026-10-06). The CI screenshot job builds Debug, so gating does not affect it.
+10. ~~Known gap: in Phase 0 the debug screen *is* the app, so it ships in Release archives/TestFlight builds.~~ **Closed in Phase 2 Stage A (2026-10-09):** every file in `App/Sources/Debug/` is wrapped in `#if DEBUG` (validate.sh enforces it), the debug routes are registered only in DEBUG (`Routing/RouteRegistry.swift`), and Release ignores `-TabulaSeed`/`-TabulaNow`/`-TabulaTimeZone`. VERIFIED with `xtool dev build -c release`: 0 `DeveloperScreen` symbols. The CI screenshot job builds Debug, so it still sees the debug routes.
 11. "Sourcing swiftly's env.sh once is enough": false in non-login shells (`wsl.exe -- bash -c`); `xtool sdk install` failed with `Could not find executable 'clang' in PATH`. Fixed: `scripts/lib/toolchain.sh` in every script (2026-10-06).
 12. "xtool compiles what Xcode compiles": false for cross-import overlays (`PhotosPickerItem` not found): xtool's SwiftBuild toolset omits `-enable-cross-import-overlays`. Fixed in Package.swift.
 13. "xtool packs a working widget appex": false with SwiftBuild + ld64.lld: the appex had no code, and zsign then failed with `Can't find free space of LoadCommands for CodeSignature!` (misleading message). Fixed with `-u _main`; guarded in xtool-dev.sh and CI.
@@ -339,7 +346,8 @@ or could use the locally built simulator `.app` (`--simulator`) on a hosted simu
 - Regenerate Xcode project (CI does this): `xcodegen generate --spec project.yml` (no env needed any more)
 - From Windows Git Bash: `MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu --exec bash -c 'cd "/mnt/c/Users/simon/Documents/Claude Code/school_timetable" && bash scripts/validate.sh'`
 - CI: `.github/workflows/ios.yml` (TestFlight: Actions → iOS CI → Run workflow) · UI screenshots: `.github/workflows/ui-screenshots.yml`
-- Open a screen directly: launch argument `-TabulaScreen <id>` (ids in `App/Sources/Routing/AppScreen.swift`)
+- Open a screen directly: launch argument `-TabulaScreen <id>` (ids: the feature `*Routes.swift` files, registry `App/Sources/Routing/RouteRegistry.swift`); deterministic data `-TabulaSeed empty|blank|elementary|secondary|university`, fixed clock `-TabulaNow <ISO-8601>|live`, zone `-TabulaTimeZone <IANA id>` (DEBUG builds only, §19)
+- Add UI strings: `python3 scripts/l10n-add.py KEY "English" "comment"` (or `--from file.json`); `--check` = canonical-form check (validate.sh runs it)
 ```
 
 ## 17. Local LLM runtime (import-ml)
@@ -391,7 +399,7 @@ on GitHub's macOS runners.
 | CI job `ios-simulator-screenshots` (`.github/workflows/ui-screenshots.yml`) | UNRUN on macOS (written; `bash -n` + structure checked; picker logic tested on sample `simctl` JSON; the create and screenshot steps dry-run on WSL with a stub `xcrun`: live app → 6 PNGs + job summary, simulated crash → exit 1 + per-shot crash logs. The dry run caught and fixed a bug: sourcing `SIM_NAME=iPhone 17 Pro Max` as shell) | `xcode-27` runner: logs `xcrun simctl list devicetypes` + `runtimes`; creates a fresh simulator of the **largest "Pro Max"** on the newest available iOS runtime (override input `device`); `xcodebuild build -destination "platform=iOS Simulator,id=…" CODE_SIGNING_ALLOWED=NO`; boots, fixes the status bar (9:41, full battery), installs; for every id in `screens` (default `debug debug-localization debug-macros debug-import debug-alarms`): `simctl launch … -TabulaScreen <id>`, 8 s, **fails if the process is gone** (crash on launch), `simctl io … screenshot` in `appearance light`, `appearance dark` and `content_size accessibility-extra-extra-extra-large`; optional `watch` input screenshots the watch app on the largest Apple Watch simulator; uploads PNGs + `log show` + build log | first run after the orchestrator pushes |
 | Triggers / cost | VERIFIED (static, validate.sh enforces) | manual, or push to `main` touching only on-screen inputs: `App/**`, `WidgetExtension/**`, `Packages/TimetableUI/Sources/**` + `Package.swift`, `Resources/**`, `Config/App-Info.plist`, the workflow itself (not TimetableCore, not the rest of `Config/`, not TimetableUI tests); never on PRs; `cancel-in-progress`; `timeout-minutes: 15`; estimate 5–8 macOS minutes per run (billed rounded up per job). Full matrix: §8 | — |
 | Simulator picker | VERIFIED (self-test) / FAILED as first written | qa-reviewer: `xcrun simctl list -j runtimes devicetypes` treats `devicetypes` as a **search term** → `"runtimes": []`. Now `xcrun simctl list -j` (full) + `scripts/sim_pick.py`; `--self-test` on a realistic full sample (devicetypes/runtimes/devices/pairs; iOS 26.4 + 27.0 + unavailable 27.2 with `availabilityError`; watchOS 26.4 + 27.0; tvOS) → 8/8: iOS 27.0 + iPhone 17 Pro Max, unavailable runtime ignored, override honoured, unknown override fails, watchOS 27.0 + Series 11 (46mm), empty-runtimes (old bug) fails loudly, partial JSON rejected, fallback without `supportedDeviceTypes` respects `minRuntimeVersion`. Runs in validate.sh; validate.sh fails on any `simctl list -j <word>` in the workflow | — |
-| Launch-argument router | VERIFIED (Linux tests + iOS compile) | `TimetableUI.LaunchArguments` / `ScreenRoute` (9/9 swift-testing tests on Linux), `App/Sources/Routing/AppScreen.swift`; unknown ids fall back to `debug` and show `UNKNOWN "<id>"` as a FAIL row, so a typo is visible in the screenshot | runtime proof = first CI screenshot |
+| Launch-route registry (Phase 2 Stage A) | VERIFIED (Linux tests + iOS compile) / runtime UNRUN | `TimetableUI.RouteTable` + `LaunchOptions` (Linux tests), `App/Sources/Routing/{AppRoute,RouteRegistry}.swift`, one `*Routes.swift` provider per feature folder; validate.sh fails on duplicate/malformed ids. Unknown id → normal app shell; the developer screen (`-TabulaScreen debug-developer`) and the `debug` screen show `UNKNOWN "<id>"` | runtime proof = first CI screenshot |
 
 **How the human views the screenshots:** github.com/simon01920/tabula-app-ios → **Actions** → "UI screenshots (iOS
 Simulator)" → open a run → **Summary** lists device/runtime and every PNG → section **Artifacts** →
@@ -399,8 +407,23 @@ Simulator)" → open a run → **Summary** lists device/runtime and every PNG �
 kept 14 days). CLI: `gh run download <run id> -n ui-screenshots-<n>`. Manual run: Actions → the workflow → **Run
 workflow** (choose `screens`, optional `device`, `watch`).
 
-**How Phase 2 screens register:** add a case to `AppScreen` (stable kebab-case id), map it in `AppRootView`, add
-the id to the workflow's `screens` default; data-driven screens render a deterministic fixture when opened this way.
+**How Phase 2 screens register (Stage A, 2026-10-09):** add `AppRoute("<feature>.<name>", <placement>) { View() }` to
+your feature's provider (`Onboarding/OnboardingRoutes.swift`, `Today/TodayRoutes.swift`, `Timetable/TimetableRoutes.swift`,
+`Editors/EditorRoutes.swift`, `Settings/SettingsRoutes.swift`); placements: `.tabRoot(tab)`, `.sheet(over: tab)`,
+`.onboarding`, `.standalone`. Add the id to the workflow's `screens` list. Data-driven screens are captured with a seed:
+
+| Launch argument (DEBUG builds only) | Effect |
+|---|---|
+| `-TabulaSeed empty` | in-memory store with nothing in it → onboarding |
+| `-TabulaSeed blank` | onboarding finished (secondary preset), no subjects/lessons → empty states |
+| `-TabulaSeed elementary` | ZŠ 3.A: 6×45 min bells, tiles, room change + cancelled lesson on the reference day |
+| `-TabulaSeed secondary` | gymnázium 2.B: A/B weeks, short-day overrides on Thu 15 Oct, tasks, exams (= Tools/EngineDemo data) |
+| `-TabulaSeed university` | FIIT 2nd year: free-form 90-min blocks, odd/even weeks, buildings, lecture/seminar/lab |
+| `-TabulaNow <ISO-8601 with offset>` / `live` | fixed clock (default with a seed: Tue 2026-10-13 10:20 Europe/Bratislava) / real clock |
+| `-TabulaTimeZone <IANA id>` | device zone override (default with a seed: Europe/Bratislava) |
+
+Example: `xcrun simctl launch booted sk.simondev.tabula -TabulaSeed secondary -TabulaScreen today -AppleLanguages "(sk)"`.
+Release builds ignore the three developer arguments (`-TabulaScreen` still selects a registered, non-debug route).
 
 ## 20. Paid-account placeholders (account deferred)
 
