@@ -4,8 +4,8 @@
 //   -TabulaScreen <route id>                      first screen (route registry, App/Sources/Routing)
 //   -TabulaSeed empty|blank|elementary|secondary|university
 //                                                 in-memory repository with deterministic sample data
-//   -TabulaNow <ISO-8601 instant> | live          fixed clock ("live" = real clock even with a seed)
-//   -TabulaTimeZone <IANA id>                     device time zone override (default with a seed: the
+//   -TabulaNow <ISO-8601 instant> | live          fixed clock ("live" = real clock); only together with -TabulaSeed
+//   -TabulaTimeZone <IANA id>                     device time zone override, only with -TabulaSeed (default: the
 //                                                 scenario's zone, Europe/Bratislava)
 //
 // Release builds ignore -TabulaSeed / -TabulaNow / -TabulaTimeZone (`allowsDeveloperOverrides: false`); the app
@@ -86,6 +86,14 @@ public struct LaunchOptions: Sendable, Equatable {
             } else {
                 problems.append("-\(Self.seedKey) \"\(rawSeed)\" unknown (\(SeedKind.allCases.map(\.rawValue).joined(separator: "|")))")
             }
+        }
+        // A fixed clock or zone would stamp the real on-disk data (and the persisted HLC) with fake times: both
+        // apply only to the in-memory seed store.
+        guard seed != nil else {
+            for (key, value) in [(Self.nowKey, rawNow), (Self.timeZoneKey, rawZone)] where value != nil {
+                problems.append("-\(key) ignored without -\(Self.seedKey) (only the in-memory seed store may use it)")
+            }
+            return
         }
         if let rawNow {
             if rawNow == "live" {

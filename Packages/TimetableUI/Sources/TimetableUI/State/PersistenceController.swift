@@ -20,7 +20,7 @@ public enum SaveOutcome: Equatable, Sendable {
 /// Loads once and saves serially.
 public actor PersistenceController {
     private let repository: any TabulaRepository
-    /// Highest generation written so far (`-1` before the first save).
+    /// Highest generation written **successfully** so far (`-1` before the first save).
     public private(set) var lastSavedGeneration = -1
     /// Number of successful writes (tests, debug screen).
     public private(set) var writeCount = 0
@@ -42,11 +42,14 @@ public actor PersistenceController {
         }
     }
 
-    /// Saves `database` as `generation`. Writes happen strictly one after another in request order; a request
-    /// that is older than (or equal to) one already requested is skipped, and a request superseded by a newer
-    /// one while it waited for the previous write is skipped too (the newer one writes the newer data).
+    /// Saves `database` as `generation`. Writes happen strictly one after another in request order.
+    /// - A generation already written successfully (or older) is skipped: `flush()` after a successful save is a no-op.
+    /// - A generation whose last write **failed** stays pending: requesting it again (e.g. `AppModel.flush()` when the
+    ///   app goes to the background) retries the write.
+    /// - A request superseded by a newer one while it waited for the previous write is skipped (the newer one writes
+    ///   the newer data).
     public func save(_ database: TabulaDatabase, generation: Int) async -> SaveOutcome {
-        guard generation > lastRequestedGeneration else {
+        guard generation > lastSavedGeneration, generation >= lastRequestedGeneration else {
             return .skippedStale(generation: generation, lastSaved: lastSavedGeneration)
         }
         lastRequestedGeneration = generation
@@ -56,12 +59,16 @@ public actor PersistenceController {
         return await task.value
     }
 
+    /// `true` when the newest requested generation has not been written successfully (a retry is due).
+    public var hasPendingChanges: Bool { lastRequestedGeneration > lastSavedGeneration }
+
+    /// Highest generation requested so far (`-1` before the first request).
     private var lastRequestedGeneration = -1
     private var tail: Task<SaveOutcome, Never>?
 
     private func write(_ database: TabulaDatabase, generation: Int, after previous: Task<SaveOutcome, Never>?) async -> SaveOutcome {
         _ = await previous?.value
-        guard generation == lastRequestedGeneration else {
+        guard generation == lastRequestedGeneration, generation > lastSavedGeneration else {
             return .skippedStale(generation: generation, lastSaved: lastSavedGeneration)
         }
         do {

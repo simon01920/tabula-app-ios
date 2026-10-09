@@ -37,11 +37,19 @@ struct LaunchOptionsTests {
     }
 
     @Test func liveClockAndProblems() {
-        #expect(parse(["-TabulaNow", "live"]).clock == .live)
+        #expect(parse(["-TabulaSeed", "blank", "-TabulaNow", "live"]).clock == .live)
         let bad = parse(["-TabulaSeed", "college", "-TabulaNow", "tomorrow", "-TabulaTimeZone", "Mars/Olympus"])
         #expect(bad.seed == nil && bad.clock == nil && bad.timeZone == nil)
         #expect(bad.problems.count == 3)
         #expect(bad.problems[0].contains("college"))
+    }
+
+    @Test func clockAndZoneNeedTheInMemorySeed() {
+        // Never with the real file store: fixed times would be stamped into persisted data and the HLC.
+        let options = parse(["-TabulaNow", "2026-10-13T08:20:00Z", "-TabulaTimeZone", "Asia/Tokyo"])
+        #expect(options.seed == nil && options.clock == nil && options.timeZone == nil)
+        #expect(options.problems == ["-TabulaNow ignored without -TabulaSeed (only the in-memory seed store may use it)",
+                                     "-TabulaTimeZone ignored without -TabulaSeed (only the in-memory seed store may use it)"])
     }
 
     @Test func releaseIgnoresDeveloperOverridesButKeepsTheScreen() {

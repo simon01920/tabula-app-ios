@@ -1,6 +1,6 @@
 // Developer screen (DEBUG only): what the app foundation is doing, usable on a physical device without Xcode —
-// data source, launch options, clock/calendar, store status, validation, plus actions to load sample data or
-// re-run onboarding. Reachable from Settings → Developer and `-TabulaScreen debug-developer`.
+// data source, launch options, clock/calendar, store status, validation, plus onboarding reset and recovery fault
+// injection. Reachable from Settings → Developer and `-TabulaScreen debug-developer`.
 // Developer-facing: verbatim strings on purpose (never shipped).
 // APIs: List, Section, NavigationLink(destination:label:), Button(role:action:label:),
 //       confirmationDialog(_:isPresented:titleVisibility:actions:), LabeledContent (iOS 16), textSelection (iOS).
@@ -26,7 +26,6 @@ struct DeveloperSettingsLink: View {
 /// Screen state as a property-wrapper object (no macros).
 @MainActor
 final class DeveloperScreenState: ObservableObject {
-    @Published var pendingSample: SeedKind?
     @Published var confirmReset = false
     @Published var faultMessage: String?
 }
@@ -105,10 +104,10 @@ struct DeveloperScreen: View {
                 }
             } header: { Text(verbatim: "Store") }
 
+            // No "load sample data into the real store" action on purpose (QA 2026-10-09): the scenarios carry fixed
+            // IDs, foreign HLC nodes and fixed 2026 dates. Use -TabulaSeed (in-memory) for sample data; real sample
+            // data for a user's store comes from onboarding (TimetableCore.SampleData with the app's ids/clock/now).
             Section {
-                ForEach([SeedKind.elementary, .secondary, .university], id: \.self) { kind in
-                    Button { state.pendingSample = kind } label: { Text(verbatim: "Replace data with sample: \(kind.rawValue)") }
-                }
                 Button { state.confirmReset = true } label: {
                     Text(verbatim: "Show onboarding again (data is replaced when it finishes)")
                 }
@@ -136,13 +135,6 @@ struct DeveloperScreen: View {
             }
         }
         .navigationTitle(Text(verbatim: "Developer"))
-        .confirmationDialog(Text(verbatim: "Replace all data?"), isPresented: Binding(
-            get: { state.pendingSample != nil }, set: { if !$0 { state.pendingSample = nil } }), titleVisibility: .visible) {
-            Button(role: .destructive) {
-                if let kind = state.pendingSample { loadSample(kind) }
-                state.pendingSample = nil
-            } label: { Text(verbatim: "Replace") }
-        }
         .confirmationDialog(Text(verbatim: "Show onboarding again?"), isPresented: $state.confirmReset, titleVisibility: .visible) {
             Button(role: .destructive) {
                 model.apply(.settings { $0.onboardingCompletedAt = nil })
@@ -159,12 +151,6 @@ struct DeveloperScreen: View {
 
     private func row(_ title: String, _ value: String) -> some View {
         ProbeRow(title, value: value)
-    }
-
-    private func loadSample(_ kind: SeedKind) {
-        model.apply(.replaceDatabase(label: "debug sample \(kind.rawValue)") { _, _, _ in
-            SampleScenarios.make(kind).database ?? DatabaseMutation.emptyBase
-        })
     }
 }
 #endif // DEBUG

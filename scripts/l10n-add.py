@@ -8,6 +8,8 @@ committed catalog this way reproduces it byte for byte.
 
 Every entry needs an English value and a context comment (CLAUDE.md, LOCALIZATION.md). Existing keys are
 refused unless --replace is given. Only English is written; other languages come from the localisation stage.
+--replace changes the English value and the comment but KEEPS existing translations (their state becomes
+"needs_review" when the English text changed); add --drop-translations to remove them instead.
 
 Usage:
   python3 scripts/l10n-add.py KEY "English value" "Context comment for translators"
@@ -15,7 +17,7 @@ Usage:
   python3 scripts/l10n-add.py --from strings.json      # {"key": {"en": "...", "comment": "..."} |
                                                          #         {"one": "...", "other": "...", "comment": "..."}}
   python3 scripts/l10n-add.py --check                  # verify the file is in canonical form (exit 1 if not)
-Options: --catalog PATH (default Resources/Localizable.xcstrings), --replace
+Options: --catalog PATH (default Resources/Localizable.xcstrings), --replace [--drop-translations]
 """
 import argparse
 import json
@@ -31,6 +33,16 @@ def dump(data: dict) -> str:
 
 def unit(value: str) -> dict:
     return {"stringUnit": {"state": "translated", "value": value}}
+
+
+def mark_review(node):
+    """A copy of a localization with every translated string unit marked needs_review."""
+    if isinstance(node, dict):
+        copy = {k: mark_review(v) for k, v in node.items()}
+        if "stringUnit" in copy and copy["stringUnit"].get("state") == "translated":
+            copy["stringUnit"] = {**copy["stringUnit"], "state": "needs_review"}
+        return copy
+    return node
 
 
 def entry(spec: dict, key: str) -> dict:
@@ -57,6 +69,7 @@ def main() -> int:
     parser.add_argument("--from", dest="source")
     parser.add_argument("--catalog", default=str(ROOT / "Resources/Localizable.xcstrings"))
     parser.add_argument("--replace", action="store_true")
+    parser.add_argument("--drop-translations", action="store_true")
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
 
@@ -86,8 +99,15 @@ def main() -> int:
     for key, spec in specs.items():
         if key in strings and not args.replace:
             raise SystemExit(f"error: {key} already exists (use --replace to overwrite)")
-        strings[key] = entry(spec, key)
-        print(f"added {key}")
+        new = entry(spec, key)
+        old = strings.get(key)
+        if old and not args.drop_translations:
+            english_changed = old.get("localizations", {}).get("en") != new["localizations"]["en"]
+            for lang, value in old.get("localizations", {}).items():
+                if lang != "en":
+                    new["localizations"][lang] = mark_review(value) if english_changed else value
+        strings[key] = new
+        print(f"{'replaced' if old else 'added'} {key}{' (translations kept)' if old and not args.drop_translations else ''}")
     path.write_text(dump(data), encoding="utf-8")
     return 0
 

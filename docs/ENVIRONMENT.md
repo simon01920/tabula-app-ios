@@ -419,8 +419,8 @@ your feature's provider (`Onboarding/OnboardingRoutes.swift`, `Today/TodayRoutes
 | `-TabulaSeed elementary` | ZŠ 3.A: 6×45 min bells, tiles, room change + cancelled lesson on the reference day |
 | `-TabulaSeed secondary` | gymnázium 2.B: A/B weeks, short-day overrides on Thu 15 Oct, tasks, exams (= Tools/EngineDemo data) |
 | `-TabulaSeed university` | FIIT 2nd year: free-form 90-min blocks, odd/even weeks, buildings, lecture/seminar/lab |
-| `-TabulaNow <ISO-8601 with offset>` / `live` | fixed clock (default with a seed: Tue 2026-10-13 10:20 Europe/Bratislava) / real clock |
-| `-TabulaTimeZone <IANA id>` | device zone override (default with a seed: Europe/Bratislava) |
+| `-TabulaNow <ISO-8601 with offset>` / `live` | only with `-TabulaSeed` (never the real store): fixed clock (default: Tue 2026-10-13 10:20 Europe/Bratislava) / real clock |
+| `-TabulaTimeZone <IANA id>` | only with `-TabulaSeed`: device zone override (default: Europe/Bratislava) |
 
 Example: `xcrun simctl launch booted sk.simondev.tabula -TabulaSeed secondary -TabulaScreen today -AppleLanguages "(sk)"`.
 Release builds ignore the three developer arguments (`-TabulaScreen` still selects a registered, non-debug route).

@@ -7,9 +7,9 @@ AX5, dark mode, German-length strings, CJK, VoiceOver).
 
 Builds: local `bash scripts/xtool-dev.sh` (base variant, installs + launches) or a TestFlight/CI build. Launch
 arguments (DEBUG builds only) via Xcode scheme / `xcrun simctl launch booted sk.simondev.tabula <args>`:
-`-TabulaSeed empty|blank|elementary|secondary|university`, `-TabulaNow 2026-10-13T10:20:00+02:00` (or `live`),
+`-TabulaSeed empty|blank|elementary|secondary|university`, `-TabulaNow 2026-10-13T10:20:00+02:00` (or `live`; with a seed only),
 `-TabulaTimeZone Europe/Bratislava`, `-TabulaScreen <route id>`, `-AppleLanguages "(de)"`. On a device without
-Xcode, use **Settings → Developer** instead (sample data, onboarding reset, recovery tests).
+Xcode, use **Settings → Developer** instead (onboarding reset, recovery tests; sample data only via `-TabulaSeed` or onboarding).
 
 ---
 
@@ -65,7 +65,7 @@ Xcode, use **Settings → Developer** instead (sample data, onboarding reset, re
 - Expected on Tue 13 Oct: 5 lessons; *Výtvarná výchova* has badge "Room changed" (icon + text) and room "Knižnica";
   *Hudobná výchova* is struck through with badge "Cancelled".
 - Subject badges: emoji on the subject colour; the yellow/pastel colours keep a visible edge in light mode,
-  dark navy colours (ocean pack, via Developer sample data later) keep an edge in dark mode.
+  dark navy colours (ocean pack, once B3/B4 allow choosing it) keep an edge in dark mode.
 - Field rule: elementary shows only room, teacher, bring-list lines; a lesson without bring list shows **no empty line
   or dash**. `-TabulaSeed university`: building, room, teacher, lesson type ("Lecture"/"Seminar"/"Lab"); no notes line
   where notes are empty.
@@ -76,7 +76,12 @@ Xcode, use **Settings → Developer** instead (sample data, onboarding reset, re
 ### A7. Time zone, locale, 12/24 h
 - Device set to 12-hour (Settings → General → Date & Time → 24-Hour Time off) with a fresh install (onboarding
   default `hourCycle auto`): times show "8:00 AM" style in en-US; Slovak region keeps 24 h.
-- Change the device time zone while the app is open → Developer → "Time zone" updates without relaunch.
+- Change the device time zone while the app is open → Developer → "Time zone" updates without relaunch; also after
+  changing it while the app is in the background (refresh on becoming active, `NSTimeZone.resetSystemTimeZone()`).
+- Leave the app open across midnight (or set the clock forward past midnight) → Today shows the new day
+  (`significantTimeChangeNotification`).
+- Make a change, then immediately go Home: Developer → "Last save" shows `saved` after returning (background task
+  protected flush). With storage full, the "Couldn't save" banner appears and the change is retried on the next flush.
 - Region with Sunday first (en-US) → Developer → "First weekday sunday"; Slovak → monday.
 - `-TabulaSeed secondary` has `hourCycle h24`: always 24 h even on a 12 h device.
 
@@ -85,7 +90,7 @@ Xcode, use **Settings → Developer** instead (sample data, onboarding reset, re
 |---|---|---|
 | Empty | `-TabulaSeed empty` / `blank` | welcome screen / "No lessons today" + date; no blank rows |
 | Normal | `-TabulaSeed secondary` | list of lessons, badges |
-| Long text | Developer → sample data, then (B3) rename a subject to 60+ chars | wraps, no truncation of the time line |
+| Long text | `-TabulaSeed secondary`, then (B3) rename a subject to 60+ chars | wraps, no truncation of the time line |
 | Dynamic Type XXL / AX5 | Settings → Accessibility → Larger Text | every text scales; banner ✕ stays tappable; nothing clipped |
 | Dark mode | Appearance Dark | all text legible; subject badge text black/white per contrast |
 | German | `-AppleLanguages "(de)"` | strings fall back to English until stage C1 (expected now); layout holds long strings |

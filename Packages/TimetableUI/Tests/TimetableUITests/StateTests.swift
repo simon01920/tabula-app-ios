@@ -122,6 +122,31 @@ struct MutationValidationTests {
     }
 }
 
+/// A repository whose next `failures` saves throw `writeFailed`.
+private actor FlakyRepository: TabulaRepository {
+    private var remainingFailures: Int
+    private var stored: TabulaDatabase?
+    private(set) var saveAttempts = 0
+
+    init(failures: Int) { remainingFailures = failures }
+
+    func failNext(_ count: Int) { remainingFailures = count }
+
+    func load() throws -> TabulaDatabase {
+        guard let stored else { throw RepositoryError.notFound }
+        return stored
+    }
+
+    func save(_ database: TabulaDatabase) throws {
+        saveAttempts += 1
+        if remainingFailures > 0 {
+            remainingFailures -= 1
+            throw RepositoryError.writeFailed("disk full (test)")
+        }
+        stored = database
+    }
+}
+
 @Suite("PersistenceController")
 struct PersistenceControllerTests {
     @Test func loadEmptyAndLoaded() async {
@@ -160,6 +185,37 @@ struct PersistenceControllerTests {
         let last = await controller.lastSavedGeneration
         #expect(last == 19)
         #expect(stored.timetables[0].name == "T\(last)")
+    }
+
+    @Test func failedWriteStaysPendingAndFlushRetries() async throws {
+        let repository = FlakyRepository(failures: 1)
+        let controller = PersistenceController(repository: repository)
+        let database = SampleScenarios.blank()
+        guard case .failed = await controller.save(database, generation: 1) else {
+            Issue.record("expected the first write to fail")
+            return
+        }
+        #expect(await controller.hasPendingChanges)
+        // The flush on scene background re-requests the same generation: retried, not skipped.
+        #expect(await controller.save(database, generation: 1) == .saved(generation: 1))
+        #expect(await controller.hasPendingChanges == false)
+        #expect(await repository.saveAttempts == 2)
+    }
+
+    @Test func flushAfterSuccessIsANoOp() async throws {
+        let repository = FlakyRepository(failures: 0)
+        let controller = PersistenceController(repository: repository)
+        let database = SampleScenarios.blank()
+        #expect(await controller.save(database, generation: 3) == .saved(generation: 3))
+        #expect(await controller.save(database, generation: 3) == .skippedStale(generation: 3, lastSaved: 3))
+        #expect(await repository.saveAttempts == 1)
+        // An older generation after a failed newer one is still refused (never regress).
+        await repository.failNext(1)
+        guard case .failed = await controller.save(database, generation: 4) else {
+            Issue.record("expected failure")
+            return
+        }
+        #expect(await controller.save(database, generation: 3) == .skippedStale(generation: 3, lastSaved: 3))
     }
 
     @Test func newerFileIsReadOnly() async throws {

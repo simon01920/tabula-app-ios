@@ -9,9 +9,12 @@
 //          model.apply(.upsert(lesson))   → ApplyResult (.applied(warnings) / .rejected / .failed)
 // APIs: Observation.Observable (macro; allowed in app code per PHASE2_PLAN §0.1), Task.sleep(for:),
 //       NotificationCenter.addObserver(forName:object:queue:using:), MainActor.assumeIsolated,
-//       NSNotification.Name.NSSystemTimeZoneDidChange, NSLocale.currentLocaleDidChangeNotification.
+//       NSNotification.Name.NSSystemTimeZoneDidChange, NSLocale.currentLocaleDidChangeNotification,
+//       UIApplication.significantTimeChangeNotification (midnight, carrier time update, DST), NSTimeZone.resetSystemTimeZone()
+//       (docs checked 2026-10-10).
 import Foundation
 import Observation
+import UIKit
 import TimetableCore
 import TimetableUI
 
@@ -52,6 +55,10 @@ final class AppModel {
     private(set) var calendarContext: CalendarContext
     private(set) var formatter: TimetableFormatter
     private(set) var renderer: LocalizedTextRenderer
+    /// The local date of `now`. Stored (not computed) so views re-render when it changes: it is refreshed at
+    /// midnight / DST / clock changes (`significantTimeChangeNotification`), on time-zone and locale changes and
+    /// whenever the scene becomes active (`refreshEnvironment()`).
+    private(set) var today: LocalDate
     /// One resolver per live timetable.
     private(set) var resolvers: [Timetable.ID: ScheduleResolver] = [:]
 
@@ -75,6 +82,7 @@ final class AppModel {
         let formatter = TimetableFormatter(settings: settings, context: context, locale: environment.locale())
         self.formatter = formatter
         renderer = LocalizedTextRenderer(formatter: formatter, lookup: environment.catalogLookup)
+        today = context.localDate(of: environment.nowProvider.now())
     }
 
     // MARK: Read API
@@ -93,8 +101,6 @@ final class AppModel {
     var timetables: [Timetable] { database.map(ActiveTimetable.ordered) ?? [] }
     /// The resolver of `timetableID` (nil for unknown/deleted timetables).
     func resolver(for timetableID: Timetable.ID) -> ScheduleResolver? { resolvers[timetableID] }
-    /// The local date of `now`.
-    var today: LocalDate { calendarContext.localDate(of: now) }
 
     // MARK: Lifecycle
 
@@ -211,6 +217,8 @@ final class AppModel {
                                                       locale: locale)
         formatter = TimetableFormatter(settings: settings, context: calendarContext, locale: locale)
         renderer = LocalizedTextRenderer(formatter: formatter, lookup: environment.catalogLookup)
+        let newToday = calendarContext.localDate(of: now)
+        if newToday != today { today = newToday }
         if let database {
             let all = ScheduleResolver.all(database: database, context: calendarContext)
             resolvers = Dictionary(all.map { ($0.timetable.id, $0) }, uniquingKeysWith: { first, _ in first })
@@ -220,13 +228,17 @@ final class AppModel {
     }
 
     /// Rebuilds the calendar context and formatters (time zone, locale, first weekday or 12/24 h changed).
+    /// Call when the scene becomes active, and on system time / zone / locale changes. Clears Foundation's cached
+    /// system time zone first so `TimeZone.current` reflects a zone change made while the app was suspended.
     func refreshEnvironment() {
+        NSTimeZone.resetSystemTimeZone()
         rebuildDerived()
     }
 
     private func observeSystemChanges() {
         guard observers.isEmpty else { return }
-        for name in [NSNotification.Name.NSSystemTimeZoneDidChange, NSLocale.currentLocaleDidChangeNotification] {
+        for name in [NSNotification.Name.NSSystemTimeZoneDidChange, NSLocale.currentLocaleDidChangeNotification,
+                     UIApplication.significantTimeChangeNotification] {
             observers.append(NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
                 MainActor.assumeIsolated { self?.refreshEnvironment() }
             })

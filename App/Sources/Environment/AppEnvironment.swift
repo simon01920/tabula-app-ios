@@ -71,14 +71,13 @@ struct AppEnvironment: Sendable {
                 saveDebounce: .milliseconds(100))
         }
         #endif
+        // The real store always uses the real clock and the system zone: -TabulaNow/-TabulaTimeZone are honoured only
+        // with -TabulaSeed (LaunchOptions drops them otherwise), so fake times never reach persisted data or the HLC.
         let location = StoreLocation.resolve()
-        let zoneOverride = launchOptions.timeZone
-        let now: NowProvider
-        if case .fixed(let date)? = launchOptions.clock { now = .fixed(date) } else { now = .live }
         return AppEnvironment(
             persistence: PersistenceController(repository: FileRepository(directory: location.directory)),
             clockStore: UserDefaultsClockStore(defaults: location.defaults),
-            nowProvider: now, deviceTimeZone: { zoneOverride ?? TimeZone.current }, locale: { Locale.current },
+            nowProvider: .live, deviceTimeZone: { TimeZone.current }, locale: { Locale.current },
             catalogLookup: lookup, entitlements: AllAccessEntitlements(),
             dataSource: .file(directory: location.directory, isAppGroup: location.isAppGroup),
             launchOptions: launchOptions, saveDebounce: .milliseconds(400))
