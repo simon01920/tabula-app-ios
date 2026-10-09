@@ -106,3 +106,23 @@ Xcode, use **Settings → Developer** instead (onboarding reset, recovery tests;
 - App Group container availability on the xtool-signed build (free team → Application Support fallback).
 - Liquid Glass tab bar appearance; `.bar` material banner under the status bar; sheet presentation for `.sheet` routes
   (no sheet route exists yet — B3).
+
+## B4. Settings + themes (written without being able to see the UI; everything below is unverified until run on a device)
+Routes: `settings`, `settings.calendar`, `settings.appearance`, `settings.reminders`, `settings.about` (`-TabulaScreen <id>`, seeds `secondary`/`university`/`elementary`).
+Root sections: Profile, Calendar & time, Appearance, Timetables (only if B3 registers `editor.timetables`), Reminders, Language, Tabula Pro, About, Developer (DEBUG, last).
+
+| Check | Expected |
+|---|---|
+| Profile | Picker: Primary school / Secondary school / University / Other; "Lessons are called" shows Lesson or Class; footer says existing data is untouched; existing lessons unchanged after switching |
+| Week start | System / Monday / Sunday / Saturday; weekday names in the app language; week views follow after changing |
+| Time format | System / 12-hour / 24-hour; the "Now" row changes immediately (13:05 vs 1:05 PM); persists after relaunch |
+| Time zone | Follow shows the device zone; Fixed shows a row opening a searchable list (try "tokyo", "new york"), current zone first with checkmark, tap selects and returns; switching back works; Today times react |
+| Appearance | System/Light/Dark applies instantly app-wide; all four packs selectable (all-access), Ocean/Sunset/Pastel carry a "Pro" marker; swatches wrap at AX5; Pastel swatches have a visible edge; colour list shows names; preview tile text legible in light and dark, outline on pale or navy tiles |
+| Reminders | Three tiers, silent switch and Focus text, "later update" note; no permission prompt. Wording about Time Sensitive and the silent switch comes from documentation, verify on device |
+| Language | Button opens iOS Settings for Tabula |
+| Pro | "Current plan: Pro" and "All features are unlocked during development." |
+| About | Version and build from the bundle; privacy and acknowledgements; a missing version/build row is absent, never a dash |
+| Read-only store (Developer: schema 99) | Pickers disabled, pages still open |
+| Stress | empty seed (onboarding), normal, AX5 (rows wrap, 44 pt, nothing clipped), dark, German (`-AppleLanguages "(de)"`, English fallback until C1), CJK (`ja`), VoiceOver (palette row reads "Ocean, Pro, Abyss, Navy, ...", selected trait, swatches not read separately) |
+
+Not verifiable without a device: Form/menu Picker look and Liquid Glass; target page of `UIApplication.openSettingsURLString`; searchable pushed list; sheet presentation of `editor.timetables` (the B3 view must bring its own NavigationStack).

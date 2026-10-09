@@ -2425,6 +2425,114 @@
         }
       }
     },
+    "settings.about.acknowledgements.body" : {
+      "comment" : "Credits text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabula is built with Swift and SwiftUI. No third-party libraries are bundled."
+          }
+        }
+      }
+    },
+    "settings.about.acknowledgements.title" : {
+      "comment" : "Section header on the About page for credits.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acknowledgements"
+          }
+        }
+      }
+    },
+    "settings.about.build" : {
+      "comment" : "Row label; the value is the build number.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Build"
+          }
+        }
+      }
+    },
+    "settings.about.privacy.body" : {
+      "comment" : "Short privacy summary.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your timetables stay on your device. Tabula has no accounts and collects no analytics or usage data."
+          }
+        }
+      }
+    },
+    "settings.about.privacy.title" : {
+      "comment" : "Section header on the About page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy"
+          }
+        }
+      }
+    },
+    "settings.about.row" : {
+      "comment" : "Settings row that opens the About page; lists what is inside.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version, privacy, acknowledgements"
+          }
+        }
+      }
+    },
+    "settings.about.title" : {
+      "comment" : "Settings section/page title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About"
+          }
+        }
+      }
+    },
+    "settings.about.version" : {
+      "comment" : "Row label; the value is the app version number.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version"
+          }
+        }
+      }
+    },
+    "settings.appearance.colors.title" : {
+      "comment" : "Section header above the list of named colours of the selected palette.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Colours in this palette"
+          }
+        }
+      }
+    },
     "settings.appearance.dark" : {
       "comment" : "Appearance option: always dark.",
       "extractionState" : "manual",
@@ -2445,6 +2553,78 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Light"
+          }
+        }
+      }
+    },
+    "settings.appearance.mode" : {
+      "comment" : "Picker label and section header: system, light or dark appearance.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mode"
+          }
+        }
+      }
+    },
+    "settings.appearance.palette.footer" : {
+      "comment" : "Footer under the palette list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The default palette for your timetables. Colours you already chose for subjects do not change."
+          }
+        }
+      }
+    },
+    "settings.appearance.palette.pro" : {
+      "comment" : "Small marker on a palette that needs the Pro plan. Very short.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro"
+          }
+        }
+      }
+    },
+    "settings.appearance.palette.title" : {
+      "comment" : "Section header: choose a set of colours for subjects.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Colour palette"
+          }
+        }
+      }
+    },
+    "settings.appearance.preview.title" : {
+      "comment" : "Section header above a sample lesson tile in the selected palette.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview"
+          }
+        }
+      }
+    },
+    "settings.appearance.row" : {
+      "comment" : "Settings row that opens the Appearance page; lists what is inside.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Light or dark, colour palette"
           }
         }
       }
@@ -2473,6 +2653,210 @@
         }
       }
     },
+    "settings.calendar.hourcycle.example" : {
+      "comment" : "Label of a row that shows the current time in the chosen format, as a live example. Short.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Now"
+          }
+        }
+      }
+    },
+    "settings.calendar.hourcycle.h12" : {
+      "comment" : "Time format option: 12-hour clock with AM/PM.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "12-hour"
+          }
+        }
+      }
+    },
+    "settings.calendar.hourcycle.h24" : {
+      "comment" : "Time format option: 24-hour clock.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "24-hour"
+          }
+        }
+      }
+    },
+    "settings.calendar.hourcycle.system" : {
+      "comment" : "Time format option: follow the device setting.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System"
+          }
+        }
+      }
+    },
+    "settings.calendar.hourcycle.title" : {
+      "comment" : "Picker label: 12-hour or 24-hour clock.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time format"
+          }
+        }
+      }
+    },
+    "settings.calendar.row" : {
+      "comment" : "Settings row that opens the Calendar & time page; lists what is inside.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Week start, time format, time zone"
+          }
+        }
+      }
+    },
+    "settings.calendar.timezone.device" : {
+      "comment" : "Row label; the value is the device's current time zone name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Device time zone"
+          }
+        }
+      }
+    },
+    "settings.calendar.timezone.fixed" : {
+      "comment" : "Time zone option: always use one chosen time zone.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixed time zone"
+          }
+        }
+      }
+    },
+    "settings.calendar.timezone.follow" : {
+      "comment" : "Time zone option: use the device's current time zone.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Follow this device"
+          }
+        }
+      }
+    },
+    "settings.calendar.timezone.footer.fixed" : {
+      "comment" : "Footer under the time zone setting when a fixed zone is chosen.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesson times always use this time zone, even when your device is somewhere else."
+          }
+        }
+      }
+    },
+    "settings.calendar.timezone.footer.follow" : {
+      "comment" : "Footer under the time zone setting when following the device.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lessons stay at the same clock time when you travel."
+          }
+        }
+      }
+    },
+    "settings.calendar.timezone.search" : {
+      "comment" : "Search field prompt on the time zone list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search time zones"
+          }
+        }
+      }
+    },
+    "settings.calendar.timezone.title" : {
+      "comment" : "Picker label: how lesson times relate to time zones.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time zone"
+          }
+        }
+      }
+    },
+    "settings.calendar.timezone.zone" : {
+      "comment" : "Row label and page title for choosing the fixed time zone; the value is the chosen zone.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time zone"
+          }
+        }
+      }
+    },
+    "settings.calendar.title" : {
+      "comment" : "Settings section/page title: week start, 12/24 hour clock, time zone.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calendar & time"
+          }
+        }
+      }
+    },
+    "settings.calendar.weekstart.system" : {
+      "comment" : "Week start option: follow the device region setting.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System"
+          }
+        }
+      }
+    },
+    "settings.calendar.weekstart.title" : {
+      "comment" : "Picker label: first day of the week.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Week starts on"
+          }
+        }
+      }
+    },
     "settings.developer" : {
       "comment" : "Settings row (only in development builds) opening diagnostic tools. Not shown in the App Store version.",
       "extractionState" : "manual",
@@ -2481,6 +2865,378 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Developer"
+          }
+        }
+      }
+    },
+    "settings.language.footer" : {
+      "comment" : "Footer under the language button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabula uses the language you choose for it in the iOS Settings app."
+          }
+        }
+      }
+    },
+    "settings.language.open" : {
+      "comment" : "Button that opens the iOS Settings page of this app, where the per-app language is chosen.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open iOS language settings"
+          }
+        }
+      }
+    },
+    "settings.language.title" : {
+      "comment" : "Settings section header for app language.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language"
+          }
+        }
+      }
+    },
+    "settings.pro.plan" : {
+      "comment" : "Row label; the value is Free or Pro.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current plan"
+          }
+        }
+      }
+    },
+    "settings.pro.tier.free" : {
+      "comment" : "Plan name: free tier.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free"
+          }
+        }
+      }
+    },
+    "settings.pro.tier.pro" : {
+      "comment" : "Plan name: paid tier.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro"
+          }
+        }
+      }
+    },
+    "settings.pro.title" : {
+      "comment" : "Settings section header for the paid plan.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabula Pro"
+          }
+        }
+      }
+    },
+    "settings.pro.unlocked" : {
+      "comment" : "Footer shown while every feature is available without purchase.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All features are unlocked during development."
+          }
+        }
+      }
+    },
+    "settings.profile.elementary" : {
+      "comment" : "Profile option: primary / elementary school.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primary school"
+          }
+        }
+      }
+    },
+    "settings.profile.footer" : {
+      "comment" : "Footer under the profile settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changing your profile does not change existing timetables or lessons. It only affects suggestions and wording for new ones."
+          }
+        }
+      }
+    },
+    "settings.profile.other" : {
+      "comment" : "Profile option: none of the above.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other"
+          }
+        }
+      }
+    },
+    "settings.profile.picker" : {
+      "comment" : "Settings picker label: the user's school type; options are the four profile names.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I am in"
+          }
+        }
+      }
+    },
+    "settings.profile.secondary" : {
+      "comment" : "Profile option: secondary / high school.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Secondary school"
+          }
+        }
+      }
+    },
+    "settings.profile.terminology" : {
+      "comment" : "Settings row label; the value is the word the app uses for a lesson (e.g. Lesson / Class).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lessons are called"
+          }
+        }
+      }
+    },
+    "settings.profile.title" : {
+      "comment" : "Settings section header: who the user is (school type).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profile"
+          }
+        }
+      }
+    },
+    "settings.profile.university" : {
+      "comment" : "Profile option: university or college.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "University"
+          }
+        }
+      }
+    },
+    "settings.reminders.alarm.detail" : {
+      "comment" : "Explanation of the loud alarm reminder type.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rings like an alarm clock, even when the phone is on silent or in a Focus. Needs your permission and is a Pro feature."
+          }
+        }
+      }
+    },
+    "settings.reminders.alarm.title" : {
+      "comment" : "Reminder type name: alarm that rings loudly.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loud alarm"
+          }
+        }
+      }
+    },
+    "settings.reminders.focus.detail" : {
+      "comment" : "Explains Focus modes.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A Focus can hide or delay Standard reminders. Choose which apps and people may interrupt in iOS Settings under Focus."
+          }
+        }
+      }
+    },
+    "settings.reminders.later" : {
+      "comment" : "Note at the bottom of the reminders page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reminders are configured in a later update. Nothing is scheduled yet, and Tabula has not asked for any permission."
+          }
+        }
+      }
+    },
+    "settings.reminders.row" : {
+      "comment" : "Settings row that opens the page explaining reminder types.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How reminders are delivered"
+          }
+        }
+      }
+    },
+    "settings.reminders.silent.detail" : {
+      "comment" : "Explains the iPhone ring/silent switch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard and Time Sensitive reminders follow the ring/silent switch for sound. Only a loud alarm is made to ring regardless."
+          }
+        }
+      }
+    },
+    "settings.reminders.silentfocus.title" : {
+      "comment" : "Section header: how the silent switch and Focus modes affect reminders.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Silent switch and Focus"
+          }
+        }
+      }
+    },
+    "settings.reminders.standard.detail" : {
+      "comment" : "Explanation of the Standard reminder type.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A normal notification. It is delivered like any other app notification and can be held back by a Focus."
+          }
+        }
+      }
+    },
+    "settings.reminders.standard.title" : {
+      "comment" : "Reminder type name: normal notification.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard"
+          }
+        }
+      }
+    },
+    "settings.reminders.tiers.title" : {
+      "comment" : "Section header: the three ways a reminder can be delivered.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reminder types"
+          }
+        }
+      }
+    },
+    "settings.reminders.timesensitive.detail" : {
+      "comment" : "Explanation of the Time Sensitive reminder type.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delivered right away and can break through a Focus or the notification summary, if you allow Time Sensitive notifications for Tabula in iOS Settings."
+          }
+        }
+      }
+    },
+    "settings.reminders.timesensitive.title" : {
+      "comment" : "Reminder type name; matches the iOS term Time Sensitive.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time Sensitive"
+          }
+        }
+      }
+    },
+    "settings.reminders.title" : {
+      "comment" : "Settings section/page title for reminders.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reminders"
+          }
+        }
+      }
+    },
+    "settings.timetables.manage" : {
+      "comment" : "Button that opens the timetable list editor.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage timetables"
+          }
+        }
+      }
+    },
+    "settings.timetables.title" : {
+      "comment" : "Settings section header for timetable management.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timetables"
           }
         }
       }

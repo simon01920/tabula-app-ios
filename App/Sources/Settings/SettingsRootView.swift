@@ -1,34 +1,58 @@
-// PLACEHOLDER (Stage A) — stage B4 replaces this file with the real Settings screen.
-// Keep the type name `SettingsRootView` and its no-argument init: the app shell uses it.
-// Contains the appearance picker (exercises AppModel.apply → stamping → debounced save → relaunch persistence) and
-// the DEBUG-only Developer entry (`DeveloperSettingsLink`, Debug/DeveloperSettingsLink.swift). B4: keep
+// Settings root (stage B4): one grouped Form; sub-pages are SettingsCalendarView, SettingsAppearanceView,
+// SettingsRemindersView, SettingsAboutView. Every write goes through `model.apply(.settings { … })`.
+// Keep the type name `SettingsRootView` and its no-argument init (the app shell uses it) and keep
 //     #if DEBUG
 //     DeveloperSettingsLink()
 //     #endif
-// as the last section of the real Settings list.
-// APIs: NavigationStack, Form, Section, Picker(selection:content:label:), pickerStyle(.inline), Binding(get:set:).
+// as the last section.
+// Field rule: a row with nothing to show (e.g. build number missing, Timetables editor not registered) is absent.
+// APIs: NavigationStack, Form, Section, Picker(selection:content:label:), NavigationLink(destination:label:),
+//       LabeledContent, Label(title:icon:), View.sheet(isPresented:content:), EnvironmentValues.openURL,
+//       UIApplication.openSettingsURLString (UIKit, iOS 8+).
 import SwiftUI
 import TimetableCore
 import TimetableUI
+import UIKit
 
 struct SettingsRootView: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.openURL) private var openURL
+    @State private var showsTimetables = false
 
     var body: some View {
         NavigationStack {
             Form {
+                profileSection
                 Section {
-                    Picker(selection: appearance) {
-                        Text("settings.appearance.system").tag(Appearance.auto)
-                        Text("settings.appearance.light").tag(Appearance.light)
-                        Text("settings.appearance.dark").tag(Appearance.dark)
-                    } label: {
-                        Text("settings.appearance.title")
+                    NavigationLink { SettingsCalendarView() } label: {
+                        Label { Text("settings.calendar.row") } icon: { Image(systemName: "calendar") }
                     }
-                    .pickerStyle(.inline)
-                    .disabled(model.isReadOnly)
+                } header: {
+                    Text("settings.calendar.title")
+                }
+                Section {
+                    NavigationLink { SettingsAppearanceView() } label: {
+                        Label { Text("settings.appearance.row") } icon: { Image(systemName: "paintpalette") }
+                    }
                 } header: {
                     Text("settings.appearance.title")
+                }
+                timetablesSection
+                Section {
+                    NavigationLink { SettingsRemindersView() } label: {
+                        Label { Text("settings.reminders.row") } icon: { Image(systemName: "bell") }
+                    }
+                } header: {
+                    Text("settings.reminders.title")
+                }
+                languageSection
+                proSection
+                Section {
+                    NavigationLink { SettingsAboutView() } label: {
+                        Label { Text("settings.about.row") } icon: { Image(systemName: "info.circle") }
+                    }
+                } header: {
+                    Text("settings.about.title")
                 }
                 #if DEBUG
                 DeveloperSettingsLink()
@@ -38,9 +62,86 @@ struct SettingsRootView: View {
         }
     }
 
-    private var appearance: Binding<Appearance> {
-        Binding(get: { model.settings.appearance.effective }, set: { value in
-            model.apply(.settings { $0.appearance = value })
+    // MARK: Profile
+
+    private var profileSection: some View {
+        let selected = ProfileChoices.selection(for: model.settings.profile)
+        return Section {
+            Picker(selection: profile) {
+                ForEach(ProfileChoices.offered, id: \.self) { option in
+                    Text(LocalizedStringKey("settings.profile.\(option.rawValue)")).tag(option)
+                }
+            } label: {
+                Text("settings.profile.picker")
+            }
+            .disabled(model.isReadOnly)
+            LabeledContent {
+                Text(LocalizedStringKey(ProfileChoices.terminologyKey(for: selected)))
+            } label: {
+                Text("settings.profile.terminology")
+            }
+            .accessibilityElement(children: .combine)
+        } header: {
+            Text("settings.profile.title")
+        } footer: {
+            Text("settings.profile.footer")
+        }
+    }
+
+    private var profile: Binding<UserProfile> {
+        Binding(get: { ProfileChoices.selection(for: model.settings.profile) }, set: { value in
+            model.apply(.settings { $0.profile = value })
         })
+    }
+
+    // MARK: Timetables (lights up when stage B3 registers `editor.timetables`)
+
+    @ViewBuilder private var timetablesSection: some View {
+        if let route = RouteRegistry.routes.first(where: { $0.id == "editor.timetables" }) {
+            Section {
+                Button { showsTimetables = true } label: {
+                    Label { Text("settings.timetables.manage") } icon: { Image(systemName: "rectangle.stack") }
+                        .foregroundStyle(.primary)
+                }
+                .sheet(isPresented: $showsTimetables) { route.makeView() }
+            } header: {
+                Text("settings.timetables.title")
+            }
+        }
+    }
+
+    // MARK: Language
+
+    private var languageSection: some View {
+        Section {
+            Button {
+                if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
+            } label: {
+                Label { Text("settings.language.open") } icon: { Image(systemName: "globe") }
+                    .foregroundStyle(.primary)
+            }
+        } header: {
+            Text("settings.language.title")
+        } footer: {
+            Text("settings.language.footer")
+        }
+    }
+
+    // MARK: Pro
+
+    private var proSection: some View {
+        Section {
+            LabeledContent {
+                if model.entitlements.tier == .pro { Text("settings.pro.tier.pro") } else { Text("settings.pro.tier.free") }
+            } label: {
+                Text("settings.pro.plan")
+            }
+        } header: {
+            Text("settings.pro.title")
+        } footer: {
+            if ProFeature.allCases.allSatisfy(model.entitlements.isAllowed) {
+                Text("settings.pro.unlocked")
+            }
+        }
     }
 }
