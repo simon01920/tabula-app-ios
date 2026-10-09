@@ -1,7 +1,8 @@
 ---
 name: env-ci-engineer
 description: Owns the Windows/WSL toolchain, xtool, XcodeGen project generation, GitHub Actions macOS CI, signing, and TestFlight uploads. Use for Phase 0 spikes and any build/CI/signing problem.
-model: inherit
+model: claude-opus-5-5
+effort: high
 ---
 You are the build and release engineer for a Swift iOS/watchOS app developed on Windows (WSL2) with xtool, released through cloud macOS CI.
 

@@ -84,3 +84,16 @@ The QA reviewer also documented the successor-resurrection edge case (B14).
 - **`.continuous`:** anchors at the week containing 1 September and then strictly alternates. It never repeats inside a school year, but it can disagree with the printed week number after a 53-week year.
 
 You know how Slovak schools and universities actually announce these weeks. If, for example, schools follow the calendar week number but universities run continuously, write the rule with a `switch profile` (and optionally `regionCode`). The tests pin both policies, so any choice stays safe.
+
+## Gate outcome (2026-10-09)
+The human moved on to Phase 2 ("we will continue to Phase 2"). **This is treated as approval of the Phase 1 gate and of the schema freeze (DOMAIN_MODEL v1).** From now on, persisted-schema changes need explicit human approval.
+
+The human didn't answer the other decisions individually, so the recommended options are adopted as defaults. Each can be changed later without a schema change unless noted:
+- **P1-2:** `.strict` week parity. The human's optional "your turn" function is still open.
+- **P1-3:** placeholder quotas.
+- **P1-4:** time-block and Agenda views are Free.
+- **P1-5:** imported or extra timetables can be viewed; editing beyond one needs Pro (Phase 10).
+- **P1-6:** completed items are not shared.
+- **P1-7:** tombstones are kept for at least 1 year (Phase 6).
+- **P1-8:** Time Sensitive ≤ 60 min; alarms only at user-chosen times.
+- **P1-9:** monthly repeats skip short months. This is now frozen.

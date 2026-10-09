@@ -12,6 +12,13 @@ The main session is the **orchestrator**. It plans, delegates, reviews, integrat
 - Work in **phases** (`docs/specs/ROADMAP.md`). At the end of each phase write a gate report (done / not done / risks / decisions needed / manual on-device checklist) and **stop for human approval**.
 - Keep `docs/RISKS.md` and `docs/ENVIRONMENT.md` current. Log every verified fact and every failed assumption.
 
+### Model routing (human decision, 2026-10-09)
+The orchestrator stays on **Opus 5.5**. For each delegated task it picks the agent tier:
+- **Opus 5.5, high effort** (`<role>`, e.g. `swiftui-engineer`): architecture and foundations, complex or risky logic (time, sync, persistence, layout engines), anything touching the frozen schema, security- or data-loss-sensitive work, and **all `qa-reviewer` runs**.
+- **Sonnet 5.5, medium effort** (`<role>-sonnet`, e.g. `swiftui-engineer-sonnet`): well-specified, lower-risk work such as forms and settings screens built on an existing foundation, translations, docs, CI and script wiring, checklists, and mechanical refactors.
+
+When in doubt, use Opus. Each gate report lists which tier did each task, so the split can be reviewed.
+
 ## Environment rules (hard)
 1. Pure logic lives in `TimetableCore` (no Apple-only imports) so `swift test` runs on WSL/Linux.
 2. Apple-framework code lives in thin targets: `TimetableUI`, `App`, `WidgetExtension`, `WatchApp`.
