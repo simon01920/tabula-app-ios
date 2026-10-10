@@ -231,8 +231,8 @@ import l10n_common as L10N  # noqa: E402
 
 l10n_gaps = L10N.all_problems({"strings": catalog})
 check(not l10n_gaps,
-      f"String Catalog: {len(catalog)} keys x {len(L10N.TARGETS)} languages complete ({', '.join(L10N.LANGS)}), "
-      "format specifiers match English, plural categories per CLDR",
+      f"String Catalog: {len(catalog)} keys complete in all {len(L10N.TARGETS)} translations ({', '.join(L10N.TARGETS)}; "
+      "Serbian counts twice: sr = Cyrillic, sr-Latn = Latin), format specifiers match English, plural categories per CLDR",
       f"String Catalog: {len(l10n_gaps)} translation problem(s) (python3 scripts/l10n-translate-missing.py status|list):"
       + "".join(f"\n       {g}" for g in l10n_gaps[:25]) + ("\n       ..." if len(l10n_gaps) > 25 else ""))
 catalog_langs = {lang for v in catalog.values() for lang in v.get("localizations", {})}
@@ -244,17 +244,16 @@ xt_lprojs = {name: {pathlib.PurePosixPath(r).name for r in res if str(r).startsw
              for name, res in (("app", xt.get("resources", [])), ("widget", ext.get("resources", [])))}
 want_lprojs = {f"{lang}.lproj" for lang in L10N.LANGS}
 check(all(v == want_lprojs for v in xt_lprojs.values()),
-      "xtool.yml: app + widget resources list the .lproj of all 12 languages (scripts/l10n-compile.py output)",
+      f"xtool.yml: app + widget resources list the .lproj of all {len(L10N.LANGS)} language ids (scripts/l10n-compile.py output)",
       "xtool.yml .lproj resources differ from the shipped languages: "
       + str({k: sorted(want_lprojs ^ v) for k, v in xt_lprojs.items() if v != want_lprojs}))
-known = pj.get("options", {}).get("knownRegions")
-check(known is not None and set(known) == set(L10N.LANGS) and pj["options"].get("developmentLanguage") == "en",
-      "project.yml: options.knownRegions = the 12 shipped languages, developmentLanguage en",
-      f"project.yml knownRegions {known} != {list(L10N.LANGS)}")
+check(pj.get("options", {}).get("developmentLanguage") == "en" and "knownRegions" not in pj.get("options", {}),
+      "project.yml: developmentLanguage en (XcodeGen has no knownRegions option; languages come from the catalog + CFBundleLocalizations)",
+      "project.yml: developmentLanguage must be en, and options.knownRegions is ignored by XcodeGen (remove it)")
 for plist_name in ("Config/App-Info.plist", "Config/Widgets-Info.plist"):
     declared = plistlib.load(open(ROOT / plist_name, "rb")).get("CFBundleLocalizations")
     check(declared is not None and set(declared) == set(L10N.LANGS) and len(declared) == len(L10N.LANGS),
-          f"{plist_name}: CFBundleLocalizations lists the 12 shipped languages",
+          f"{plist_name}: CFBundleLocalizations lists the shipped languages ({len(L10N.LANGS)} ids)",
           f"{plist_name}: CFBundleLocalizations {declared} != {list(L10N.LANGS)}")
 KEY_USE = re.compile(r'(?:(?<![A-Za-z_.])(?:Text|Label|Button|Toggle|Picker|Section|Tab|navigationTitle|LocalizedStringKey|'
                      r'LocalizedStringResource)\(\s*|String\(localized:\s*|(?:forKey|key):\s*)"((?:[^"\\]|\\.)*)"')
