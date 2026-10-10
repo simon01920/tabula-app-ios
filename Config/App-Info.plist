@@ -48,6 +48,17 @@
 	<false/>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
+	<!-- Phase 3 reminders: BGAppRefreshTask re-plans the rolling notification window. The identifier must equal
+	     BackgroundRefreshPolicy.taskIdentifier (TimetableUI; validate_config.py checks it). "Executing app refresh
+	     tasks requires setting the fetch UIBackgroundModes capability" (BGAppRefreshTask docs, 2026-10-10). -->
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>sk.simondev.tabula.reminders.refresh</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+	</array>
 	<key>NSAlarmKitUsageDescription</key>
 	<string>Tabula schedules loud alarms only for reminders you explicitly mark as important, such as an exam tomorrow.</string>
 	<key>NSCameraUsageDescription</key>

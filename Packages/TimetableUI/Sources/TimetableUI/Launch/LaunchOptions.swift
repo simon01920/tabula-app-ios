@@ -7,10 +7,12 @@
 //   -TabulaNow <ISO-8601 instant> | live          fixed clock ("live" = real clock); only together with -TabulaSeed
 //   -TabulaTimeZone <IANA id>                     device time zone override, only with -TabulaSeed (default: the
 //                                                 scenario's zone, Europe/Bratislava)
+//   -TabulaReminders fake|live                    reminder clients with -TabulaSeed: `fake` (default, in-memory: nothing
+//                                                 reaches the real notification centre / AlarmKit) or `live`
 //
-// Release builds ignore -TabulaSeed / -TabulaNow / -TabulaTimeZone (`allowsDeveloperOverrides: false`); the app
-// passes `allowsDeveloperOverrides: true` only under `#if DEBUG`. -TabulaScreen still works in Release so a
-// TestFlight build can open a screen directly, but debug-only routes are not registered there.
+// Release builds ignore ALL of them (`allowsDeveloperOverrides: false`, Phase 2 decision P2-6, PHASE3_PLAN §0.11):
+// the app passes `allowsDeveloperOverrides: true` only under `#if DEBUG`, so a shipped build always starts in the
+// normal shell.
 import Foundation
 
 /// Which deterministic data set `-TabulaSeed` loads into an in-memory repository.
@@ -43,6 +45,8 @@ public struct LaunchOptions: Sendable, Equatable {
     public static let nowKey = "TabulaNow"
     /// `-TabulaTimeZone`.
     public static let timeZoneKey = "TabulaTimeZone"
+    /// `-TabulaReminders`.
+    public static let remindersKey = "TabulaReminders"
 
     /// Requested first screen (`-TabulaScreen`), unvalidated. Resolve it with a `RouteTable`.
     public var screen: String?
@@ -52,34 +56,41 @@ public struct LaunchOptions: Sendable, Equatable {
     public var clock: ClockOverride?
     /// Device time-zone override.
     public var timeZone: TimeZone?
+    /// `true` with `-TabulaSeed … -TabulaReminders live`: the seed app uses the real notification centre and AlarmKit.
+    /// Without a seed the real store always uses the real clients.
+    public var liveReminders: Bool
     /// Problems with the given arguments (unknown seed, unparsable date, unknown zone, ignored in Release), in
     /// argument order. Developer-facing text, shown by the debug screen.
     public var problems: [String]
 
     /// Creates options directly (tests, previews).
     public init(screen: String? = nil, seed: SeedKind? = nil, clock: ClockOverride? = nil, timeZone: TimeZone? = nil,
-                problems: [String] = []) {
+                liveReminders: Bool = false, problems: [String] = []) {
         self.screen = screen
         self.seed = seed
         self.clock = clock
         self.timeZone = timeZone
+        self.liveReminders = liveReminders
         self.problems = problems
     }
 
-    /// Parses `arguments`. With `allowsDeveloperOverrides == false` (Release) seed, clock and time zone are
-    /// ignored and reported in `problems`.
+    /// Parses `arguments`. With `allowsDeveloperOverrides == false` (Release) every option — screen, seed, clock,
+    /// time zone, reminders — is ignored and reported in `problems`.
     public init(arguments: LaunchArguments, allowsDeveloperOverrides: Bool) {
         self.init()
-        screen = arguments.value(for: LaunchArguments.screenKey)
+        let rawScreen = arguments.value(for: LaunchArguments.screenKey)
         let rawSeed = arguments.value(for: Self.seedKey)
         let rawNow = arguments.value(for: Self.nowKey)
         let rawZone = arguments.value(for: Self.timeZoneKey)
+        let rawReminders = arguments.value(for: Self.remindersKey)
         guard allowsDeveloperOverrides else {
-            for (key, value) in [(Self.seedKey, rawSeed), (Self.nowKey, rawNow), (Self.timeZoneKey, rawZone)] where value != nil {
+            for (key, value) in [(LaunchArguments.screenKey, rawScreen), (Self.seedKey, rawSeed), (Self.nowKey, rawNow),
+                                 (Self.timeZoneKey, rawZone), (Self.remindersKey, rawReminders)] where value != nil {
                 problems.append("-\(key) ignored in Release builds")
             }
             return
         }
+        screen = rawScreen
         if let rawSeed {
             if let kind = SeedKind(rawValue: rawSeed) {
                 seed = kind
@@ -88,9 +99,10 @@ public struct LaunchOptions: Sendable, Equatable {
             }
         }
         // A fixed clock or zone would stamp the real on-disk data (and the persisted HLC) with fake times: both
-        // apply only to the in-memory seed store.
+        // apply only to the in-memory seed store. Reminder clients are always live for the real store.
         guard seed != nil else {
-            for (key, value) in [(Self.nowKey, rawNow), (Self.timeZoneKey, rawZone)] where value != nil {
+            for (key, value) in [(Self.nowKey, rawNow), (Self.timeZoneKey, rawZone), (Self.remindersKey, rawReminders)]
+            where value != nil {
                 problems.append("-\(key) ignored without -\(Self.seedKey) (only the in-memory seed store may use it)")
             }
             return
@@ -110,6 +122,11 @@ public struct LaunchOptions: Sendable, Equatable {
             } else {
                 problems.append("-\(Self.timeZoneKey) \"\(rawZone)\" is not a known time zone")
             }
+        }
+        switch rawReminders {
+        case nil, "fake"?: liveReminders = false
+        case "live"?: liveReminders = true
+        case let other?: problems.append("-\(Self.remindersKey) \"\(other)\" unknown (fake|live)")
         }
     }
 

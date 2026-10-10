@@ -284,6 +284,24 @@ check(not interpolated, "UI code: no interpolated LocalizedStringKey literal (it
 check(not verbatim, "App code: no Text(verbatim: \"literal\") outside App/Sources/Debug (hard-coded text)",
       f"hard-coded verbatim text (use a catalog key): {verbatim}")
 
+# --- reminders: background app refresh (Phase 3 Stage A) ----------------------------------------------------------
+# SwiftUI `.backgroundTask(.appRefresh(id))` + BGTaskScheduler need the id in BGTaskSchedulerPermittedIdentifiers and
+# UIBackgroundModes `fetch` (BGAppRefreshTask docs). The plist is shared by both build paths (xtool infoPath and
+# project.yml INFOPLIST_FILE), so checking it covers both. The id must equal BackgroundRefreshPolicy.taskIdentifier.
+app_plist = plistlib.load(open(ROOT / "Config/App-Info.plist", "rb"))
+policy_src = (ROOT / "Packages/TimetableUI/Sources/TimetableUI/Reminders/BackgroundRefreshPolicy.swift").read_text(encoding="utf-8")
+policy_id = re.search(r'static let taskIdentifier = "([^"]+)"', policy_src)
+check(policy_id is not None and app_plist.get("BGTaskSchedulerPermittedIdentifiers") == [policy_id.group(1)]
+      and "fetch" in app_plist.get("UIBackgroundModes", []),
+      f"App-Info.plist: BGTaskSchedulerPermittedIdentifiers == [BackgroundRefreshPolicy.taskIdentifier] "
+      f"({policy_id.group(1) if policy_id else '?'}) and UIBackgroundModes contains fetch",
+      f"App-Info.plist background refresh keys wrong: permitted={app_plist.get('BGTaskSchedulerPermittedIdentifiers')}, "
+      f"modes={app_plist.get('UIBackgroundModes')}, policy id={policy_id.group(1) if policy_id else None}")
+check(pj["targets"]["TabulaApp"]["settings"]["base"].get("INFOPLIST_FILE") == "Config/App-Info.plist"
+      and xt.get("infoPath") == "Config/App-Info.plist",
+      "both build paths use Config/App-Info.plist (background refresh keys apply to xtool and XcodeGen builds)",
+      "TabulaApp Info.plist differs between xtool.yml and project.yml")
+
 # --- privacy manifests + export compliance --------------------------------------------------------------------
 VALID_UD_REASONS = {"CA92.1", "1C8F.1", "C56D.1", "AC6B.1"}   # NSPrivacyAccessedAPITypeReasons doc (2026-10-04)
 for label, path, xt_res, pj_target in (

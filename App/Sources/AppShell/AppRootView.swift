@@ -54,12 +54,12 @@ struct AppRootView: View {
     }
 }
 
-/// Today · Timetable · Settings (standard `TabView`, so iOS 26 applies Liquid Glass to the tab bar).
+/// Today · Timetable · Tasks · Exams · Settings (standard `TabView`, so iOS 26 applies Liquid Glass to the tab bar).
+/// The selected tab lives in `AppNavigation` so notification taps (deep links) can switch it; a deep link to a task or
+/// exam also presents the feature's detail route (`tasks.detail` / `exams.detail`) as a sheet when registered.
 struct MainTabView: View {
     let launchRoute: AppRoute?
-    // `nil` = not changed by the user yet → the launch route's choice. (Avoids assigning `_state` in init, which
-    // is unverified with the macro-based @State of the Xcode 27 SDK.)
-    @State private var selectedTab: AppTab?
+    @Environment(AppNavigation.self) private var navigation
     @State private var sheetDismissed = false
 
     private var initialTab: AppTab {
@@ -69,8 +69,13 @@ struct MainTabView: View {
         }
     }
 
+    // `nil` in `navigation.selectedTab` = not changed by the user yet → the launch route's choice.
     private var selection: Binding<AppTab> {
-        Binding(get: { selectedTab ?? initialTab }, set: { selectedTab = $0 })
+        Binding(get: { navigation.selectedTab ?? initialTab }, set: { navigation.selectedTab = $0 })
+    }
+
+    private var presentedItem: Binding<ItemLink?> {
+        Binding(get: { navigation.presentedItem }, set: { navigation.presentedItem = $0 })
     }
 
     private var isSheetPresented: Binding<Bool> {
@@ -91,12 +96,27 @@ struct MainTabView: View {
             Tab("shell.tab.timetable", systemImage: "calendar", value: AppTab.timetable) {
                 root(for: .timetable) { TimetableRootView() }
             }
+            Tab("shell.tab.tasks", systemImage: "checklist", value: AppTab.tasks) {
+                root(for: .tasks) { TasksRootView() }
+            }
+            Tab("shell.tab.exams", systemImage: "graduationcap", value: AppTab.exams) {
+                root(for: .exams) { ExamsRootView() }
+            }
             Tab("shell.tab.settings", systemImage: "gearshape", value: AppTab.settings) {
                 root(for: .settings) { SettingsRootView() }
             }
         }
         .sheet(isPresented: isSheetPresented) {
             launchRoute?.makeView()
+        }
+        // Second sheet on a background view: two `.sheet` modifiers on the same view are not reliable.
+        .background {
+            Color.clear
+                .sheet(item: presentedItem) { link in
+                    if let id = AppNavigation.detailRouteID(for: link), let route = RouteRegistry.route(id: id) {
+                        route.makeView()
+                    }
+                }
         }
     }
 

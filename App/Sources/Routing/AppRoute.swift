@@ -3,10 +3,12 @@
 import SwiftUI
 import TimetableUI
 
-/// The tabs of the app shell (PHASE2_PLAN §0.3). Phase 3 adds `.tasks` and `.exams`.
+/// The tabs of the app shell, in tab-bar order: Today · Timetable · Tasks · Exams · Settings (PHASE3_PLAN §0.1).
 enum AppTab: String, CaseIterable, Hashable, Sendable {
     case today
     case timetable
+    case tasks
+    case exams
     case settings
 }
 

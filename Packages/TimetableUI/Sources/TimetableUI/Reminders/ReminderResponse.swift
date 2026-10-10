@@ -71,3 +71,8 @@ public enum ReminderResponseInterpreter {
         }
     }
 }
+
+extension ItemLink: Identifiable {
+    /// The link itself (for `sheet(item:)`).
+    public var id: ItemLink { self }
+}

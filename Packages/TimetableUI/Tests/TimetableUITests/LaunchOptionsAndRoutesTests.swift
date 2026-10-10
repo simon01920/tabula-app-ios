@@ -52,13 +52,27 @@ struct LaunchOptionsTests {
                                      "-TabulaTimeZone ignored without -TabulaSeed (only the in-memory seed store may use it)"])
     }
 
-    @Test func releaseIgnoresDeveloperOverridesButKeepsTheScreen() {
-        let options = parse(["-TabulaScreen", "today", "-TabulaSeed", "secondary", "-TabulaNow", "2026-10-13T08:20:00Z"],
-                            debug: false)
-        #expect(options.screen == "today")
+    /// Phase 2 decision P2-6 / PHASE3_PLAN §0.11: a Release build ignores every launch option, including the screen.
+    @Test func releaseIgnoresEveryLaunchOptionIncludingTheScreen() {
+        let options = parse(["-TabulaScreen", "today", "-TabulaSeed", "secondary", "-TabulaNow", "2026-10-13T08:20:00Z",
+                             "-TabulaReminders", "live"], debug: false)
+        #expect(options.screen == nil)
         #expect(options.seed == nil)
         #expect(options.clock == nil)
-        #expect(options.problems == ["-TabulaSeed ignored in Release builds", "-TabulaNow ignored in Release builds"])
+        #expect(!options.liveReminders)
+        #expect(options.problems == ["-TabulaScreen ignored in Release builds", "-TabulaSeed ignored in Release builds",
+                                     "-TabulaNow ignored in Release builds", "-TabulaReminders ignored in Release builds"])
+    }
+
+    @Test func remindersAreFakeInSeedModeUnlessLiveIsRequested() {
+        #expect(!parse(["-TabulaSeed", "secondary"], debug: true).liveReminders)
+        #expect(!parse(["-TabulaSeed", "secondary", "-TabulaReminders", "fake"], debug: true).liveReminders)
+        #expect(parse(["-TabulaSeed", "secondary", "-TabulaReminders", "live"], debug: true).liveReminders)
+        let typo = parse(["-TabulaSeed", "secondary", "-TabulaReminders", "real"], debug: true)
+        #expect(!typo.liveReminders && typo.problems == ["-TabulaReminders \"real\" unknown (fake|live)"])
+        let noSeed = parse(["-TabulaReminders", "fake"], debug: true)
+        #expect(!noSeed.liveReminders)
+        #expect(noSeed.problems == ["-TabulaReminders ignored without -TabulaSeed (only the in-memory seed store may use it)"])
     }
 }
 

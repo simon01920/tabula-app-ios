@@ -49,6 +49,8 @@ struct AppEnvironment: Sendable {
     let launchOptions: LaunchOptions
     /// Delay between the last change and the save (coalesces bursts of edits).
     let saveDebounce: Duration
+    /// Notification centre, AlarmKit, applied-plan store, background refresh and device state for the reminder adapter.
+    let reminders: ReminderDependencies
 
     /// The environment for this process.
     static func make(launchOptions: LaunchOptions) -> AppEnvironment {
@@ -68,7 +70,8 @@ struct AppEnvironment: Sendable {
                 clockStore: InMemoryClockStore(HybridLogicalClock(node: 0x5EED)),
                 nowProvider: now, deviceTimeZone: { zone }, locale: { Locale.current }, catalogLookup: lookup,
                 entitlements: AllAccessEntitlements(), dataSource: .seed(seed), launchOptions: launchOptions,
-                saveDebounce: .milliseconds(100))
+                saveDebounce: .milliseconds(100),
+                reminders: launchOptions.liveReminders ? .live(defaults: .standard) : .inMemory())
         }
         #endif
         // The real store always uses the real clock and the system zone: -TabulaNow/-TabulaTimeZone are honoured only
@@ -80,7 +83,8 @@ struct AppEnvironment: Sendable {
             nowProvider: .live, deviceTimeZone: { TimeZone.current }, locale: { Locale.current },
             catalogLookup: lookup, entitlements: AllAccessEntitlements(),
             dataSource: .file(directory: location.directory, isAppGroup: location.isAppGroup),
-            launchOptions: launchOptions, saveDebounce: .milliseconds(400))
+            launchOptions: launchOptions, saveDebounce: .milliseconds(400),
+            reminders: .live(defaults: location.defaults))
     }
 }
 
@@ -124,5 +128,36 @@ final class UserDefaultsClockStore: ClockStore, @unchecked Sendable {
     func save(_ clock: HybridLogicalClock) {
         guard let data = try? JSONEncoder().encode(clock) else { return }
         defaults.set(data, forKey: Self.key)
+    }
+}
+
+/// What the reminder adapter talks to (Phase 3 Stage A). Live: `UNUserNotificationCenter`, AlarmKit, the App Group
+/// UserDefaults, `BGTaskScheduler`, UIKit/ProcessInfo. In memory (`-TabulaSeed` without `-TabulaReminders live`):
+/// fakes, so screenshots and seed runs never schedule anything on the device or simulator.
+struct ReminderDependencies: Sendable {
+    let notifications: any NotificationCenterClient
+    let alarms: any AlarmClient
+    let stateStore: any ReminderStateStore
+    let backgroundScheduler: any BackgroundRefreshScheduling
+    let deviceState: @MainActor @Sendable () -> DeviceReminderState
+    /// `true` when the real system clients are used (debug screen).
+    let isLive: Bool
+
+    static func live(defaults: UserDefaults) -> ReminderDependencies {
+        ReminderDependencies(notifications: LiveNotificationCenterClient(), alarms: LiveAlarmClient(),
+                             stateStore: UserDefaultsReminderStateStore(defaults: defaults),
+                             backgroundScheduler: LiveBackgroundRefreshScheduler(),
+                             deviceState: { DeviceStateReader.live() }, isLive: true)
+    }
+
+    /// Plausible fixed state for screenshots: everything allowed, Time Sensitive not available (as in xtool builds).
+    static func inMemory() -> ReminderDependencies {
+        ReminderDependencies(notifications: InMemoryNotificationCenterClient(authorization: .authorized,
+                                                                             timeSensitive: .notSupported),
+                             alarms: InMemoryAlarmClient(authorization: .authorized),
+                             stateStore: InMemoryReminderStateStore(),
+                             backgroundScheduler: RecordingBackgroundRefreshScheduler(),
+                             deviceState: { DeviceReminderState(isLowPowerModeEnabled: false, backgroundRefresh: .available) },
+                             isLive: false)
     }
 }

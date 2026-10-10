@@ -30,6 +30,16 @@ enum ApplyResult: Equatable {
     case failed(MutationError)
 }
 
+/// What `AppModel.onChange` reports.
+enum AppModelChange: Equatable, Sendable {
+    /// The store finished loading.
+    case loaded
+    /// An accepted `apply(_:)`.
+    case data
+    /// Calendar context / formatters rebuilt (zone, locale, significant time change, scene active).
+    case environment
+}
+
 @MainActor
 @Observable
 final class AppModel {
@@ -70,6 +80,10 @@ final class AppModel {
     @ObservationIgnored private var generation = 0
     @ObservationIgnored private var saveTask: Task<Void, Never>?
     @ObservationIgnored private var observers: [any NSObjectProtocol] = []
+    @ObservationIgnored private var loadTask: Task<Void, Never>?
+    /// Called after the store loaded, after every accepted change and after every environment refresh (time zone,
+    /// locale, day change, scene activation). The reminder coordinator re-plans from it (debounced).
+    @ObservationIgnored var onChange: (@MainActor (AppModelChange) -> Void)?
 
     init(environment: AppEnvironment) {
         self.environment = environment
@@ -104,9 +118,20 @@ final class AppModel {
 
     // MARK: Lifecycle
 
-    /// Loads the store once and starts observing time-zone / locale changes.
+    /// Loads the store once and starts observing time-zone / locale changes. Single-flight: concurrent callers (the
+    /// window's `.task`, a notification action or a background refresh that launched the app) all await the same load.
     func load() async {
+        if let loadTask {
+            await loadTask.value
+            return
+        }
         guard isLoading else { return }
+        let task = Task { await performLoad() }
+        loadTask = task
+        await task.value
+    }
+
+    private func performLoad() async {
         let outcome = await environment.persistence.load()
         switch outcome {
         case let .loaded(database, banners, isReadOnly):
@@ -126,6 +151,7 @@ final class AppModel {
         isLoading = false
         rebuildDerived()
         observeSystemChanges()
+        onChange?(.loaded)
     }
 
     /// Writes pending changes now (scene going to the background).
@@ -167,6 +193,7 @@ final class AppModel {
             generation += 1
             rebuildDerived()
             scheduleSave()
+            onChange?(.data)
             return .applied(warnings: warnings)
         }
     }
@@ -233,6 +260,7 @@ final class AppModel {
     func refreshEnvironment() {
         NSTimeZone.resetSystemTimeZone()
         rebuildDerived()
+        onChange?(.environment)
     }
 
     private func observeSystemChanges() {

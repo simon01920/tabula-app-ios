@@ -2,16 +2,17 @@
 // Module name is `TabulaApp` on both build paths (SwiftPM target name / PRODUCT_MODULE_NAME in project.yml),
 // so the app type must not be called `TabulaApp` (type/module name shadowing) and no module may be called
 // `App` (clashes with SwiftUI.App).
-// APIs: SwiftUI.App, Scene, WindowGroup, State (macro in the Xcode 27 SDK; allowed per PHASE2_PLAN §0.1),
-//       Environment(\.scenePhase), ScenePhase, View.environment(_:) for Observable objects, View.task(_:),
-//       View.onChange(of:_:) (two-parameter closure, iOS 17), UIApplication.beginBackgroundTask(withName:expirationHandler:),
+// APIs: SwiftUI.App, Scene, WindowGroup, UIApplicationDelegateAdaptor (iOS 14), Environment(\.scenePhase), ScenePhase,
+//       View.environment(_:) for Observable objects, View.task(_:), View.onChange(of:_:) (two-parameter closure, iOS 17),
+//       Scene.backgroundTask(_:action:) + BackgroundTask.appRefresh(_:) (iOS 16; the action's return completes the task,
+//       SwiftUI registers the identifier), UIApplication.beginBackgroundTask(withName:expirationHandler:),
 //       UIApplication.endBackgroundTask(_:).
 import SwiftUI
 import UIKit
 import TimetableUI
 
-/// Launch options of this process, parsed once. Developer overrides (-TabulaSeed/-TabulaNow/-TabulaTimeZone) only in
-/// DEBUG builds; Release ignores them (PHASE2_PLAN §0.6).
+/// Launch options of this process, parsed once. Developer overrides (-TabulaScreen/-TabulaSeed/-TabulaNow/
+/// -TabulaTimeZone/-TabulaReminders) only in DEBUG builds; Release ignores them all (PHASE2_PLAN §0.6, decision P2-6).
 enum LaunchContext {
     static let options: LaunchOptions = {
         #if DEBUG
@@ -26,23 +27,35 @@ enum LaunchContext {
 
 @main
 struct TabulaRootApp: App {
-    @State private var model = AppModel(environment: .make(launchOptions: LaunchContext.options))
-    /// `-TabulaScreen <id>` resolved against the route registry (Routing/RouteRegistry.swift). Read once at launch.
+    /// Owns `AppServices` (model, navigation, reminders) from before launch finishes (Environment/AppServices.swift).
+    @UIApplicationDelegateAdaptor private var appDelegate: TabulaAppDelegate
+    /// `-TabulaScreen <id>` resolved against the route registry (Routing/RouteRegistry.swift). Read once at launch;
+    /// always "no route" in Release (LaunchOptions drops the argument).
     private let launchRoute = RouteRegistry.resolve(LaunchContext.options.screen)
     @Environment(\.scenePhase) private var scenePhase
 
+    private var services: AppServices { appDelegate.services }
+
     var body: some Scene {
+        let reminders = services.reminders
         WindowGroup {
             AppRootView(launchRoute: launchRoute)
-                .environment(model)
-                .task { await model.load() }
+                .environment(services.model)
+                .environment(services.navigation)
+                .environment(services.reminders)
+                .task { await services.model.load() }
         }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
-                model.refreshEnvironment()   // day / time zone / locale may have changed while suspended
+                services.model.refreshEnvironment()   // day / time zone / locale may have changed; also re-plans reminders
             } else {
-                BackgroundSave.flush(model)
+                BackgroundSave.flush(services.model)
             }
+        }
+        // The BGAppRefreshTask handler: loads the store if the app was launched for it, re-plans, submits the next
+        // request. Returning completes the task (SwiftUI cancels it when the time is up).
+        .backgroundTask(.appRefresh(BackgroundRefreshPolicy.taskIdentifier)) {
+            await reminders.backgroundRefresh()
         }
     }
 }

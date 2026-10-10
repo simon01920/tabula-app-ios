@@ -130,6 +130,8 @@ struct DeveloperScreen: View {
                 } header: { Text(verbatim: "Recovery tests (file store only)") }
             }
 
+            ReminderDebugSection()
+
             Section {
                 NavigationLink { DebugScreen(area: .all) } label: { Text(verbatim: "Phase 0 probes") }
             }

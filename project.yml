@@ -75,6 +75,9 @@ targets:
         PRODUCT_MODULE_NAME: TabulaApp      # same module name as the SwiftPM target on the xtool path
         PRODUCT_BUNDLE_IDENTIFIER: $(TABULA_BUNDLE_ID)         # = xtool.yml bundleID (validate.sh)
         INFOPLIST_FILE: Config/App-Info.plist
+        # Background App Refresh (Phase 3 reminders): UIBackgroundModes [fetch] + BGTaskSchedulerPermittedIdentifiers live
+        # in Config/App-Info.plist (shared with xtool). Xcode's "Background Modes" capability only writes that plist key;
+        # no entitlement is involved, so nothing else is needed here (validate_config.py checks the keys).
         # Config/Tabula.entitlements (App Group only, shared with xtool) unless TABULA_PAID_ACCOUNT = 1, then
         # Config/Entitlements/PaidAccount/Tabula.entitlements. Selection logic: Config/AppIdentity.xcconfig.
         CODE_SIGN_ENTITLEMENTS: $(TABULA_APP_ENTITLEMENTS)
