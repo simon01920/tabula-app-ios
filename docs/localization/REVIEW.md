@@ -2,7 +2,7 @@
 
 Status of every shipped language. **All 12 launch languages are machine translations (Claude, Phase 2 stage C1). None has had a native-speaker review. Do not describe any of them as native quality.** Every non-English unit in `Resources/Localizable.xcstrings` carries `"state": "needs_review"`; a reviewer changes it to `translated` only after checking it (the completeness check accepts both states).
 
-Source of truth: `Resources/Localizable.xcstrings` (420 keys at C1, 28 of them plurals). Drafts/inputs of the first translation pass: `docs/localization/translations/<lang>.json` (the catalog is canonical; these files are the authored input and a record, `sr-Latn` has none because it is generated from `sr`).
+Source of truth: `Resources/Localizable.xcstrings` (797 keys after the follow-up pass: 420 from C1 plus the editor.*, timetable.* and today.* keys; the unused placeholder.* keys were deleted). Drafts/inputs of the first translation pass: `docs/localization/translations/<lang>.json` (the catalog is canonical; these files are the authored input and a record, `sr-Latn` has none because it is generated from `sr`).
 
 ## Language table
 
@@ -71,7 +71,7 @@ Questions for reviewers, all languages: (a) is the "class" word for the universi
 - **Info.plist usage strings** (camera, photo library, AlarmKit) and the app display name are **not localized yet** (they fall back to English); they need `InfoPlist.xcstrings` in a later stage.
 
 ## Machine-translation provenance
-Pass 1 (Phase 2 stage C1, 2026-10-10): model-authored for all 11 target languages from the English strings and translator comments. No external translation service, no glossary import. `sk` probe strings (8) pre-existed from Phase 0.
+Pass 2 (2026-10-10, follow-up): the 383 editor / timetable / today keys, same terminology table; the six unused `*.placeholder.*` keys were removed. Pass 1 (Phase 2 stage C1, 2026-10-10): model-authored for all 11 target languages from the English strings and translator comments. No external translation service, no glossary import. `sk` probe strings (8) pre-existed from Phase 0.
 
 ## Manual on-device checks (language)
 - Settings > Tabula > Language: all 12 languages offered (incl. Srpski/Српски). Cold start in each: no raw keys (`shell.tab.today`, `a11y.lesson.room`) anywhere; plural strings (conflicts, share warnings, reminder bodies) read correctly for 1, 2, 5, 21.
