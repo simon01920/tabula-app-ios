@@ -8,6 +8,22 @@
 	<string>Tabula Widgets</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>sk</string>
+		<string>cs</string>
+		<string>pl</string>
+		<string>hu</string>
+		<string>ro</string>
+		<string>de</string>
+		<string>fr</string>
+		<string>uk</string>
+		<string>sr</string>
+		<string>sr-Latn</string>
+		<string>ja</string>
+		<string>zh-Hans</string>
+	</array>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionPointIdentifier</key>

@@ -9,8 +9,19 @@ infoPath: Config/App-Info.plist     # merged over xtool's defaults (CFBundleIden
 iconPath: Resources/AppIcon.png     # copied as CFBundleIconFile; xtool does not compile .xcassets (PR #219 open)
 entitlementsPath: Config/Tabula.entitlements
 resources:                          # copied verbatim into the .app root (by file/dir name)
-  - .build-l10n/en.lproj
-  - .build-l10n/sk.lproj
+  - .build-l10n/en.lproj            # the 12 launch languages, compiled from Resources/Localizable.xcstrings by
+  - .build-l10n/sk.lproj            # scripts/l10n-compile.py; validate_config.py checks this list == the catalog's
+  - .build-l10n/cs.lproj            # languages == CFBundleLocalizations == project.yml knownRegions.
+  - .build-l10n/pl.lproj
+  - .build-l10n/hu.lproj
+  - .build-l10n/ro.lproj
+  - .build-l10n/de.lproj
+  - .build-l10n/fr.lproj
+  - .build-l10n/uk.lproj
+  - .build-l10n/sr.lproj            # Serbian, Cyrillic
+  - .build-l10n/sr-Latn.lproj       # Serbian, Latin
+  - .build-l10n/ja.lproj
+  - .build-l10n/zh-Hans.lproj       # Chinese, Simplified
   - Config/Privacy/App/PrivacyInfo.xcprivacy
 extensions:
   - product: TabulaWidgets          # bundle ID defaults to sk.simondev.tabula.TabulaWidgets
@@ -19,4 +30,15 @@ extensions:
     resources:
       - .build-l10n/en.lproj
       - .build-l10n/sk.lproj
+      - .build-l10n/cs.lproj
+      - .build-l10n/pl.lproj
+      - .build-l10n/hu.lproj
+      - .build-l10n/ro.lproj
+      - .build-l10n/de.lproj
+      - .build-l10n/fr.lproj
+      - .build-l10n/uk.lproj
+      - .build-l10n/sr.lproj
+      - .build-l10n/sr-Latn.lproj
+      - .build-l10n/ja.lproj
+      - .build-l10n/zh-Hans.lproj
       - Config/Privacy/Widgets/PrivacyInfo.xcprivacy

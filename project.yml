@@ -18,6 +18,12 @@ options:
   createIntermediateGroups: true
   developmentLanguage: en
   groupSortPosition: top
+  # Languages: the 12 launch languages live in Resources/Localizable.xcstrings (ids en sk cs pl hu ro de fr uk sr
+  # sr-Latn ja zh-Hans; sr = Serbian Cyrillic). XcodeGen 2.46 has NO knownRegions option (verified 2026-10-10: a
+  # `knownRegions:` key is ignored, pbxproj keeps Base+en) and Xcode compiles every language of the catalog anyway
+  # (CI run 37449454629 emitted sk.lproj with this project). The languages are declared to iOS by CFBundleLocalizations
+  # in Config/App-Info.plist + Config/Widgets-Info.plist; validate_config.py keeps those, the catalog and xtool.yml's
+  # .lproj resources identical.
 
 # Identity values + the paid-account switch live in ONE file (see its header). Project-level base configuration,
 # so every target can use $(TABULA_BUNDLE_ID), $(TABULA_APP_ENTITLEMENTS), … . Do NOT redefine TABULA_* below:

@@ -130,11 +130,22 @@ fi
 
 step "String Catalog -> .lproj (xtool path compiler)"
 if python3 "$REPO_ROOT/scripts/l10n-compile.py" --self-test >"$TMP/l10n-self.log" 2>&1; then
-  ok "l10n-compile --self-test ($(grep -c '^OK' "$TMP/l10n-self.log") edge cases: %% , empty, state new, fallback)"
+  ok "l10n-compile --self-test ($(grep -c "^OK" "$TMP/l10n-self.log") edge cases: %%, empty, state new, fallback, plural categories, sr-Latn/zh-Hans, positional)"
 else
   cat "$TMP/l10n-self.log"; bad "l10n-compile --self-test"
 fi
-if python3 "$REPO_ROOT/scripts/l10n-compile.py" "$REPO_ROOT/Resources/Localizable.xcstrings" "$TMP/l10n"; then ok "l10n-compile Resources/Localizable.xcstrings"; else bad "l10n-compile"; fi
+if python3 -B "$REPO_ROOT/scripts/l10n-translate-missing.py" self-test >"$TMP/l10n-tm.log" 2>&1; then
+  ok "l10n-translate-missing self-test ($(grep -c '^OK' "$TMP/l10n-tm.log") checks: specifier/category refusal, merge, sr-Latn derivation, list)"
+else
+  cat "$TMP/l10n-tm.log"; bad "l10n-translate-missing self-test"
+fi
+if python3 -B "$REPO_ROOT/scripts/l10n-compile.py" "$REPO_ROOT/Resources/Localizable.xcstrings" "$TMP/l10n" >"$TMP/l10n-compile.log" 2>"$TMP/l10n-compile.err"; then
+  ok "l10n-compile Resources/Localizable.xcstrings: $(grep -c 'lproj:' "$TMP/l10n-compile.log") languages, $(grep -c '^warning' "$TMP/l10n-compile.err") warnings"
+  # No gap may hide behind the compiler's per-key fallback to English (the completeness check also fails on it).
+  if grep -q 'no usable translation' "$TMP/l10n-compile.err"; then cat "$TMP/l10n-compile.err"; bad "l10n-compile: 'no usable translation' warnings"; fi
+else
+  cat "$TMP/l10n-compile.err"; bad "l10n-compile"
+fi
 if python3 -B "$REPO_ROOT/scripts/l10n-add.py" --check; then :; else bad "Localizable.xcstrings not in canonical (Xcode) form: add strings with scripts/l10n-add.py"; fi
 
 step "CI helper self-tests (macOS-job path gate, simulator picker)"
