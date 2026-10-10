@@ -85,3 +85,6 @@ all `needs_review`. Terminology follows the existing `settings.reminders.*` stri
 de "Zeitkritisch", ja "即時通知"). French uses NBSP before ":"; Serbian keeps the app name "Tabula" in Latin script, as
 the existing strings do. Apple UI terms (Focus, Low Power Mode, Background App Refresh, Action button, Control Center)
 should be checked against each language's iOS wording during review. Recorded in `translations/<lang>.json`.
+
+### Phase 3 Stage B4 additions (2026-10-10, localization-engineer-sonnet)
+91 new keys (`reminders.*`, `health.*`, `settings.reminder-health.*`, `settings.reminders.*`: reminder rule editor, follow-up, reminder times, override section, permission sheet, quiet hours, health check and test results), machine-translated (model-authored) for all 11 authored languages, `sr-Latn` derived, all `needs_review`. Not native quality. 8 plural keys (hours/minutes/days/reminder counts, Time Sensitive lead) use the full CLDR categories for sk/cs/pl/uk/sr/ro; reviewers please check Slavic genitive/accusative forms ("minúty" vs "minút", "hodinu pred") and Hungarian wording without a case suffix after the time argument. Terminology reuses existing strings (Time Sensitive, Loud alarm, Standard, Focus, Quiet hours = sk "Pokojné hodiny", cs "Tiché hodiny", de "Ruhezeiten"). Quiet hours wording is new and worth a native check.
