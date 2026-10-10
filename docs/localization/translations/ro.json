@@ -829,7 +829,7 @@
 "health.timeSensitive.notSupported": "Indisponibile în această versiune a aplicației: reamintirile urgente sosesc ca reamintiri obișnuite.",
 "health.alarms.title": "Alarme sonore",
 "health.alarms.authorized": "Permise.",
-"health.alarms.denied": "Dezactivate în Setări. În locul alarmelor sonore sosesc notificări urgente.",
+"health.alarms.denied": "Dezactivate în Setări. În locul alarmelor sonore sosesc notificări: urgente, dacă este posibil, altfel obișnuite.",
 "health.alarms.notDetermined": "Încă nepermise. Tabula te întreabă când alegi o alarmă sonoră.",
 "health.alarms.unavailable": "Indisponibile pe acest dispozitiv.",
 "health.focus.title": "Concentrare",

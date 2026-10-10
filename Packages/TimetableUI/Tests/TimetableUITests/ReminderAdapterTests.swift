@@ -5,7 +5,7 @@ import TimetableCore
 
 // Phase 3 Stage A: the reminder adapter (planner → clients) with the in-memory notification centre and AlarmKit.
 
-private enum Fixture {
+enum Fixture {
     static let zone = TimeZone(identifier: "Europe/Bratislava")!
     static let context = CalendarContext(timeZone: zone, firstWeekday: .monday)
     static let london = CalendarContext(timeZone: TimeZone(identifier: "Europe/London")!, firstWeekday: .monday)

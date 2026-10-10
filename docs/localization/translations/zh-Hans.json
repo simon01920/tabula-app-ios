@@ -829,7 +829,7 @@
 "health.timeSensitive.notSupported": "此版本的 App 不支持：时效性提醒会像普通提醒一样送达。",
 "health.alarms.title": "响铃闹钟",
 "health.alarms.authorized": "已允许。",
-"health.alarms.denied": "已在“设置”中关闭。响铃闹钟会改为以时效性通知送达。",
+"health.alarms.denied": "已在“设置”中关闭。响铃闹钟会改为以通知送达：可用时为时效性通知，否则为普通通知。",
 "health.alarms.notDetermined": "尚未允许。你选择响铃闹钟时，Tabula 会询问你。",
 "health.alarms.unavailable": "此设备不支持。",
 "health.focus.title": "专注模式",

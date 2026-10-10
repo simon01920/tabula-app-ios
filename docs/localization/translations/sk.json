@@ -829,7 +829,7 @@
 "health.timeSensitive.notSupported": "V tejto verzii aplikácie nie je k dispozícii: časovo citlivé pripomienky prídu ako bežné.",
 "health.alarms.title": "Hlasné budíky",
 "health.alarms.authorized": "Povolené.",
-"health.alarms.denied": "Vypnuté v Nastaveniach. Hlasné budíky namiesto toho prídu ako časovo citlivé hlásenia.",
+"health.alarms.denied": "Vypnuté v Nastaveniach. Hlasné budíky namiesto toho prídu ako hlásenia: časovo citlivé, ak je to možné, inak bežné.",
 "health.alarms.notDetermined": "Zatiaľ nepovolené. Tabula sa opýta, keď si vyberiete hlasný budík.",
 "health.alarms.unavailable": "Na tomto zariadení nie je k dispozícii.",
 "health.focus.title": "Sústredenie",

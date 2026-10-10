@@ -31166,85 +31166,85 @@
       }
     },
     "health.alarms.denied" : {
-      "comment" : "Health check: alarms are turned off for Tabula in the Settings app.",
+      "comment" : "Health check: alarms are turned off for Tabula in the Settings app. Loud alarms then fall back to Time Sensitive notifications (only when the app has that capability) or standard ones.",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Vypnuto v Nastavení. Hlasité budíky místo toho přijdou jako časově citlivá oznámení."
+            "value" : "Vypnuto v Nastavení. Hlasité budíky místo toho přijdou jako oznámení: časově citlivá, pokud je to možné, jinak běžná."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "In den Einstellungen deaktiviert. Statt lauter Alarme kommen zeitkritische Mitteilungen."
+            "value" : "In den Einstellungen deaktiviert. Statt lauter Alarme kommen Mitteilungen: zeitkritisch, wo verfügbar, sonst normal."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Turned off in Settings. Loud alarms arrive as Time Sensitive notifications instead."
+            "value" : "Turned off in Settings. Loud alarms arrive as notifications instead: Time Sensitive where available, otherwise standard."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Désactivées dans Réglages. Les alarmes sonores arrivent à la place comme notifications urgentes."
+            "value" : "Désactivées dans Réglages. Les alarmes sonores arrivent à la place comme notifications : urgentes si possible, sinon normales."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Kikapcsolva a Beállításokban. A hangos riasztások helyett időérzékeny értesítések érkeznek."
+            "value" : "Kikapcsolva a Beállításokban. A hangos riasztások helyett értesítések érkeznek: ha lehet, időérzékenyek, egyébként normálok."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "設定でオフになっています。大音量アラームの代わりに即時通知が届きます。"
+            "value" : "設定でオフになっています。大音量アラームの代わりに通知が届きます（利用できる場合は即時通知、それ以外は通常の通知）。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wyłączone w Ustawieniach. Zamiast głośnych alarmów przychodzą pilne powiadomienia."
+            "value" : "Wyłączone w Ustawieniach. Zamiast głośnych alarmów przychodzą powiadomienia: pilne, jeśli to możliwe, w przeciwnym razie zwykłe."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Dezactivate în Setări. În locul alarmelor sonore sosesc notificări urgente."
+            "value" : "Dezactivate în Setări. În locul alarmelor sonore sosesc notificări: urgente, dacă este posibil, altfel obișnuite."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Vypnuté v Nastaveniach. Hlasné budíky namiesto toho prídu ako časovo citlivé hlásenia."
+            "value" : "Vypnuté v Nastaveniach. Hlasné budíky namiesto toho prídu ako hlásenia: časovo citlivé, ak je to možné, inak bežné."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Искључено у Подешавањима. Уместо гласних аларма стижу хитна обавештења."
+            "value" : "Искључено у Подешавањима. Уместо гласних аларма стижу обавештења: хитна где је могуће, иначе обична."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Isključeno u Podešavanjima. Umesto glasnih alarma stižu hitna obaveštenja."
+            "value" : "Isključeno u Podešavanjima. Umesto glasnih alarma stižu obaveštenja: hitna gde je moguće, inače obična."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Вимкнено в Параметрах. Замість гучних будильників надходять термінові сповіщення."
+            "value" : "Вимкнено в Параметрах. Замість гучних будильників надходять сповіщення: термінові, якщо це можливо, інакше звичайні."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "已在“设置”中关闭。响铃闹钟会改为以时效性通知送达。"
+            "value" : "已在“设置”中关闭。响铃闹钟会改为以通知送达：可用时为时效性通知，否则为普通通知。"
           }
         }
       }

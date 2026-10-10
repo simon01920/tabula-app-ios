@@ -124,10 +124,9 @@ final class ReminderCoordinator {
         debounceTask?.cancel()
         let delay = debounce ?? self.debounce
         debounceTask = Task { [weak self] in
-            if delay > .zero {
-                try? await Task.sleep(for: delay)
-                guard !Task.isCancelled else { return }
-            }
+            if delay > .zero { try? await Task.sleep(for: delay) }
+            // Also for zero-delay requests: a `replanNow` that already covered this reason cancels the task.
+            guard !Task.isCancelled else { return }
             await self?.runCoalesced()
         }
     }
@@ -169,20 +168,25 @@ final class ReminderCoordinator {
         pendingReasons = []
         let database = model.database ?? DatabaseMutation.emptyBase
         let resolvers = model.database == nil ? [] : model.resolvers.values.sorted { $0.timetable.id < $1.timetable.id }
+        let signature = ReminderRenderSignature(language: Bundle.main.preferredLocalizations.first ?? "",
+                                                localeIdentifier: model.formatter.locale.identifier,
+                                                hourCycle: model.settings.hourCycle.rawValue,
+                                                timeZoneIdentifier: model.calendarContext.timeZone.identifier)
         let input = ReminderRunInput(database: database, resolvers: resolvers, context: model.calendarContext,
                                      renderer: model.renderer, now: model.now,
-                                     loudAlarmsEntitled: model.entitlements.isAllowed(.loudAlarms))
+                                     loudAlarmsEntitled: model.entitlements.isAllowed(.loudAlarms),
+                                     renderSignature: signature)
         let result = await engine.run(input)
         lastResult = result
         lastReasons = reasons
         lastRunAt = model.now
-        let earliest = BackgroundRefreshPolicy.earliestBeginDate(nextReplanDate: result.plan.nextReplanDate, now: model.now)
+        let earliest = BackgroundRefreshPolicy.earliestBeginDate(nextReplanDate: result.replanDate, now: model.now)
         if let error = await backgroundScheduler.submit(earliestBeginDate: earliest) {
             lastBackgroundRequest = "failed: \(error)"
         } else {
             lastBackgroundRequest = earliest.formatted(date: .abbreviated, time: .shortened)
         }
-        scheduleTimer(at: result.plan.nextReplanDate)
+        scheduleTimer(at: result.replanDate)
         await refreshHealthIfShown()
     }
 
@@ -207,7 +211,7 @@ final class ReminderCoordinator {
     // MARK: Notification responses
 
     /// Executes a notification response (delegate → here). Loads the store first (the action may have launched the app
-    /// in the background), and for Mark done re-plans and saves before returning, because the system may suspend the
+    /// in the background), and for Mark done saves, then re-plans before returning, because the system may suspend the
     /// app right after the completion handler.
     func handle(_ action: NotificationResponseAction, _ delivered: DeliveredNotification) async {
         await model.load()
@@ -215,10 +219,10 @@ final class ReminderCoordinator {
         case .markDone(let source):
             guard let mutation = ReminderResponseInterpreter.mutation(for: source, now: model.now) else { return }
             if case .applied = model.apply(mutation) {
-                await engine.notifications.removeDelivered(ids: [delivered.requestID])
+                await engine.removeDelivered(for: source)   // the item's other reminders in Notification Center
             }
+            await model.flush()                              // persist first: the system may suspend us any moment
             await replanNow(.notificationAction)
-            await model.flush()
         case .snooze(let delivered, let reminderAction):
             _ = await engine.snooze(delivered, action: reminderAction, context: model.calendarContext,
                                     renderer: model.renderer, now: model.now)

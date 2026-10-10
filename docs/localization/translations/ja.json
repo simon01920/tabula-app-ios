@@ -829,7 +829,7 @@
 "health.timeSensitive.notSupported": "このバージョンのAppでは利用できません：即時通知のリマインダーは通常の通知として届きます。",
 "health.alarms.title": "大音量アラーム",
 "health.alarms.authorized": "許可されています。",
-"health.alarms.denied": "設定でオフになっています。大音量アラームの代わりに即時通知が届きます。",
+"health.alarms.denied": "設定でオフになっています。大音量アラームの代わりに通知が届きます（利用できる場合は即時通知、それ以外は通常の通知）。",
 "health.alarms.notDetermined": "まだ許可されていません。大音量アラームを選んだときにTabulaが確認します。",
 "health.alarms.unavailable": "このデバイスでは利用できません。",
 "health.focus.title": "集中モード",

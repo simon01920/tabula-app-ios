@@ -71,7 +71,10 @@ struct AppEnvironment: Sendable {
                 nowProvider: now, deviceTimeZone: { zone }, locale: { Locale.current }, catalogLookup: lookup,
                 entitlements: AllAccessEntitlements(), dataSource: .seed(seed), launchOptions: launchOptions,
                 saveDebounce: .milliseconds(100),
-                reminders: launchOptions.liveReminders ? .live(defaults: .standard) : .inMemory())
+                // Live seed runs keep their applied-plan state in their own suite, never next to the real store's.
+                reminders: launchOptions.liveReminders
+                    ? .live(defaults: UserDefaults(suiteName: "sk.simondev.tabula.seed-reminders") ?? .standard)
+                    : .inMemory())
         }
         #endif
         // The real store always uses the real clock and the system zone: -TabulaNow/-TabulaTimeZone are honoured only

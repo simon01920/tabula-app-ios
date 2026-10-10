@@ -829,7 +829,7 @@
 "health.timeSensitive.notSupported": "Indisponibles dans cette version de l’app : les rappels urgents arrivent comme des rappels normaux.",
 "health.alarms.title": "Alarmes sonores",
 "health.alarms.authorized": "Autorisées.",
-"health.alarms.denied": "Désactivées dans Réglages. Les alarmes sonores arrivent à la place comme notifications urgentes.",
+"health.alarms.denied": "Désactivées dans Réglages. Les alarmes sonores arrivent à la place comme notifications : urgentes si possible, sinon normales.",
 "health.alarms.notDetermined": "Pas encore autorisées. Tabula vous le demandera lorsque vous choisirez une alarme sonore.",
 "health.alarms.unavailable": "Indisponibles sur cet appareil.",
 "health.focus.title": "Concentration",

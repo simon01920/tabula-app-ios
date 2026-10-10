@@ -23,12 +23,17 @@ public struct ReminderRunInput: Sendable {
     /// `EntitlementsProvider.isAllowed(.loudAlarms)`.
     public var loudAlarmsEntitled: Bool
     public var horizonDays: Int
+    /// `maxPending` = the system cap; `reserved` = the minimum reserve. The engine raises the reserve to the number of
+    /// non-planner requests actually pending (snoozes, tests), so they never push planner requests out.
     public var budget: NotificationBudget
     public var defaultAlarmSoftLimit: Int
+    /// Language / locale / hour cycle / zone the text is rendered with; a change re-adds every planner notification.
+    public var renderSignature: ReminderRenderSignature?
 
     public init(database: TabulaDatabase, resolvers: [ScheduleResolver], context: CalendarContext,
                 renderer: LocalizedTextRenderer, now: Date, loudAlarmsEntitled: Bool, horizonDays: Int = 14,
-                budget: NotificationBudget = .iOSDefault, defaultAlarmSoftLimit: Int = 10) {
+                budget: NotificationBudget = .iOSDefault, defaultAlarmSoftLimit: Int = 10,
+                renderSignature: ReminderRenderSignature? = nil) {
         self.database = database
         self.resolvers = resolvers
         self.context = context
@@ -38,6 +43,7 @@ public struct ReminderRunInput: Sendable {
         self.horizonDays = horizonDays
         self.budget = budget
         self.defaultAlarmSoftLimit = defaultAlarmSoftLimit
+        self.renderSignature = renderSignature
     }
 }
 
@@ -51,6 +57,10 @@ public struct ReminderRunResult: Sendable, Hashable {
     public var notices: [LocalizedText] {
         [plan.saturationNotice, plan.alarmOverflowNotice].compactMap { $0 }
     }
+
+    /// When to re-plan next: `nextReplanDate`, kept ≥ 1 min away from every fire instant
+    /// (`BackgroundRefreshPolicy.replanDate(for:)`).
+    public var replanDate: Date { BackgroundRefreshPolicy.replanDate(for: plan) }
 }
 
 @MainActor
@@ -81,17 +91,27 @@ public final class ReminderEngine {
         var attempt = 0
         while true {
             attempt += 1
-            let options = ReminderPlanningOptions(horizonDays: input.horizonDays, budget: input.budget,
+            let pending = await notifications.pendingRequests()
+            let daemonAlarms = await alarms.scheduledAlarms()
+            let budget = NotificationBudget(maxPending: input.budget.maxPending,
+                                            reserved: max(input.budget.reserved,
+                                                          ReminderApplyOperations.foreignPendingCount(pending)))
+            let options = ReminderPlanningOptions(horizonDays: input.horizonDays, budget: budget,
                                                   alarmSoftLimit: softLimit, canScheduleAlarms: canScheduleAlarms)
             let plan = ReminderPlanner.plan(ReminderInputBuilder.input(database: input.database, resolvers: input.resolvers,
                                                                        context: input.context, now: input.now,
                                                                        options: options))
-            let pending = await notifications.pendingRequests()
-            let daemonAlarms = await alarms.scheduledAlarmIDs()
-            let ops = ReminderApplyOperations.compute(lastApplied: state.plan, alarmLedger: state.alarmLedger, plan: plan,
-                                                      pending: pending, scheduledAlarmIDs: daemonAlarms,
-                                                      openSources: openSources)
-            let pass = await apply(ops, plan: plan, builder: builder, daemonAlarms: daemonAlarms)
+            let valuesKnown = input.renderSignature == nil || input.renderSignature == state.renderSignature
+            if !valuesKnown { report.renderSignatureChanged = true }
+            let ops = ReminderApplyOperations.compute(lastApplied: state.plan, activeAlarms: state.activeAlarms,
+                                                      alarmLedger: state.alarmLedger, plan: plan, pending: pending,
+                                                      scheduledAlarms: daemonAlarms, openSources: openSources,
+                                                      now: input.now, valuesKnown: valuesKnown)
+            let pass = await apply(ops, plan: plan, builder: builder, daemonAlarms: daemonAlarms.map { $0.map(\.id) })
+            if input.renderSignature != nil {
+                state.renderSignature = input.renderSignature
+                store.save(state)
+            }
             applied = pass.applied
             report.notificationsAdded += pass.report.notificationsAdded
             report.notificationsRemoved += pass.report.notificationsRemoved
@@ -102,6 +122,7 @@ public final class ReminderEngine {
             report.staleSnoozesRemoved += pass.report.staleSnoozesRemoved
             report.notificationFailures += pass.report.notificationFailures
             report.alarmFailures = pass.report.alarmFailures
+            report.alarmsInProgressKept = pass.report.alarmsInProgressKept
             guard attempt < 2 else { break }
             if pass.report.alarmLimitReached {
                 report.alarmLimitReached = true
@@ -156,6 +177,7 @@ public final class ReminderEngine {
         for id in ops.cancelAlarmIDs { await alarms.cancel(id: id) }
         report.alarmsCancelled = ops.cancelAlarmIDs.count
         report.alarmsUnchanged = ops.unchangedAlarms.count
+        report.alarmsInProgressKept = ops.alarmsInProgressKept
         var scheduled = Set<ReminderID>()
         var stop: AlarmScheduleOutcome?
         for planned in ops.scheduleAlarms {
@@ -181,13 +203,15 @@ public final class ReminderEngine {
         let keptNotifications = Set(ops.unchangedNotifications.map(\.id)).union(added)
         let keptAlarms = Set(ops.unchangedAlarms.map(\.id)).union(scheduled)
         var applied = plan
-        applied.notifications = plan.notifications.filter { keptNotifications.contains($0.id) }
+        // Kept due notifications stay in the applied plan, so the next run protects them too (until delivered).
+        applied.notifications = ops.dueNotificationsKept + plan.notifications.filter { keptNotifications.contains($0.id) }
         applied.alarms = plan.alarms.filter { keptAlarms.contains($0.id) }
 
         // Ledger: what the applied plan holds, plus earlier ledger alarms still in the daemon that were not cancelled.
         let stillThere = (daemonAlarms.map(Set.init) ?? previousLedger).intersection(previousLedger)
             .subtracting(ops.cancelAlarmIDs)
         state.alarmLedger = Self.sorted(Set(applied.alarms.map(\.alarmID)).union(stillThere))
+        state.activeAlarms = ops.lingeringAlarms
         state.plan = applied
         store.save(state)
         return Pass(applied: applied, report: report, alarmsUnauthorized: stop == .notAuthorized)
@@ -208,6 +232,13 @@ public final class ReminderEngine {
         guard let date = action.snoozeDate(now: now, context: context) else { return nil }
         let spec = ReminderRequestBuilder(renderer: renderer, context: context).snooze(delivered, until: date)
         return await notifications.add(spec)
+    }
+
+    /// Removes every delivered notification of `source` from Notification Center (after Mark as Done).
+    public func removeDelivered(for source: ReminderSource) async {
+        let ids = await notifications.deliveredNotifications()
+            .filter { $0.userInfo[ReminderUserInfo.source] == source.rawValue }.map(\.id)
+        if !ids.isEmpty { await notifications.removeDelivered(ids: ids) }
     }
 
     /// Schedules the health check's test notification (5 s).

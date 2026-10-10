@@ -30,6 +30,11 @@ Silent switch on/off · each Focus (DND, Sleep, custom) · Low Power Mode · app
   reminder); health-check test `tabula.test.…`. Non-planner ids are never touched by the diff, except snoozes of
   completed/deleted tasks and exams. Loud alarms use the planner's deterministic UUID; only alarms in the adapter's
   ledger (or with a planner-derived id) are ever cancelled. Diff, never wipe-and-reschedule.
+- **In-progress alarms and due notifications** (Stage A QA fix): alarms the daemon reports ringing, snoozed or paused,
+  or whose fire time has passed, and pending notifications at or past their fire time are never removed by a re-plan
+  unless their task/exam is no longer open; re-plans are kept ≥ 1 min away from every fire instant. The planner's
+  reserve of the 64 slots is `max(4, pending snoozes/tests/other requests)`. A change of language, locale, hour cycle
+  or zone replaces every planner notification once (render signature).
 - **Tiers:** Standard → `.active`; Time Sensitive → `.timeSensitive` (paid entitlement only; otherwise iOS delivers it as
   standard and the health check says so); Loud alarm → AlarmKit `.fixed` alarm with a 9-minute Snooze countdown (Live
   Activity), only from user rules (D7), soft limit 10, learned lower limit after `maximumLimitReached` → overflow is

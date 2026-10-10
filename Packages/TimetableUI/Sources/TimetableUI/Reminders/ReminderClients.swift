@@ -198,6 +198,8 @@ public protocol NotificationCenterClient: Sendable {
     func add(_ request: NotificationRequestSpec) async -> NotificationAddOutcome
     /// Removes pending requests by id (unknown ids are ignored).
     func removePending(ids: [String]) async
+    /// Notifications currently shown in Notification Center (id + string userInfo; `nextTriggerDate` unused).
+    func deliveredNotifications() async -> [PendingNotificationInfo]
     /// Removes delivered notifications from Notification Center by id.
     func removeDelivered(ids: [String]) async
     /// Current settings.
@@ -247,6 +249,26 @@ public struct AlarmSpec: Hashable, Sendable {
     }
 }
 
+/// One alarm as the AlarmKit daemon reports it (`Alarm.id` + `Alarm.state`).
+public struct ScheduledAlarmInfo: Hashable, Sendable {
+    /// `Alarm.State`, plus `.unknown` for future cases.
+    public enum State: String, Hashable, Sendable, Codable {
+        case scheduled, alerting, countdown, paused, unknown
+    }
+
+    public var id: UUID
+    public var state: State
+
+    public init(id: UUID, state: State = .scheduled) {
+        self.id = id
+        self.state = state
+    }
+
+    /// Ringing, snoozed (post-alert countdown) or paused: the alarm is in progress and must not be cancelled by a
+    /// re-plan unless its item is no longer open.
+    public var isInProgress: Bool { state != .scheduled }
+}
+
 /// Result of scheduling one alarm.
 public enum AlarmScheduleOutcome: Hashable, Sendable {
     case scheduled
@@ -263,9 +285,9 @@ public protocol AlarmClient: Sendable {
     func authorization() async -> AlarmAuthorization
     /// Shows the system prompt (only when the user picks a Loud-alarm rule). Returns the resulting state.
     func requestAuthorization() async -> AlarmAuthorization
-    /// IDs of every alarm of this app known to the daemon (planner and debug-probe alarms alike), or `nil` when
-    /// the list cannot be read.
-    func scheduledAlarmIDs() async -> [UUID]?
+    /// Every alarm of this app known to the daemon (planner, test and debug-probe alarms alike, in every state:
+    /// scheduled, alerting, snoozed countdown, paused), or `nil` when the list cannot be read.
+    func scheduledAlarms() async -> [ScheduledAlarmInfo]?
     /// Schedules one alarm. Must **not** prompt: implementations return `.notAuthorized` unless authorised.
     func schedule(_ alarm: AlarmSpec) async -> AlarmScheduleOutcome
     /// Cancels one alarm (unknown ids are ignored).

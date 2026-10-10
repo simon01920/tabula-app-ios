@@ -24,7 +24,8 @@ protocol BackgroundRefreshScheduling: Sendable {
 }
 
 struct LiveBackgroundRefreshScheduler: BackgroundRefreshScheduling {
-    func submit(earliestBeginDate: Date) async -> String? {
+    /// `@concurrent`: always off the main actor (`submitTaskRequest` must not be called from the main thread).
+    @concurrent func submit(earliestBeginDate: Date) async -> String? {
         let request = BGAppRefreshTaskRequest(identifier: BackgroundRefreshPolicy.taskIdentifier)
         request.earliestBeginDate = earliestBeginDate
         do {
