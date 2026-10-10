@@ -101,3 +101,121 @@ Xcode, use **Settings → Developer** instead (sample data, onboarding reset, re
 - App Group container availability on the xtool-signed build (free team → Application Support fallback).
 - Liquid Glass tab bar appearance; `.bar` material banner under the status bar; sheet presentation for `.sheet` routes
   (no sheet route exists yet — B3).
+
+---
+
+## B2. Today + Timetable views (Stage B2)
+
+Nothing in this section has been seen running: it compiles (xtool, 0 compiler warnings) and the view state is
+Linux-tested (`TimetableViewStateTests`), but the UI itself is unverified. Reference instant of every seed:
+Tue 2026-10-13 10:20 Europe/Bratislava (`-TabulaNow` default). Secondary seed: ISO week 42 = **Week B**; Thu 15 Oct
+has a short day (30-min lessons), ANJ cancelled, MAT moved to "Aula" with a substitute teacher, an extra INF lesson;
+holidays Thu 29 – Fri 30 Oct ("Jesenné prázdniny").
+
+**CI screenshot routes (B2):** `today`, `timetable`, `timetable.grid`, `timetable.week`, `timetable.day`,
+`timetable.tiles`, `timetable.lesson-detail`, `timetable.quick-add` with `-TabulaSeed secondary`, plus
+`today@elementary`, `timetable@elementary` (opens in Tiles), `timetable.week@university`, `today@blank`,
+`timetable.grid@blank`, and `today` with `-TabulaNow 2026-10-13T20:00:00+02:00` (day over),
+`2026-10-17T11:00:00+02:00` (weekend), `2026-10-29T09:00:00+02:00` (holiday), `2026-10-13T06:30:00+02:00` (before
+school). Light, dark, AX5, sk + de.
+
+### B2.1 Today — Now & Next header
+- Setup: `-TabulaSeed secondary -TabulaScreen today`.
+- Expected: card with "● Now" pill, the lesson running at 10:20 with emoji badge, time range, room/teacher lines;
+  "Time left" + big countdown (**paused** at the fixed clock), progress bar in the subject colour; divider; "Next" +
+  next subject, time range, room. With `-TabulaNow live` on a school day the countdown ticks every second and the
+  header switches to the next lesson at the exact end minute.
+- `-TabulaNow 2026-10-13T06:30:00+02:00` → "First Lesson" + "Starts in" countdown (h:mm:ss).
+- `…T20:00…` → "No more lessons today", "Next Lesson · Tomorrow, <time range>"; below today's tiles (all with a
+  check mark) a "Tomorrow" section with Wednesday's lessons.
+- `2026-10-17T11:00` (Saturday) → "No lessons today", next lesson "Mon 19 Oct, …"; section "Next School Day".
+- `2026-10-29T09:00` → "Jesenné prázdniny" with "Holidays" under it; next lesson Mon 2 Nov.
+- Cancelled day: create one with the day-change editor (B3) → "Lessons are cancelled today" + the note.
+- `-TabulaSeed blank` → "No lessons yet" empty state (no header card, no dashes). No timetable → "No timetable yet".
+
+### B2.2 Today — tiles
+- Tiles in the subject colour; text black or white (never coloured text on colour); pastel tiles keep a hairline
+  edge in light mode, dark ones in dark mode; Increase Contrast adds an outline to every tile.
+- Current lesson has a 3-pt ring; past lessons a check mark (no dimming, so contrast is kept).
+- Between lessons: "Break · 10 min" / "Lunch · 50 min" / "Free period · 1 hr, 35 min"; none before the first or after
+  the last lesson; overlapping lessons get no separator.
+- `-TabulaSeed elementary`: *Výtvarná výchova* badge "Room changed", room "Knižnica", bring line; *Hudobná výchova*
+  struck through + "Cancelled". No teacher/notes lines where the field is empty or hidden.
+- Compact density (Timetable → options → Compact) → tiles show only room/building/teacher lines.
+- Tap a tile → lesson detail sheet.
+
+### B2.3 Timetable — week bar, strip, options
+- `-TabulaScreen timetable.day`: bar "12 Oct – 16 Oct" + capsule "Week B"; ‹ › (44 pt) move a week; day pills Mo–Fr,
+  today (13) in a red circle, Thursday has an orange dot, the selected day a tinted pill. Swipe left/right on the
+  content moves a day (day views) / a week (grid, week) — check it does not fight vertical scrolling.
+- Leaving the current week/day shows a "Today" toolbar button that jumps back.
+- Options menu (top right, icon = current view): View (Grid / Week / Day / Tiles), Density, **Show Week** → Week A /
+  Week B (secondary only; Week A jumps to 19 Oct), "Change for This Day…" in Day/Tiles (disabled until B3's
+  `editor.day-change` exists).
+- Picking a view persists it per timetable (force-quit, relaunch → same view). The title becomes a timetable menu
+  only when there are 2+ timetables (B3 manager).
+- VoiceOver on a day pill: "Thursday, 15 October 2026, n lessons, n changes" (the dot is never the only cue); the
+  selected pill announces "Selected".
+
+### B2.4 Grid (`timetable.grid`)
+- Day headers aligned with the columns; period column shows number, start and end (compact: start only); break rows
+  are thin bands, lunch a band with a fork-and-knife.
+- 5 columns on iPhone 16 Pro Max portrait without horizontal scrolling; a 6/7-day timetable (B3 settings) still fits;
+  landscape → wider cells.
+- Cells: emoji + short name (SJL, MAT…), room in comfortable density; Thursday cells show corner icons (changed,
+  cancelled + struck through, extra); multi-period lessons span rows including the break between.
+- Empty lesson slots: dashed outline + faint "+"; tap → quick-add sheet. Next week shows Week A's lessons.
+- Holiday week (26 Oct): Thu/Fri columns shaded with an umbrella + "Jesenné prázdniny".
+- Dynamic Type AX1–AX5 → the grid becomes a **list** (sections per day, "Free period" rows with +, "Break"/"Lunch
+  break" separators only between lessons); back to XXXL → grid.
+- VoiceOver: order Monday period 1…n, then Tuesday…; a cell reads "<full date>: Matematika, period 1, 8:00 to 8:45,
+  room 214, …"; an empty slot "<full date>, period 3, <time>, free" + hint "Adds a lesson in this period."
+- `-TabulaSeed university` (free-form times): rows are the distinct time slots of the week.
+
+### B2.5 Week time-blocks (`timetable.week`)
+- Blocks proportional to duration, hour labels left, hour lines; the short Thursday is visibly shorter.
+- Red current-time line + dot in today's column at 10:20 (fixed clock); live clock → moves once a minute, never
+  animated (also with Reduce Motion).
+- Overlapping lessons sit side by side in lanes. At AX sizes this view shows the grid's list.
+
+### B2.6 Day (`timetable.day`) and Tiles (`timetable.tiles`)
+- Day: one column on a time axis with name, time range, room/teacher/type lines in taller blocks, status badge top
+  right, now line on today. At AX sizes the day is shown as tiles.
+- Tiles (elementary default): big tiles + separators, current lesson ringed. A day without lessons → "No lessons" /
+  holiday name / "Lessons cancelled" + full date.
+
+### B2.7 Lesson detail (`timetable.lesson-detail`)
+- Secondary seed opens the modified Thursday MAT: badge "Changed", date, time, period, Room "Aula", Teacher
+  "Mgr. Novák (suplovanie)"; "Changes on This Day": Time changed (Usually: <regular time>), Room changed
+  (Usually: 214), Substitute teacher (Usually: Mgr. Horváth). A Friday 5th-period lesson shows "Only in Week A".
+- Hidden fields (switch Teacher off in B3 settings) disappear here too, including their "Usually" values.
+- "Edit" / "Change for This Day" disabled with "Editing isn't available in this version yet." until B3 registers
+  `editor.lesson` / `editor.day-change`; afterwards they open those editors with `\.editorContext` set.
+- One-off extra lesson (Thursday INF): Edit disabled, footer says it exists only on this day.
+
+### B2.8 Quick add (`timetable.quick-add`)
+- Sheet (medium/large): header = full date + "Period n · time"; subjects alphabetically with badges; footer "The
+  lesson is added to Week B only…" (secondary). Tap a subject → sheet closes, the cell is filled; the same slot in
+  Week A stays free. Read-only store → inline error, nothing changes.
+- "New Subject…" disabled until B3 registers `editor.subject`. `-TabulaSeed blank` → "No subjects yet".
+
+### B2.9 State matrix
+| State | How | Expected |
+|---|---|---|
+| Empty | `blank` seed | Today "No lessons yet"; grid of dashed free slots; quick add "No subjects yet" |
+| Normal | `secondary`, `elementary`, `university` | as above |
+| Long text | B3: subject name 60+ chars, 8-char short name, long room/notes | tiles wrap the name; grid scales the short name (≥ 60 %, 2 lines); notes ≤ 3 lines |
+| Dynamic Type XXL / AX5 | Larger Text | countdown scales; grid/week → list, day → tiles at AX; day pills ≥ 44 pt; nothing clipped in tiles |
+| Dark mode | Appearance Dark | tile text contrast, outlines on dark colours, red now line visible, badges legible (material) |
+| German | `-AppleLanguages "(de)"` | after C1: long captions wrap; week range scales to fit |
+| CJK | `-AppleLanguages "(ja)"` | short weekday names (月 火 …), Japanese dates, list separator "、" |
+| VoiceOver | VoiceOver on | one element per lesson with the full sentence; header readable; grid column-major; hints on cells/slots |
+
+### B2.10 Not verifiable here (needs device / simulator)
+- `Text(timerInterval:pauseTime:)` / `ProgressView(timerInterval:)` frozen with a fixed clock and ticking live otherwise;
+  TimelineView(.everyMinute) refresh after returning from background.
+- Grid geometry (offset-positioned cells and their hit testing), 7 columns at 375 pt (≈ 45 pt columns), VoiceOver
+  sort-priority order inside the ZStack.
+- `toolbarTitleMenu` with Liquid Glass; swipe gesture vs. ScrollView/List scrolling.
+- `Duration.UnitsFormatStyle` output per language.
+- Editor sheets reading `\.editorContext` (depends on B3).
