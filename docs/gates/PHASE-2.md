@@ -99,3 +99,8 @@ CI simulator (iOS 27, run 37968712889, foundation only): the shell, Liquid Glass
 - **Tasks & exams:** a Tasks tab (Today / Upcoming / Overdue / Completed, subtasks, attachments, priorities) and an Exams tab (countdown, history).
 - **Reminders:** the iOS adapter for the Phase 1 planner (64-cap rolling window, Time Sensitive, AlarmKit loud alarms), permission explainer and health check.
 - **Testing:** these features rely heavily on real-device testing (silent switch, Focus, lock screen). With no device, Phase 3's on-device checklist will be long. Simulator screenshots cover the UI, not delivery behaviour.
+
+## Gate outcome (2026-10-10)
+The human approved Phase 2 ("Looks very good, good job. Now you can move to Phase 3"). P2-1 is approved. P2-3, P2-4 and P2-6 take their recommended defaults (P2-6 is implemented in Phase 3).
+- **P2-2** (Subject `sortIndex`, a schema change) was **not explicitly approved**. Subjects stay alphabetical, and the question is re-asked at the Phase 3 gate.
+- **P2-5** (who reviews translations) is still open.
