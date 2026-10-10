@@ -42,7 +42,7 @@ When in doubt, use Opus. Each gate report lists which tier did each task, so the
 - Local iOS build: `bash scripts/xtool-dev.sh build` · macro variant: `--macro-probes` · build+install+launch on a device: `bash scripts/xtool-dev.sh`
 - Isolated probes: `bash scripts/probe-build.sh <MacroProbeSwiftData|XCStringsSwiftPM>`
 - Xcode project (CI generates it): `TABULA_DEVELOPMENT_TEAM= xcodegen generate --spec project.yml`
-- From Windows Git Bash: `MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu -- bash -lc 'cd "/mnt/c/Users/simon/Documents/Claude Code/school_timetable" && bash scripts/validate.sh'`
+- From Windows Git Bash (use `--exec`: with `--` the WSL login shell expands `$VARS`/`$?` first, so exit codes read as 0): `MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu --exec bash -lc 'cd "/mnt/c/Users/simon/Documents/Claude Code/school_timetable" && bash scripts/validate.sh'`
 - CI: `.github/workflows/ios.yml` (TestFlight: Actions → iOS CI → Run workflow; needs the paid account, deferred)
 - Facts, failures and human steps: `docs/ENVIRONMENT.md`; risks: `docs/RISKS.md`; gate reports: `docs/gates/`
 
