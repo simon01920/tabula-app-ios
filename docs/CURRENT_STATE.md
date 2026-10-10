@@ -1,4 +1,8 @@
-# Tabula: what exists right now (after Phase 1)
+# Tabula: what exists right now
+
+> **Update after Phase 2 (2026-10-10):** the app now has real screens: onboarding, Today, Timetable (grid / week / day / tiles), editors, settings, in 12 languages. Current screenshots are in [`screenshots/phase2/`](screenshots/phase2/). The gate report is `docs/gates/PHASE-2.md`. The sections below describe the state after Phase 1 and are kept for history.
+
+# Phase 1 state (historical)
 
 Date: 2026-10-08 · Code: `main` @ `22af18c` · Screenshots: iOS 27 Simulator (iPhone Pro Max) from CI run [37697929357](https://github.com/simon01920/tabula-app-ios/actions/runs/37697929357)
 
