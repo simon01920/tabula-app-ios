@@ -1,4 +1,4 @@
-// COMPILED 2026-10-06 (xtool path, base + macro variants, 0 warnings; XcodeGen CI run 37449454629). Not yet run on a device. Phase 0 AlarmKit probe; Phase 4 replaces it with the real design.
+// COMPILED 2026-10-06 (Phase 0 probe); Phase 3 Stage A: production metadata `TabulaAlarmMetadata`, localised strings. Not yet run on a device. Phase 4 replaces the visual design.
 // APIs checked on 2026-10-04 against developer.apple.com JSON docs; citations in docs/spikes/ALARMKIT.md.
 //
 // APIs used
@@ -10,14 +10,16 @@
 //     AlarmPresentationState.mode: .countdown(Mode.Countdown: startDate, fireDate, totalCountdownDuration,
 //     previouslyElapsedDuration), .paused(Mode.Paused: totalCountdownDuration, previouslyElapsedDuration), .alert(Mode.Alert)
 //   SwiftUI: Text(timerInterval:pauseTime:countsDown:showsHours:), Text(LocalizedStringResource), Text(verbatim:)
-//   TimetableUI: AlarmProbeMetadata (shared with the app; the TabulaWidgets target must link TimetableUI)
+//   TimetableUI: TabulaAlarmMetadata (shared with the app; the TabulaWidgets target must link TimetableUI)
 //
 // Why this exists: Apple's AlarmKit sample says "AlarmKit expects a widget extension if an app supports a countdown
 // presentation. Otherwise, the system may unexpectedly dismiss alarms and fail to alert." Plain alert-only alarms
 // (the 60 s probe) do not need it. Countdowns, timers and snooze (which goes back to a countdown) do.
 // The system supplies AlarmPresentationState; the app never starts or updates this Live Activity itself.
 //
-// Strings are verbatim / taken from the alarm's own presentation: developer-facing probe, not in the String Catalog.
+// Strings: titles come from the alarm's own presentation (rendered by the app in its language when scheduling);
+// the subtitle is `TabulaAlarmMetadata.subtitle` (rendered text); "Ringing" and the VoiceOver label are catalog keys.
+// One attributes type for production, test and DEBUG probe alarms (ActivityKit matches on the type).
 
 import ActivityKit
 import AlarmKit
@@ -26,10 +28,10 @@ import TimetableUI
 import WidgetKit
 
 /// Lock Screen, StandBy and Dynamic Island presentation for alarms scheduled with
-/// `AlarmAttributes<AlarmProbeMetadata>`. Registered in the TabulaWidgets `WidgetBundle`.
+/// `AlarmAttributes<TabulaAlarmMetadata>`. Registered in the TabulaWidgets `WidgetBundle`.
 struct AlarmLiveActivity: Widget {
     var body: some WidgetConfiguration {
-        ActivityConfiguration(for: AlarmAttributes<AlarmProbeMetadata>.self) { context in
+        ActivityConfiguration(for: AlarmAttributes<TabulaAlarmMetadata>.self) { context in
             AlarmProbeLockScreenView(context: context)
         } dynamicIsland: { context in
             let tint = context.attributes.tintColor
@@ -54,7 +56,7 @@ struct AlarmLiveActivity: Widget {
             } compactLeading: {
                 Image(systemName: "alarm.fill")
                     .foregroundStyle(tint)
-                    .accessibilityLabel(Text(verbatim: "Tabula alarm"))
+                    .accessibilityLabel(Text("alarm.liveActivity.label"))
             } compactTrailing: {
                 AlarmProbeRemainingText(mode: context.state.mode)
                     .font(.caption.monospacedDigit())
@@ -63,7 +65,7 @@ struct AlarmLiveActivity: Widget {
             } minimal: {
                 Image(systemName: "alarm.fill")
                     .foregroundStyle(tint)
-                    .accessibilityLabel(Text(verbatim: "Tabula alarm"))
+                    .accessibilityLabel(Text("alarm.liveActivity.label"))
             }
             .keylineTint(tint)
         }
@@ -73,7 +75,7 @@ struct AlarmLiveActivity: Widget {
 /// Lock Screen / StandBy banner. Text stays in the default foreground colour; the user-visible tint is only
 /// used for the icon, so contrast does not depend on the alarm's tint colour.
 struct AlarmProbeLockScreenView: View {
-    let context: ActivityViewContext<AlarmAttributes<AlarmProbeMetadata>>
+    let context: ActivityViewContext<AlarmAttributes<TabulaAlarmMetadata>>
 
     var body: some View {
         HStack(alignment: .center, spacing: 12) {
@@ -85,9 +87,13 @@ struct AlarmProbeLockScreenView: View {
                 Text(AlarmProbeDisplay.title(attributes: context.attributes, mode: context.state.mode))
                     .font(.headline)
                     .lineLimit(2)
-                Text(verbatim: "Tabula probe · \(context.attributes.metadata?.probeKind ?? "no metadata")")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                // Rendered by the app at scheduling time (user text / probe kind), not a catalog key.
+                if let subtitle = context.attributes.metadata?.subtitle, !subtitle.isEmpty {
+                    Text(verbatim: subtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+                }
             }
             Spacer(minLength: 8)
             AlarmProbeRemainingText(mode: context.state.mode)
@@ -111,7 +117,7 @@ struct AlarmProbeRemainingText: View {
             let now = Date()
             Text(timerInterval: now...now.addingTimeInterval(remaining), pauseTime: now, countsDown: true)
         case .alerting:
-            Text(verbatim: "Ringing")
+            Text("alarm.liveActivity.ringing")
         }
     }
 }
@@ -141,7 +147,7 @@ enum AlarmProbeDisplay {
         }
     }
 
-    static func title(attributes: AlarmAttributes<AlarmProbeMetadata>,
+    static func title(attributes: AlarmAttributes<TabulaAlarmMetadata>,
                       mode: AlarmPresentationState.Mode) -> LocalizedStringResource {
         switch mode {
         case .countdown:

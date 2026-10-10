@@ -47,7 +47,7 @@ public struct DatabaseMutation: Sendable {
     public let replacesDatabase: Bool
     private let step: @Sendable (inout TabulaDatabase, inout HybridLogicalClock, Date) throws -> Void
 
-    private init(label: String, replacesDatabase: Bool = false,
+    init(label: String, replacesDatabase: Bool = false,
                  step: @escaping @Sendable (inout TabulaDatabase, inout HybridLogicalClock, Date) throws -> Void) {
         self.label = label
         self.replacesDatabase = replacesDatabase

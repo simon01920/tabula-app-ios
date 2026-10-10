@@ -1,4 +1,4 @@
-// COMPILED 2026-10-06 (xtool path, base + macro variants, 0 warnings; XcodeGen CI run 37449454629). Not yet run on a device. Phase 0 debug probe only; delete after the Phase 0 gate.
+// COMPILED 2026-10-06 (xtool path, base + macro variants, 0 warnings; XcodeGen CI run 37449454629). Not yet run on a device. Phase 0 debug probe (DEBUG only); since Phase 3 Stage A it shares `TabulaAlarmMetadata` (kind .probe) with production alarms.
 // Every API below was checked on 2026-10-04 against developer.apple.com JSON docs; citations in docs/spikes/ALARMKIT.md.
 //
 // APIs used
@@ -20,7 +20,7 @@
 //     UNNotificationRequest(identifier:content:trigger:), UNNotificationSettings (.authorizationStatus,
 //     .alertSetting, .soundSetting, .timeSensitiveSetting), UNNotificationInterruptionLevel (.active, .timeSensitive)
 //   SwiftUI: Section(content:header:footer:), Button, Stepper, Text(verbatim:), ProgressView, @StateObject,
-//     onChange(of:initial:_:) (iOS 17), scenePhase. TimetableUI: ProbeRow, ProbeStatus, AlarmProbeMetadata.
+//     onChange(of:initial:_:) (iOS 17), scenePhase. TimetableUI: ProbeRow, ProbeStatus, TabulaAlarmMetadata.
 //
 // Concurrency (Swift 6): AlarmManager, UNUserNotificationCenter and UNNotificationSettings are NOT documented as
 // Sendable. All calls into them therefore happen inside `nonisolated static` helpers that return only Sendable values
@@ -431,21 +431,21 @@ nonisolated enum AlarmProbeActions {
                         secondaryButtonBehavior: .countdown),
                     countdown: AlarmPresentation.Countdown(title: "Tabula test alarm snoozed", pauseButton: nil),
                     paused: nil)
-                let attributes = AlarmAttributes<AlarmProbeMetadata>(
+                let attributes = AlarmAttributes<TabulaAlarmMetadata>(
                     presentation: presentation,
-                    metadata: AlarmProbeMetadata(probeKind: kind),
+                    metadata: TabulaAlarmMetadata(kind: .probe, subtitle: kind),
                     tintColor: Color.orange)
-                let configuration = AlarmManager.AlarmConfiguration<AlarmProbeMetadata>(
+                let configuration = AlarmManager.AlarmConfiguration<TabulaAlarmMetadata>(
                     countdownDuration: Alarm.CountdownDuration(preAlert: nil, postAlert: snoozeSeconds),
                     schedule: .fixed(fireDate),
                     attributes: attributes)
                 _ = try await AlarmManager.shared.schedule(id: id, configuration: configuration)
             } else {
-                let attributes = AlarmAttributes<AlarmProbeMetadata>(
+                let attributes = AlarmAttributes<TabulaAlarmMetadata>(
                     presentation: AlarmPresentation(alert: makeAlert(title: "Tabula test alarm")),
-                    metadata: AlarmProbeMetadata(probeKind: kind),
+                    metadata: TabulaAlarmMetadata(kind: .probe, subtitle: kind),
                     tintColor: Color.orange)
-                let configuration = AlarmManager.AlarmConfiguration<AlarmProbeMetadata>.alarm(
+                let configuration = AlarmManager.AlarmConfiguration<TabulaAlarmMetadata>.alarm(
                     schedule: .fixed(fireDate),
                     attributes: attributes)
                 _ = try await AlarmManager.shared.schedule(id: id, configuration: configuration)
@@ -469,11 +469,11 @@ nonisolated enum AlarmProbeActions {
         let relative = Alarm.Schedule.Relative(
             time: Alarm.Schedule.Relative.Time(hour: hour, minute: minute),
             repeats: .never)
-        let attributes = AlarmAttributes<AlarmProbeMetadata>(
+        let attributes = AlarmAttributes<TabulaAlarmMetadata>(
             presentation: AlarmPresentation(alert: makeAlert(title: "Tabula test alarm (relative)")),
-            metadata: AlarmProbeMetadata(probeKind: "relative"),
+            metadata: TabulaAlarmMetadata(kind: .probe, subtitle: "relative"),
             tintColor: Color.orange)
-        let configuration = AlarmManager.AlarmConfiguration<AlarmProbeMetadata>.alarm(
+        let configuration = AlarmManager.AlarmConfiguration<TabulaAlarmMetadata>.alarm(
             schedule: .relative(relative),
             attributes: attributes)
         do {
@@ -495,11 +495,11 @@ nonisolated enum AlarmProbeActions {
             paused: AlarmPresentation.Paused(
                 title: "Tabula test countdown paused",
                 resumeButton: AlarmButton(text: "Resume", textColor: .white, systemImageName: "play.fill")))
-        let attributes = AlarmAttributes<AlarmProbeMetadata>(
+        let attributes = AlarmAttributes<TabulaAlarmMetadata>(
             presentation: presentation,
-            metadata: AlarmProbeMetadata(probeKind: "countdown"),
+            metadata: TabulaAlarmMetadata(kind: .probe, subtitle: "countdown"),
             tintColor: Color.blue)
-        let configuration = AlarmManager.AlarmConfiguration<AlarmProbeMetadata>.timer(
+        let configuration = AlarmManager.AlarmConfiguration<TabulaAlarmMetadata>.timer(
             duration: seconds,
             attributes: attributes)
         do {
@@ -616,15 +616,15 @@ nonisolated enum AlarmProbeActions {
     static func probeAlarmLimit(maxAttempts: Int) async -> String {
         let preExisting = (try? AlarmManager.shared.alarms.count) ?? -1
         let base = Date().addingTimeInterval(400 * 24 * 60 * 60)
-        let attributes = AlarmAttributes<AlarmProbeMetadata>(
+        let attributes = AlarmAttributes<TabulaAlarmMetadata>(
             presentation: AlarmPresentation(alert: makeAlert(title: "Tabula limit probe (should never ring)")),
-            metadata: AlarmProbeMetadata(probeKind: "limit-probe"),
+            metadata: TabulaAlarmMetadata(kind: .probe, subtitle: "limit-probe"),
             tintColor: Color.gray)
         var scheduled: [UUID] = []
         var stopReason = "hit the probe's own cap of \(maxAttempts) with no error"
         for index in 0..<maxAttempts {
             let id = UUID()
-            let configuration = AlarmManager.AlarmConfiguration<AlarmProbeMetadata>.alarm(
+            let configuration = AlarmManager.AlarmConfiguration<TabulaAlarmMetadata>.alarm(
                 schedule: .fixed(base.addingTimeInterval(TimeInterval(index * 60))),
                 attributes: attributes)
             do {
