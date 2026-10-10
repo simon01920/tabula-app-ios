@@ -317,7 +317,8 @@ struct SubjectDeleteConfirmation: View {
     @Environment(AppModel.self) private var model
 
     var body: some View {
-        let impact = model.database.map { TimetableManagement.subjectImpact(of: subjectID, in: $0) } ?? (0, 0, 0)
+        let impact: (lessons: Int, changes: Int, linkedItems: Int) =
+            model.database.map { TimetableManagement.subjectImpact(of: subjectID, in: $0) } ?? (lessons: 0, changes: 0, linkedItems: 0)
         ImpactConfirmation(
             title: "editor.subject.delete.title", subjectName: name,
             rows: [ImpactRow(id: "lessons", key: "editor.impact.lessons", count: impact.lessons),
