@@ -281,3 +281,48 @@ school). Light, dark, AX5, sk + de.
 - `toolbarTitleMenu` with Liquid Glass; swipe gesture vs. ScrollView/List scrolling.
 - `Duration.UnitsFormatStyle` output per language.
 - Editor sheets reading `\.editorContext` (depends on B3).
+---
+
+## B3. Editors (Stage B3). Written without seeing the UI; nothing below has been verified on a device or simulator.
+
+Launch routes (all sheets over the Timetable tab; use `-TabulaSeed secondary`): `editor.lesson`, `editor.lesson-new`,
+`editor.subject`, `editor.subjects`, `editor.bell`, `editor.timetable`, `editor.terms`, `editor.day-change`,
+`editor.timetables`. The standard state matrix applies to every editor: empty, normal, long text, Dynamic Type XXL and
+AX5, dark mode, German-length strings (`-AppleLanguages "(de)"`), CJK (`ja`), VoiceOver. Every control must be at least 44 pt.
+
+### B3.1 Common sheet behaviour (all editors with Cancel/Save)
+- Cancel with no edits closes. After any edit, Cancel asks "Discard your changes?" (Discard / Keep Editing); swipe-down does nothing while edits exist (by design) and works again after reverting.
+- Save is disabled while required input is missing (reason shown in red under the section). A valid Save closes the sheet and the data survives relaunch.
+- Rejected saves (validation errors) keep the sheet open and show the red "This can't be saved" section at the top. In read-only mode (Developer, schema v99) Save shows the read-only message.
+- No input shows placeholder text; every input has a visible label (right-aligned value). VoiceOver reads label + value.
+
+### B3.2 `editor.lesson` / `editor.lesson-new`
+- Existing: subject, day, weeks (only with A/B rotation, footer "If no week is selected, the lesson takes place every week"), time (Period / Times segmented), validity, details.
+- Field rule: turn off Teacher in Timetable Settings, reopen the lesson: no Teacher input, and the lesson keeps its teacher (re-enable to check). Enabled-but-empty fields are empty inputs.
+- New (`editor.lesson-new`): day = 2nd school day, period 3 preselected; choosing a subject fills room/teacher defaults only for enabled fields. "New Subject" opens the subject editor and selects the result.
+- Overlap warning: give a lesson the same day/period as another: orange "Overlaps with X on Tuesday" appears live, Save stays enabled. Lessons in different A/B weeks do not warn.
+- Delete: confirmation sheet states how many one-day changes go with it.
+- Time pickers follow the device 12/24 h setting, not the app setting (known limitation).
+
+### B3.3 `editor.subject`, `editor.subjects`
+- Preview tile uses black/white text; "Text contrast n : 1" shown; very light/dark colours show the outline hint. Swatches have colour names for VoiceOver ("Red, selected"). Custom colour via the system picker. Emoji field keeps one character. Symbol grid selection is announced as selected.
+- Defaults section only lists enabled fields. Delete subject: confirmation lists lessons/changes/linked items.
+- Subjects list is alphabetical (no persisted order exists, so no manual reorder). Swipe left or context menu deletes.
+
+### B3.4 `editor.bell`
+- Edit times with the pickers, add/remove periods, Edit button enables drag reorder, "Sort by Time". Periods used by lessons show a lock instead of the remove button. End <= start blocks Save (red); overlap only warns.
+- "Add Schedule for a Day" creates a copy for one weekday; assign more weekdays via toggles; "Remove ..." returns those days to the regular schedule. Check the Timetable tab shows that day with the variant's times and the lessons stay.
+
+### B3.5 `editor.timetable`
+- Name/emoji/days. Rotation: with lessons present, switching between a day cycle and weekdays is not offered, footer explains. Week cycle: length (cannot go below the weeks lessons use), counting (strict/continuous/from chosen week), offset, names; "This week is B" preview matches the Today header. Day cycle preview "Today is Day n".
+- Free times <-> bell schedule; switching a free-times timetable to a bell schedule creates a default schedule on Save. Field toggles, default view, density, palette.
+
+### B3.6 `editor.terms`, `editor.day-change`
+- Terms/breaks: add, edit dates (end before start shows red and blocks Save), remove. A term used by lessons shows a lock.
+- Day change: kinds Cancel a lesson / Change a lesson / No school / Short day / Follow another day / Extra lesson. Kinds needing a lesson are hidden on a day without lessons. Existing changes of the date are listed with an undo arrow (applies immediately). After saving, Today/Timetable show the badge and changed times.
+
+### B3.7 `editor.timetables`
+- Rows show name, lesson count, "Active" (icon + text). Menu (44 pt) per row: Edit, Show This Timetable, Duplicate, Reset, Delete. Duplicate creates "<name> copy" with identical lessons.
+- **Last timetable**: Delete is disabled and the footer says why; Reset Timetable (confirmation) clears the lessons and the shell stays on the tab bar (no onboarding).
+- With 2+ timetables: Delete shows a sheet listing exactly what is removed; deleting the active one activates another. Edit + drag reorder. Add Timetable switches to the new one.
+- Opened from Settings as a sheet: must show its own navigation bar with Done.
