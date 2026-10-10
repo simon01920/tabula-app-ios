@@ -30,7 +30,7 @@ on:
       screens:
         description: "Space-separated entries id[@seed[@lang]] — id = -TabulaScreen route, seed = -TabulaSeed (empty|blank|elementary|secondary|university), lang = -AppleLanguages code (e.g. sk, de)"
         type: string
-        default: "today@secondary timetable@secondary settings@secondary onboarding@empty today@secondary@sk debug"
+        default: "onboarding@empty onboarding.profile@empty onboarding.rotation@empty onboarding.time@empty today@secondary today@elementary timetable.grid@secondary timetable.week@secondary timetable.tiles@elementary timetable.lesson-detail@secondary editor.lesson@secondary editor.subject@secondary editor.timetables@secondary settings@secondary settings.appearance@secondary today@secondary@sk timetable.grid@secondary@de"
       device:
         description: "Simulator device type name, e.g. 'iPhone 17 Pro Max' (empty = largest available Pro Max)"
         type: string
@@ -51,7 +51,7 @@ env:
   XCODE_APP: /Applications/Xcode_27.app
   XCODEGEN_VERSION: "2.46.0"
   XCODEGEN_SHA256: 4d9e34b62172d645eed6457cac13fc222569974098ef4ee9c3368bedf0196806
-  SCREENS: ${{ inputs.screens || 'today@secondary timetable@secondary settings@secondary onboarding@empty today@secondary@sk debug' }}
+  SCREENS: ${{ inputs.screens || 'onboarding@empty onboarding.profile@empty onboarding.rotation@empty onboarding.time@empty today@secondary today@elementary timetable.grid@secondary timetable.week@secondary timetable.tiles@elementary timetable.lesson-detail@secondary editor.lesson@secondary editor.subject@secondary editor.timetables@secondary settings@secondary settings.appearance@secondary today@secondary@sk timetable.grid@secondary@de' }}
   DEVICE_OVERRIDE: ${{ inputs.device || '' }}
   OUT: screenshots
 

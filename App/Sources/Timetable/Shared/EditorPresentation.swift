@@ -41,3 +41,29 @@ extension View {
         }
     }
 }
+
+/// A timetable-level editor (settings, bell schedule, subjects, terms) opened from the timetable's options menu.
+/// These routes edit the active timetable and ignore `EditorContext`.
+struct ManagementSheet: Identifiable {
+    let route: AppRoute
+    var id: String { route.id }
+
+    struct Entry: Identifiable {
+        let routeID: String
+        let titleKey: String  // existing String Catalog key
+        let symbol: String
+        var id: String { routeID }
+    }
+
+    static let entries: [Entry] = [
+        Entry(routeID: "editor.timetable", titleKey: "editor.timetable.title", symbol: "gearshape"),
+        Entry(routeID: "editor.bell", titleKey: "editor.bell.title", symbol: "bell"),
+        Entry(routeID: "editor.subjects", titleKey: "editor.subjects.title", symbol: "books.vertical"),
+        Entry(routeID: "editor.terms", titleKey: "editor.terms.title", symbol: "calendar"),
+    ]
+
+    @MainActor
+    static func make(_ routeID: String) -> ManagementSheet? {
+        EditorRouteLookup.route(routeID).map { ManagementSheet(route: $0) }
+    }
+}

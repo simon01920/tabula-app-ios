@@ -425,6 +425,9 @@ your feature's provider (`Onboarding/OnboardingRoutes.swift`, `Today/TodayRoutes
 Example: `xcrun simctl launch booted sk.simondev.tabula -TabulaSeed secondary -TabulaScreen today -AppleLanguages "(sk)"`.
 Release builds ignore the three developer arguments (`-TabulaScreen` still selects a registered, non-debug route).
 
+**Custom screen sets:** Actions → "UI screenshots (iOS Simulator)" → Run workflow → `screens` = space-separated
+`id[@seed[@lang]]` entries (route ids: any `AppRoute("…")` in `App/Sources/*/**Routes.swift`; seeds `empty|blank|elementary|secondary|university`; `lang` = `-AppleLanguages` code, e.g. `sk`, `de`, `ja`). Example: `editor.bell@university editor.terms@secondary@sk timetable.week@secondary@de`. The default set (workflow `SCREENS` and the dispatch input default, kept identical) covers onboarding, Today, the three timetable views, lesson detail, the lesson/subject/timetables editors, settings and two localised shots; pushes to `main` use the default. `debug` (and `debug-*`) can still be requested explicitly. Editors opened by route (no `EditorContext`) show seed data (first lesson/subject).
+
 ## 20. Paid-account placeholders (account deferred)
 
 Full runbook: [`docs/PAID_ACCOUNT_SWITCHOVER.md`](PAID_ACCOUNT_SWITCHOVER.md). Variables list: `.env.example`.

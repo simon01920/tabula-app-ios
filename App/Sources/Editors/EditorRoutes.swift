@@ -21,7 +21,8 @@
 //   .sheet(…)       { TermsEditorView() }                    // optional timetableID:
 //   .sheet(…)       { DayChangeEditorView(date: localDate, lessonID: lessonID) }
 //   .sheet(…)       { TimetablesManagerView() }
-// Add entries here only; see Routing/RouteRegistry.swift.
+// Routes read `@Environment(\.editorContext)` (set by B2 sheets); `nil` = launch route -> seed defaults. Mapping:
+// TimetableUI `EditorLaunchTarget`. Add entries here only; see Routing/RouteRegistry.swift.
 import SwiftUI
 import TimetableCore
 import TimetableUI
@@ -36,7 +37,7 @@ enum EditorRoutes: RouteProvider {
             AppRoute("editor.bell", .sheet(over: .timetable)) { BellScheduleEditorView() },
             AppRoute("editor.timetable", .sheet(over: .timetable)) { TimetableEditorView() },
             AppRoute("editor.terms", .sheet(over: .timetable)) { TermsEditorView() },
-            AppRoute("editor.day-change", .sheet(over: .timetable)) { DayChangeEditorView() },
+            AppRoute("editor.day-change", .sheet(over: .timetable)) { DayChangeEditorRoute() },
             AppRoute("editor.timetables", .sheet(over: .timetable)) { TimetablesManagerView() },
         ]
     }
@@ -46,8 +47,20 @@ enum EditorRoutes: RouteProvider {
 private struct LessonEditorRoute: View {
     var isNew = false
     @Environment(AppModel.self) private var model
+    @Environment(\.editorContext) private var editorContext
 
     var body: some View {
+        switch EditorLaunchTarget(editorContext) {
+        case .editLesson(let id, let timetableID):
+            LessonEditorView(target: .existing(id), timetableID: timetableID)
+        case .newLesson(let context, let timetableID):
+            LessonEditorView(target: .new(context), timetableID: timetableID)
+        default:
+            seedBody
+        }
+    }
+
+    @ViewBuilder private var seedBody: some View {
         if !isNew, let lesson = EditorSeedPicker.firstLesson(in: model) {
             LessonEditorView(target: .existing(lesson.id))
         } else {
@@ -72,8 +85,27 @@ private struct LessonEditorRoute: View {
 /// `editor.subject` without an id.
 private struct SubjectEditorRoute: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.editorContext) private var editorContext
 
     var body: some View {
-        SubjectEditorView(subjectID: EditorSeedPicker.firstSubject(in: model)?.id)
+        if case .newSubject(let timetableID) = EditorLaunchTarget(editorContext) {
+            // The quick-add sheet lists subjects live from the model, so the new subject appears there without a callback.
+            SubjectEditorView(subjectID: nil, timetableID: timetableID)
+        } else {
+            SubjectEditorView(subjectID: EditorSeedPicker.firstSubject(in: model)?.id)
+        }
+    }
+}
+
+/// `editor.day-change`: the context's date and lesson, else today with the first lesson.
+private struct DayChangeEditorRoute: View {
+    @Environment(\.editorContext) private var editorContext
+
+    var body: some View {
+        if case .dayChange(let date, let lessonID, let timetableID) = EditorLaunchTarget(editorContext) {
+            DayChangeEditorView(date: date, lessonID: lessonID, timetableID: timetableID)
+        } else {
+            DayChangeEditorView()
+        }
     }
 }

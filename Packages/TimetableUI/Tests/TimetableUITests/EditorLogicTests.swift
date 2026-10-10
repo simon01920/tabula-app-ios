@@ -34,7 +34,7 @@ struct EditorBasicsTests {
 
     @Test func dateBridgeRoundTrips() throws {
         let date = try #require(LocalDate(year: 2026, month: 10, day: 15))
-        let time = try #require(LocalTime(hour: 8, minute: 55))
+        let time = try #require(LocalTime(hour: 8, minute: 55)!)
         let instant = LocalDateBridge.instant(date, time)
         #expect(LocalDateBridge.time(instant) == time)
         #expect(LocalDateBridge.date(instant, fallback: .earliest) == date)
@@ -656,5 +656,40 @@ struct TimetableManagementTests {
         #expect(result.lessons.filter { $0.subjectID == subject.id && !$0.isDeleted }.isEmpty)
         #expect(errors(result).isEmpty)
         #expect(result.validate().filter { $0.code == .referencesDeletedEntity }.isEmpty)
+    }
+}
+
+@Suite("EditorLaunchTarget")
+struct EditorLaunchTargetTests {
+    let tt = Timetable.ID(UUID())
+
+    @Test func nilContextIsNil() {
+        #expect(EditorLaunchTarget(nil) == nil)
+    }
+
+    @Test func lessonAndSubjectAndDayChange() {
+        let lesson = Lesson.ID(UUID())
+        let date = LocalDate(year: 2026, month: 10, day: 13)!
+        #expect(EditorLaunchTarget(EditorContext(timetableID: tt, target: .lesson(lesson))) == .editLesson(lesson, timetableID: tt))
+        #expect(EditorLaunchTarget(EditorContext(timetableID: tt, target: .newSubject)) == .newSubject(timetableID: tt))
+        #expect(EditorLaunchTarget(EditorContext(timetableID: tt, target: .dayChange(date: date, occurrence: nil, lessonID: lesson)))
+                == .dayChange(date: date, lessonID: lesson, timetableID: tt))
+    }
+
+    @Test func newLessonCarriesDaySlotAndCycleWeek() {
+        let period = Period.ID(UUID())
+        let date = LocalDate(year: 2026, month: 10, day: 14)!
+        let withPeriod = QuickAddTarget(timetableID: tt, date: date, dayKey: .weekday(.wednesday), cycleWeek: 2,
+                                        periodID: period, lessonNumber: 3, start: LocalTime(hour: 9, minute: 0)!,
+                                        end: LocalTime(hour: 9, minute: 45)!)
+        #expect(EditorLaunchTarget(EditorContext(timetableID: tt, target: .newLesson(withPeriod)))
+                == .newLesson(NewLessonContext(day: .weekday(.wednesday), slot: .period(period, span: 1), cycleWeek: 2), timetableID: tt))
+        var free = withPeriod
+        free.periodID = nil
+        free.cycleWeek = nil
+        #expect(EditorLaunchTarget(EditorContext(timetableID: tt, target: .newLesson(free)))
+                == .newLesson(NewLessonContext(day: .weekday(.wednesday),
+                                               slot: .time(start: LocalTime(hour: 9, minute: 0)!, end: LocalTime(hour: 9, minute: 45)!)),
+                              timetableID: tt))
     }
 }

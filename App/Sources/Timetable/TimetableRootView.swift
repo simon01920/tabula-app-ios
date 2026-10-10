@@ -23,6 +23,7 @@ struct TimetableRootView: View {
     @State private var detail: LessonDetailTarget?
     @State private var quickAdd: QuickAddTarget?
     @State private var editor: EditorPresentation?
+    @State private var management: ManagementSheet?
 
     init() {
         initialView = nil
@@ -69,6 +70,7 @@ struct TimetableRootView: View {
             QuickAddSheet(target: target)
         }
         .editorSheet($editor)
+        .sheet(item: $management) { item in item.route.makeView() }
     }
 
     // MARK: State
@@ -190,6 +192,15 @@ struct TimetableRootView: View {
                     }
                 } header: {
                     Text("timetable.options.showWeek")
+                }
+            }
+
+            Section {
+                ForEach(ManagementSheet.entries) { entry in
+                    Button { management = ManagementSheet.make(entry.routeID) } label: {
+                        Label { Text(LocalizedStringKey(entry.titleKey)) } icon: { Image(systemName: entry.symbol) }
+                    }
+                    .disabled(!EditorRouteLookup.isAvailable(entry.routeID))
                 }
             }
 
