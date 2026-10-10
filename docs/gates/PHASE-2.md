@@ -21,6 +21,26 @@ Orchestrator-verified after all B merges (`10ea1e7`): `validate.sh` ALL CHECKS P
 ## Runtime evidence so far
 CI simulator (iOS 27, run 37968712889, foundation only): the shell, Liquid Glass tab bar and seed data render. Slovak dates are formatted correctly. **Untranslated keys show as raw keys in Slovak.** iOS does not fall back to English per key, so C1 adds a completeness check and no partially translated language can ship.
 
+### Full-app screenshot review (orchestrator, CI run 38010477525: 17 screens × light/dark/AX = 51 PNGs, no crash)
+**Works as designed:**
+- **Today:** Now & Next card with a progress bar, colour tiles, break separators, Liquid Glass tab bar.
+- **Grid:** Week B label, change badges (time changed / cancelled struck through / added), double period, tap-to-add slots, the today marker, and a dot on the day with changes. It matches the reference patterns.
+- **Week time-blocks:** proportional layout, with the short Thursday visible.
+- **Lesson detail:** "Time changed — usually 08:00–08:45".
+- **Onboarding:** profile step.
+- **Subject editor:** live preview with the contrast ratio, named palette swatches, custom colour.
+- **Settings.**
+- **Largest text:** the grid switches to a readable list.
+- **Dark mode** works everywhere.
+
+**Bugs found (fix pass):**
+1. **Frozen countdown is wrong.** Today shows "45:00" at 10:20 for a 10:00–10:45 lesson (should be 25:00). `Text(timerInterval:pauseTime:)` reference.
+2. **Week view "now" line is drawn over tile text** (Tue SJL).
+3. **Lesson editor's Subject picker** shows only the emoji, not the name.
+4. **Settings → "I am in" shows the raw key `settings.profile.secondary`.** The key is built at runtime and missing from the catalog, invisible to the static key check. Needs a test that enumerates all dynamic keys.
+5. **Subject editor's "close to the background → outline" hint fires for yellow in dark mode.** It should compare against the current scheme's background.
+6. Polish: on Today tiles the "done" check overlaps the period-number circle.
+
 ## Decisions taken (reviewable)
 - Real app code uses `@Observable`, `@State` and `@Entry`, all proven in Phase 0. SwiftData is banned.
 - Tabs: Today · Timetable · Settings. Tasks and Exams arrive in Phase 3.
