@@ -189,7 +189,7 @@ private struct TimetableFormContent: View {
     private var weekLabelFields: some View {
         ForEach(1...max(1, draft.weekLength), id: \.self) { week in
             LabeledContent {
-                TextField(text: weekLabelBinding(week), prompt: Text(verbatim: "")) { Text("editor.rotation.label") }
+                TextField(text: weekLabelBinding(week), prompt: Text(emptyPrompt)) { Text("editor.rotation.label") }
                     .multilineTextAlignment(.trailing)
             } label: {
                 Text(verbatim: model.renderer.format(key: "editor.rotation.week.label", arguments: [.integer(Int64(week))]))
@@ -261,7 +261,7 @@ private struct TimetableFormContent: View {
             Toggle(isOn: $draft.daySkipsBreaks) { Text("editor.rotation.day.skipsBreaks") }
             ForEach(1...max(1, draft.dayLength), id: \.self) { index in
                 LabeledContent {
-                    TextField(text: dayLabelBinding(index), prompt: Text(verbatim: "")) { Text("editor.rotation.label") }
+                    TextField(text: dayLabelBinding(index), prompt: Text(emptyPrompt)) { Text("editor.rotation.label") }
                         .multilineTextAlignment(.trailing)
                 } label: {
                     Text(verbatim: model.renderer.format(key: "editor.rotation.day.label", arguments: [.integer(Int64(index))]))

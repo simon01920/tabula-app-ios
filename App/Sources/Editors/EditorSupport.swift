@@ -14,6 +14,9 @@ import TimetableCore
 import TimetableUI
 import UIKit
 
+/// An empty prompt: inputs show their label next to the field and never placeholder text (field rule).
+var emptyPrompt: LocalizedStringKey { "" }
+
 // MARK: - Scaffold
 
 /// A sheet with Cancel / Save, a Form for `content` and a discard confirmation when there are unsaved edits.
@@ -156,7 +159,7 @@ struct LabeledTextField: View {
 
     var body: some View {
         LabeledContent {
-            TextField(text: $text, prompt: Text(verbatim: ""), axis: axis) { Text(titleKey) }
+            TextField(text: $text, prompt: Text(emptyPrompt), axis: axis) { Text(titleKey) }
                 .multilineTextAlignment(.trailing)
         } label: {
             Text(titleKey)

@@ -1285,6 +1285,18 @@
         }
       }
     },
+    "editor.dayChange.lessonRow" : {
+      "comment" : "Lesson picker row: time range, then subject name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@  %@"
+          }
+        }
+      }
+    },
     "editor.dayChange.noLessons" : {
       "comment" : "Footer when the chosen date has no lessons.",
       "extractionState" : "manual",
@@ -2133,6 +2145,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ · %@"
+          }
+        }
+      }
+    },
+    "editor.range.dates" : {
+      "comment" : "Date range, e.g. a term: first date, en dash, last date.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ – %@"
           }
         }
       }

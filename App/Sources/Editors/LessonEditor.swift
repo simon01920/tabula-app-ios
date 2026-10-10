@@ -225,7 +225,8 @@ private struct LessonFormContent: View {
                         })) {
                         VStack(alignment: .leading) {
                             Text(verbatim: term.name)
-                            Text(verbatim: "\(model.formatter.date(term.range.start)) – \(model.formatter.date(term.range.end))")
+                            Text(verbatim: model.renderer.format(key: "editor.range.dates", arguments: [
+                                .text(model.formatter.date(term.range.start)), .text(model.formatter.date(term.range.end))]))
                                 .font(.footnote)
                                 .foregroundStyle(.secondary)
                         }
@@ -283,7 +284,7 @@ private struct LessonFormContent: View {
         Section {
             ForEach(Array(draft.bringList.enumerated()), id: \.offset) { index, _ in
                 HStack {
-                    TextField(text: itemBinding(index), prompt: Text(verbatim: "")) { Text("editor.field.bringItem") }
+                    TextField(text: itemBinding(index), prompt: Text(emptyPrompt)) { Text("editor.field.bringItem") }
                     Button {
                         if draft.bringList.indices.contains(index) { draft.bringList.remove(at: index) }
                     } label: {

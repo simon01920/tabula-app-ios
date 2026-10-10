@@ -259,7 +259,8 @@ private struct DayChangeFormContent: View {
         Picker(selection: $draft.lessonID) {
             if draft.lessonID == nil { Text("editor.dayChange.lesson.choose").tag(Lesson.ID?.none) }
             ForEach(entries) { entry in
-                Text(verbatim: "\(model.formatter.timeRange(entry.start, entry.end))  \(entry.subjectName)")
+                Text(verbatim: model.renderer.format(key: "editor.dayChange.lessonRow", arguments: [
+                    .text(model.formatter.timeRange(entry.start, entry.end)), .text(entry.subjectName)]))
                     .tag(Lesson.ID?.some(entry.lessonID))
             }
         } label: {
