@@ -85,3 +85,10 @@ all `needs_review`. Terminology follows the existing `settings.reminders.*` stri
 de "Zeitkritisch", ja "即時通知"). French uses NBSP before ":"; Serbian keeps the app name "Tabula" in Latin script, as
 the existing strings do. Apple UI terms (Focus, Low Power Mode, Background App Refresh, Action button, Control Center)
 should be checked against each language's iOS wording during review. Recorded in `translations/<lang>.json`.
+
+### Phase 3 Stage B2 additions (2026-10-10, swiftui-engineer-sonnet)
+72 new keys (`exams.segment.*`, `exams.week.*`, `exams.period.*`, `exams.when.*`, `exams.kind.*`, `exams.detail.*`,
+`exams.editor.*`, `exams.a11y.*`, `exams.subtitle`, `exams.action.*`, `exams.empty.*`), model-authored for 11 languages
+(`sr-Latn` derived), all `needs_review`. Reviewer: exam-type terms (sk "Polsemestrálna skúška", pl "Kolokwium" for
+midterm, ja 中間試験/期末試験), plural forms of `exams.when.inDays/daysAgo` and `exams.period.count` (sk/cs/pl/uk/ro/sr
+categories), and "Exam period" (sk "Skúškové obdobie", de "Prüfungszeitraum").
