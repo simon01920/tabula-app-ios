@@ -77,3 +77,11 @@ Pass 3 (2026-10-10, Phase 2 QA fix pass): 5 keys (`editor.warnings.*`, `editor.w
 - Settings > Tabula > Language: all 12 languages offered (incl. Srpski/Српски). Cold start in each: no raw keys (`shell.tab.today`, `a11y.lesson.room`) anywhere; plural strings (conflicts, share warnings, reminder bodies) read correctly for 1, 2, 5, 21.
 - Device language "Srpski (latinica)" picks Latin, "Српски" picks Cyrillic; if not, see "Identifier choice".
 - Dynamic Type XXL + de/hu/fr + ja/zh on the Today and Timetable tabs, widget gallery names.
+
+### Phase 3 Stage A additions (2026-10-10, notifications-engineer)
+56 new keys (`shell.tab.tasks/exams`, `tasks.*`, `exams.*`, `attachments.*`, `reminders.override.*`, `alarm.*`,
+`reminder.test.*`, `health.*`), English + machine translations for all 11 authored languages (`sr-Latn` derived),
+all `needs_review`. Terminology follows the existing `settings.reminders.*` strings (e.g. sk "Časovo citlivé",
+de "Zeitkritisch", ja "即時通知"). French uses NBSP before ":"; Serbian keeps the app name "Tabula" in Latin script, as
+the existing strings do. Apple UI terms (Focus, Low Power Mode, Background App Refresh, Action button, Control Center)
+should be checked against each language's iOS wording during review. Recorded in `translations/<lang>.json`.

@@ -19,3 +19,29 @@ Request in context with a pre-explainer. Provide an in-app "Reminders health che
 
 ## Test matrix (on device)
 Silent switch on/off · each Focus (DND, Sleep, custom) · Low Power Mode · app force-quit · reboot · time-zone change · DST change · airplane mode · Watch mirrored delivery · permission revoked/re-granted · 100+ tasks (cap behaviour).
+
+## Implementation (Phase 3 Stage A, 2026-10-10)
+- **Single source of truth:** `TimetableCore.ReminderPlanner`. The adapter (`TimetableUI/Reminders`, Linux-tested) diffs
+  the plan against what is really pending and applies it through `NotificationCenterClient` (UNUserNotificationCenter)
+  and `AlarmClient` (AlarmKit). It never decides timing. Re-plan triggers: launch, foreground, data change (1 s debounce,
+  coalesced), time zone / locale / significant time change, notification action, AlarmKit authorization change,
+  `BGAppRefreshTask`, and an in-app timer at `nextReplanDate`.
+- **IDs:** planner `rem.<16 hex>` (wall-clock based, stable across zone changes); snoozes `snooze.<rem id>` (one per
+  reminder); health-check test `tabula.test.…`. Non-planner ids are never touched by the diff, except snoozes of
+  completed/deleted tasks and exams. Loud alarms use the planner's deterministic UUID; only alarms in the adapter's
+  ledger (or with a planner-derived id) are ever cancelled. Diff, never wipe-and-reschedule.
+- **Tiers:** Standard → `.active`; Time Sensitive → `.timeSensitive` (paid entitlement only; otherwise iOS delivers it as
+  standard and the health check says so); Loud alarm → AlarmKit `.fixed` alarm with a 9-minute Snooze countdown (Live
+  Activity), only from user rules (D7), soft limit 10, learned lower limit after `maximumLimitReached` → overflow is
+  delivered as notifications and shown as a notice.
+- **Actions:** Mark as Done (task/exam; repeating tasks get their successor per DOMAIN_MODEL §3.9, tombstone-safe),
+  Remind Me in 1 Hour, Remind Me Tomorrow (07:00 local), tap → deep link (Tasks/Exams tab, `tasks.detail` /
+  `exams.detail` when registered). Foreground presentation: banner + list + sound.
+- **Trigger time zone:** calendar trigger with explicit Gregorian calendar + zone = the plan's zone (absolute instant);
+  ambiguous DST wall-clock times use an exact interval trigger. Apple does not document the trigger's zone semantics
+  (docs/ENVIRONMENT.md §21).
+- **Permissions:** never at launch; notification prompt only from explicit UI (B4's pre-explainer), AlarmKit prompt only
+  when the user picks a Loud-alarm rule; the adapter never triggers AlarmKit's implicit prompt.
+- **Health check model:** `ReminderHealthCheck` (rows for notifications, Time Sensitive, loud alarms, Focus, Silent mode,
+  Low Power, Background App Refresh, pending vs 64, saturation, alarm overflow, hidden/locked app). UI in B4.
+- **Device matrix:** `docs/checklists/PHASE3_DEVICE.md` §A.

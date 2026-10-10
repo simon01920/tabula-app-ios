@@ -97,17 +97,20 @@ final class ReminderCoordinator {
             observers.append(NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
                 MainActor.assumeIsolated {
                     guard let self else { return }
-                    Task { await self.refreshHealth() }
+                    Task { await self.refreshHealthIfShown() }
                 }
             })
         }
         let updates = engine.alarms.authorizationUpdates()
+        let alarms = engine.alarms
         authorizationTask = Task { [weak self] in
-            var previous: AlarmAuthorization?
-            for await state in updates {
-                guard let self else { return }
-                if previous != nil, previous != state { self.requestReplan(.alarmAuthorization, debounce: .zero) }
+            // Baseline first: whether the stream starts with the current value is not documented.
+            var previous = await alarms.authorization()
+            for await state in updates where state != previous {
                 previous = state
+                guard let self else { return }
+                self.requestReplan(.alarmAuthorization, debounce: .zero)
+                await self.refreshHealthIfShown()
             }
         }
         requestReplan(.launch, debounce: .zero)
@@ -180,6 +183,11 @@ final class ReminderCoordinator {
             lastBackgroundRequest = earliest.formatted(date: .abbreviated, time: .shortened)
         }
         scheduleTimer(at: result.plan.nextReplanDate)
+        await refreshHealthIfShown()
+    }
+
+    /// Keeps the health rows current once a screen asked for them (`refreshHealth()` was called).
+    private func refreshHealthIfShown() async {
         if health != nil { await refreshHealth() }
     }
 

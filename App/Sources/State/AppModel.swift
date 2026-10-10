@@ -7,6 +7,8 @@
 //          model.database / model.activeTimetable / model.resolver(for:) / model.calendarContext / model.now
 //          model.formatter / model.renderer / model.entitlements
 //          model.apply(.upsert(lesson))   → ApplyResult (.applied(warnings) / .rejected / .failed)
+// Reminders: every accepted change and every environment refresh calls `onChange`; the ReminderCoordinator re-plans
+//          from it (debounced), so editors never schedule notifications themselves.
 // APIs: Observation.Observable (macro; allowed in app code per PHASE2_PLAN §0.1), Task.sleep(for:),
 //       NotificationCenter.addObserver(forName:object:queue:using:), MainActor.assumeIsolated,
 //       NSNotification.Name.NSSystemTimeZoneDidChange, NSLocale.currentLocaleDidChangeNotification,

@@ -206,6 +206,7 @@ So with a free account, AlarmKit and the countdown Live Activity should be testa
 - Q9. Does the widget extension and Live Activity work in a free-account / xtool-signed build?
 
 ## 10. The probe
+> **Update (Phase 3 Stage A, 2026-10-10):** `AlarmProbeMetadata` was replaced by the production type `TabulaAlarmMetadata` (`Packages/TimetableUI/Sources/TimetableUI/Reminders/TabulaAlarmMetadata.swift`, kind `.probe` for these probes); the Live Activity renders `AlarmAttributes<TabulaAlarmMetadata>`. The table below is the Phase 0 state.
 | File | Purpose |
 |---|---|
 | `App/Sources/Debug/AlarmProbes.swift` | `struct AlarmProbesSection: View`, a group of `Section`s to put inside a `List`/`Form`. It shows AlarmKit authorization with a request button; a 60 s fixed alarm; a 60 s alarm with a 1-min Snooze; a 2-min countdown; fixed and relative alarms with an adjustable delay for time-zone/DST tests; the scheduled-alarm list with per-alarm and cancel-all buttons; notification authorization, Time Sensitive, alert and sound settings, and the pending count; 10 s Standard and Time Sensitive notifications; an AlarmKit limit probe (up to 200 far-future alarms, then cancel); a pending-cap probe (70 far-future notifications, count, remove); and the last-result line. |
