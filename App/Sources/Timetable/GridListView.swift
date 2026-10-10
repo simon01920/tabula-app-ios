@@ -8,7 +8,7 @@ import TimetableCore
 import TimetableUI
 
 struct GridListView: View {
-    let layout: GridLayout
+    let layout: TimetableCore.GridLayout
     let strip: WeekStripModel
     let timetable: Timetable
     let reasons: [OccurrenceID: [ModificationReason]]
@@ -42,7 +42,7 @@ struct GridListView: View {
     }
 
     @ViewBuilder
-    private func row(_ item: GridListItem, column: GridLayout.Column) -> some View {
+    private func row(_ item: GridListItem, column: TimetableCore.GridLayout.Column) -> some View {
         switch item {
         case let .lesson(cell, _):
             Button { onOpen(cell.entry) } label: {
@@ -91,7 +91,7 @@ struct GridListView: View {
         }
     }
 
-    private func header(_ column: GridLayout.Column) -> some View {
+    private func header(_ column: TimetableCore.GridLayout.Column) -> some View {
         HStack(spacing: 8) {
             Text(verbatim: model.formatter.date(column.date, style: .full))
             if let day = strip.days.first(where: { $0.date == column.date }) {
@@ -112,13 +112,13 @@ struct GridListView: View {
         .accessibilityAddTraits(.isHeader)
     }
 
-    private func emptyKey(_ column: GridLayout.Column) -> LocalizedStringKey {
+    private func emptyKey(_ column: TimetableCore.GridLayout.Column) -> LocalizedStringKey {
         if column.activeBreakID != nil { return "timetable.day.holiday" }
         if column.cancellingOverrideID != nil { return "timetable.day.cancelled" }
         return "timetable.day.noLessons"
     }
 
-    private func emptySymbol(_ column: GridLayout.Column) -> String {
+    private func emptySymbol(_ column: TimetableCore.GridLayout.Column) -> String {
         if column.activeBreakID != nil { return "beach.umbrella" }
         if column.cancellingOverrideID != nil { return "xmark.circle" }
         return "moon.zzz"

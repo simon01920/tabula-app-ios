@@ -36,7 +36,7 @@ private struct LessonDetailRouteView: View {
 
     private var target: LessonDetailTarget? {
         guard let timetable = model.activeTimetable, let resolver = model.resolver(for: timetable.id) else { return nil }
-        let start = GridLayout.displayWeekStart(today: model.today, resolver: resolver)
+        let start = TimetableCore.GridLayout.displayWeekStart(today: model.today, resolver: resolver)
         let entries = (0..<7).flatMap { resolver.day(start.adding(days: $0)).entries }
         let pick = entries.first { $0.status == .modified } ?? entries.first { $0.status != .scheduled }
             ?? resolver.day(model.today).entries.first ?? entries.first
@@ -58,8 +58,8 @@ private struct QuickAddRouteView: View {
 
     private var target: QuickAddTarget? {
         guard let timetable = model.activeTimetable, let resolver = model.resolver(for: timetable.id) else { return nil }
-        let start = GridLayout.displayWeekStart(today: model.today, resolver: resolver)
-        let layout = GridLayout.week(containing: start, resolver: resolver)
+        let start = TimetableCore.GridLayout.displayWeekStart(today: model.today, resolver: resolver)
+        let layout = TimetableCore.GridLayout.week(containing: start, resolver: resolver)
         return layout.emptySlots.lazy.compactMap {
             QuickAddTarget.make(layout: layout, column: $0.column, row: $0.row, timetable: timetable)
         }.first

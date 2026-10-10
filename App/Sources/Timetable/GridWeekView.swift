@@ -17,7 +17,7 @@ import TimetableCore
 import TimetableUI
 
 struct GridWeekView: View {
-    let layout: GridLayout
+    let layout: TimetableCore.GridLayout
     let strip: WeekStripModel
     let timetable: Timetable
     let reasons: [OccurrenceID: [ModificationReason]]
@@ -55,7 +55,7 @@ struct GridWeekView: View {
 
     private var isCompact: Bool { timetable.density.effective == .compact }
 
-    private func height(of row: GridLayout.Row) -> CGFloat {
+    private func height(of row: TimetableCore.GridLayout.Row) -> CGFloat {
         if row.isLessonRow { return isCompact ? compactRowHeight : comfortableRowHeight }
         return row.kind == .lunch ? lunchRowHeight : breakRowHeight
     }
@@ -257,7 +257,7 @@ struct GridWeekView: View {
 
 /// One lesson in the grid: subject colour, emoji, short name, optional room, status/conflict icons.
 struct GridCellView: View {
-    let cell: GridLayout.Cell
+    let cell: TimetableCore.GridLayout.Cell
     let reasons: [ModificationReason]
     let visibility: FieldVisibility
     let showsDetails: Bool
