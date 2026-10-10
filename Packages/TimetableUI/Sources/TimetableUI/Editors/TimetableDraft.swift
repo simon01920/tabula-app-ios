@@ -164,6 +164,16 @@ public struct TimetableDraft: Equatable, Sendable {
         return found
     }
 
+    /// Lessons of the timetable that sit in bell-schedule periods: with a free-form time structure they have no
+    /// period to resolve against (the resolver reports `periodNotInSchedule` and the lesson is not placed).
+    public static func periodLessonCount(lessons: [Lesson], timetableID: Timetable.ID) -> Int {
+        lessons.filter { lesson in
+            guard !lesson.isDeleted, lesson.timetableID == timetableID else { return false }
+            if case .period = lesson.slot { return true }
+            return false
+        }.count
+    }
+
     /// `true` when nothing blocks saving.
     public var canSave: Bool { issues.isEmpty }
 
@@ -192,9 +202,13 @@ public struct TimetableDraft: Equatable, Sendable {
     }
 
     /// The timetable to store. `timeStructure` is computed by the caller (it may need new bell schedules).
-    public func makeTimetable(timeStructure: TimeStructure) -> Timetable? {
+    ///
+    /// `current` is the timetable as stored NOW. Nested sheets (bell schedule, terms) save while this editor is open, so
+    /// the `base` captured when it opened can be stale; everything this editor does not edit (and the time structure,
+    /// which the caller derives from `current`) comes from `current`, never from `base`.
+    public func makeTimetable(timeStructure: TimeStructure, onto current: Timetable? = nil) -> Timetable? {
         guard let trimmedName = EditorText.trimmedOrNil(name) else { return nil }
-        var timetable = base
+        var timetable = current ?? base
         timetable.name = trimmedName
         timetable.emoji = EditorText.firstCharacter(emoji)
         timetable.enabledDays = enabledDays
@@ -208,15 +222,24 @@ public struct TimetableDraft: Equatable, Sendable {
         return timetable
     }
 
-    /// The time structure for the chosen kind: kept as stored when the kind did not change, a new default schedule
-    /// (with its mutation) when switching to bell schedules without an existing one.
+    /// The time structure for the chosen kind: kept as stored (in `current`, the timetable as stored now; defaults to
+    /// the one the editor opened with) when the kind did not change, a new default schedule (with its mutation) when
+    /// switching to bell schedules without an existing one. A bell schedule edited from inside this editor therefore
+    /// keeps its new weekday mapping.
     public func resolveTimeStructure<G: IDGenerator>(existingSchedules: [BellSchedule], scheduleName: String,
-                                                      ids: inout G) -> (structure: TimeStructure, extra: [DatabaseMutation]) {
+                                                      ids: inout G, current: Timetable? = nil)
+        -> (structure: TimeStructure, extra: [DatabaseMutation]) {
+        let stored = (current ?? base).timeStructure
         switch timeKind {
         case .freeForm:
-            return (.freeForm(defaultDurationMinutes: min(max(1, freeMinutes), LocalTime.minutesPerDay - 1)), [])
+            let minutes = min(max(1, freeMinutes), LocalTime.minutesPerDay - 1)
+            if case .freeForm(let storedMinutes) = stored, case .freeForm(let openedMinutes) = base.timeStructure,
+               openedMinutes == freeMinutes {
+                return (.freeForm(defaultDurationMinutes: storedMinutes), [])   // minutes not edited here
+            }
+            return (.freeForm(defaultDurationMinutes: minutes), [])
         case .bellSchedule:
-            if case .bellSchedule = base.timeStructure { return (base.timeStructure, []) }
+            if case .bellSchedule = stored { return (stored, []) }
             if let existing = existingSchedules.first(where: { !$0.isDeleted && $0.timetableID == timetableID }) {
                 return (.bellSchedule(defaultID: existing.id, perWeekday: [:]), [])
             }

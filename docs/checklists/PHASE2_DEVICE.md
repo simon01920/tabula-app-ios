@@ -93,8 +93,8 @@ Xcode, use **Settings → Developer** instead (onboarding reset, recovery tests;
 | Long text | `-TabulaSeed secondary`, then (B3) rename a subject to 60+ chars | wraps, no truncation of the time line |
 | Dynamic Type XXL / AX5 | Settings → Accessibility → Larger Text | every text scales; banner ✕ stays tappable; nothing clipped |
 | Dark mode | Appearance Dark | all text legible; subject badge text black/white per contrast |
-| German | `-AppleLanguages "(de)"` | strings fall back to English until stage C1 (expected now); layout holds long strings |
-| CJK | `-AppleLanguages "(ja)"` | dates/times/weekday names in Japanese format (年月日, 時), list separator "、" after C1 |
+| German | `-AppleLanguages "(de)"` | German strings shown (machine translation, needs_review); layout holds long strings |
+| CJK | `-AppleLanguages "(ja)"` | dates/times/weekday names in Japanese format (年月日, 時), list separator "、" |
 | VoiceOver | VoiceOver on | tabs announced with names; lesson rows one element; banner text + Dismiss |
 
 ### A9. Not verifiable without a device / simulator run (open items)
@@ -123,7 +123,7 @@ Root sections: Profile, Calendar & time, Appearance, Timetables (only if B3 regi
 | Pro | "Current plan: Pro" and "All features are unlocked during development." |
 | About | Version and build from the bundle; privacy and acknowledgements; a missing version/build row is absent, never a dash |
 | Read-only store (Developer: schema 99) | Pickers disabled, pages still open |
-| Stress | empty seed (onboarding), normal, AX5 (rows wrap, 44 pt, nothing clipped), dark, German (`-AppleLanguages "(de)"`, English fallback until C1), CJK (`ja`), VoiceOver (palette row reads "Ocean, Pro, Abyss, Navy, ...", selected trait, swatches not read separately) |
+| Stress | empty seed (onboarding), normal, AX5 (rows wrap, 44 pt, nothing clipped), dark, German (`-AppleLanguages "(de)"`), CJK (`ja`), VoiceOver (palette row reads "Ocean, Pro, Abyss, Navy, ...", selected trait, swatches not read separately) |
 
 Not verifiable without a device: Form/menu Picker look and Liquid Glass; target page of `UIApplication.openSettingsURLString`; searchable pushed list; sheet presentation of `editor.timetables` (the B3 view must bring its own NavigationStack).
 ## B1. Onboarding (`App/Sources/Onboarding`, logic in `TimetableUI/Onboarding`)
@@ -144,7 +144,7 @@ Routes: `onboarding` (welcome), `onboarding.profile|rotation|time|fields|reminde
 - [ ] Kill and relaunch after finishing: no onboarding, data still there.
 
 ### B1.2 Existing data is never lost (important)
-- [ ] With data present (`-TabulaSeed secondary`), delete the only timetable so the shell returns to onboarding, finish onboarding: old tasks and exams are still in the app (debug screen counts), the new timetable is active.
+- [ ] With data present, open Developer -> "Show onboarding again" (confirm) and finish onboarding: the old timetable, tasks and exams are still in the app (Developer counts), the new timetable is added and active, nothing is replaced.
 - [ ] `-TabulaScreen onboarding.start` on a seeded DB and "Get started": adds a second timetable, does not replace.
 
 ### B1.3 State matrix
@@ -152,8 +152,8 @@ Routes: `onboarding` (welcome), `onboarding.profile|rotation|time|fields|reminde
 |---|---|---|
 | Dynamic Type AX5 | Settings -> Larger Text | every step scrolls; Back/Next keep 44 pt, labels wrap, steppers and date pickers usable |
 | Dark mode | Appearance Dark | cards visible against background; outline of selected row visible; red error text legible |
-| German | `-AppleLanguages "(de)"` | long labels wrap (English fallback / raw keys until C1 is expected) |
-| Slovak plurals | `-AppleLanguages "(sk)"` | cycle value "2 týždne / 5 týždňov" (after C1) |
+| German | `-AppleLanguages "(de)"` | long labels wrap; no English fallback and no raw keys (all 12 languages are complete, every translation is needs_review) |
+| Slovak plurals | `-AppleLanguages "(sk)"` | cycle value "2 týždne / 5 týždňov"  |
 | CJK | `-AppleLanguages "(ja)"` | times and dates in Japanese format; no clipping |
 | VoiceOver | on | step title is a header and is announced on step change; progress read "Step X of 7"; choice rows read title, detail, "selected"; preview rows read "Lesson 3, 10:00 to 10:45"; decorative icons silent |
 | Reduce Motion | on | step change is an immediate swap, no fade |
@@ -269,7 +269,7 @@ school). Light, dark, AX5, sk + de.
 | Long text | B3: subject name 60+ chars, 8-char short name, long room/notes | tiles wrap the name; grid scales the short name (≥ 60 %, 2 lines); notes ≤ 3 lines |
 | Dynamic Type XXL / AX5 | Larger Text | countdown scales; grid/week → list, day → tiles at AX; day pills ≥ 44 pt; nothing clipped in tiles |
 | Dark mode | Appearance Dark | tile text contrast, outlines on dark colours, red now line visible, badges legible (material) |
-| German | `-AppleLanguages "(de)"` | after C1: long captions wrap; week range scales to fit |
+| German | `-AppleLanguages "(de)"` | long captions wrap; week range scales to fit |
 | CJK | `-AppleLanguages "(ja)"` | short weekday names (月 火 …), Japanese dates, list separator "、" |
 | VoiceOver | VoiceOver on | one element per lesson with the full sentence; header readable; grid column-major; hints on cells/slots |
 
@@ -326,3 +326,13 @@ AX5, dark mode, German-length strings (`-AppleLanguages "(de)"`), CJK (`ja`), Vo
 - **Last timetable**: Delete is disabled and the footer says why; Reset Timetable (confirmation) clears the lessons and the shell stays on the tab bar (no onboarding).
 - With 2+ timetables: Delete shows a sheet listing exactly what is removed; deleting the active one activates another. Edit + drag reorder. Add Timetable switches to the new one.
 - Opened from Settings as a sheet: must show its own navigation bar with Done.
+
+### QA fix pass 2 (stale draft, tap targets, warnings, VoiceOver separators)
+- [ ] **Stale draft (B3.5/B3.4)**: Timetable settings -> "Edit bell schedule" -> "Add Schedule for a Day" for Friday, assign Friday, Save the bell sheet, back in Timetable settings change only the name, Save. Open Timetable: Friday still uses the variant's times (and Edit bell schedule still lists the Friday variant). Repeat with terms: add a term in the Terms sheet, then Save settings: the term is still there.
+- [ ] **Tap targets (grid)**: 7 enabled days on a 375/393 pt phone at default text size: day columns are at least 44 pt wide and every cell/free slot opens on a single tap; on a narrow width (iPhone SE / split view) or with larger text the list layout appears instead of cramped columns.
+- [ ] **Tap targets (time blocks)**: week time-blocks view with a 30 minute lesson and back-to-back short lessons: tapping slightly above/below a short block opens it (44 pt hit area); proportions of the drawn blocks are unchanged.
+- [ ] **Warnings surfaced**: Timetable settings -> Time: switch a timetable with period-based lessons to "Free times" and Save: an alert "Saved with warnings" says how many lessons use bell-schedule periods and are not shown until given start/end times; OK closes the editor. The Timetable tab no longer shows those lessons (expected); switching back to bell schedule shows them again.
+- [ ] No alert appears for a plain save without warnings (editor closes immediately).
+- [ ] **VoiceOver**: Settings -> Appearance palette row and the subject editor preview read their parts with the language's list separator (Japanese "、"); the subject picker shows "emoji name" in the right order in every language.
+- [ ] **Lesson editor**: new lesson with "Date range" validity opens with today as start (not September 2026); an unknown lesson type (from a newer app version/import) shows its raw text in the picker, not a key.
+- [ ] Developer label reads "Show onboarding again (finishing it adds a timetable)".

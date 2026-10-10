@@ -120,7 +120,7 @@ private struct PackRow: View {
         var parts = [lookup(choice.pack.nameKey)]
         if choice.pack.requiresPro { parts.append(lookup("settings.appearance.palette.pro")) }
         parts.append(model.formatter.list(choice.pack.colors.map { lookup($0.nameKey) }))
-        return parts.joined(separator: ", ")
+        return parts.joined(separator: model.renderer.string(forKey: "a11y.separator"))
     }
 }
 

@@ -196,14 +196,5 @@ struct LessonDetailView: View {
     }
 
     /// Catalog key of a field's name in the detail list.
-    static func fieldNameKey(_ field: LessonField) -> String {
-        switch field {
-        case .room: return "timetable.detail.field.room"
-        case .building: return "timetable.detail.field.building"
-        case .teacher: return "timetable.detail.field.teacher"
-        case .lessonType: return "timetable.detail.field.lessonType"
-        case .notes: return "timetable.detail.field.notes"
-        default: return "timetable.detail.field.bringList"
-        }
-    }
+    static func fieldNameKey(_ field: LessonField) -> String { DynamicL10nKeys.lessonDetailField(field) }
 }

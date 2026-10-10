@@ -39,13 +39,14 @@ struct LessonEditorView: View {
         case .existing(let id):
             guard let lesson = database.lessons.first(where: { $0.id == id && !$0.isDeleted }),
                   let timetable = model.timetables.first(where: { $0.id == lesson.timetableID }) else { return nil }
-            return (timetable, LessonDraft(lesson: lesson, timetable: timetable))
+            return (timetable, LessonDraft(lesson: lesson, timetable: timetable, today: model.today))
         case .new(let context):
             let timetable = timetableID.flatMap { id in model.timetables.first { $0.id == id } } ?? model.activeTimetable
             guard let timetable else { return nil }
             let subject = context.subjectID.flatMap { id in database.subjects.first { $0.id == id && !$0.isDeleted } }
             let draft = LessonDraft(newIn: timetable, context: context, schedule: defaultSchedule(of: timetable, in: database),
-                                    subject: subject, firstWeekday: model.calendarContext.firstWeekday, id: newID)
+                                    subject: subject, firstWeekday: model.calendarContext.firstWeekday, id: newID,
+                                    today: model.today)
             return (timetable, draft)
         }
     }
@@ -120,7 +121,7 @@ private struct LessonFormContent: View {
     private func subjectPickerItem(_ subject: Subject) -> some View {
         switch subject.symbol {
         case .emoji(let emoji)?:
-            Text(verbatim: emoji + " " + subject.name)
+            Text(verbatim: model.renderer.format(key: "editor.subject.emojiName", arguments: [.text(emoji), .text(subject.name)]))
         case .systemImage(let name)?:
             Label { Text(verbatim: subject.name) } icon: { Image(systemName: name) }
         case nil:
@@ -276,11 +277,21 @@ private struct LessonFormContent: View {
         }
     }
 
+    /// Known types show their translated name; an unknown one shows its raw text, never a catalog key.
+    @ViewBuilder
+    private func lessonTypeName(_ type: LessonType) -> some View {
+        if let key = VisibleLessonFields.nameKey(of: type) {
+            Text(LocalizedStringKey(key))
+        } else {
+            Text(verbatim: type.rawValue)
+        }
+    }
+
     private var lessonTypePicker: some View {
         Picker(selection: $draft.lessonType) {
             Text("editor.lessonType.none").tag(LessonType?.none)
             ForEach(LessonType.knownValues, id: \.self) { type in
-                Text(LocalizedStringKey(VisibleLessonFields.nameKey(of: type) ?? type.rawValue)).tag(LessonType?.some(type))
+                lessonTypeName(type).tag(LessonType?.some(type))
             }
             if let current = draft.lessonType, !current.isKnown {
                 Text(verbatim: current.rawValue).tag(LessonType?.some(current))

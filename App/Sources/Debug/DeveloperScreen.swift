@@ -109,7 +109,7 @@ struct DeveloperScreen: View {
             // data for a user's store comes from onboarding (TimetableCore.SampleData with the app's ids/clock/now).
             Section {
                 Button { state.confirmReset = true } label: {
-                    Text(verbatim: "Show onboarding again (data is replaced when it finishes)")
+                    Text(verbatim: "Show onboarding again (finishing it adds a timetable)")
                 }
             } header: { Text(verbatim: "Actions (go through AppModel.apply)") }
 

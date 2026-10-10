@@ -144,16 +144,21 @@ struct TimeBlockCanvas: View {
             ForEach(layout.blocks, id: \.entry.id) { block in
                 let laneWidth = columnWidth / CGFloat(max(1, block.laneCount))
                 let blockHeight = max(minimumBlockHeight, CGFloat(block.height) * height)
+                // Short blocks keep their proportional drawing; only the hit area grows to 44 pt (centred on the block).
+                let hit = TapTarget.hitArea(drawn: Double(blockHeight - 2))
                 Button {
                     onOpen(block.entry)
                 } label: {
                     TimeBlockView(block: block, reasons: reasons[block.entry.id] ?? [],
                                   visibility: timetable.fieldVisibility, detailed: detailed, height: blockHeight)
+                        .frame(width: laneWidth - 3, height: blockHeight - 2)
+                        .frame(height: CGFloat(hit.length))
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .frame(width: laneWidth - 3, height: blockHeight - 2)
+                .frame(width: laneWidth - 3, height: CGFloat(hit.length))
                 .offset(x: gutterWidth + CGFloat(block.column) * columnWidth + CGFloat(block.lane) * laneWidth + 1.5,
-                        y: CGFloat(block.top) * height + 1)
+                        y: CGFloat(block.top) * height + 1 - CGFloat(hit.overhang))
                 .accessibilityLabel(Text(verbatim: blockLabel(block)))
                 .accessibilityHint(Text("timetable.a11y.openHint"))
                 .accessibilitySortPriority(-Double(block.column * 10_000 + block.entry.startTime.minuteOfDay))

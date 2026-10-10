@@ -9,8 +9,9 @@ public enum GridMode: Equatable, Sendable {
     case grid
     case list
 
-    /// Narrowest day column (points) the grid is drawn with; below it the list is used.
-    public static let minimumColumnWidth = 40.0
+    /// Narrowest day column (points) the grid is drawn with; below it the list is used. 44 pt is the minimum tap target
+    /// (HIG): a 7-day week fits the grid from about 350 pt of usable width (44 + 7 x 44), narrower screens get the list.
+    public static let minimumColumnWidth = 44.0
 
     /// The list at accessibility text sizes (REFERENCE_ANALYSIS anti-pattern 5) or when `columnCount` columns of at
     /// least `minimumColumnWidth` do not fit into `availableWidth` next to the period column.
@@ -140,5 +141,17 @@ public enum GridPresentation {
         guard let column = layout.columns.first(where: { $0.date == today }),
               minuteOfDay >= layout.startMinute, minuteOfDay <= layout.endMinute else { return nil }
         return (column.index, layout.position(ofMinute: minuteOfDay))
+    }
+}
+
+/// Minimum tap target (HIG: 44 x 44 pt). Proportional views (time blocks) keep their drawn size and only widen the
+/// hit area, so proportions are not distorted.
+public enum TapTarget {
+    public static let minimum = 44.0
+
+    /// The hit length for a drawn `length` and the amount the hit area extends beyond it on each side.
+    public static func hitArea(drawn length: Double) -> (length: Double, overhang: Double) {
+        let hit = max(length, minimum)
+        return (hit, (hit - length) / 2)
     }
 }

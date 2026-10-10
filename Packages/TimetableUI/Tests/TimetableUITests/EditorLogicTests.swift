@@ -55,6 +55,7 @@ struct EditorBasicsTests {
 @Suite("Lesson draft")
 struct LessonDraftTests {
     private let scenario = SampleScenarios.secondary()
+    static let today = LocalDate(year: 2027, month: 2, day: 10)!
 
     private var existing: Lesson { scenario.database.lessons.first { !$0.isDeleted }! }
 
@@ -62,7 +63,7 @@ struct LessonDraftTests {
         let timetable = scenario.timetable
         var visibility = timetable
         visibility.fieldVisibility = .all
-        let draft = LessonDraft(lesson: existing, timetable: visibility)
+        let draft = LessonDraft(lesson: existing, timetable: visibility, today: Self.today)
         let made = try #require(draft.makeLesson(in: visibility))
         var expected = existing
         expected.bringList = EditorText.cleanedList(existing.bringList)
@@ -75,7 +76,7 @@ struct LessonDraftTests {
         var lesson = existing
         lesson.teacher = "Mgr. X"
         lesson.notes = "keep me"
-        var draft = LessonDraft(lesson: lesson, timetable: timetable)
+        var draft = LessonDraft(lesson: lesson, timetable: timetable, today: Self.today)
         draft.teacher = "changed but hidden"
         draft.room = "  301 "
         let made = try #require(draft.makeLesson(in: timetable))
@@ -87,7 +88,7 @@ struct LessonDraftTests {
     @Test func emptyEnabledFieldIsStoredAsAbsent() throws {
         var timetable = scenario.timetable
         timetable.fieldVisibility = .all
-        var draft = LessonDraft(lesson: existing, timetable: timetable)
+        var draft = LessonDraft(lesson: existing, timetable: timetable, today: Self.today)
         draft.room = "   "
         draft.bringList = ["", "  "]
         let made = try #require(draft.makeLesson(in: timetable))
@@ -97,7 +98,7 @@ struct LessonDraftTests {
 
     @Test func blockingIssues() {
         let timetable = scenario.timetable
-        var draft = LessonDraft(lesson: existing, timetable: timetable)
+        var draft = LessonDraft(lesson: existing, timetable: timetable, today: Self.today)
         draft.subjectID = nil
         #expect(draft.issues(in: timetable) == [.noSubject])
         #expect(draft.makeLesson(in: timetable) == nil)
@@ -117,7 +118,7 @@ struct LessonDraftTests {
     @Test func cycleWeeksOnlyForWeekRotation() throws {
         let timetable = scenario.timetable   // odd/even week rotation
         guard case .weekCycle(let cycle) = timetable.rotation else { Issue.record("expected week cycle"); return }
-        var draft = LessonDraft(lesson: existing, timetable: timetable)
+        var draft = LessonDraft(lesson: existing, timetable: timetable, today: Self.today)
         draft.cycleWeeks = [1]
         #expect(try #require(draft.makeLesson(in: timetable)).occurrence.cycleWeeks == [1])
         draft.cycleWeeks = Set(1...cycle.length)
@@ -149,7 +150,7 @@ struct LessonDraftTests {
         let id = Lesson.ID(UUID())
         let draft = LessonDraft(newIn: timetable,
                                 context: NewLessonContext(day: .weekday(.wednesday), slot: .period(period.id, span: 1)),
-                                schedule: scenario.regularBell, subject: subject, firstWeekday: .monday, id: id)
+                                schedule: scenario.regularBell, subject: subject, firstWeekday: .monday, id: id, today: Self.today)
         #expect(draft.day == .weekday(.wednesday))
         #expect(draft.slot.periodID == period.id)
         #expect(draft.room == (subject.defaultRoom ?? ""))
@@ -165,7 +166,7 @@ struct LessonDraftTests {
         let subject = database.subjects[0]
         let draft = LessonDraft(newIn: timetable, context: NewLessonContext(day: .weekday(.friday)),
                                 schedule: scenario.regularBell, subject: subject, firstWeekday: .monday,
-                                id: Lesson.ID(UUID()))
+                                id: Lesson.ID(UUID()), today: Self.today)
         let lesson = try #require(draft.makeLesson(in: timetable))
         let stored = try apply(.upsert(lesson), to: database)
         #expect(errors(stored).isEmpty)
@@ -412,6 +413,51 @@ struct TimetableDraftTests {
         #expect(TimetableDraft.minimumWeekCycleLength(lessons: [lesson], timetableID: lesson.timetableID) == 3)
         lesson.occurrence = LessonOccurrenceRule(day: .cycleDay(5))
         #expect(TimetableDraft.minimumDayCycleLength(lessons: [lesson], timetableID: lesson.timetableID) == 5)
+    }
+
+    @Test func staleDraftDoesNotOverwriteABellScheduleEditedFromInsideTheEditor() throws {
+        let opened = scenario.timetable
+        guard case .bellSchedule(let defaultID, _) = opened.timeStructure else { Issue.record("bell"); return }
+        // The editor opened with `opened`; the nested bell-schedule sheet then saved a Friday variant.
+        var draft = TimetableDraft(timetable: opened, today: today)
+        draft.name = "Renamed"
+        var stored = opened
+        let variant = BellSchedule.ID(UUID())
+        stored.timeStructure = .bellSchedule(defaultID: defaultID, perWeekday: [.friday: variant])
+        var ids = SequentialIDGenerator(namespace: 0xB4)
+        let resolved = draft.resolveTimeStructure(existingSchedules: [], scheduleName: "x", ids: &ids, current: stored)
+        #expect(resolved.structure == stored.timeStructure)
+        #expect(resolved.extra.isEmpty)
+        let made = try #require(draft.makeTimetable(timeStructure: resolved.structure, onto: stored))
+        #expect(made.name == "Renamed")
+        #expect(made.timeStructure.bellScheduleID(for: .friday) == variant)
+        // Without `current` the stale copy would win (the old behaviour).
+        let stale = try #require(draft.makeTimetable(timeStructure: draft.resolveTimeStructure(
+            existingSchedules: [], scheduleName: "x", ids: &ids).structure))
+        #expect(stale.timeStructure.bellScheduleID(for: .friday) != variant)
+    }
+
+    @Test func freeFormMinutesNotEditedHereKeepTheStoredValue() {
+        var opened = scenario.timetable
+        opened.timeStructure = .freeForm(defaultDurationMinutes: 50)
+        let draft = TimetableDraft(timetable: opened, today: today)
+        var stored = opened
+        stored.timeStructure = .freeForm(defaultDurationMinutes: 70)
+        var ids = SequentialIDGenerator(namespace: 0xB5)
+        #expect(draft.resolveTimeStructure(existingSchedules: [], scheduleName: "x", ids: &ids, current: stored).structure
+            == .freeForm(defaultDurationMinutes: 70))
+    }
+
+    @Test func countsLessonsThatNeedBellPeriods() {
+        let id = scenario.timetable.id
+        let lessons = scenario.database.lessons
+        let periodBased = lessons.filter { lesson in
+            if case .period = lesson.slot { return !lesson.isDeleted && lesson.timetableID == id }
+            return false
+        }.count
+        #expect(TimetableDraft.periodLessonCount(lessons: lessons, timetableID: id) == periodBased)
+        #expect(periodBased > 0)
+        #expect(TimetableDraft.periodLessonCount(lessons: lessons, timetableID: Timetable.ID(UUID())) == 0)
     }
 
     @Test func switchingToBellScheduleCreatesADefaultOne() throws {

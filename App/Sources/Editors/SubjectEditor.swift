@@ -125,7 +125,7 @@ private struct SubjectFormContent: View {
             .listRowBackground(Color.clear)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text("editor.subject.preview"))
-            .accessibilityValue(Text(verbatim: [name, summary.shortName ?? ""].filter { !$0.isEmpty }.joined(separator: ", ")))
+            .accessibilityValue(Text(verbatim: [name, summary.shortName ?? ""].filter { !$0.isEmpty }.joined(separator: model.renderer.string(forKey: "a11y.separator"))))
         } header: {
             Text("editor.subject.preview")
         } footer: {

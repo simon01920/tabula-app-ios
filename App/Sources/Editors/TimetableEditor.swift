@@ -37,11 +37,14 @@ private struct TimetableEditorBody: View {
             canSave: { $0.canSave },
             save: { draft in
                 guard let database = model.database else { return nil }
+                // The bell-schedule and terms sheets save while this editor is open: build on the timetable as stored
+                // NOW, not on the one captured when this editor opened (a stale copy would drop their changes).
+                let stored = database.timetables.first { $0.id == timetable.id && !$0.isDeleted } ?? timetable
                 var ids = SystemIDGenerator()
                 let resolved = draft.resolveTimeStructure(
                     existingSchedules: database.bellSchedules,
-                    scheduleName: model.renderer.string(forKey: "editor.bell.defaultName"), ids: &ids)
-                guard let edited = draft.makeTimetable(timeStructure: resolved.structure) else { return nil }
+                    scheduleName: model.renderer.string(forKey: "editor.bell.defaultName"), ids: &ids, current: stored)
+                guard let edited = draft.makeTimetable(timeStructure: resolved.structure, onto: stored) else { return nil }
                 return model.apply(.batch(resolved.extra + [.upsert(edited)], label: "timetable settings"))
             },
             content: { draft in

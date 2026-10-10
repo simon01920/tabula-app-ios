@@ -71,7 +71,7 @@ Questions for reviewers, all languages: (a) is the "class" word for the universi
 - **Info.plist usage strings** (camera, photo library, AlarmKit) and the app display name are **not localized yet** (they fall back to English); they need `InfoPlist.xcstrings` in a later stage.
 
 ## Machine-translation provenance
-Pass 2 (2026-10-10, follow-up): the 383 editor / timetable / today keys, same terminology table; the six unused `*.placeholder.*` keys were removed. Pass 1 (Phase 2 stage C1, 2026-10-10): model-authored for all 11 target languages from the English strings and translator comments. No external translation service, no glossary import. `sk` probe strings (8) pre-existed from Phase 0.
+Pass 3 (2026-10-10, Phase 2 QA fix pass): 5 keys (`editor.warnings.*`, `editor.warning.periodInFreeForm`, `editor.subject.emojiName`), model-authored, reviewer: check the free-form/bell-schedule wording against the terms used by `editor.time.bell` / `editor.time.free`. Pass 2 (2026-10-10, follow-up): the 383 editor / timetable / today keys, same terminology table; the six unused `*.placeholder.*` keys were removed. Pass 1 (Phase 2 stage C1, 2026-10-10): model-authored for all 11 target languages from the English strings and translator comments. No external translation service, no glossary import. `sk` probe strings (8) pre-existed from Phase 0.
 
 ## Manual on-device checks (language)
 - Settings > Tabula > Language: all 12 languages offered (incl. Srpski/Српски). Cold start in each: no raw keys (`shell.tab.today`, `a11y.lesson.room`) anywhere; plural strings (conflicts, share warnings, reminder bodies) read correctly for 1, 2, 5, 21.

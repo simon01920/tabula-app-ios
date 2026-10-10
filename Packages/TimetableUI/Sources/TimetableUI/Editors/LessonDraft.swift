@@ -164,8 +164,8 @@ public struct LessonDraft: Equatable, Sendable {
     /// The stored lesson (or a skeleton): hidden fields and unknown validity are taken from here.
     private let base: Lesson
 
-    /// Edits `lesson`.
-    public init(lesson: Lesson, timetable: Timetable) {
+    /// Edits `lesson`. `today` seeds the validity range of lessons that have none (today until 30 days later).
+    public init(lesson: Lesson, timetable: Timetable, today: LocalDate) {
         lessonID = lesson.id
         timetableID = lesson.timetableID
         isNew = false
@@ -174,7 +174,7 @@ public struct LessonDraft: Equatable, Sendable {
         day = lesson.occurrence.day
         cycleWeeks = lesson.occurrence.cycleWeeks ?? []
         slot = SlotDraft(slot: lesson.slot)
-        let fallbackStart = LocalDate(year: 2026, month: 9, day: 1) ?? .earliest
+        let fallbackStart = today
         var mode = ValidityMode.always
         var terms = Set<Term.ID>()
         var range = LocalDateRange(start: fallbackStart, end: fallbackStart.adding(days: 30))
@@ -198,7 +198,7 @@ public struct LessonDraft: Equatable, Sendable {
 
     /// A new lesson in `timetable`. Subject defaults (room, building, teacher) are applied for the enabled fields.
     public init(newIn timetable: Timetable, context: NewLessonContext, schedule: BellSchedule?, subject: Subject?,
-                firstWeekday: Weekday, id: Lesson.ID) {
+                firstWeekday: Weekday, id: Lesson.ID, today: LocalDate) {
         lessonID = id
         timetableID = timetable.id
         isNew = true
@@ -212,7 +212,7 @@ public struct LessonDraft: Equatable, Sendable {
         } else {
             self.slot = SlotDraft(defaultFor: timetable, schedule: schedule)
         }
-        let fallbackStart = LocalDate(year: 2026, month: 9, day: 1) ?? .earliest
+        let fallbackStart = today
         validityMode = .always
         termIDs = []
         rangeStart = fallbackStart

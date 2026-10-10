@@ -56,10 +56,10 @@ struct ManagementSheet: Identifiable {
     }
 
     static let entries: [Entry] = [
-        Entry(routeID: "editor.timetable", titleKey: "editor.timetable.title", symbol: "gearshape"),
-        Entry(routeID: "editor.bell", titleKey: "editor.bell.title", symbol: "bell"),
-        Entry(routeID: "editor.subjects", titleKey: "editor.subjects.title", symbol: "books.vertical"),
-        Entry(routeID: "editor.terms", titleKey: "editor.terms.title", symbol: "calendar"),
+        Entry(routeID: "editor.timetable", titleKey: DynamicL10nKeys.managementTitleKeys[0], symbol: "gearshape"),
+        Entry(routeID: "editor.bell", titleKey: DynamicL10nKeys.managementTitleKeys[1], symbol: "bell"),
+        Entry(routeID: "editor.subjects", titleKey: DynamicL10nKeys.managementTitleKeys[2], symbol: "books.vertical"),
+        Entry(routeID: "editor.terms", titleKey: DynamicL10nKeys.managementTitleKeys[3], symbol: "calendar"),
     ]
 
     @MainActor

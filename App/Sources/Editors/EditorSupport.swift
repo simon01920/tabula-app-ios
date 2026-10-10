@@ -24,7 +24,8 @@ struct EditorScaffold<Draft: Equatable, Content: View>: View {
     let titleKey: LocalizedStringKey
     let initial: Draft
     let canSave: (Draft) -> Bool
-    /// Applies the draft; `nil` = nothing to apply. `.applied` dismisses the sheet.
+    /// Applies the draft; `nil` = nothing to apply. `.applied` dismisses the sheet (after an acknowledgement when the
+    /// change introduced validation warnings).
     let save: (Draft) -> ApplyResult?
     @ViewBuilder let content: (Binding<Draft>) -> Content
 
@@ -32,6 +33,9 @@ struct EditorScaffold<Draft: Equatable, Content: View>: View {
     @State private var edited: Draft?
     @State private var result: ApplyResult?
     @State private var confirmingDiscard = false
+    @State private var warningLines: [ApplyWarningLine] = []
+    @State private var showingWarnings = false
+    @Environment(AppModel.self) private var model
 
     private var current: Draft { edited ?? initial }
     private var isDirty: Bool { edited != nil && edited != initial }
@@ -74,14 +78,39 @@ struct EditorScaffold<Draft: Equatable, Content: View>: View {
                 Text("editor.common.discard.message")
             }
         }
+        .alert("editor.warnings.title", isPresented: $showingWarnings) {
+            Button("editor.warnings.ok") { dismiss() }
+        } message: {
+            Text(verbatim: warningText)
+        }
         // A swipe-down would lose edits silently: while dirty, only Cancel (with confirmation) or Save leave the sheet.
         .interactiveDismissDisabled(isDirty)
     }
 
+    private var warningText: String {
+        let lines = warningLines.map { line -> String in
+            if line.takesCount {
+                return model.renderer.format(key: line.messageKey, arguments: [.integer(Int64(line.count))])
+            }
+            let message = model.renderer.string(forKey: line.messageKey)
+            guard let entityKey = line.entityKey else { return message }
+            return model.renderer.format(key: "editor.warnings.line",
+                                         arguments: [.text(model.renderer.string(forKey: entityKey)), .text(message)])
+        }
+        return lines.joined(separator: "\n")
+    }
+
     private func commit() {
         guard let outcome = save(current) else { return }
-        if case .applied = outcome {
-            dismiss()
+        if case .applied(let warnings) = outcome {
+            // The change is stored; warnings never block (spec), but the user sees them before the sheet closes.
+            let lines = ApplyWarnings.lines(from: warnings)
+            if lines.isEmpty {
+                dismiss()
+            } else {
+                warningLines = lines
+                showingWarnings = true
+            }
         } else {
             result = outcome
         }

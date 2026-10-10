@@ -13,6 +13,23 @@ public enum DynamicL10nKeys {
     public static func lessonField(_ value: LessonField) -> String { "editor.field." + value.rawValue }
     public static func defaultView(_ value: TimetableViewKind) -> String { "editor.view." + value.rawValue }
     public static func reminderTarget(_ value: ReminderTarget) -> String { "onboarding.reminders.target." + value.rawValue }
+    /// Catalog key of a lesson field's name in the lesson detail list (`LessonDetailView`).
+    public static func lessonDetailField(_ field: LessonField) -> String {
+        switch field {
+        case .room: return "timetable.detail.field.room"
+        case .building: return "timetable.detail.field.building"
+        case .teacher: return "timetable.detail.field.teacher"
+        case .lessonType: return "timetable.detail.field.lessonType"
+        case .notes: return "timetable.detail.field.notes"
+        default: return "timetable.detail.field.bringList"
+        }
+    }
+
+    /// Titles of the timetable-level editors listed in the options menu (`ManagementSheet.entries`).
+    public static let managementTitleKeys: [String] = [
+        "editor.timetable.title", "editor.bell.title", "editor.subjects.title", "editor.terms.title",
+    ]
+
     /// `base` + the profile's terminology suffix (selects between two complete catalog strings).
     public static func term(_ base: String, _ terminology: ProfilePreset.Terminology) -> String {
         base + "." + terminology.rawValue
@@ -46,6 +63,11 @@ public enum DynamicL10nKeys {
         keys += SubjectDraft.Issue.allCases.map(\.l10nKey)
         keys += TimetableDraft.Issue.allCases.map(\.l10nKey)
         keys += ProfilePreset.Terminology.allCases.map(\.l10nKey)
+        keys += ProfileChoices.offered.map(ProfileChoices.terminologyKey(for:))
+        keys += LessonField.knownValues.map(lessonDetailField)
+        keys += managementTitleKeys
+        // Known lesson types only: an unknown type has no key and shows its raw text (user / newer-version data).
+        keys += LessonType.knownValues.compactMap(VisibleLessonFields.nameKey(of:))
         keys += ["timetable.cycle.namedWeek", "timetable.cycle.numberedWeek", "timetable.cycle.namedDay",
                  "timetable.cycle.numberedDay"]
         return Array(Set(keys)).sorted()
