@@ -114,10 +114,10 @@ public struct TaskRowModel: Identifiable, Equatable, Sendable {
         subject = task.subjectID.flatMap { subjects[$0] }.flatMap { $0.isDeleted ? nil : SubjectSummary($0) }
         due = TaskDueDescription.make(due: task.due, today: now.date)
         priority = task.priority
-        let liveSubtasks = task.subtasks.filter { !$0.isDeleted }
+        let liveSubtasks = task.subtasks.filter { !$0.meta.isDeleted }
         subtasksTotal = liveSubtasks.count
         subtasksDone = liveSubtasks.filter { $0.completedAt != nil }.count
-        attachmentCount = task.attachments.filter { !$0.isDeleted }.count
+        attachmentCount = task.attachments.filter { !$0.meta.isDeleted }.count
         repeats = task.repeatRule != nil
     }
 

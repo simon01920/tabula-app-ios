@@ -19,10 +19,14 @@ public enum TaskL10nKeys {
 
     public static func repeatMode(_ mode: TaskDraft.RepeatMode) -> String { "tasks.editor.repeat.mode." + mode.rawValue }
 
-    /// "Every day" / "Every %lld days" (plural on the interval) for a repeat frequency.
-    public static func repeatEvery(_ mode: TaskDraft.RepeatMode) -> String? {
-        mode == .none ? nil : "tasks.repeat.every." + mode.rawValue
+    /// "Every day" (plain, interval 1) or "Every %lld days" (plural on the interval) for a known repeat frequency.
+    public static func repeatEvery(frequency: RepeatFrequency, interval: Int) -> String {
+        (interval == 1 ? "tasks.repeat.every1." : "tasks.repeat.every.") + frequency.rawValue
     }
+
+    /// Empty-state title / detail of a segment ("tasks.empty.today.title").
+    public static func emptyTitle(_ segment: TaskSegment) -> String { "tasks.empty." + segment.rawValue + ".title" }
+    public static func emptyDetail(_ segment: TaskSegment) -> String { "tasks.empty." + segment.rawValue + ".detail" }
 
     /// Keys of the relative due phrases.
     public static var dueKeys: [String] { TaskDueDescription.allKeys }
@@ -33,13 +37,15 @@ public enum TaskL10nKeys {
         keys += TaskKind.knownValues.compactMap(kind)
         keys += TaskPriority.allCases.map(priority)
         keys += [TaskPriority.high, .urgent].map(priorityAccessibility)
-        keys += TaskSegment.allCases.map(\.titleKey)
         keys += TaskSegment.allCases.map(\.countedTitleKey)
         keys += TaskSort.allCases.map(\.titleKey)
         keys += TaskDraft.DueMode.allCases.map(dueMode)
         keys += TaskDraft.RepeatMode.allCases.map(repeatMode)
-        keys += TaskDraft.RepeatMode.allCases.compactMap(repeatEvery)
+        for frequency in RepeatFrequency.knownValues {
+            keys += [repeatEvery(frequency: frequency, interval: 1), repeatEvery(frequency: frequency, interval: 2)]
+        }
         keys += TaskDraft.Issue.allCases.map(\.l10nKey)
+        keys += TaskSegment.allCases.flatMap { [emptyTitle($0), emptyDetail($0)] }
         keys += dueKeys
         return Array(Set(keys)).sorted()
     }

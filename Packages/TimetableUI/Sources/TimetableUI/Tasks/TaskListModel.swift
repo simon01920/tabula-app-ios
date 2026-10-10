@@ -15,8 +15,6 @@ import TimetableCore
 public enum TaskSegment: String, CaseIterable, Sendable, Equatable {
     case today, upcoming, overdue, completed
 
-    /// Catalog key of the segment's plain name (picker accessibility, empty states).
-    public var titleKey: String { "tasks.segment." + rawValue }
     /// Catalog key of the segment label with its count (`%lld`), shown in the segmented control.
     public var countedTitleKey: String { "tasks.segment." + rawValue + ".count" }
     /// SF Symbol of the segment (empty states).

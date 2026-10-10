@@ -26,7 +26,7 @@ public enum TaskQuickAdd {
 public enum TaskEdits {
     /// `task` with the subtask `id` toggled (done at `now` / reopened); `nil` when the task has no such live subtask.
     public static func togglingSubtask(_ id: Subtask.ID, in task: TaskItem, now: Date) -> TaskItem? {
-        guard let index = task.subtasks.firstIndex(where: { $0.id == id && !$0.isDeleted }) else { return nil }
+        guard let index = task.subtasks.firstIndex(where: { $0.id == id && !$0.meta.isDeleted }) else { return nil }
         var edited = task
         edited.subtasks[index].completedAt = edited.subtasks[index].completedAt == nil ? now : nil
         return edited
@@ -41,6 +41,6 @@ public enum TaskEdits {
 
     /// The live subtasks in display order.
     public static func liveSubtasks(of task: TaskItem) -> [Subtask] {
-        task.subtasks.filter { !$0.isDeleted }.sorted { ($0.sortIndex, $0.id) < ($1.sortIndex, $1.id) }
+        task.subtasks.filter { !$0.meta.isDeleted }.sorted { ($0.sortIndex, $0.id) < ($1.sortIndex, $1.id) }
     }
 }

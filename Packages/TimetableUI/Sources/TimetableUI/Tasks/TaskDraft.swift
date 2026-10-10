@@ -116,10 +116,10 @@ public struct TaskDraft: Equatable, Sendable {
         subjectID = task.subjectID
         priority = task.priority
         notes = task.notes ?? ""
-        subtasks = task.subtasks.filter { !$0.isDeleted }.sorted { ($0.sortIndex, $0.id) < ($1.sortIndex, $1.id) }
+        subtasks = task.subtasks.filter { !$0.meta.isDeleted }.sorted { ($0.sortIndex, $0.id) < ($1.sortIndex, $1.id) }
             .map(SubtaskDraft.init)
         reminderOverride = task.reminderOverride
-        attachments = task.attachments.filter { !$0.isDeleted }
+        attachments = task.attachments.filter { !$0.meta.isDeleted }
             .sorted { ($0.sortIndex, $0.id) < ($1.sortIndex, $1.id) }
         let seedDate = today.addingIfValid(days: 1) ?? today
         dueDate = task.due?.date ?? seedDate

@@ -19,9 +19,16 @@ public struct TaskRepeatSummary: Equatable, Sendable {
         until = rule.until
     }
 
+    /// "Every day" / "Every 3 weeks" (`nil` for a frequency from a newer app version).
+    public static func everyText(frequency: RepeatFrequency, interval: Int, renderer: LocalizedTextRenderer) -> String? {
+        guard RepeatFrequency.knownValues.contains(frequency) else { return nil }
+        let key = TaskL10nKeys.repeatEvery(frequency: frequency, interval: interval)
+        return renderer.format(key: key, arguments: interval == 1 ? [] : [.integer(Int64(interval))])
+    }
+
     /// The display lines, each one complete catalog phrase.
     public func lines(renderer: LocalizedTextRenderer) -> [String] {
-        var lines = [renderer.format(key: "tasks.repeat.every." + frequency.rawValue, arguments: [.integer(Int64(interval))])]
+        var lines = [Self.everyText(frequency: frequency, interval: interval, renderer: renderer) ?? ""]
         if !weekdays.isEmpty {
             let names = weekdays.map { renderer.formatter.weekdayName($0, width: .abbreviated) }
             lines.append(renderer.format(key: "tasks.repeat.onDays", arguments: [.text(renderer.formatter.list(names))]))
