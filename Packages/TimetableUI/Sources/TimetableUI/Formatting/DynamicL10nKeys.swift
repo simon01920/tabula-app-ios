@@ -70,6 +70,7 @@ public enum DynamicL10nKeys {
         keys += LessonType.knownValues.compactMap(VisibleLessonFields.nameKey(of:))
         keys += ["timetable.cycle.namedWeek", "timetable.cycle.numberedWeek", "timetable.cycle.namedDay",
                  "timetable.cycle.numberedDay"]
+        keys += TaskL10nKeys.allKeys
         return Array(Set(keys)).sorted()
     }
 }
