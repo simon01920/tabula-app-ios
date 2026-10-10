@@ -33013,6 +33013,18 @@
         }
       }
     },
+    "health.rows.title" : {
+      "comment" : "Section header of the health check rows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Details"
+          }
+        }
+      }
+    },
     "health.saturation.title" : {
       "comment" : "Health check row title: some reminders could not be scheduled because of the system limit.",
       "extractionState" : "manual",
@@ -33261,6 +33273,222 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "静音模式"
+          }
+        }
+      }
+    },
+    "health.status.info" : {
+      "comment" : "Status word of an informational health check row.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Info"
+          }
+        }
+      }
+    },
+    "health.status.ok" : {
+      "comment" : "Status word of a health check row that is fine.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
+    },
+    "health.status.problem" : {
+      "comment" : "Status word of a health check row with a problem.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Problem"
+          }
+        }
+      }
+    },
+    "health.status.warning" : {
+      "comment" : "Status word of a health check row that may need attention.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check"
+          }
+        }
+      }
+    },
+    "health.summary.footer" : {
+      "comment" : "Second line under the health check summary.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS decides in the end. Send a test to be sure."
+          }
+        }
+      }
+    },
+    "health.summary.ok" : {
+      "comment" : "Top line of the health check when nothing needs attention.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reminders should work"
+          }
+        }
+      }
+    },
+    "health.summary.problem" : {
+      "comment" : "Top line of the health check when there is a problem.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reminders may not arrive"
+          }
+        }
+      }
+    },
+    "health.summary.warning" : {
+      "comment" : "Top line of the health check when there are warnings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some things need a look"
+          }
+        }
+      }
+    },
+    "health.test.alarm" : {
+      "comment" : "Button in the health check; rings in about a minute.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send Test Alarm"
+          }
+        }
+      }
+    },
+    "health.test.alarm.failed" : {
+      "comment" : "Result when the test alarm failed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The test alarm could not be scheduled."
+          }
+        }
+      }
+    },
+    "health.test.alarm.limit" : {
+      "comment" : "Result when the alarm limit was reached.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS has no room for another alarm right now."
+          }
+        }
+      }
+    },
+    "health.test.alarm.notAuthorized" : {
+      "comment" : "Result when alarm permission is missing.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loud alarms are not allowed yet."
+          }
+        }
+      }
+    },
+    "health.test.alarm.sent" : {
+      "comment" : "Result after scheduling a test alarm.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scheduled. It rings in about a minute."
+          }
+        }
+      }
+    },
+    "health.test.notification" : {
+      "comment" : "Button in the health check.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send Test Notification"
+          }
+        }
+      }
+    },
+    "health.test.notification.failed" : {
+      "comment" : "Result when the test notification failed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The test notification could not be scheduled."
+          }
+        }
+      }
+    },
+    "health.test.notification.sent" : {
+      "comment" : "Result after sending a test notification.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sent. It arrives in a few seconds."
+          }
+        }
+      }
+    },
+    "health.tests.footer" : {
+      "comment" : "Footer of the test section.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The test notification arrives in a few seconds. Lock your phone to see how it looks there. A test alarm rings in one minute."
+          }
+        }
+      }
+    },
+    "health.tests.title" : {
+      "comment" : "Section header of the test buttons in the health check.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Test"
           }
         }
       }
@@ -54349,6 +54577,366 @@
         }
       }
     },
+    "reminders.followUp.afterHours" : {
+      "comment" : "Follow-up delay option (plural on arg 1), whole hours.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld hour"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld hours"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "reminders.followUp.afterMinutes" : {
+      "comment" : "Follow-up delay option (plural on arg 1).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld minute"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld minutes"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "reminders.followUp.delay" : {
+      "comment" : "Picker label: how long after the reminder the follow-up comes.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remind again after"
+          }
+        }
+      }
+    },
+    "reminders.followUp.footer" : {
+      "comment" : "Footer of the follow-up section in the rule editor.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sent only if the item is still not done. A follow-up is never a loud alarm."
+          }
+        }
+      }
+    },
+    "reminders.followUp.kind.afterMinutes" : {
+      "comment" : "Follow-up choice: a second reminder some time after the first (the delay is chosen next).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A while later"
+          }
+        }
+      }
+    },
+    "reminders.followUp.kind.inherit" : {
+      "comment" : "Follow-up choice in an item's reminder override: use the rule's follow-up.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Same as default"
+          }
+        }
+      }
+    },
+    "reminders.followUp.kind.nextMorning" : {
+      "comment" : "Follow-up choice: a second reminder the next morning at a chosen time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next morning"
+          }
+        }
+      }
+    },
+    "reminders.followUp.kind.none" : {
+      "comment" : "Follow-up choice: no second reminder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "None"
+          }
+        }
+      }
+    },
+    "reminders.followUp.kind.unsupported" : {
+      "comment" : "Follow-up choice shown for a follow-up this app version cannot edit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From a newer version"
+          }
+        }
+      }
+    },
+    "reminders.followUp.time" : {
+      "comment" : "Time picker label: the follow-up comes next morning at this time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next morning at"
+          }
+        }
+      }
+    },
+    "reminders.followUp.title" : {
+      "comment" : "Section title and picker label: a second reminder if the item is still not done.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Follow-up"
+          }
+        }
+      }
+    },
+    "reminders.offset.atDue" : {
+      "comment" : "Reminder time: exactly when the item is due or starts.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "At the due time"
+          }
+        }
+      }
+    },
+    "reminders.offset.daysBefore" : {
+      "comment" : "Reminder time (plural on arg 1): days before the due date at a clock time. Arg 2 is a time like 18:00.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$lld day before, at %2$@"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$lld days before, at %2$@"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "reminders.offset.footer" : {
+      "comment" : "Footer of the reminder time editor.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Counted back from the due time, or from the start of a lesson or exam."
+          }
+        }
+      }
+    },
+    "reminders.offset.hoursBefore" : {
+      "comment" : "Reminder time (plural on arg 1): whole hours before the due time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld hour before"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld hours before"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "reminders.offset.kind" : {
+      "comment" : "Label of the picker choosing between 'minutes before' and 'days before at a time'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type"
+          }
+        }
+      }
+    },
+    "reminders.offset.minutesBefore" : {
+      "comment" : "Reminder time (plural on arg 1): minutes before the due time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld minute before"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld minutes before"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "reminders.offset.sameDay" : {
+      "comment" : "Reminder time: on the due date itself at a clock time. Arg 1 is a time like 07:00.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On the day, at %@"
+          }
+        }
+      }
+    },
+    "reminders.offset.time" : {
+      "comment" : "Label of the clock time picker of a 'days before at a time' reminder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "At"
+          }
+        }
+      }
+    },
+    "reminders.offset.title" : {
+      "comment" : "Navigation title of the screen that edits one reminder time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reminder Time"
+          }
+        }
+      }
+    },
+    "reminders.offset.unsupported" : {
+      "comment" : "Shown for a reminder time this app version cannot edit or schedule.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A reminder time from a newer version of the app"
+          }
+        }
+      }
+    },
+    "reminders.offsetKind.daysBefore" : {
+      "comment" : "Picker option: reminder N days before at a fixed clock time (0 days = the same day).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Days before, at a time"
+          }
+        }
+      }
+    },
+    "reminders.offsetKind.minutesBefore" : {
+      "comment" : "Picker option: reminder a number of minutes/hours before the due time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minutes or hours before"
+          }
+        }
+      }
+    },
+    "reminders.offsets.add" : {
+      "comment" : "Menu button in the reminder rule editor that adds another time to be reminded.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Reminder Time"
+          }
+        }
+      }
+    },
+    "reminders.offsets.addCustom" : {
+      "comment" : "Item in the add-reminder-time menu: adds a custom 'minutes before' time that the user then edits.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom Time…"
+          }
+        }
+      }
+    },
     "reminders.override.custom" : {
       "comment" : "Summary row: this task or exam has its own reminder times.",
       "extractionState" : "manual",
@@ -54429,6 +55017,30 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "自定义提醒"
+          }
+        }
+      }
+    },
+    "reminders.override.defaultIs" : {
+      "comment" : "Footer introducing the default reminder summary lines below it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default reminders:"
+          }
+        }
+      }
+    },
+    "reminders.override.enabled" : {
+      "comment" : "Toggle in a custom reminder override: off = no reminders for this item.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remind me"
           }
         }
       }
@@ -54517,6 +55129,18 @@
         }
       }
     },
+    "reminders.override.noDefault" : {
+      "comment" : "Footer when the default rule for this item kind is off.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No default reminders are switched on for this kind in Settings."
+          }
+        }
+      }
+    },
     "reminders.override.off" : {
       "comment" : "Summary row: reminders are switched off for this task or exam.",
       "extractionState" : "manual",
@@ -54601,6 +55225,66 @@
         }
       }
     },
+    "reminders.override.offsets" : {
+      "comment" : "Picker label in the override: reminder times.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Times"
+          }
+        }
+      }
+    },
+    "reminders.override.offsets.custom" : {
+      "comment" : "Override choice: choose reminder times for this item.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom"
+          }
+        }
+      }
+    },
+    "reminders.override.offsets.inherit" : {
+      "comment" : "Override choice: use the default reminder times.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Same as default"
+          }
+        }
+      }
+    },
+    "reminders.override.tier" : {
+      "comment" : "Picker label in the override: how the reminder arrives.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delivery"
+          }
+        }
+      }
+    },
+    "reminders.override.tier.inherit" : {
+      "comment" : "Override choice: use the default delivery tier.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Same as default"
+          }
+        }
+      }
+    },
     "reminders.override.title" : {
       "comment" : "Section header in the task and exam editors for this item's reminder settings.",
       "extractionState" : "manual",
@@ -54681,6 +55365,354 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "提醒"
+          }
+        }
+      }
+    },
+    "reminders.override.useDefault" : {
+      "comment" : "Toggle in a task/exam editor: follow the reminder settings instead of custom reminders.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use default reminders"
+          }
+        }
+      }
+    },
+    "reminders.permission.allow" : {
+      "comment" : "Button that shows the system notification prompt.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow Notifications"
+          }
+        }
+      }
+    },
+    "reminders.permission.delivered.title" : {
+      "comment" : "Header of the list of what the notifications are used for.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What you will get"
+          }
+        }
+      }
+    },
+    "reminders.permission.denied" : {
+      "comment" : "Footer of the permission explainer when the permission was already refused.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifications are turned off for Tabula. Open Settings to turn them on."
+          }
+        }
+      }
+    },
+    "reminders.permission.footer" : {
+      "comment" : "Footer of the permission explainer.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can change this any time in iOS Settings."
+          }
+        }
+      }
+    },
+    "reminders.permission.notNow" : {
+      "comment" : "Button that dismisses the permission explainer.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not Now"
+          }
+        }
+      }
+    },
+    "reminders.permission.point.control" : {
+      "comment" : "Permission explainer bullet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only what you choose in Settings. No ads, nothing else."
+          }
+        }
+      }
+    },
+    "reminders.permission.point.due" : {
+      "comment" : "Permission explainer bullet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reminders for homework, assignments and to-dos before they are due"
+          }
+        }
+      }
+    },
+    "reminders.permission.point.exams" : {
+      "comment" : "Permission explainer bullet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reminders before exams, and before lessons if you switch those on"
+          }
+        }
+      }
+    },
+    "reminders.permission.title" : {
+      "comment" : "Title of the notification permission explainer sheet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow Notifications"
+          }
+        }
+      }
+    },
+    "reminders.permission.why" : {
+      "comment" : "Explains why the notification permission is needed, shown before the system prompt.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To remind you in time, Tabula needs your permission to send notifications. iOS will ask you next."
+          }
+        }
+      }
+    },
+    "reminders.quiet.end" : {
+      "comment" : "Label of the quiet hours end time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Until"
+          }
+        }
+      }
+    },
+    "reminders.quiet.rule" : {
+      "comment" : "Toggle in the rule editor: quiet hours that apply only to this kind of reminder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quiet hours for this kind"
+          }
+        }
+      }
+    },
+    "reminders.quiet.rule.footer" : {
+      "comment" : "Footer under the rule's quiet hours.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reminders inside these hours are moved to when they end. If that is after the due time, the reminder is skipped."
+          }
+        }
+      }
+    },
+    "reminders.quiet.start" : {
+      "comment" : "Label of the quiet hours start time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From"
+          }
+        }
+      }
+    },
+    "reminders.quiet.title" : {
+      "comment" : "Section title for quiet hours (reminders are held until they end).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quiet hours"
+          }
+        }
+      }
+    },
+    "reminders.rule.enabled" : {
+      "comment" : "Toggle in the rule editor: this kind of reminder is on.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remind me"
+          }
+        }
+      }
+    },
+    "reminders.rule.incomplete" : {
+      "comment" : "Footer shown when an enabled rule has no reminder times.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add at least one reminder time, or nothing will be sent."
+          }
+        }
+      }
+    },
+    "reminders.rule.offsets.footer" : {
+      "comment" : "Footer under the reminder times list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reminders that would already be in the past are skipped."
+          }
+        }
+      }
+    },
+    "reminders.rule.offsets.title" : {
+      "comment" : "Section title listing the reminder times of a rule.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When"
+          }
+        }
+      }
+    },
+    "reminders.summary.incomplete" : {
+      "comment" : "Summary under a reminder kind that is on but has no times.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No reminder times"
+          }
+        }
+      }
+    },
+    "reminders.summary.multiple" : {
+      "comment" : "Summary under a reminder kind (plural on arg 1): how many reminder times it has.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld reminder"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld reminders"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "reminders.tier.alarm.footer" : {
+      "comment" : "Footer under the selected Loud alarm tier.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rings only at the times you set here, and only for reminders you made yourself. It needs its own permission. Follow-ups are never loud alarms, and quiet hours of this kind still apply."
+          }
+        }
+      }
+    },
+    "reminders.tier.proOnly" : {
+      "comment" : "Note under a feature that needs the paid Pro plan.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Included with Tabula Pro."
+          }
+        }
+      }
+    },
+    "reminders.tier.timeSensitive.off" : {
+      "comment" : "Shown under the Time Sensitive tier when the user turned the policy off.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time Sensitive is turned off in Reminders settings, so these arrive as Standard."
+          }
+        }
+      }
+    },
+    "reminders.tier.timeSensitive.policy" : {
+      "comment" : "Explains the Time Sensitive lead limit (plural on arg 1, minutes).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Used only within %lld minute of the item. Earlier reminders arrive as Standard."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Used only within %lld minutes of the item. Earlier reminders arrive as Standard."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "reminders.tier.title" : {
+      "comment" : "Section title of the delivery tier choice (Standard, Time Sensitive, Loud alarm).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How it arrives"
           }
         }
       }
@@ -62497,6 +63529,30 @@
         }
       }
     },
+    "settings.reminder-health.row" : {
+      "comment" : "Row in Settings → Reminders that opens the health check.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check that reminders work"
+          }
+        }
+      }
+    },
+    "settings.reminder-health.title" : {
+      "comment" : "Navigation title of the reminders health check screen.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reminder Check"
+          }
+        }
+      }
+    },
     "settings.reminders.alarm.detail" : {
       "comment" : "Explanation of the loud alarm reminder type.",
       "extractionState" : "manual",
@@ -62665,6 +63721,30 @@
         }
       }
     },
+    "settings.reminders.alarms.footer" : {
+      "comment" : "Footer of the loud alarm toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A loud alarm rings through the silent switch and Focus, only at the times you choose. iOS asks for permission separately. Choose it per kind or per item."
+          }
+        }
+      }
+    },
+    "settings.reminders.alarms.toggle" : {
+      "comment" : "Toggle: loud alarms (AlarmKit) may be used; asks for permission.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow loud alarms"
+          }
+        }
+      }
+    },
     "settings.reminders.focus.detail" : {
       "comment" : "Explains Focus modes.",
       "extractionState" : "manual",
@@ -62749,6 +63829,42 @@
         }
       }
     },
+    "settings.reminders.kind.edit" : {
+      "comment" : "Row that opens the rule editor of a reminder kind.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Times and delivery"
+          }
+        }
+      }
+    },
+    "settings.reminders.kinds.footer" : {
+      "comment" : "Footer of the reminder kinds list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Each kind has its own times and delivery."
+          }
+        }
+      }
+    },
+    "settings.reminders.kinds.title" : {
+      "comment" : "Section title listing the kinds of reminders (homework, exams, ...).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remind me about"
+          }
+        }
+      }
+    },
     "settings.reminders.later" : {
       "comment" : "Note at the bottom of the reminders page.",
       "extractionState" : "manual",
@@ -62829,6 +63945,30 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "提醒将在后续更新中配置。目前尚未安排任何提醒，Tabula 也没有请求任何权限。"
+          }
+        }
+      }
+    },
+    "settings.reminders.quiet.footer" : {
+      "comment" : "Footer of the global quiet hours.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reminders inside quiet hours are held until they end. Loud alarms ignore these hours."
+          }
+        }
+      }
+    },
+    "settings.reminders.quiet.toggle" : {
+      "comment" : "Toggle: global quiet hours.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quiet hours for all reminders"
           }
         }
       }
@@ -63333,6 +64473,54 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "提醒类型"
+          }
+        }
+      }
+    },
+    "settings.reminders.timeSensitive.footer" : {
+      "comment" : "Footer of the Time Sensitive settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time Sensitive can break through a Focus, but not the silent switch. Reminders earlier than this limit arrive as Standard."
+          }
+        }
+      }
+    },
+    "settings.reminders.timeSensitive.lead" : {
+      "comment" : "Stepper label (plural on arg 1): Time Sensitive is used only this close to the item.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Only within %lld minute of the item"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Only within %lld minutes of the item"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "settings.reminders.timeSensitive.toggle" : {
+      "comment" : "Toggle: Time Sensitive notifications may be used at all.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow Time Sensitive"
           }
         }
       }
