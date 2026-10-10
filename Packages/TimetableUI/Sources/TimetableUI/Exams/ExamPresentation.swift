@@ -37,7 +37,12 @@ public struct ExamFacts: Equatable, Sendable {
 
     /// The visibility that applies to `exam`: its timetable's, else the active timetable's, else everything.
     public static func visibility(for exam: Exam, in database: TabulaDatabase) -> FieldVisibility {
-        let own = exam.timetableID.flatMap { id in database.timetables.first { $0.id == id && !$0.isDeleted } }
+        visibility(timetableID: exam.timetableID, in: database)
+    }
+
+    /// The visibility of `timetableID`'s timetable, else the active timetable's, else everything.
+    public static func visibility(timetableID: Timetable.ID?, in database: TabulaDatabase) -> FieldVisibility {
+        let own = timetableID.flatMap { id in database.timetables.first { $0.id == id && !$0.isDeleted } }
         return (own ?? ActiveTimetable.resolve(database))?.fieldVisibility ?? .all
     }
 }

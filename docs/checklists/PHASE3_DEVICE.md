@@ -143,3 +143,43 @@ Implements NOTIFICATIONS.md "Test matrix (on device)", extended with the Phase 0
 | A8.1 | Launch normally | Tab bar: Today · Timetable · Tasks · Exams · Settings (Liquid Glass), localised in sk/de/ja | | |
 | A8.2 | Tasks / Exams tabs (before B1/B2) | Empty state with icon, title, explanation; Dynamic Type AX5 wraps; VoiceOver reads title + text | | |
 | A8.3 | Release/TestFlight build launched with `-TabulaScreen settings` (Xcode scheme) | Ignored: the normal shell opens (P2-6) | | |
+
+---
+
+## B2. Exams tab (Stage B2) — device only; the UI was written without being seen
+
+Setup: seed or real data. Useful states: (1) no exams, (2) one exam, (3) exams today / tomorrow / in 3 days / in 6 days /
+in 20 days, (4) completed and past exams, (5) university profile with 3+ exams and with an exam-period break
+(Terms & breaks editor, kind "Exam period"), (6) a timetable with room/building/notes switched off. Repeat key rows with
+Dynamic Type AX5, dark mode, German/Hungarian (long), Japanese/Chinese, and VoiceOver. Launch routes for screenshots:
+`exams`, `exams.history`, `exams.detail`, `exams.editor`, `exams.editor-new`.
+
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| B2.1 | Exams tab with no exams | Empty state (graduation cap, "No Exams Yet", explanation) + "Add Exam" button; "+" in the top right | | |
+| B2.2 | Add one exam 20 days away | Big card on top: "Next Exam", "in 20 days" in large type, subject badge, title, type, date, time/room only if set; neutral (grey) frame | | |
+| B2.3 | Change the date to 6 / 3 / 1 / 0 days away | Frame colour escalates (accent, orange, red, red; thicker from 3 days), icon changes, countdown text reads "in 6 days", "in 3 days", "Tomorrow", "Today" — meaning is readable without colour (try greyscale filter) | | |
+| B2.4 | Add several more exams across weeks | Below the card: sections "This week" / "Next week" / "Week of 2 Nov"; next exam is not repeated; order by date then start time (exam without start time after those with) | | |
+| B2.5 | First weekday Sunday vs Monday with an exam on a Sunday | Lands in the week group the chosen first weekday implies | | |
+| B2.6 | Row content | Order: when (icon + text), title, "Subject · Type", date, time, room/building, topics preview (first 3, "…" if more). Absent fields leave no blank line, dash or placeholder | | |
+| B2.7 | Timetable field visibility: switch Room off (timetable editor) | Room disappears from card, rows, detail, editor; its stored value is not lost (switch on again: back). Same for Building and Notes | | |
+| B2.8 | Swipe a row left | "Mark Done" (green); the exam moves to History; if it was the next exam the following one becomes the card | | |
+| B2.9 | History segment | Completed and past exams, newest first, checkmark for completed; swipe: "Mark Done" (past, open) or "Mark as Not Done" (completed; future ones return to Upcoming) | | |
+| B2.10 | History with nothing in it | "No Past Exams" empty state inside the list; segment control stays | | |
+| B2.11 | Only past exams exist, Upcoming segment | "No Upcoming Exams" empty state | | |
+| B2.12 | University profile, 2+ exams, no exam-period break | One "Exam period" section with the range first-last exam and "n exams" | | |
+| B2.13 | Add an exam-period break (Terms & breaks, kind Exam period) around two exams | Section titled with the break's name, dates, count, "In progress" badge while today is inside; those exams are listed under it (not under weeks); a break of another timetable does not claim exams of this one | | |
+| B2.14 | Tap an exam | Detail pushed: title, status/countdown, date, time, type, subject, room, building (only existing ones), topics list, notes, Mark Done button; "Edit" top right | | |
+| B2.15 | Detail, Edit, Delete Exam, confirm | Editor closes, detail pops back to the list; exam gone | | |
+| B2.16 | Editor: empty title | Save disabled, hint "Enter a title…"; enables with a title | | |
+| B2.17 | Editor: start time on, end time on, set end before start | Red "end time must be after the start time", Save disabled; fixing re-enables. Turning start off hides end and stores neither | | |
+| B2.18 | Editor topics: add 3, drag to reorder, delete one, leave one blank | Drag handles and delete controls are always visible; blank topic is dropped on save; order kept | | |
+| B2.19 | Editor: Cancel after a change | "Discard changes?" confirmation; swipe-down blocked while dirty; Cancel without change closes at once | | |
+| B2.20 | Editor: reminder section | Shows the (stub) reminder row until stage B4; saving keeps an existing override unchanged | | |
+| B2.21 | Exam with a type outside the 7 known (e.g. imported "viva") | Shown with its own word; the editor keeps it selectable | | |
+| B2.22 | Notification tap for an exam (section A) | Exams tab + detail sheet of that exam ("Done" closes it; "Mark Done" works) | | |
+| B2.23 | VoiceOver on card / row | One element: "Title, Subject, Type, Tomorrow, Tuesday 20 October 2026, 10:00 - 10:45, Room X"; swipe actions offered as actions; week/period headers have header trait | | |
+| B2.24 | Dynamic Type AX5, de, ja | Card, rows, editor wrap without clipping; toolbar "+" and all buttons at least 44 pt; segment control usable | | |
+| B2.25 | Dark mode / Increase Contrast | Card frame and fill legible; subject badge text legible; no text drawn on the escalation colour | | |
+| B2.26 | Midnight rollover with the Exams tab open | Countdown texts update ("Tomorrow" becomes "Today") after the day changes / app becomes active | | |
+| B2.27 | Plurals: exam 2, 5, 21 days away in sk, pl, uk, cs | Grammatically correct forms | | |
