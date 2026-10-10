@@ -3253,6 +3253,18 @@
         }
       }
     },
+    "timetable.a11y.addHint" : {
+      "comment" : "VoiceOver hint on an empty period of the timetable grid; double-tapping opens the subject picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adds a lesson in this period."
+          }
+        }
+      }
+    },
     "timetable.a11y.cell" : {
       "comment" : "VoiceOver label of a lesson cell in the timetable grid. %1$@ = full date with weekday ('Tuesday, 13 October 2026'), %2$@ = the lesson sentence (subject, period, time, room…). Adapt the punctuation to your language.",
       "extractionState" : "manual",
@@ -3285,6 +3297,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "free"
+          }
+        }
+      }
+    },
+    "timetable.a11y.openHint" : {
+      "comment" : "VoiceOver hint on a lesson in any timetable view or on Today.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows the lesson details."
+          }
+        }
+      }
+    },
+    "timetable.action.cancel" : {
+      "comment" : "Toolbar button that closes a sheet without changes (quick add of a lesson).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "timetable.action.done" : {
+      "comment" : "Toolbar button that closes the read-only lesson detail sheet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        }
+      }
+    },
+    "timetable.conflict.badge" : {
+      "comment" : "Small warning label on a lesson in the timetable list that overlaps another lesson or doesn't fit the bell schedule. Warning only; nothing is blocked.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overlaps or doesn't fit"
           }
         }
       }
@@ -3337,6 +3397,378 @@
         }
       }
     },
+    "timetable.day.cancelled" : {
+      "comment" : "Empty state / list row for a day on which all lessons were cancelled ('cancel day' change).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lessons cancelled"
+          }
+        }
+      }
+    },
+    "timetable.day.holiday" : {
+      "comment" : "Empty state / list row for a day inside school holidays or a break without its own name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Holidays"
+          }
+        }
+      }
+    },
+    "timetable.day.noLessons" : {
+      "comment" : "Empty state / list row for a day without lessons (weekend, free day).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No lessons"
+          }
+        }
+      }
+    },
+    "timetable.density.comfortable" : {
+      "comment" : "Timetable view options menu: roomy layout with more details per lesson.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comfortable"
+          }
+        }
+      }
+    },
+    "timetable.density.compact" : {
+      "comment" : "Timetable view options menu: dense layout that fits more on screen.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compact"
+          }
+        }
+      }
+    },
+    "timetable.detail.changeDay" : {
+      "comment" : "Button in the lesson detail: opens the editor for a one-off change on this date (cancel, substitute, room change, short day). Title case on iOS buttons in English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change for This Day"
+          }
+        }
+      }
+    },
+    "timetable.detail.changes" : {
+      "comment" : "Section header in the lesson detail listing what differs from the regular timetable on this date.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changes on This Day"
+          }
+        }
+      }
+    },
+    "timetable.detail.edit" : {
+      "comment" : "Toolbar button in the lesson detail: opens the lesson editor (changes the lesson for every week).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit"
+          }
+        }
+      }
+    },
+    "timetable.detail.editorsMissing" : {
+      "comment" : "Footer in the lesson detail shown while the lesson / day-change editors are not part of the build yet (Edit and Change buttons are disabled).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editing isn't available in this version yet."
+          }
+        }
+      }
+    },
+    "timetable.detail.field.bringList" : {
+      "comment" : "Label of the bring list (things to take to the lesson) in the lesson detail.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bring"
+          }
+        }
+      }
+    },
+    "timetable.detail.field.building" : {
+      "comment" : "Label of the building/faculty field in the lesson detail.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Building"
+          }
+        }
+      }
+    },
+    "timetable.detail.field.lessonType" : {
+      "comment" : "Label of the lesson type (lecture, seminar, lab) in the lesson detail.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type"
+          }
+        }
+      }
+    },
+    "timetable.detail.field.notes" : {
+      "comment" : "Label of the notes field in the lesson detail.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes"
+          }
+        }
+      }
+    },
+    "timetable.detail.field.room" : {
+      "comment" : "Label of the room field in the lesson detail.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Room"
+          }
+        }
+      }
+    },
+    "timetable.detail.field.teacher" : {
+      "comment" : "Label of the teacher field in the lesson detail.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teacher"
+          }
+        }
+      }
+    },
+    "timetable.detail.missing" : {
+      "comment" : "Shown in the lesson detail sheet when the lesson was deleted or moved meanwhile.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This lesson no longer exists"
+          }
+        }
+      }
+    },
+    "timetable.detail.oneOffFooter" : {
+      "comment" : "Footer in the lesson detail of a one-off extra lesson (from a day change); the Edit button is disabled for it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This extra lesson happens only on this day. Change or remove it with Change for This Day."
+          }
+        }
+      }
+    },
+    "timetable.detail.period" : {
+      "comment" : "Lesson detail: which period of the bell schedule the lesson starts in. %lld = 1-based lesson number (Slovak: '%lld. hodina').",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Period %lld"
+          }
+        }
+      }
+    },
+    "timetable.detail.title" : {
+      "comment" : "Navigation title of the read-only lesson detail sheet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesson"
+          }
+        }
+      }
+    },
+    "timetable.detail.usually" : {
+      "comment" : "Lesson detail, under a change: the regular value before the change on this date. %@ = room, teacher, building, subject or time range.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usually: %@"
+          }
+        }
+      }
+    },
+    "timetable.detail.weeks" : {
+      "comment" : "Lesson detail for alternating weeks: in which cycle weeks the lesson takes place. %@ = a list such as 'Week A' or 'Week 1 and Week 3'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only in %@"
+          }
+        }
+      }
+    },
+    "timetable.empty.noTimetable" : {
+      "comment" : "Empty state of the Timetable tab when no timetable exists.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No timetable yet"
+          }
+        }
+      }
+    },
+    "timetable.list.break" : {
+      "comment" : "Separator row between lessons in the timetable list (short break).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Break"
+          }
+        }
+      }
+    },
+    "timetable.list.free" : {
+      "comment" : "List row for a period without a lesson; tapping adds a lesson.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free period"
+          }
+        }
+      }
+    },
+    "timetable.list.lunch" : {
+      "comment" : "Separator row between lessons in the timetable list (lunch).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lunch break"
+          }
+        }
+      }
+    },
+    "timetable.list.todayTag" : {
+      "comment" : "Small tag next to the date header of today's section in the timetable list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today"
+          }
+        }
+      }
+    },
+    "timetable.options" : {
+      "comment" : "Accessibility label of the toolbar menu with the view picker, density, week A/B and day-change actions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View Options"
+          }
+        }
+      }
+    },
+    "timetable.options.changeDay" : {
+      "comment" : "Menu item in the timetable view options (day views): opens the one-off change editor for the selected date.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change for This Day…"
+          }
+        }
+      }
+    },
+    "timetable.options.density" : {
+      "comment" : "Section label in the timetable view options: compact or comfortable layout.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Density"
+          }
+        }
+      }
+    },
+    "timetable.options.showWeek" : {
+      "comment" : "Section header in the timetable view options for alternating weeks: jump to the next 'Week A' / 'Week B'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Week"
+          }
+        }
+      }
+    },
+    "timetable.options.view" : {
+      "comment" : "Section label in the timetable view options: grid, week, day or tiles.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View"
+          }
+        }
+      }
+    },
     "timetable.placeholder.title" : {
       "comment" : "Temporary placeholder on the Timetable tab during development; the timetable's name is shown below it.",
       "extractionState" : "manual",
@@ -3345,6 +3777,102 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Timetable views are on the way"
+          }
+        }
+      }
+    },
+    "timetable.quickAdd.cycleWeekFooter" : {
+      "comment" : "Footer of the quick-add subject picker for alternating weeks. %@ = the shown cycle week, e.g. 'Week B'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The lesson is added to %@ only. You can choose more weeks in the lesson editor."
+          }
+        }
+      }
+    },
+    "timetable.quickAdd.failed" : {
+      "comment" : "Error under the quick-add subject list when saving failed (e.g. read-only data).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The lesson couldn't be added. Nothing was changed."
+          }
+        }
+      }
+    },
+    "timetable.quickAdd.newSubject" : {
+      "comment" : "Button in the quick-add sheet: opens the subject editor to create a subject.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Subject…"
+          }
+        }
+      }
+    },
+    "timetable.quickAdd.noSubjects" : {
+      "comment" : "Quick-add sheet when the timetable has no subjects; the user can create one with 'New Subject…'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No subjects yet"
+          }
+        }
+      }
+    },
+    "timetable.quickAdd.period" : {
+      "comment" : "Quick-add sheet header: the tapped empty slot. %1$lld = lesson number, %2$@ = time range such as '9:50 – 10:35'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Period %1$lld · %2$@"
+          }
+        }
+      }
+    },
+    "timetable.quickAdd.subjectHint" : {
+      "comment" : "VoiceOver hint on a subject in the quick-add sheet; one tap creates the lesson.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adds this subject to the period."
+          }
+        }
+      }
+    },
+    "timetable.quickAdd.title" : {
+      "comment" : "Navigation title of the sheet that adds a lesson to an empty period by picking a subject.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Lesson"
+          }
+        }
+      }
+    },
+    "timetable.route.nothingToShow" : {
+      "comment" : "Developer/screenshot screen without matching sample data. Rarely seen by users.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing to show"
           }
         }
       }
@@ -3445,6 +3973,30 @@
         }
       }
     },
+    "timetable.title.withEmoji" : {
+      "comment" : "Navigation title of the Timetable tab. %1$@ = the timetable's emoji, %2$@ = its name (user text). Change the order only if your language needs it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@"
+          }
+        }
+      }
+    },
+    "timetable.unplaced.header" : {
+      "comment" : "Header of lessons listed below the grid because their times match no period of the bell schedule.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outside the bell schedule"
+          }
+        }
+      }
+    },
     "timetable.view.day" : {
       "comment" : "Timetable view picker: one day on a time axis.",
       "extractionState" : "manual",
@@ -3493,6 +4045,318 @@
         }
       }
     },
+    "timetable.week.next" : {
+      "comment" : "VoiceOver label of the chevron button that shows the following week (or day in day views).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next Week"
+          }
+        }
+      }
+    },
+    "timetable.week.previous" : {
+      "comment" : "VoiceOver label of the chevron button that shows the previous week.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Previous Week"
+          }
+        }
+      }
+    },
+    "timetable.week.range" : {
+      "comment" : "Title of the shown week: first and last shown day. %1$@ / %2$@ = day and month such as '12 Oct'. Adapt the dash/spacing to your language.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ – %2$@"
+          }
+        }
+      }
+    },
+    "timetable.week.today" : {
+      "comment" : "Toolbar button that returns the timetable to the current week and today's date.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today"
+          }
+        }
+      }
+    },
+    "today.a11y.finished" : {
+      "comment" : "VoiceOver value of a lesson on Today that is already over. Lower case.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "finished"
+          }
+        }
+      }
+    },
+    "today.a11y.inProgress" : {
+      "comment" : "VoiceOver value of the lesson that is taking place right now. Lower case.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "in progress"
+          }
+        }
+      }
+    },
+    "today.empty.noLessons.message" : {
+      "comment" : "Today empty state when the timetable has no lessons at all.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open the Timetable tab and tap an empty period to add your first lesson."
+          }
+        }
+      }
+    },
+    "today.empty.noLessons.title" : {
+      "comment" : "Today empty state title when the timetable has no lessons at all.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No lessons yet"
+          }
+        }
+      }
+    },
+    "today.empty.noTimetable.message" : {
+      "comment" : "Today empty state when no timetable exists.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Once you have a timetable, your day appears here."
+          }
+        }
+      }
+    },
+    "today.empty.noTimetable.title" : {
+      "comment" : "Today empty state title when no timetable exists.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No timetable yet"
+          }
+        }
+      }
+    },
+    "today.gap.break" : {
+      "comment" : "Separator between two lessons on Today. %@ = duration such as '10 min' (formatted by the system).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Break · %@"
+          }
+        }
+      }
+    },
+    "today.gap.free" : {
+      "comment" : "Separator on Today when at least one whole period has no lesson. %@ = duration such as '1 hr, 35 min'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free period · %@"
+          }
+        }
+      }
+    },
+    "today.gap.lunch" : {
+      "comment" : "Separator on Today for the lunch break. %@ = duration such as '50 min'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lunch · %@"
+          }
+        }
+      }
+    },
+    "today.header.dayAndTime" : {
+      "comment" : "When the next lesson is not today: %1$@ = 'Tomorrow' or a date such as 'Wed 14 Oct', %2$@ = time range.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@"
+          }
+        }
+      }
+    },
+    "today.header.dayCancelled" : {
+      "comment" : "Today header when all of today's lessons were cancelled. The user's note may follow below.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lessons are cancelled today"
+          }
+        }
+      }
+    },
+    "today.header.dayOver" : {
+      "comment" : "Today header after the last lesson of the day.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No more lessons today"
+          }
+        }
+      }
+    },
+    "today.header.first" : {
+      "comment" : "Caption above the first lesson of the day on Today (before school starts).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First Lesson"
+          }
+        }
+      }
+    },
+    "today.header.free" : {
+      "comment" : "Today header on a day without lessons (weekend, free day).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No lessons today"
+          }
+        }
+      }
+    },
+    "today.header.holiday" : {
+      "comment" : "Today header during school holidays (shown alone, or under the holiday's own name).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Holidays"
+          }
+        }
+      }
+    },
+    "today.header.next" : {
+      "comment" : "Caption above the next lesson on Today.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next"
+          }
+        }
+      }
+    },
+    "today.header.nextLesson" : {
+      "comment" : "Caption above the next lesson on a later day (after school, weekend, holidays).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next Lesson"
+          }
+        }
+      }
+    },
+    "today.header.nothingAhead" : {
+      "comment" : "Today header when no lesson is found within the search horizon (about a month).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No lessons in the next few weeks."
+          }
+        }
+      }
+    },
+    "today.header.now" : {
+      "comment" : "Pill above the lesson that is taking place right now.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Now"
+          }
+        }
+      }
+    },
+    "today.header.startsIn" : {
+      "comment" : "Caption above the live countdown to the next lesson's start (the countdown itself is a timer such as '12:34').",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starts in"
+          }
+        }
+      }
+    },
+    "today.header.timeLeft" : {
+      "comment" : "Caption above the live countdown to the end of the current lesson.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time left"
+          }
+        }
+      }
+    },
+    "today.header.tomorrow" : {
+      "comment" : "Day of the next lesson when it is tomorrow.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tomorrow"
+          }
+        }
+      }
+    },
     "today.placeholder.empty.title" : {
       "comment" : "Today screen when the selected timetable has no lessons on this date. The date is shown below it.",
       "extractionState" : "manual",
@@ -3513,6 +4377,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No timetable yet"
+          }
+        }
+      }
+    },
+    "today.section.nextSchoolDay" : {
+      "comment" : "Section title on Today listing the lessons of the next school day (after the weekend or holidays); the date follows below.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next School Day"
+          }
+        }
+      }
+    },
+    "today.section.tomorrow" : {
+      "comment" : "Section title on Today listing tomorrow's lessons once today's are over; the date follows below.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tomorrow"
           }
         }
       }

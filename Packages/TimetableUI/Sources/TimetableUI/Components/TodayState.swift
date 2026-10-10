@@ -73,6 +73,15 @@ public struct TodayState: Equatable, Sendable {
     /// Its timeline (all upcoming).
     public var upcomingItems: [TodayItem]
 
+    /// Modification reasons of every listed occurrence (for the header's badge and VoiceOver sentence).
+    public var reasonsByOccurrence: [OccurrenceID: [ModificationReason]] {
+        var result: [OccurrenceID: [ModificationReason]] = [:]
+        for item in items + upcomingItems {
+            if case let .lesson(lesson, reasons, _) = item, !reasons.isEmpty { result[lesson.id] = reasons }
+        }
+        return result
+    }
+
     /// Builds the state at `now` for the resolver's timetable. `database` provides break names, cancel-day notes and
     /// bell schedules (for gap kinds).
     public static func make(now: Date, resolver: ScheduleResolver, database: TabulaDatabase) -> TodayState {
