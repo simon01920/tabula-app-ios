@@ -13,6 +13,7 @@ public enum DynamicL10nKeys {
     public static func lessonField(_ value: LessonField) -> String { "editor.field." + value.rawValue }
     public static func defaultView(_ value: TimetableViewKind) -> String { "editor.view." + value.rawValue }
     public static func reminderTarget(_ value: ReminderTarget) -> String { "onboarding.reminders.target." + value.rawValue }
+    public static func examKind(_ value: ExamKind) -> String { "exams.kind." + value.rawValue }
     /// Catalog key of a lesson field's name in the lesson detail list (`LessonDetailView`).
     public static func lessonDetailField(_ field: LessonField) -> String {
         switch field {
@@ -51,6 +52,9 @@ public enum DynamicL10nKeys {
         keys += LessonField.knownValues.map(lessonField)
         keys += TimetableViewKind.knownValues.map(defaultView)
         keys += ReminderTarget.knownValues.map(reminderTarget)
+        keys += ExamKind.knownValues.map(examKind)
+        keys += ExamWhen.allKeys
+        keys += ExamDraft.Issue.allCases.map(\.l10nKey)
         for base in termBases {
             keys += ProfilePreset.Terminology.allCases.map { term(base, $0) }
         }
