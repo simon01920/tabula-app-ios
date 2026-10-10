@@ -114,16 +114,26 @@ private struct LessonFormContent: View {
 
     // MARK: Subject
 
+    /// Picker row: emoji + name as one text (a menu-style picker shows only plain text/Label content, which is
+    /// also what the selected value displays), or SF Symbol + name; just the name without a symbol.
+    @ViewBuilder
+    private func subjectPickerItem(_ subject: Subject) -> some View {
+        switch subject.symbol {
+        case .emoji(let emoji)?:
+            Text(verbatim: emoji + " " + subject.name)
+        case .systemImage(let name)?:
+            Label { Text(verbatim: subject.name) } icon: { Image(systemName: name) }
+        case nil:
+            Text(verbatim: subject.name)
+        }
+    }
+
     private var subjectSection: some View {
         Section {
             Picker(selection: $draft.subjectID) {
                 if draft.subjectID == nil { Text("editor.lesson.subject.choose").tag(Subject.ID?.none) }
                 ForEach(subjects) { subject in
-                    HStack {
-                        SubjectBadge(subject: SubjectSummary(subject), size: 28)
-                        Text(verbatim: subject.name)
-                    }
-                    .tag(Subject.ID?.some(subject.id))
+                    subjectPickerItem(subject).tag(Subject.ID?.some(subject.id))
                 }
             } label: {
                 Text("editor.lesson.subject")

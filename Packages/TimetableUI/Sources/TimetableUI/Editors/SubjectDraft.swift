@@ -17,7 +17,7 @@ public struct SubjectDraft: Equatable, Sendable {
     public enum SymbolKind: String, Equatable, Sendable, CaseIterable { case none, emoji, systemImage }
 
     /// A problem that blocks saving.
-    public enum Issue: String, Equatable, Sendable {
+    public enum Issue: String, Equatable, Sendable, CaseIterable {
         case noName
 
         /// Catalog key of the explanation.
@@ -133,8 +133,9 @@ public struct SubjectDraft: Equatable, Sendable {
     /// the editor additionally tells when the tile blends into the page (`blendsIntoBackground`).
     public var hasLowContrast: Bool { Self.isLowContrast(contrastRatio) }
 
-    /// `true` when the tile is almost the page colour in light or dark mode (it then gets an outline).
-    public var blendsIntoBackground: Bool { tileStyle.needsOutlineInLight || tileStyle.needsOutlineInDark }
+    /// `true` when the tile is almost the page colour of the given colour scheme (it then gets an outline there;
+    /// the same decision `LessonTileStyle.needsOutline(isDark:)` makes for real tiles).
+    public func blendsIntoBackground(isDark: Bool) -> Bool { tileStyle.needsOutline(isDark: isDark) }
 
     /// The symbol to store.
     public var symbol: SubjectSymbol? {

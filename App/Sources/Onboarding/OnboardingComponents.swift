@@ -10,7 +10,7 @@ import TimetableUI
 extension OnboardingDraft {
     /// `base` + the profile's terminology suffix (`.lesson` / `.classLecture`): "never concatenate fragments" does
     /// not apply, this selects between two complete catalog strings.
-    func termKey(_ base: String) -> String { "\(base).\(preset.terminology.rawValue)" }
+    func termKey(_ base: String) -> String { DynamicL10nKeys.term(base, preset.terminology) }
 }
 
 /// Title, optional subtitle and content of one step.

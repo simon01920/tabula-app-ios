@@ -118,3 +118,14 @@ struct LocalizedTextRendererTests {
         #expect(CatalogFormat.substitute("100%", []) == "100%")
     }
 }
+
+@Suite("Countdown format")
+struct CountdownFormatTests {
+    @Test func formats() {
+        #expect(CountdownFormat.string(remaining: 25 * 60) == "25:00")
+        #expect(CountdownFormat.string(remaining: 45 * 60 - 20 * 60) == "25:00")
+        #expect(CountdownFormat.string(remaining: 307) == "5:07")
+        #expect(CountdownFormat.string(remaining: 3723) == "1:02:03")
+        #expect(CountdownFormat.string(remaining: -5) == "0:00")
+    }
+}

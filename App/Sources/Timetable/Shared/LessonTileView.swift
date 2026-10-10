@@ -45,6 +45,12 @@ struct LessonTileView: View {
                     .strikethrough(isCancelled, pattern: .solid, color: foreground)
                     .fixedSize(horizontal: false, vertical: true)
                 Spacer(minLength: 4)
+                if timing == .past {
+                    // Inline (not an overlay) so it never collides with the period number.
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.footnote)
+                        .accessibilityHidden(true)
+                }
                 if let number = lesson.periodNumber {
                     PeriodNumberBadge(number: number, foreground: foreground)
                 }
@@ -77,15 +83,6 @@ struct LessonTileView: View {
                 RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(Color.primary, lineWidth: 3)
             } else if style.needsOutline(isDark: colorScheme == .dark) || contrast == .increased {
                 RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(Color.secondary.opacity(0.6), lineWidth: 1)
-            }
-        }
-        .overlay(alignment: .topTrailing) {
-            if timing == .past {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.footnote)
-                    .foregroundStyle(foreground)
-                    .padding(6)
-                    .accessibilityHidden(true)
             }
         }
         .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))

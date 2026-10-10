@@ -237,11 +237,14 @@ struct SubjectDraftTests {
         #expect(SubjectDraft.isLowContrast(4.4) && !SubjectDraft.isLowContrast(4.5))
         draft.colorChoice = .custom(.black)
         #expect(draft.tileTextColor == .white)
-        #expect(draft.blendsIntoBackground)         // black tile on a dark page
+        #expect(draft.blendsIntoBackground(isDark: true) && !draft.blendsIntoBackground(isDark: false))  // black tile on a dark page
         draft.colorChoice = .custom(ColorValue(red: 255, green: 250, blue: 250))
-        #expect(draft.blendsIntoBackground && draft.tileTextColor == .black)
+        #expect(draft.blendsIntoBackground(isDark: false) && !draft.blendsIntoBackground(isDark: true) && draft.tileTextColor == .black)
         draft.colorChoice = .custom(ColorValue(red: 119, green: 119, blue: 119))
-        #expect(!draft.blendsIntoBackground)
+        #expect(!draft.blendsIntoBackground(isDark: false) && !draft.blendsIntoBackground(isDark: true))
+        draft.colorChoice = .custom(ColorValue(red: 255, green: 221, blue: 0))     // yellow: outline in light only
+        #expect(draft.blendsIntoBackground(isDark: false) == draft.tileStyle.needsOutline(isDark: false))
+        #expect(!draft.blendsIntoBackground(isDark: true))
     }
 
     @Test func symbolKinds() {

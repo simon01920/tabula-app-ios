@@ -69,7 +69,7 @@ struct SettingsRootView: View {
         return Section {
             Picker(selection: profile) {
                 ForEach(ProfileChoices.offered, id: \.self) { option in
-                    Text(LocalizedStringKey("settings.profile.\(option.rawValue)")).tag(option)
+                    Text(LocalizedStringKey(DynamicL10nKeys.profile(option))).tag(option)
                 }
             } label: {
                 Text("settings.profile.picker")

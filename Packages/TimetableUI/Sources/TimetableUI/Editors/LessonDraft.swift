@@ -10,7 +10,7 @@ public struct SlotDraft: Equatable, Sendable {
     public enum Mode: String, Equatable, Sendable, CaseIterable { case period, time }
 
     /// A problem that blocks saving.
-    public enum Issue: String, Equatable, Sendable {
+    public enum Issue: String, Equatable, Sendable, CaseIterable {
         case noPeriod
         case endBeforeStart
 
@@ -133,7 +133,7 @@ public enum ValidityMode: String, Equatable, Sendable, CaseIterable {
 /// The lesson editor's state.
 public struct LessonDraft: Equatable, Sendable {
     /// A problem that blocks saving.
-    public enum Issue: String, Equatable, Sendable {
+    public enum Issue: String, Equatable, Sendable, CaseIterable {
         case noSubject
         case noTerms
         case emptyRange

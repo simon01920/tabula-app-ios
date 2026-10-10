@@ -225,7 +225,7 @@ struct RemindersStepView: View {
     }
 
     private func key(of target: ReminderTarget) -> String {
-        target == .lesson ? flow.draft.termKey("onboarding.reminders.target") : "onboarding.reminders.target.\(target.rawValue)"
+        target == .lesson ? flow.draft.termKey("onboarding.reminders.target") : DynamicL10nKeys.reminderTarget(target)
     }
 
     private func tier(_ symbol: String, _ title: LocalizedStringKey, _ body: LocalizedStringKey) -> some View {

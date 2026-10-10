@@ -136,7 +136,7 @@ private struct TermsFormContent: View {
                         get: { breakBinding(item.id).wrappedValue.kind },
                         set: { breakBinding(item.id).wrappedValue.kind = $0 })) {
                         ForEach(BreakKind.knownValues, id: \.self) { kind in
-                            Text(LocalizedStringKey("editor.breaks.kind.\(kind.rawValue)")).tag(kind)
+                            Text(LocalizedStringKey(DynamicL10nKeys.breakKind(kind))).tag(kind)
                         }
                         if !item.kind.isKnown { Text(verbatim: item.kind.rawValue).tag(item.kind) }
                     } label: {

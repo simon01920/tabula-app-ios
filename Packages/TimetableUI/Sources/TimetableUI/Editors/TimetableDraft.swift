@@ -21,7 +21,7 @@ public struct TimetableDraft: Equatable, Sendable {
     public enum TimeKind: String, Equatable, Sendable, CaseIterable { case bellSchedule, freeForm }
 
     /// A problem that blocks saving.
-    public enum Issue: String, Equatable, Sendable {
+    public enum Issue: String, Equatable, Sendable, CaseIterable {
         case noName
         case noDays
         case noSchoolDays

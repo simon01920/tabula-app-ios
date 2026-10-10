@@ -31,7 +31,7 @@ public struct DayChangeDraft: Equatable, Sendable {
     }
 
     /// A problem that blocks saving.
-    public enum Issue: String, Equatable, Sendable {
+    public enum Issue: String, Equatable, Sendable, CaseIterable {
         case noLesson
         case nothingChanged
         case noBellSchedule

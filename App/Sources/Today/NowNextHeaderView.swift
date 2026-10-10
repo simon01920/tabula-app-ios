@@ -65,8 +65,7 @@ struct NowNextHeaderView: View {
                 Text("today.header.timeLeft")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                Text(timerInterval: interval(lesson.start, lesson.end), pauseTime: pauseTime, countsDown: true,
-                     showsHours: true)
+                countdown(to: lesson.end, from: lesson.start)
                     .font(.system(.largeTitle, design: .rounded).weight(.bold))
                     .monospacedDigit()
                 progress(lesson)
@@ -74,6 +73,17 @@ struct NowNextHeaderView: View {
                     .accessibilityHidden(true)
             }
             .accessibilityElement(children: .combine)
+        }
+    }
+
+    /// Live system countdown, or (fixed screenshot clock) a static text from `CountdownFormat`, because
+    /// `Text(timerInterval:pauseTime:)` showed the full interval when paused.
+    @ViewBuilder
+    private func countdown(to end: Date, from start: Date) -> some View {
+        if let pauseTime {
+            Text(verbatim: CountdownFormat.string(remaining: end.timeIntervalSince(pauseTime)))
+        } else {
+            Text(timerInterval: interval(start, end), countsDown: true, showsHours: true)
         }
     }
 
@@ -102,8 +112,7 @@ struct NowNextHeaderView: View {
                 Text("today.header.startsIn")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                Text(timerInterval: interval(model.now, lesson.start), pauseTime: pauseTime, countsDown: true,
-                     showsHours: true)
+                countdown(to: lesson.start, from: model.now)
                     .font(.system(.largeTitle, design: .rounded).weight(.bold))
                     .monospacedDigit()
             }

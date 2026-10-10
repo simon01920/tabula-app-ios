@@ -238,7 +238,7 @@ private struct PeriodRow: View {
             }
             Picker(selection: $period.kind) {
                 ForEach(PeriodKind.knownValues, id: \.self) { kind in
-                    Text(LocalizedStringKey("editor.bell.kind.\(kind.rawValue)")).tag(kind)
+                    Text(LocalizedStringKey(DynamicL10nKeys.periodKind(kind))).tag(kind)
                 }
                 if !period.kind.isKnown { Text(verbatim: period.kind.rawValue).tag(period.kind) }
             } label: {

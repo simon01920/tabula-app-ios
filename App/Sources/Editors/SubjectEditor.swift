@@ -71,6 +71,7 @@ private struct SubjectFormContent: View {
     let timetable: Timetable
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
     @State private var browsingPack: PalettePackID?
     @State private var confirmingDelete = false
     @State private var deleteFailed = false
@@ -116,7 +117,7 @@ private struct SubjectFormContent: View {
             .frame(maxWidth: .infinity, minHeight: 64, alignment: .leading)
             .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Color(style.background)))
             .overlay {
-                if style.needsOutlineInLight || style.needsOutlineInDark {
+                if style.needsOutline(isDark: colorScheme == .dark) {
                     RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(Color.secondary.opacity(0.5), lineWidth: 1)
                 }
             }
@@ -135,7 +136,7 @@ private struct SubjectFormContent: View {
                     Label { Text("editor.subject.contrast.low") } icon: { Image(systemName: "exclamationmark.triangle.fill") }
                         .foregroundStyle(.orange)
                 }
-                if draft.blendsIntoBackground {
+                if draft.blendsIntoBackground(isDark: colorScheme == .dark) {
                     Label { Text("editor.subject.contrast.blends") } icon: { Image(systemName: "info.circle") }
                 }
             }

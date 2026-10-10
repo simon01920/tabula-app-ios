@@ -258,7 +258,8 @@ for plist_name in ("Config/App-Info.plist", "Config/Widgets-Info.plist"):
 KEY_USE = re.compile(r'(?:(?<![A-Za-z_.])(?:Text|Label|Button|Toggle|Picker|Section|Tab|navigationTitle|LocalizedStringKey|'
                      r'LocalizedStringResource)\(\s*|String\(localized:\s*|(?:forKey|key):\s*)"((?:[^"\\]|\\.)*)"')
 VERBATIM_LITERAL = re.compile(r'Text\(\s*verbatim:\s*"')
-unknown_keys, verbatim = [], []
+unknown_keys, verbatim, interpolated = [], [], []
+INTERPOLATED_KEY = re.compile(r'LocalizedStringKey\(\s*"[^"]*\\\(')
 for folder in ("App/Sources", "Packages/TimetableUI/Sources", "WidgetExtension/Sources"):
     for f in sorted((ROOT / folder).rglob("*.swift")):
         rel = f.relative_to(ROOT).as_posix()
@@ -272,10 +273,14 @@ for folder in ("App/Sources", "Packages/TimetableUI/Sources", "WidgetExtension/S
                     continue   # interpolated keys ("probe.lessons %lld") are checked by Xcode's extraction
                 if key not in catalog:
                     unknown_keys.append(f"{rel}:{no} \"{key}\"")
+            if INTERPOLATED_KEY.search(line):
+                interpolated.append(f"{rel}:{no}")
             if rel.startswith("App/Sources/") and VERBATIM_LITERAL.search(line):
                 verbatim.append(f"{rel}:{no}")
 check(not unknown_keys, "UI code: every literal localisation key exists in Resources/Localizable.xcstrings",
       f"keys missing from the String Catalog (add with scripts/l10n-add.py): {unknown_keys}")
+check(not interpolated, "UI code: no interpolated LocalizedStringKey literal (it builds the format key a.%@ and shows raw; use DynamicL10nKeys)",
+      f"interpolated LocalizedStringKey literals (use DynamicL10nKeys + a String variable): {interpolated}")
 check(not verbatim, "App code: no Text(verbatim: \"literal\") outside App/Sources/Debug (hard-coded text)",
       f"hard-coded verbatim text (use a catalog key): {verbatim}")
 

@@ -1,7 +1,7 @@
 // Proportional views drawn from `TimeBlockLayout` (wall-clock minutes → height): the week time-blocks view
 // (route `timetable.week`) and the single-day view (route `timetable.day`). Overlapping lessons share the column in
 // lanes; a current-time line marks "now" in today's column (moved once a minute by the parent's TimelineView, never
-// animated, so Reduce Motion needs no special case; frozen at `-TabulaNow` in screenshot mode).
+// animated, so Reduce Motion needs no special case; drawn beneath the tiles; frozen at `-TabulaNow` in screenshot mode).
 // APIs: GeometryReader, ScrollView, ZStack + frame/offset, Rectangle, Circle, @ScaledMetric, Button(.plain),
 //       accessibilitySortPriority(_:), accessibilityHidden(_:).
 import SwiftUI
@@ -129,6 +129,18 @@ struct TimeBlockCanvas: View {
                     .accessibilityHidden(true)
             }
 
+            // Beneath the tiles (declared before them), so it never covers tile text; visible over empty space and the gutter.
+            if let marker = GridPresentation.nowMarker(layout, today: today, minuteOfDay: nowMinute) {
+                let y = CGFloat(marker.position) * height
+                HStack(spacing: 0) {
+                    Circle().fill(Color.red).frame(width: 8, height: 8)
+                    Rectangle().fill(Color.red).frame(width: columnWidth - 6, height: 2)
+                }
+                .offset(x: gutterWidth + CGFloat(marker.column) * columnWidth - 2, y: y - 4)
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+            }
+
             ForEach(layout.blocks, id: \.entry.id) { block in
                 let laneWidth = columnWidth / CGFloat(max(1, block.laneCount))
                 let blockHeight = max(minimumBlockHeight, CGFloat(block.height) * height)
@@ -146,16 +158,16 @@ struct TimeBlockCanvas: View {
                 .accessibilityHint(Text("timetable.a11y.openHint"))
                 .accessibilitySortPriority(-Double(block.column * 10_000 + block.entry.startTime.minuteOfDay))
             }
-
+        }
+        .overlay(alignment: .topLeading) {
+            // The line itself is beneath the tiles; this dot on the column's left edge (outside the tile text)
+            // keeps "now" visible when it falls inside a lesson.
             if let marker = GridPresentation.nowMarker(layout, today: today, minuteOfDay: nowMinute) {
-                let y = CGFloat(marker.position) * height
-                HStack(spacing: 0) {
-                    Circle().fill(Color.red).frame(width: 8, height: 8)
-                    Rectangle().fill(Color.red).frame(width: columnWidth - 6, height: 2)
-                }
-                .offset(x: gutterWidth + CGFloat(marker.column) * columnWidth - 2, y: y - 4)
-                .allowsHitTesting(false)
-                .accessibilityHidden(true)
+                Circle().fill(Color.red).frame(width: 8, height: 8)
+                    .offset(x: gutterWidth + CGFloat(marker.column) * columnWidth - 4,
+                            y: CGFloat(marker.position) * height - 4)
+                    .allowsHitTesting(false)
+                    .accessibilityHidden(true)
             }
         }
         .frame(width: width, height: height, alignment: .topLeading)

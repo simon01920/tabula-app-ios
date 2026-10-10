@@ -126,7 +126,7 @@ private struct TimetableFormContent: View {
                     if newKind == .dayCycle && originalKind != .dayCycle { draft.daySchoolDays = draft.enabledDays }
                 })) {
                 ForEach(allowedKinds, id: \.self) { kind in
-                    Text(LocalizedStringKey("editor.rotation.kind.\(kind.rawValue)")).tag(kind)
+                    Text(LocalizedStringKey(DynamicL10nKeys.rotationKind(kind))).tag(kind)
                 }
             } label: {
                 Text("editor.rotation")
@@ -330,7 +330,7 @@ private struct TimetableFormContent: View {
                     set: { isOn in
                         if isOn { draft.visibleFields.insert(field) } else { draft.visibleFields.remove(field) }
                     })) {
-                    Text(LocalizedStringKey("editor.field.\(field.rawValue)"))
+                    Text(LocalizedStringKey(DynamicL10nKeys.lessonField(field)))
                 }
             }
         } header: {
@@ -346,7 +346,7 @@ private struct TimetableFormContent: View {
         Section {
             Picker(selection: $draft.defaultView) {
                 ForEach(viewChoices, id: \.self) { kind in
-                    Text(LocalizedStringKey("editor.view.\(kind.rawValue)")).tag(kind)
+                    Text(LocalizedStringKey(DynamicL10nKeys.defaultView(kind))).tag(kind)
                 }
             } label: {
                 Text("editor.view")
