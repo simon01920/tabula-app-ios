@@ -26,12 +26,25 @@ PRINTF = re.compile(r"%(?:\d+\$)?[-+ #0]*\d*(?:\.\d+)?(hh|h|ll|l|q|z|t|j)?([@dDi
 PLURAL_CATEGORIES = ("zero", "one", "two", "few", "many", "other")
 
 
-def value_type(sample: str, key: str) -> str:
-    # "%%" is a literal percent sign, not a format specifier: remove it before searching.
-    match = PRINTF.search(sample.replace("%%", ""))
-    if not match:
-        raise ValueError(f"plural variant for '{key}' has no format specifier: {sample!r}")
-    return (match.group(1) or "") + match.group(2)
+def value_type(forms: dict, key: str) -> str:
+    """Format type of the plural-driving argument (argument 1) from the plural forms of one language.
+
+    "%%" is a literal percent sign, not a specifier. Positional specifiers are honoured: a translation may put
+    "%2$@" before "%1$lld" (word order), so the first match is not necessarily argument 1. Falls back to the
+    first specifier found when no form mentions argument 1 explicitly."""
+    first = None
+    for text in [forms["other"]] + [t for c, t in forms.items() if c != "other"]:
+        seq = 0
+        for match in PRINTF.finditer(text.replace("%%", "")):
+            seq += 1
+            position = int(match.group(0).split("$")[0][1:]) if "$" in match.group(0) else seq
+            kind = (match.group(1) or "") + match.group(2)
+            if position == 1:
+                return kind
+            first = first or kind
+    if first is None:
+        raise ValueError(f"plural variant for '{key}' has no format specifier: {forms['other']!r}")
+    return first
 
 
 def usable(unit: dict | None) -> bool:
@@ -77,7 +90,7 @@ def compile_catalog(catalog_path: pathlib.Path, out_dir: pathlib.Path) -> int:
                 warnings.append(f"{key} [{lang}]: plural lacks a usable 'other' form -> skipped")
                 continue
             try:
-                value_kind = value_type(forms["other"], key)
+                value_kind = value_type(forms, key)
             except ValueError as exc:
                 errors.append(str(exc))
                 continue
@@ -121,13 +134,22 @@ def compile_catalog(catalog_path: pathlib.Path, out_dir: pathlib.Path) -> int:
 
 
 def self_test() -> int:
-    """Edge cases: '%%' before a specifier, empty and 'new' units, missing translations."""
+    """Edge cases: '%%' before a specifier, empty and 'new' units, missing translations, every plural category set
+    (sk 4, sr 3, ja 1), hyphenated lproj names (sr-Latn, zh-Hans), positional re-ordering (%2$@ before %1$lld)."""
     unit = lambda value, state="translated": {"stringUnit": {"state": state, "value": value}}  # noqa: E731
     catalog = {"sourceLanguage": "en", "version": "1.0", "strings": {
         "pct %lld": {"localizations": {"en": {"variations": {"plural": {
             "one": unit("100%% of %lld"), "other": unit("100%% of %lld items")}}}}},
         "hello": {"localizations": {"en": unit("Hello"), "sk": unit("", "translated"), "de": unit("Hallo", "new")}},
         "bye": {"localizations": {"en": unit("Bye"), "sk": unit("Ahoj")}},
+        "days": {"localizations": {
+            "en": {"variations": {"plural": {"one": unit("In %1$lld day (%2$@)"), "other": unit("In %1$lld days (%2$@)")}}},
+            "sk": {"variations": {"plural": {c: unit(f"Za %1$lld {c} (%2$@)") for c in ("one", "few", "many", "other")}}},
+            "sr": {"variations": {"plural": {c: unit(f"Za %1$lld {c} (%2$@)") for c in ("one", "few", "other")}}},
+            "sr-Latn": {"variations": {"plural": {c: unit(f"Za %1$lld {c} (%2$@)") for c in ("one", "few", "other")}}},
+            "ja": {"variations": {"plural": {"other": unit("%2$@の%1$lld日後")}}},
+            "zh-Hans": {"variations": {"plural": {"other": unit("%1$lld天后（%2$@）")}}},
+        }},
     }}
     with tempfile.TemporaryDirectory() as tmp:
         src = pathlib.Path(tmp) / "Localizable.xcstrings"
@@ -137,8 +159,16 @@ def self_test() -> int:
         en_pl = plistlib.load(open(out / "en.lproj/Localizable.stringsdict", "rb"))
         sk = plistlib.load(open(out / "sk.lproj/Localizable.strings", "rb"))
         sk_pl = plistlib.load(open(out / "sk.lproj/Localizable.stringsdict", "rb"))
+        sk_days = sk_pl["days"]["arg"]
+        sr_days = plistlib.load(open(out / "sr.lproj/Localizable.stringsdict", "rb"))["days"]["arg"]
+        ja_days = plistlib.load(open(out / "ja.lproj/Localizable.stringsdict", "rb"))["days"]["arg"]
         checks = {
             "exit code 0": rc == 0,
+            "sk emits one/few/many/other": all(c in sk_days for c in ("one", "few", "many", "other")),
+            "sr emits one/few/other and no many": all(c in sr_days for c in ("one", "few", "other")) and "many" not in sr_days,
+            "ja emits other only": [c for c in ja_days if c in PLURAL_CATEGORIES] == ["other"],
+            "positional: %2$@ before %1$lld still gives lld": ja_days["NSStringFormatValueTypeKey"] == "lld",
+            "hyphenated lproj folders sr-Latn and zh-Hans": (out / "sr-Latn.lproj").is_dir() and (out / "zh-Hans.lproj").is_dir(),
             "'%%' ignored -> value type lld": en_pl["pct %lld"]["arg"]["NSStringFormatValueTypeKey"] == "lld",
             "empty sk unit falls back to en": sk.get("hello") == "Hello",
             "real sk translation kept": sk.get("bye") == "Ahoj",

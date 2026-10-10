@@ -66,6 +66,11 @@ echo "+ variant: $VARIANT (TABULA_MACRO_PROBES=${TABULA_MACRO_PROBES:-unset})$([
 echo "+ (cd $WORK && xtool dev $*)"
 xtool dev "$@"
 
+for bundle in "$WORK/xtool/TabulaApp.app" "$WORK/xtool/TabulaApp.app/PlugIns/TabulaWidgets.appex"; do
+  if [ -d "$bundle" ]; then
+    echo "+ localisations in ${bundle#"$WORK"/xtool/}: $(cd "$bundle" && ls -d ./*.lproj | sed 's|^\./||; s|\.lproj$||' | tr '\n' ' ')"
+  fi
+done
 APPEX="$WORK/xtool/TabulaApp.app/PlugIns/TabulaWidgets.appex/TabulaWidgets"
 if [ -f "$APPEX" ] && command -v llvm-objdump >/dev/null 2>&1; then
   sections="$(llvm-objdump --macho --section-headers "$APPEX" 2>/dev/null || true)"

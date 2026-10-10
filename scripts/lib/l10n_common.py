@@ -39,6 +39,29 @@ ACCEPTED_STATES = ("translated", "needs_review", "stale")   # anything but "new"
 SPEC = re.compile(r"%(?:(\d+)\$)?[-+ #0]*\d*(?:\.\d+)?(hh|h|ll|l|q|z|t|j)?([@dDiuUxXoOfeEgGcCsSp])")
 
 
+_SR_LATN = dict(zip("абвгдђежзијклмнопрстћуфхцчшљњџ",
+                    ["a", "b", "v", "g", "d", "đ", "e", "ž", "z", "i", "j", "k", "l", "m", "n", "o", "p", "r", "s",
+                     "t", "ć", "u", "f", "h", "c", "č", "š", "lj", "nj", "dž"]))
+
+
+def sr_to_latin(text: str) -> str:
+    """Serbian Cyrillic -> Latin (the mapping is 1:1, so sr-Latn is derived from sr and never drifts).
+    Characters outside the Serbian Cyrillic alphabet (Latin brand names, digits, %@ specifiers) pass through."""
+    out = []
+    for i, ch in enumerate(text):
+        low = ch.lower()
+        if low not in _SR_LATN:
+            out.append(ch)
+            continue
+        latin = _SR_LATN[low]
+        if ch != low:   # uppercase
+            neighbours = (text[i - 1] if i else "", text[i + 1] if i + 1 < len(text) else "")
+            all_caps = any(n and n != n.lower() and n.lower() in _SR_LATN for n in neighbours)
+            latin = latin.upper() if (len(latin) == 1 or all_caps) else latin[0].upper() + latin[1:]
+        out.append(latin)
+    return "".join(out)
+
+
 def dump(data: dict) -> str:
     """Canonical catalog form (identical to scripts/l10n-add.py and Xcode)."""
     return json.dumps(data, indent=2, separators=(",", " : "), ensure_ascii=False, sort_keys=True) + "\n"

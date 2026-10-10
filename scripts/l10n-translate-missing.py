@@ -9,6 +9,7 @@ Workflow when new English strings are added (scripts/l10n-add.py), e.g. after th
   3. A translator (human or model) fills the template: a plain string, or {category: text} for plural keys
      (categories per language: see "plural_categories" in the list output / scripts/lib/l10n_common.py).
      Keep the format specifiers (%@, %lld, %1$lld ...) identical in type and number; no concatenation.
+     Serbian: translate Cyrillic ("sr") only; "sr-Latn" is transliterated from it automatically on merge.
   4. python3 scripts/l10n-translate-missing.py merge filled.json   # {lang: {key: value}} or a dir of <lang>.json
      Every merged unit gets state "needs_review" (never native quality; log new keys in
      docs/localization/REVIEW.md). Existing complete translations are kept unless --replace is given.
@@ -62,6 +63,8 @@ def cmd_list(catalog, langs, out_path):
     keys, template = {}, {lang: {} for lang in langs}
     for key, per_lang in gap.items():
         entry = catalog["strings"][key]
+        if "sr" in per_lang and "sr-Latn" in per_lang:
+            per_lang = {k: v for k, v in per_lang.items() if k != "sr-Latn"}   # derived from sr on merge
         kind, value = L.english_shape(entry)
         needs = {lang: ("string" if kind == "string" else list(L.PLURAL_CATEGORIES[lang])) for lang in per_lang}
         keys[key] = {"comment": entry.get("comment", ""), "en": value, "needs": needs, "problems": per_lang}
@@ -138,20 +141,104 @@ def cmd_merge(path, catalog, langs, inputs, replace):
         print("\n".join(f"error: {e}" for e in errors), file=sys.stderr)
         print(f"{len(errors)} problem(s); catalog NOT written", file=sys.stderr)
         return 1
+    derived = derive_sr_latn(catalog) if "sr-Latn" in langs else 0
     path.write_text(L.dump(catalog), encoding="utf-8")
-    print(f"merged {added} translations (state {L.REVIEW_STATE}); kept {kept} existing; catalog written")
+    print(f"merged {added} translations (state {L.REVIEW_STATE}); kept {kept} existing; "
+          f"{derived} sr-Latn derived from sr; catalog written")
     return 0
+
+
+def derive_sr_latn(catalog):
+    """sr (Cyrillic) is the authored Serbian; sr-Latn is its mechanical transliteration (1:1 alphabet mapping).
+    Fills every key where sr is complete and sr-Latn is not."""
+    n = 0
+    for key, entry in catalog["strings"].items():
+        if L.problems(key, entry, "sr") or not L.problems(key, entry, "sr-Latn"):
+            continue
+        src = entry["localizations"]["sr"]
+        if "stringUnit" in src:
+            entry["localizations"]["sr-Latn"] = L.unit(L.sr_to_latin(src["stringUnit"]["value"]))
+        else:
+            plural = src["variations"]["plural"]
+            entry["localizations"]["sr-Latn"] = {"variations": {"plural": {
+                c: L.unit(L.sr_to_latin(u["stringUnit"]["value"])) for c, u in plural.items()}}}
+        n += 1
+    return n
+
+
+def self_test():
+    import contextlib
+    import io
+    import tempfile
+    en = lambda v: {"stringUnit": {"state": "translated", "value": v}}  # noqa: E731
+    catalog = {"sourceLanguage": "en", "version": "1.0", "strings": {
+        "a": {"comment": "c", "localizations": {"en": en("Hi %@")}},
+        "p": {"comment": "c", "localizations": {"en": {"variations": {"plural": {
+            "one": en("%lld day"), "other": en("%lld days")}}}}},
+    }}
+    quiet = contextlib.redirect_stderr(io.StringIO())
+    with tempfile.TemporaryDirectory() as tmp, quiet:
+        path = pathlib.Path(tmp) / "Localizable.xcstrings"
+        path.write_text(L.dump(catalog), encoding="utf-8")
+
+        def merge(table, replace=False):
+            f = pathlib.Path(tmp) / "in.json"
+            f.write_text(json.dumps(table), encoding="utf-8")
+            with contextlib.redirect_stdout(io.StringIO()):
+                return cmd_merge(path, L.load_catalog(path), L.TARGETS, [str(f)], replace)
+
+        def cat():
+            return L.load_catalog(path)
+        checks = {}
+        checks["12 languages x 2 keys missing at the start"] = sum(len(v) for v in gaps(cat(), L.TARGETS).values()) == 24
+        before = path.read_text(encoding="utf-8")
+        checks["wrong specifier type refused, catalog untouched"] = (
+            merge({"sk": {"a": "Ahoj %lld"}}) == 1 and path.read_text(encoding="utf-8") == before)
+        checks["missing specifier refused"] = merge({"sk": {"a": "Ahoj"}}) == 1
+        checks["missing plural category (sk needs few, many) refused"] = (
+            merge({"sk": {"p": {"one": "%lld deň", "other": "%lld dní"}}}) == 1)
+        checks["category that does not exist (ja one) refused"] = merge({"ja": {"p": {"one": "%lld日"}}}) == 1
+        ok = merge({"sk": {"a": "Ahoj %@", "p": {"one": "%lld deň", "few": "%lld dni", "many": "%lld dňa", "other": "%lld dní"}},
+                    "sr": {"a": "Здраво %@", "p": {"one": "%lld дан", "few": "%lld дана", "other": "%lld дана"}},
+                    "ja": {"p": {"other": "%lld日"}}}) == 0
+        c = cat()["strings"]
+        checks["valid merge accepted, state needs_review"] = (
+            ok and c["a"]["localizations"]["sk"]["stringUnit"]["state"] == "needs_review")
+        checks["sr-Latn derived from sr (text and plural)"] = (
+            c["a"]["localizations"]["sr-Latn"]["stringUnit"]["value"] == "Zdravo %@"
+            and c["p"]["localizations"]["sr-Latn"]["variations"]["plural"]["few"]["stringUnit"]["value"] == "%lld dana")
+        merge({"sk": {"a": "Zmenené %@"}})
+        checks["existing complete translation kept without --replace"] = (
+            cat()["strings"]["a"]["localizations"]["sk"]["stringUnit"]["value"] == "Ahoj %@")
+        merge({"sk": {"a": "Zmenené %@"}}, replace=True)
+        checks["--replace overwrites"] = cat()["strings"]["a"]["localizations"]["sk"]["stringUnit"]["value"] == "Zmenené %@"
+        g = gaps(cat(), L.TARGETS)
+        checks["gaps shrink: sk, sr, sr-Latn done, ja half done"] = (
+            "sk" not in g.get("a", {}) and "sk" not in g.get("p", {}) and "sr-Latn" not in g.get("a", {})
+            and "ja" in g.get("a", {}) and "ja" not in g.get("p", {}))
+        out = pathlib.Path(tmp) / "list.json"
+        with contextlib.redirect_stdout(io.StringIO()):
+            cmd_list(cat(), L.TARGETS, str(out))
+        listed = json.loads(out.read_text(encoding="utf-8"))
+        checks["list: template has plural categories per language"] = (
+            "p" in listed["template"].get("pl", {}) and set(listed["template"]["pl"]["p"]) == {"one", "few", "many", "other"}
+            and "sr-Latn" not in listed["template"])
+    for name, passed in checks.items():
+        print(("OK   " if passed else "FAIL ") + name)
+    return 0 if all(checks.values()) else 1
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("command", choices=("status", "list", "merge"))
+    parser.add_argument("command", choices=("status", "list", "merge", "self-test"))
     parser.add_argument("inputs", nargs="*", help="merge: JSON file(s) or directory of <lang>.json")
     parser.add_argument("--catalog", default=str(ROOT / "Resources/Localizable.xcstrings"))
     parser.add_argument("--langs")
     parser.add_argument("--out")
     parser.add_argument("--replace", action="store_true", help="merge: overwrite complete existing translations")
     args = parser.parse_args()
+    if args.command == "self-test":
+        return self_test()
     path = pathlib.Path(args.catalog)
     catalog = L.load_catalog(path)
     langs = parse_langs(args.langs)

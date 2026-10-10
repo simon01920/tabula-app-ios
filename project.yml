@@ -17,6 +17,10 @@ options:
     watchOS: "26.0"
   createIntermediateGroups: true
   developmentLanguage: en
+  # The 12 launch languages (docs/specs/LOCALIZATION.md); identifiers as used in Resources/Localizable.xcstrings:
+  # sr = Serbian Cyrillic, sr-Latn = Serbian Latin, zh-Hans = Simplified Chinese. validate_config.py keeps this list,
+  # CFBundleLocalizations (Config/*-Info.plist) and xtool.yml's .lproj resources identical.
+  knownRegions: [en, sk, cs, pl, hu, ro, de, fr, uk, sr, sr-Latn, ja, zh-Hans]
   groupSortPosition: top
 
 # Identity values + the paid-account switch live in ONE file (see its header). Project-level base configuration,
