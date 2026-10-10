@@ -229,6 +229,3606 @@
         }
       }
     },
+    "editor.appearance.header" : {
+      "comment" : "Section header: default view, density and palette.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appearance"
+          }
+        }
+      }
+    },
+    "editor.bell.addPeriod" : {
+      "comment" : "Button that appends a period to the bell schedule.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Period"
+          }
+        }
+      }
+    },
+    "editor.bell.addVariant" : {
+      "comment" : "Menu button; choose a weekday to give its own bell schedule.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Schedule for a Day"
+          }
+        }
+      }
+    },
+    "editor.bell.default" : {
+      "comment" : "Section header of the default bell schedule (used on all days without their own schedule).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regular days"
+          }
+        }
+      }
+    },
+    "editor.bell.defaultName" : {
+      "comment" : "Default name of a timetable's regular bell schedule.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regular"
+          }
+        }
+      }
+    },
+    "editor.bell.issue.endBeforeStart" : {
+      "comment" : "Bell schedule error that blocks saving.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A period ends before it starts. Fix its times to save."
+          }
+        }
+      }
+    },
+    "editor.bell.issue.noLessons" : {
+      "comment" : "Bell schedule error: the regular schedule has no lesson period.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add at least one lesson period."
+          }
+        }
+      }
+    },
+    "editor.bell.issue.overlap" : {
+      "comment" : "Bell schedule warning.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some periods overlap. You can still save."
+          }
+        }
+      }
+    },
+    "editor.bell.issue.overlap.row" : {
+      "comment" : "Warning on a single period row.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overlaps another period"
+          }
+        }
+      }
+    },
+    "editor.bell.kind" : {
+      "comment" : "Period kind picker label.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kind"
+          }
+        }
+      }
+    },
+    "editor.bell.kind.break" : {
+      "comment" : "Period kind: a break.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Break"
+          }
+        }
+      }
+    },
+    "editor.bell.kind.lesson" : {
+      "comment" : "Period kind: a lesson period.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesson"
+          }
+        }
+      }
+    },
+    "editor.bell.kind.lunch" : {
+      "comment" : "Period kind: lunch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lunch"
+          }
+        }
+      }
+    },
+    "editor.bell.locked.footer" : {
+      "comment" : "Footer explaining the lock.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Periods with a lock are used by lessons and can't be removed."
+          }
+        }
+      }
+    },
+    "editor.bell.name" : {
+      "comment" : "Bell schedule name input label.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        }
+      }
+    },
+    "editor.bell.periodInUse" : {
+      "comment" : "Accessibility label of the lock shown instead of the remove button for a period lessons use.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Used by a lesson, can't be removed"
+          }
+        }
+      }
+    },
+    "editor.bell.periodLabel" : {
+      "comment" : "Input label of a period's optional name (e.g. 'Lunch').",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Label"
+          }
+        }
+      }
+    },
+    "editor.bell.periods" : {
+      "comment" : "Section header of the period list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Periods"
+          }
+        }
+      }
+    },
+    "editor.bell.removePeriod" : {
+      "comment" : "Accessibility label of the button that removes a period.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Period"
+          }
+        }
+      }
+    },
+    "editor.bell.removeVariant" : {
+      "comment" : "Button that removes a weekday-specific schedule. %@ = its name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove %@"
+          }
+        }
+      }
+    },
+    "editor.bell.sort" : {
+      "comment" : "Button that orders the periods by start time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sort by Time"
+          }
+        }
+      }
+    },
+    "editor.bell.title" : {
+      "comment" : "Navigation title of the bell schedule editor.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bell Schedule"
+          }
+        }
+      }
+    },
+    "editor.bell.unavailable" : {
+      "comment" : "Shown when the bell schedule editor is opened without a timetable.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There is no timetable to edit."
+          }
+        }
+      }
+    },
+    "editor.bell.variant" : {
+      "comment" : "Section header of a per-weekday bell schedule variant.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Own schedule for some days"
+          }
+        }
+      }
+    },
+    "editor.bell.variantName" : {
+      "comment" : "Default name of a per-weekday bell schedule. %@ = weekday name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schedule for %@"
+          }
+        }
+      }
+    },
+    "editor.bell.variants" : {
+      "comment" : "Section header for weekday-specific bell schedules.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Different days"
+          }
+        }
+      }
+    },
+    "editor.bell.variants.allUsed" : {
+      "comment" : "Shown when no weekday is left for a new variant.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every school day has its own schedule."
+          }
+        }
+      }
+    },
+    "editor.bell.variants.footer" : {
+      "comment" : "Explanation of weekday-specific schedules.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A copy of the regular schedule starts the new schedule. Lessons keep their periods."
+          }
+        }
+      }
+    },
+    "editor.breaks.add" : {
+      "comment" : "Button that adds a break.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Break"
+          }
+        }
+      }
+    },
+    "editor.breaks.defaultName" : {
+      "comment" : "Default name of a newly added break.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Holiday"
+          }
+        }
+      }
+    },
+    "editor.breaks.footer" : {
+      "comment" : "Footer of the breaks section.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No lessons take place during breaks."
+          }
+        }
+      }
+    },
+    "editor.breaks.header" : {
+      "comment" : "Section header: holidays, vacations and exam periods.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Breaks"
+          }
+        }
+      }
+    },
+    "editor.breaks.kind" : {
+      "comment" : "Break kind picker label.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kind"
+          }
+        }
+      }
+    },
+    "editor.breaks.kind.examPeriod" : {
+      "comment" : "Break kind.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exam period"
+          }
+        }
+      }
+    },
+    "editor.breaks.kind.holiday" : {
+      "comment" : "Break kind.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Holiday"
+          }
+        }
+      }
+    },
+    "editor.breaks.kind.noSchool" : {
+      "comment" : "Break kind.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No school"
+          }
+        }
+      }
+    },
+    "editor.breaks.kind.vacation" : {
+      "comment" : "Break kind.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vacation"
+          }
+        }
+      }
+    },
+    "editor.breaks.name" : {
+      "comment" : "Break name input label.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        }
+      }
+    },
+    "editor.breaks.remove" : {
+      "comment" : "Accessibility label of the remove-break button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Break"
+          }
+        }
+      }
+    },
+    "editor.common.cancel" : {
+      "comment" : "Editor sheets: toolbar button that leaves the editor without saving.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "editor.common.close" : {
+      "comment" : "Toolbar button that closes a sheet that has nothing to edit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        }
+      }
+    },
+    "editor.common.delete" : {
+      "comment" : "Swipe/context action that deletes a list row (opens a confirmation first).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        }
+      }
+    },
+    "editor.common.discard" : {
+      "comment" : "Destructive button of the discard confirmation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discard Changes"
+          }
+        }
+      }
+    },
+    "editor.common.discard.message" : {
+      "comment" : "Message of the discard confirmation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your edits have not been saved."
+          }
+        }
+      }
+    },
+    "editor.common.discard.title" : {
+      "comment" : "Confirmation title when the user cancels an editor that has unsaved edits.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discard your changes?"
+          }
+        }
+      }
+    },
+    "editor.common.done" : {
+      "comment" : "Toolbar button that closes a list sheet (subjects list, timetables manager).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        }
+      }
+    },
+    "editor.common.keepEditing" : {
+      "comment" : "Cancel button of the discard confirmation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep Editing"
+          }
+        }
+      }
+    },
+    "editor.common.save" : {
+      "comment" : "Editor sheets: toolbar button that stores the edits.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        }
+      }
+    },
+    "editor.cycleDay.name" : {
+      "comment" : "Default name of a day in a day cycle (rotation), e.g. 'Day 3'. %lld = day number.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Day %lld"
+          }
+        }
+      }
+    },
+    "editor.cycleWeek.name" : {
+      "comment" : "Default name of a week in a week cycle, e.g. 'Week 2'. %lld = week number.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Week %lld"
+          }
+        }
+      }
+    },
+    "editor.dayChange.bell" : {
+      "comment" : "Picker label: the bell schedule used for the short day.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bell schedule"
+          }
+        }
+      }
+    },
+    "editor.dayChange.bell.choose" : {
+      "comment" : "Picker option while none is selected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a bell schedule"
+          }
+        }
+      }
+    },
+    "editor.dayChange.bell.edit" : {
+      "comment" : "Button that opens the bell schedule editor.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Bell Schedules"
+          }
+        }
+      }
+    },
+    "editor.dayChange.bell.footer" : {
+      "comment" : "Footer of the short-day section.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lessons keep their periods and move to the times of the chosen schedule."
+          }
+        }
+      }
+    },
+    "editor.dayChange.cancelDay.footer" : {
+      "comment" : "Footer under the no-school note.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No lessons take place on this date."
+          }
+        }
+      }
+    },
+    "editor.dayChange.changes" : {
+      "comment" : "Section header above the substitute subject, room and teacher inputs.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change to"
+          }
+        }
+      }
+    },
+    "editor.dayChange.changes.footer" : {
+      "comment" : "Footer of the change-lesson section.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leave a field empty to keep the regular value."
+          }
+        }
+      }
+    },
+    "editor.dayChange.date" : {
+      "comment" : "Date picker label.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date"
+          }
+        }
+      }
+    },
+    "editor.dayChange.existing" : {
+      "comment" : "Section header listing the changes that exist for the chosen date.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Already changed on this date"
+          }
+        }
+      }
+    },
+    "editor.dayChange.existing.cancelDay" : {
+      "comment" : "Existing change: whole day cancelled.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No school"
+          }
+        }
+      }
+    },
+    "editor.dayChange.existing.cancelDayNote" : {
+      "comment" : "Existing change. %@ = the note.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No school: %@"
+          }
+        }
+      }
+    },
+    "editor.dayChange.existing.cancelLesson" : {
+      "comment" : "Existing change. %@ = subject name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelled: %@"
+          }
+        }
+      }
+    },
+    "editor.dayChange.existing.changeLesson" : {
+      "comment" : "Existing change. %@ = subject name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changed: %@"
+          }
+        }
+      }
+    },
+    "editor.dayChange.existing.extraLesson" : {
+      "comment" : "Existing change. %@ = subject name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extra lesson: %@"
+          }
+        }
+      }
+    },
+    "editor.dayChange.existing.followDay" : {
+      "comment" : "Existing change. %@ = name of the followed day.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Follows %@"
+          }
+        }
+      }
+    },
+    "editor.dayChange.existing.footer" : {
+      "comment" : "Footer explaining the undo button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use the arrow to undo a change."
+          }
+        }
+      }
+    },
+    "editor.dayChange.existing.remove" : {
+      "comment" : "Accessibility label of the undo button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo Change"
+          }
+        }
+      }
+    },
+    "editor.dayChange.existing.shortDay" : {
+      "comment" : "Existing change. %@ = bell schedule name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Short day: %@"
+          }
+        }
+      }
+    },
+    "editor.dayChange.existing.unknown" : {
+      "comment" : "Existing change this app version does not understand.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change from a newer version of Tabula"
+          }
+        }
+      }
+    },
+    "editor.dayChange.follow" : {
+      "comment" : "Picker label: which day's timetable to follow.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Follow"
+          }
+        }
+      }
+    },
+    "editor.dayChange.follow.choose" : {
+      "comment" : "Picker option while none is selected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a day"
+          }
+        }
+      }
+    },
+    "editor.dayChange.follow.footer" : {
+      "comment" : "Footer of the follow-day section.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The lessons of the chosen day take place on this date."
+          }
+        }
+      }
+    },
+    "editor.dayChange.follow.week" : {
+      "comment" : "Picker label: which week of the cycle to follow.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Week"
+          }
+        }
+      }
+    },
+    "editor.dayChange.follow.week.natural" : {
+      "comment" : "Picker option: use the week the date naturally belongs to.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This date's week"
+          }
+        }
+      }
+    },
+    "editor.dayChange.issue.noBellSchedule" : {
+      "comment" : "Explanation why Save is disabled.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a bell schedule."
+          }
+        }
+      }
+    },
+    "editor.dayChange.issue.noFollowDay" : {
+      "comment" : "Explanation why Save is disabled.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a day to follow."
+          }
+        }
+      }
+    },
+    "editor.dayChange.issue.noLesson" : {
+      "comment" : "Explanation why Save is disabled.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a lesson."
+          }
+        }
+      }
+    },
+    "editor.dayChange.issue.noSubject" : {
+      "comment" : "Explanation why Save is disabled.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a subject."
+          }
+        }
+      }
+    },
+    "editor.dayChange.issue.nothingChanged" : {
+      "comment" : "Explanation why Save is disabled.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter at least one change."
+          }
+        }
+      }
+    },
+    "editor.dayChange.kind" : {
+      "comment" : "Header and label of the list of change kinds.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What changes"
+          }
+        }
+      }
+    },
+    "editor.dayChange.kind.cancelDay" : {
+      "comment" : "Change kind: the whole day is cancelled.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No school"
+          }
+        }
+      }
+    },
+    "editor.dayChange.kind.cancelLesson" : {
+      "comment" : "Change kind.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel a lesson"
+          }
+        }
+      }
+    },
+    "editor.dayChange.kind.changeLesson" : {
+      "comment" : "Change kind: substitute subject, room or teacher.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change a lesson"
+          }
+        }
+      }
+    },
+    "editor.dayChange.kind.extraLesson" : {
+      "comment" : "Change kind: a one-off lesson.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extra lesson"
+          }
+        }
+      }
+    },
+    "editor.dayChange.kind.followDay" : {
+      "comment" : "Change kind: the day follows the timetable of another day.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Follow another day"
+          }
+        }
+      }
+    },
+    "editor.dayChange.kind.shortDay" : {
+      "comment" : "Change kind: the day uses a different bell schedule.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Short day"
+          }
+        }
+      }
+    },
+    "editor.dayChange.lesson" : {
+      "comment" : "Picker label: which lesson of the day.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesson"
+          }
+        }
+      }
+    },
+    "editor.dayChange.lesson.choose" : {
+      "comment" : "Picker option while no lesson is selected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a lesson"
+          }
+        }
+      }
+    },
+    "editor.dayChange.noLessons" : {
+      "comment" : "Footer when the chosen date has no lessons.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No lessons take place on this date, so lessons can't be cancelled or changed."
+          }
+        }
+      }
+    },
+    "editor.dayChange.note" : {
+      "comment" : "Input label for an optional note on a cancelled day.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note"
+          }
+        }
+      }
+    },
+    "editor.dayChange.subject" : {
+      "comment" : "Picker label: substitute subject.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subject"
+          }
+        }
+      }
+    },
+    "editor.dayChange.subject.same" : {
+      "comment" : "Picker option: keep the regular subject.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Same subject"
+          }
+        }
+      }
+    },
+    "editor.dayChange.title" : {
+      "comment" : "Navigation title of the one-day change editor.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change for This Day"
+          }
+        }
+      }
+    },
+    "editor.dayChange.unavailable" : {
+      "comment" : "Shown when the day-change editor is opened without a timetable.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There is no timetable to change."
+          }
+        }
+      }
+    },
+    "editor.density" : {
+      "comment" : "Segmented picker label.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Density"
+          }
+        }
+      }
+    },
+    "editor.density.comfortable" : {
+      "comment" : "Density option.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comfortable"
+          }
+        }
+      }
+    },
+    "editor.density.compact" : {
+      "comment" : "Density option.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compact"
+          }
+        }
+      }
+    },
+    "editor.error.failed" : {
+      "comment" : "Shown when applying an edit failed unexpectedly.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The change could not be applied."
+          }
+        }
+      }
+    },
+    "editor.error.readOnly" : {
+      "comment" : "Shown when saving is refused because the stored data belongs to a newer app version.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabula is in read-only mode. Update the app to make changes."
+          }
+        }
+      }
+    },
+    "editor.error.rejected.title" : {
+      "comment" : "Header above the list of problems that prevented saving.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This can't be saved"
+          }
+        }
+      }
+    },
+    "editor.field.bringItem" : {
+      "comment" : "Accessibility label of one text field in the 'what to bring' list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Item"
+          }
+        }
+      }
+    },
+    "editor.field.bringItem.add" : {
+      "comment" : "Button that adds a row to the 'what to bring' list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Item"
+          }
+        }
+      }
+    },
+    "editor.field.bringItem.remove" : {
+      "comment" : "Accessibility label of the button that removes a 'what to bring' row.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Item"
+          }
+        }
+      }
+    },
+    "editor.field.bringList" : {
+      "comment" : "Section header / field name for the list of things to bring to a lesson.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What to bring"
+          }
+        }
+      }
+    },
+    "editor.field.building" : {
+      "comment" : "Lesson/subject input label.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Building"
+          }
+        }
+      }
+    },
+    "editor.field.lessonType" : {
+      "comment" : "Lesson input label for the lesson type (lecture, seminar, lab, tutorial); also the name of the field in the timetable's field list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type"
+          }
+        }
+      }
+    },
+    "editor.field.notes" : {
+      "comment" : "Lesson/subject input label for free notes.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes"
+          }
+        }
+      }
+    },
+    "editor.field.room" : {
+      "comment" : "Lesson/subject input label.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Room"
+          }
+        }
+      }
+    },
+    "editor.field.teacher" : {
+      "comment" : "Lesson/subject input label.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teacher"
+          }
+        }
+      }
+    },
+    "editor.fields.footer" : {
+      "comment" : "Footer explaining the field visibility toggles.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A turned-off detail is hidden everywhere, including this editor. Its saved values are kept."
+          }
+        }
+      }
+    },
+    "editor.fields.header" : {
+      "comment" : "Section header of the field toggles.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesson details"
+          }
+        }
+      }
+    },
+    "editor.impact.bellSchedules" : {
+      "comment" : "Confirmation line. Plural on the number of bell schedules.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld bell schedule will be deleted"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld bell schedules will be deleted"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "editor.impact.breaks" : {
+      "comment" : "Confirmation line. Plural on the number of breaks.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld break will be deleted"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld breaks will be deleted"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "editor.impact.dayChanges" : {
+      "comment" : "Confirmation line. Plural on the number of one-day changes.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld change for a single day will be deleted"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld changes for single days will be deleted"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "editor.impact.lessons" : {
+      "comment" : "Confirmation line. Plural on the number of lessons.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld lesson will be deleted"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld lessons will be deleted"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "editor.impact.lessons.count" : {
+      "comment" : "Timetables list: how many lessons a timetable has.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld lesson"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld lessons"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "editor.impact.linkedExams" : {
+      "comment" : "Confirmation line. Plural on the number of exams that lose their timetable link.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld exam will be kept but unlinked"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld exams will be kept but unlinked"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "editor.impact.linkedItems" : {
+      "comment" : "Confirmation line. Plural on the number of linked tasks and exams.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld homework or exam will lose its subject"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld homework items and exams will lose their subject"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "editor.impact.linkedTasks" : {
+      "comment" : "Confirmation line. Plural on the number of tasks that lose their timetable link.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld homework item will be kept but unlinked"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld homework items will be kept but unlinked"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "editor.impact.removes" : {
+      "comment" : "Header of the list in a destructive confirmation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What happens"
+          }
+        }
+      }
+    },
+    "editor.impact.subjects" : {
+      "comment" : "Confirmation line. Plural on the number of subjects.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld subject will be deleted"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld subjects will be deleted"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "editor.impact.terms" : {
+      "comment" : "Confirmation line. Plural on the number of terms.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld term will be deleted"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld terms will be deleted"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "editor.lesson.conflict.dayWeek" : {
+      "comment" : "Day followed by the week, e.g. 'Tuesday, Week B'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@, %@"
+          }
+        }
+      }
+    },
+    "editor.lesson.conflict.generic" : {
+      "comment" : "Lesson editor warning when the other lessons' names are unknown. %@ = day.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overlaps with another lesson on %@"
+          }
+        }
+      }
+    },
+    "editor.lesson.conflict.overlap" : {
+      "comment" : "Lesson editor warning. First %@ = list of subject names, second %@ = day (and week), e.g. 'Overlaps with Maths, Physics on Tuesday'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overlaps with %@ on %@"
+          }
+        }
+      }
+    },
+    "editor.lesson.conflicts" : {
+      "comment" : "Lesson editor: section header above overlap warnings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overlaps"
+          }
+        }
+      }
+    },
+    "editor.lesson.conflicts.footer" : {
+      "comment" : "Lesson editor: overlaps are warnings, never blocking.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can still save this lesson."
+          }
+        }
+      }
+    },
+    "editor.lesson.day" : {
+      "comment" : "Lesson editor: weekday (or cycle day) picker label.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Day"
+          }
+        }
+      }
+    },
+    "editor.lesson.delete" : {
+      "comment" : "Lesson editor: destructive button; also the confirmation button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Lesson"
+          }
+        }
+      }
+    },
+    "editor.lesson.delete.note" : {
+      "comment" : "Explanation in the delete-lesson confirmation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The lesson disappears from every day. Homework linked to it is kept."
+          }
+        }
+      }
+    },
+    "editor.lesson.delete.title" : {
+      "comment" : "Title of the delete-lesson confirmation sheet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete this lesson?"
+          }
+        }
+      }
+    },
+    "editor.lesson.details" : {
+      "comment" : "Lesson editor: section header above the optional fields (room, teacher, …).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Details"
+          }
+        }
+      }
+    },
+    "editor.lesson.issue.emptyRange" : {
+      "comment" : "Lesson editor: validity date range with end before start.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The end date is before the start date."
+          }
+        }
+      }
+    },
+    "editor.lesson.issue.noCycleWeeks" : {
+      "comment" : "Lesson editor: no cycle week selected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select at least one week."
+          }
+        }
+      }
+    },
+    "editor.lesson.issue.noSubject" : {
+      "comment" : "Lesson editor: explanation why Save is disabled.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a subject for this lesson."
+          }
+        }
+      }
+    },
+    "editor.lesson.issue.noTerms" : {
+      "comment" : "Lesson editor: validity 'terms' without any term selected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select at least one term, or change the validity."
+          }
+        }
+      }
+    },
+    "editor.lesson.subject" : {
+      "comment" : "Lesson editor: subject picker label.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subject"
+          }
+        }
+      }
+    },
+    "editor.lesson.subject.choose" : {
+      "comment" : "Lesson editor: picker option shown while no subject is selected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a subject"
+          }
+        }
+      }
+    },
+    "editor.lesson.subject.new" : {
+      "comment" : "Lesson editor: button that creates a subject and selects it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Subject"
+          }
+        }
+      }
+    },
+    "editor.lesson.title.edit" : {
+      "comment" : "Navigation title of the lesson editor for an existing lesson.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Lesson"
+          }
+        }
+      }
+    },
+    "editor.lesson.title.new" : {
+      "comment" : "Navigation title of the lesson editor when creating a lesson.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Lesson"
+          }
+        }
+      }
+    },
+    "editor.lesson.unavailable" : {
+      "comment" : "Shown when the lesson editor is opened for a lesson that was deleted or when there is no timetable.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This lesson no longer exists."
+          }
+        }
+      }
+    },
+    "editor.lesson.weeks" : {
+      "comment" : "Lesson editor: section header for choosing which weeks of the rotation the lesson takes place in.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weeks"
+          }
+        }
+      }
+    },
+    "editor.lesson.weeks.footer" : {
+      "comment" : "Lesson editor: explanation of the weeks toggles.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If no week is selected, the lesson takes place every week."
+          }
+        }
+      }
+    },
+    "editor.lessonType.none" : {
+      "comment" : "Lesson type picker: no type selected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "None"
+          }
+        }
+      }
+    },
+    "editor.palette" : {
+      "comment" : "Picker label: colour palette of this timetable.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palette"
+          }
+        }
+      }
+    },
+    "editor.palette.appDefault" : {
+      "comment" : "Palette option: use the app-wide palette.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Same as app"
+          }
+        }
+      }
+    },
+    "editor.period.number" : {
+      "comment" : "Name of a bell-schedule period without a label. %lld = ordinal number.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Period %lld"
+          }
+        }
+      }
+    },
+    "editor.period.withTimes" : {
+      "comment" : "Period picker row: period name, then its time range (e.g. 'Period 3 · 9:55 – 10:40').",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ · %@"
+          }
+        }
+      }
+    },
+    "editor.rotation" : {
+      "comment" : "Picker label for the timetable rotation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rotation"
+          }
+        }
+      }
+    },
+    "editor.rotation.anchor" : {
+      "comment" : "Picker label: how weeks are assigned (by calendar week parity or from a chosen week).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Counting"
+          }
+        }
+      }
+    },
+    "editor.rotation.anchor.continuous" : {
+      "comment" : "Anchor option: parity continues across the year change without restarting.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By calendar week, continuous across years"
+          }
+        }
+      }
+    },
+    "editor.rotation.anchor.reference" : {
+      "comment" : "Anchor option: count from a reference week.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From a chosen week"
+          }
+        }
+      }
+    },
+    "editor.rotation.anchor.strict" : {
+      "comment" : "Anchor option: ISO week number parity, strictly following the calendar.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By calendar week (odd/even)"
+          }
+        }
+      }
+    },
+    "editor.rotation.day.anchorDate" : {
+      "comment" : "Date picker label: a date whose cycle day is known.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reference date"
+          }
+        }
+      }
+    },
+    "editor.rotation.day.anchorIndex" : {
+      "comment" : "Picker label: which cycle day the reference date is.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cycle day on that date"
+          }
+        }
+      }
+    },
+    "editor.rotation.day.footer" : {
+      "comment" : "Footer of the day cycle section.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The cycle runs on the school days selected above."
+          }
+        }
+      }
+    },
+    "editor.rotation.day.header" : {
+      "comment" : "Section header of the day cycle settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Day cycle"
+          }
+        }
+      }
+    },
+    "editor.rotation.day.label" : {
+      "comment" : "Input label for a custom cycle day name. %lld = day number.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name of day %lld"
+          }
+        }
+      }
+    },
+    "editor.rotation.day.length" : {
+      "comment" : "Stepper label: length of the day cycle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Number of days"
+          }
+        }
+      }
+    },
+    "editor.rotation.day.skipsBreaks" : {
+      "comment" : "Toggle: the day cycle does not advance during holidays.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause during breaks"
+          }
+        }
+      }
+    },
+    "editor.rotation.footer" : {
+      "comment" : "Footer under the rotation picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use alternating weeks for A/B or odd/even weeks, and a day cycle for schools that number their days."
+          }
+        }
+      }
+    },
+    "editor.rotation.header" : {
+      "comment" : "Section header of the rotation picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rotation"
+          }
+        }
+      }
+    },
+    "editor.rotation.kind.dayCycle" : {
+      "comment" : "Rotation option: days repeat in a cycle (Day 1, Day 2, …) instead of weekdays.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Day cycle"
+          }
+        }
+      }
+    },
+    "editor.rotation.kind.none" : {
+      "comment" : "Rotation option: no rotation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Same every week"
+          }
+        }
+      }
+    },
+    "editor.rotation.kind.weekCycle" : {
+      "comment" : "Rotation option: weeks repeat in a cycle (A/B weeks, odd/even weeks).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alternating weeks"
+          }
+        }
+      }
+    },
+    "editor.rotation.label" : {
+      "comment" : "Accessibility label of an optional name field for a cycle week or day.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        }
+      }
+    },
+    "editor.rotation.locked.footer" : {
+      "comment" : "Footer when the rotation family is locked.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This timetable has lessons, so it can't switch between weekdays and a day cycle. Reset the timetable first."
+          }
+        }
+      }
+    },
+    "editor.rotation.offset" : {
+      "comment" : "Stepper label: shifts which week is the first one of the cycle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shift by weeks"
+          }
+        }
+      }
+    },
+    "editor.rotation.referenceDate" : {
+      "comment" : "Date picker label for the reference week.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A date in that week"
+          }
+        }
+      }
+    },
+    "editor.rotation.referenceWeek" : {
+      "comment" : "Picker label: which cycle week the reference date belongs to.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "That week is"
+          }
+        }
+      }
+    },
+    "editor.rotation.today.day" : {
+      "comment" : "Preview of the day cycle. %@ = name of today's cycle day.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today is %@"
+          }
+        }
+      }
+    },
+    "editor.rotation.today.week" : {
+      "comment" : "Preview of the rotation. %@ = name of the current week.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This week is %@"
+          }
+        }
+      }
+    },
+    "editor.rotation.week.footer" : {
+      "comment" : "Footer of the week cycle section.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Names are optional, for example A and B."
+          }
+        }
+      }
+    },
+    "editor.rotation.week.header" : {
+      "comment" : "Section header of the week cycle settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alternating weeks"
+          }
+        }
+      }
+    },
+    "editor.rotation.week.label" : {
+      "comment" : "Input label for a custom week name. %lld = week number.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name of week %lld"
+          }
+        }
+      }
+    },
+    "editor.rotation.week.length" : {
+      "comment" : "Stepper label: length of the week cycle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Number of weeks"
+          }
+        }
+      }
+    },
+    "editor.rotation.weekStart" : {
+      "comment" : "Picker label: first day of the week used for counting alternating weeks.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Week starts on"
+          }
+        }
+      }
+    },
+    "editor.slot.end" : {
+      "comment" : "Time picker label: end time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ends"
+          }
+        }
+      }
+    },
+    "editor.slot.header" : {
+      "comment" : "Section header of the lesson time slot rows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time"
+          }
+        }
+      }
+    },
+    "editor.slot.issue.endBeforeStart" : {
+      "comment" : "Explanation why Save is disabled.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The end time must be after the start time."
+          }
+        }
+      }
+    },
+    "editor.slot.issue.noPeriod" : {
+      "comment" : "Explanation why Save is disabled.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a period."
+          }
+        }
+      }
+    },
+    "editor.slot.mode" : {
+      "comment" : "Accessibility label of the segmented control that switches between period and clock times.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter time as"
+          }
+        }
+      }
+    },
+    "editor.slot.mode.period" : {
+      "comment" : "Segment: the lesson is placed by bell-schedule period.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Period"
+          }
+        }
+      }
+    },
+    "editor.slot.mode.time" : {
+      "comment" : "Segment: the lesson is placed by start and end clock times.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Times"
+          }
+        }
+      }
+    },
+    "editor.slot.period" : {
+      "comment" : "Picker label for the first period of a lesson.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Period"
+          }
+        }
+      }
+    },
+    "editor.slot.period.choose" : {
+      "comment" : "Picker option shown while no period is selected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a period"
+          }
+        }
+      }
+    },
+    "editor.slot.span" : {
+      "comment" : "Stepper label: how many consecutive periods the lesson lasts (double lesson = 2).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Periods in a row"
+          }
+        }
+      }
+    },
+    "editor.slot.start" : {
+      "comment" : "Time picker label: start time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starts"
+          }
+        }
+      }
+    },
+    "editor.subject.color" : {
+      "comment" : "Subject editor: section header for the colour choice.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Colour"
+          }
+        }
+      }
+    },
+    "editor.subject.color.custom" : {
+      "comment" : "Subject editor: opens the system colour picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom colour"
+          }
+        }
+      }
+    },
+    "editor.subject.contrast" : {
+      "comment" : "Subject editor: contrast ratio between tile text and tile colour. %@ = number such as 7.2.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text contrast %@ : 1"
+          }
+        }
+      }
+    },
+    "editor.subject.contrast.blends" : {
+      "comment" : "Subject editor hint for very light or very dark colours.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This colour is close to the background, so its tiles get an outline."
+          }
+        }
+      }
+    },
+    "editor.subject.contrast.low" : {
+      "comment" : "Subject editor warning when the contrast is below 4.5 : 1.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The text on this colour is hard to read. Choose a different colour."
+          }
+        }
+      }
+    },
+    "editor.subject.defaults" : {
+      "comment" : "Subject editor: section header above default room, building and teacher.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Defaults for new lessons"
+          }
+        }
+      }
+    },
+    "editor.subject.defaults.footer" : {
+      "comment" : "Subject editor: explanation of the defaults.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New lessons of this subject start with these values."
+          }
+        }
+      }
+    },
+    "editor.subject.delete" : {
+      "comment" : "Subject editor: destructive button; also the confirmation button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Subject"
+          }
+        }
+      }
+    },
+    "editor.subject.delete.note" : {
+      "comment" : "Explanation in the delete-subject confirmation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Its lessons are deleted too. Homework and exams of this subject are kept but lose the link."
+          }
+        }
+      }
+    },
+    "editor.subject.delete.title" : {
+      "comment" : "Title of the delete-subject confirmation sheet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete this subject?"
+          }
+        }
+      }
+    },
+    "editor.subject.issue.noName" : {
+      "comment" : "Explanation why Save is disabled in the subject editor.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a name."
+          }
+        }
+      }
+    },
+    "editor.subject.name" : {
+      "comment" : "Subject editor input label.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        }
+      }
+    },
+    "editor.subject.palette" : {
+      "comment" : "Subject editor: menu to choose a colour palette pack.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palette"
+          }
+        }
+      }
+    },
+    "editor.subject.preview" : {
+      "comment" : "Subject editor: header and accessibility label of the live tile preview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview"
+          }
+        }
+      }
+    },
+    "editor.subject.shortName" : {
+      "comment" : "Subject editor input label (shown on small tiles).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Short name"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol" : {
+      "comment" : "Subject editor: section header and picker label for the emoji or SF Symbol shown on the tile.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Symbol"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol.emoji" : {
+      "comment" : "Symbol option: an emoji.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Emoji"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol.emoji.field" : {
+      "comment" : "Input label for the emoji of a subject.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Emoji"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol.none" : {
+      "comment" : "Symbol option: no symbol.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "None"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol.system" : {
+      "comment" : "Symbol option: a system symbol (SF Symbol).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Symbol"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol.system.field" : {
+      "comment" : "Input label for the SF Symbol name of a subject.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Symbol name"
+          }
+        }
+      }
+    },
+    "editor.subject.title.edit" : {
+      "comment" : "Navigation title of the subject editor for an existing subject.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Subject"
+          }
+        }
+      }
+    },
+    "editor.subject.title.new" : {
+      "comment" : "Navigation title of the subject editor when creating.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Subject"
+          }
+        }
+      }
+    },
+    "editor.subject.unavailable" : {
+      "comment" : "Shown when the subject editor is opened for a deleted subject or without a timetable.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This subject no longer exists."
+          }
+        }
+      }
+    },
+    "editor.subjects.add" : {
+      "comment" : "Subjects list: add button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Subject"
+          }
+        }
+      }
+    },
+    "editor.subjects.empty.message" : {
+      "comment" : "Subjects list empty state description.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add the subjects you study. Lessons use them."
+          }
+        }
+      }
+    },
+    "editor.subjects.empty.title" : {
+      "comment" : "Subjects list empty state title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No subjects yet"
+          }
+        }
+      }
+    },
+    "editor.subjects.footer" : {
+      "comment" : "Footer of the subjects list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subjects are listed alphabetically."
+          }
+        }
+      }
+    },
+    "editor.subjects.title" : {
+      "comment" : "Navigation title of the subjects list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subjects"
+          }
+        }
+      }
+    },
+    "editor.terms.add" : {
+      "comment" : "Button that adds a term.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Term"
+          }
+        }
+      }
+    },
+    "editor.terms.defaultName" : {
+      "comment" : "Default name of a newly added term.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Term"
+          }
+        }
+      }
+    },
+    "editor.terms.empty.footer" : {
+      "comment" : "Footer of the terms section when there are no terms.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lessons can be limited to a term, for example a semester course."
+          }
+        }
+      }
+    },
+    "editor.terms.end" : {
+      "comment" : "Date picker label: last day.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ends"
+          }
+        }
+      }
+    },
+    "editor.terms.footer" : {
+      "comment" : "Footer of the terms section when terms exist.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terms with a lock are used by lessons and can't be removed."
+          }
+        }
+      }
+    },
+    "editor.terms.header" : {
+      "comment" : "Section header: semesters.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terms"
+          }
+        }
+      }
+    },
+    "editor.terms.inUse" : {
+      "comment" : "Accessibility label of the lock on a term that lessons depend on.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Used by lessons, can't be removed"
+          }
+        }
+      }
+    },
+    "editor.terms.issue.range" : {
+      "comment" : "Inline error on a term or break row.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The end date is before the start date."
+          }
+        }
+      }
+    },
+    "editor.terms.name" : {
+      "comment" : "Term name input label.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        }
+      }
+    },
+    "editor.terms.open" : {
+      "comment" : "Button that opens the terms & breaks editor.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terms and Breaks"
+          }
+        }
+      }
+    },
+    "editor.terms.open.footer" : {
+      "comment" : "Footer under the terms button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Semesters, holidays and exam periods."
+          }
+        }
+      }
+    },
+    "editor.terms.remove" : {
+      "comment" : "Accessibility label of the remove-term button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Term"
+          }
+        }
+      }
+    },
+    "editor.terms.start" : {
+      "comment" : "Date picker label: first day.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starts"
+          }
+        }
+      }
+    },
+    "editor.terms.title" : {
+      "comment" : "Navigation title of the terms & breaks editor.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terms and Breaks"
+          }
+        }
+      }
+    },
+    "editor.terms.unavailable" : {
+      "comment" : "Shown when the terms editor is opened without a timetable.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There is no timetable to edit."
+          }
+        }
+      }
+    },
+    "editor.time" : {
+      "comment" : "Picker label: bell schedule or free-form times.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesson times"
+          }
+        }
+      }
+    },
+    "editor.time.bell" : {
+      "comment" : "Time structure option: lessons follow numbered periods.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bell schedule"
+          }
+        }
+      }
+    },
+    "editor.time.editBell" : {
+      "comment" : "Button that opens the bell schedule editor.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Bell Schedule"
+          }
+        }
+      }
+    },
+    "editor.time.footer" : {
+      "comment" : "Footer of the time structure section.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A bell schedule gives numbered periods. Free times suit universities."
+          }
+        }
+      }
+    },
+    "editor.time.free" : {
+      "comment" : "Time structure option: each lesson has its own start and end time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free times"
+          }
+        }
+      }
+    },
+    "editor.time.freeMinutes" : {
+      "comment" : "Stepper label: default lesson length for free times.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default length (minutes)"
+          }
+        }
+      }
+    },
+    "editor.time.header" : {
+      "comment" : "Section header.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time structure"
+          }
+        }
+      }
+    },
+    "editor.time.switchFooter" : {
+      "comment" : "Footer when switching a free-times timetable to a bell schedule.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save first, then edit the new bell schedule."
+          }
+        }
+      }
+    },
+    "editor.timetable.days.footer" : {
+      "comment" : "Footer under the school-day toggles.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose the days that appear in this timetable."
+          }
+        }
+      }
+    },
+    "editor.timetable.emoji" : {
+      "comment" : "Timetable emoji input label.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Emoji"
+          }
+        }
+      }
+    },
+    "editor.timetable.general" : {
+      "comment" : "Timetable settings: section header (name, emoji, days).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General"
+          }
+        }
+      }
+    },
+    "editor.timetable.issue.noDays" : {
+      "comment" : "Explanation why Save is disabled.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose at least one school day."
+          }
+        }
+      }
+    },
+    "editor.timetable.issue.noName" : {
+      "comment" : "Explanation why Save is disabled.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a name."
+          }
+        }
+      }
+    },
+    "editor.timetable.issue.noSchoolDays" : {
+      "comment" : "Explanation why Save is disabled.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose at least one school day for the day cycle."
+          }
+        }
+      }
+    },
+    "editor.timetable.name" : {
+      "comment" : "Timetable name input label.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        }
+      }
+    },
+    "editor.timetable.title" : {
+      "comment" : "Navigation title of the timetable settings editor.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timetable Settings"
+          }
+        }
+      }
+    },
+    "editor.timetable.unavailable" : {
+      "comment" : "Shown when the timetable editor is opened without a timetable.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There is no timetable to edit."
+          }
+        }
+      }
+    },
+    "editor.timetables.actions" : {
+      "comment" : "Accessibility label of the per-row action menu.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timetable actions"
+          }
+        }
+      }
+    },
+    "editor.timetables.active" : {
+      "comment" : "Badge on the timetable that is currently shown.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Active"
+          }
+        }
+      }
+    },
+    "editor.timetables.add" : {
+      "comment" : "Toolbar button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Timetable"
+          }
+        }
+      }
+    },
+    "editor.timetables.copyName" : {
+      "comment" : "Name of a duplicated timetable. %@ = the original name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ copy"
+          }
+        }
+      }
+    },
+    "editor.timetables.delete" : {
+      "comment" : "Menu action and confirmation button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Timetable"
+          }
+        }
+      }
+    },
+    "editor.timetables.delete.note" : {
+      "comment" : "Explanation in the delete-timetable confirmation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This can't be undone. Homework and exams are kept, but they lose their link to this timetable."
+          }
+        }
+      }
+    },
+    "editor.timetables.delete.title" : {
+      "comment" : "Title of the delete-timetable confirmation sheet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete this timetable?"
+          }
+        }
+      }
+    },
+    "editor.timetables.duplicate" : {
+      "comment" : "Menu action: copy the timetable with all its lessons.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicate"
+          }
+        }
+      }
+    },
+    "editor.timetables.edit" : {
+      "comment" : "Menu action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Settings"
+          }
+        }
+      }
+    },
+    "editor.timetables.empty.message" : {
+      "comment" : "Empty state description.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create a timetable to get started."
+          }
+        }
+      }
+    },
+    "editor.timetables.empty.title" : {
+      "comment" : "Empty state title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No timetables"
+          }
+        }
+      }
+    },
+    "editor.timetables.footer" : {
+      "comment" : "Footer of the timetables list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag to reorder. Tap a timetable to edit its settings."
+          }
+        }
+      }
+    },
+    "editor.timetables.last.footer" : {
+      "comment" : "Explains why delete is disabled for the only timetable.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabula needs at least one timetable, so the last one can't be deleted. Reset it to clear its lessons instead."
+          }
+        }
+      }
+    },
+    "editor.timetables.limit" : {
+      "comment" : "Shown when no more timetables can be added. %lld = limit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your plan includes %lld timetables."
+          }
+        }
+      }
+    },
+    "editor.timetables.new.copy" : {
+      "comment" : "Starting point option: copy the active timetable's bell schedule.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Same bell schedule as the current timetable"
+          }
+        }
+      }
+    },
+    "editor.timetables.new.footer" : {
+      "comment" : "Footer of the new timetable sheet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The new timetable becomes the one that is shown."
+          }
+        }
+      }
+    },
+    "editor.timetables.new.free" : {
+      "comment" : "Starting point option: lessons with their own start and end times.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free times"
+          }
+        }
+      }
+    },
+    "editor.timetables.new.template" : {
+      "comment" : "Starting point option: a preset bell schedule.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard school day"
+          }
+        }
+      }
+    },
+    "editor.timetables.new.title" : {
+      "comment" : "Navigation title of the new timetable sheet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Timetable"
+          }
+        }
+      }
+    },
+    "editor.timetables.reset" : {
+      "comment" : "Menu action and confirmation button: delete all lessons of the timetable but keep the timetable.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Timetable"
+          }
+        }
+      }
+    },
+    "editor.timetables.reset.note" : {
+      "comment" : "Explanation in the reset confirmation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The timetable, its subjects, bell schedules and terms stay. Only the lessons are cleared."
+          }
+        }
+      }
+    },
+    "editor.timetables.reset.title" : {
+      "comment" : "Title of the reset confirmation sheet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset this timetable?"
+          }
+        }
+      }
+    },
+    "editor.timetables.setActive" : {
+      "comment" : "Menu action: make the timetable the active one.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show This Timetable"
+          }
+        }
+      }
+    },
+    "editor.timetables.title" : {
+      "comment" : "Navigation title of the timetables manager.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timetables"
+          }
+        }
+      }
+    },
+    "editor.unavailable.title" : {
+      "comment" : "Title shown in an editor sheet that was opened for something that does not exist (e.g. no timetable).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing to edit"
+          }
+        }
+      }
+    },
+    "editor.validity" : {
+      "comment" : "Picker label: when the lesson takes place (always / selected terms / date range).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applies"
+          }
+        }
+      }
+    },
+    "editor.validity.always" : {
+      "comment" : "Validity option.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Always"
+          }
+        }
+      }
+    },
+    "editor.validity.from" : {
+      "comment" : "Date picker label: first day of the validity range.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From"
+          }
+        }
+      }
+    },
+    "editor.validity.header" : {
+      "comment" : "Section header of the lesson validity rows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applies"
+          }
+        }
+      }
+    },
+    "editor.validity.range" : {
+      "comment" : "Validity option.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date range"
+          }
+        }
+      }
+    },
+    "editor.validity.terms" : {
+      "comment" : "Validity option.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selected terms"
+          }
+        }
+      }
+    },
+    "editor.validity.terms.none" : {
+      "comment" : "Shown in the lesson editor when validity 'terms' is chosen but the timetable has no terms.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There are no terms yet. Add terms in the timetable settings."
+          }
+        }
+      }
+    },
+    "editor.validity.to" : {
+      "comment" : "Date picker label: last day of the validity range.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Until"
+          }
+        }
+      }
+    },
+    "editor.validity.unknown" : {
+      "comment" : "Lesson editor: the stored validity is unknown to this app version and is preserved.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This lesson uses a rule from a newer version of Tabula. It stays unchanged."
+          }
+        }
+      }
+    },
+    "editor.view" : {
+      "comment" : "Picker label: the view the timetable opens in.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default view"
+          }
+        }
+      }
+    },
+    "editor.view.agenda" : {
+      "comment" : "View name: agenda list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agenda"
+          }
+        }
+      }
+    },
+    "editor.view.day" : {
+      "comment" : "View name: a single day.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Day"
+          }
+        }
+      }
+    },
+    "editor.view.grid" : {
+      "comment" : "View name: periods by days grid.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grid"
+          }
+        }
+      }
+    },
+    "editor.view.tiles" : {
+      "comment" : "View name: big tiles.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiles"
+          }
+        }
+      }
+    },
+    "editor.view.timeBlocks" : {
+      "comment" : "View name: week with proportional time blocks.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Week"
+          }
+        }
+      }
+    },
     "entityType.bellSchedule" : {
       "comment" : "Entity type name shown as a standalone label (e.g. next to a data-check message); never inserted into a sentence.",
       "extractionState" : "manual",

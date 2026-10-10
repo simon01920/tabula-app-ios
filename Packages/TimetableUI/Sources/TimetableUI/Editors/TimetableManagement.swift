@@ -300,6 +300,18 @@ public enum TimetableManagement {
         return (.batch(steps, label: "duplicate timetable"), newID)
     }
 
+    // MARK: Lessons
+
+    /// Deletes one lesson together with the day changes that refer to it; tasks lose their link to it.
+    public static func deleteLessonMutation(_ id: Lesson.ID, in database: TabulaDatabase) -> DatabaseMutation {
+        .batch(lessonRemovalSteps([id], in: database), label: "delete lesson")
+    }
+
+    /// How many day changes deleting the lesson removes.
+    public static func lessonChangeCount(_ id: Lesson.ID, in database: TabulaDatabase) -> Int {
+        database.overrides.filter { !$0.isDeleted && refersToLesson($0.change, in: [id]) }.count
+    }
+
     // MARK: Subjects
 
     /// What deleting a subject removes: its lessons, the changes that refer to it; tasks/exams lose the link.

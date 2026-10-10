@@ -61,12 +61,14 @@ public struct DayChangeDraft: Equatable, Sendable {
     public var extraRoom: String
     public var extraTeacher: String
 
-    /// A fresh draft for `date`; `lessonID` pre-selects a lesson (the user tapped one) and starts with "cancel lesson".
-    public init(timetable: Timetable, date: LocalDate, lessonID: Lesson.ID?, schedule: BellSchedule?, id: ScheduleOverride.ID) {
+    /// A fresh draft for `date`; `lessonID` pre-selects a lesson (the user tapped one). `kind` defaults to
+    /// "change lesson" when a lesson is selected, else "cancel day".
+    public init(timetable: Timetable, date: LocalDate, lessonID: Lesson.ID?, kind: Kind? = nil, schedule: BellSchedule?,
+                id: ScheduleOverride.ID) {
         overrideID = id
         timetableID = timetable.id
         self.date = date
-        kind = lessonID == nil ? .cancelDay : .cancelLesson
+        self.kind = kind ?? (lessonID == nil ? .cancelDay : .changeLesson)
         self.lessonID = lessonID
         substituteSubjectID = nil
         room = ""

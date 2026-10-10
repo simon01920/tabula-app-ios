@@ -444,7 +444,7 @@ struct DayChangeDraftTests {
 
     @Test func startsWithTheRightKind() {
         #expect(draft().kind == .cancelDay)
-        #expect(draft(lessonID: scenario.database.lessons[0].id).kind == .cancelLesson)
+        #expect(draft(lessonID: scenario.database.lessons[0].id).kind == .changeLesson)
     }
 
     @Test func eachKindBuildsItsOverrideAndValidates() throws {

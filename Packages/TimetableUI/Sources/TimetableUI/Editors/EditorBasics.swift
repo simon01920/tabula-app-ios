@@ -58,6 +58,13 @@ public enum LocalDateBridge {
         return calendar
     }
 
+    /// The same calendar with `locale` (for `.environment(\.calendar, …)` so the picker formats like the app).
+    public static func calendar(locale: Locale) -> Calendar {
+        var calendar = Self.calendar
+        calendar.locale = locale
+        return calendar
+    }
+
     /// The instant whose UTC wall clock is `date` at `time`.
     public static func instant(_ date: LocalDate, _ time: LocalTime = .midnight) -> Date {
         var parts = DateComponents()
