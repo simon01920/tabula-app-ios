@@ -829,7 +829,7 @@
 "health.timeSensitive.notSupported": "In dieser App-Version nicht verfügbar: Zeitkritische Erinnerungen kommen wie normale an.",
 "health.alarms.title": "Laute Alarme",
 "health.alarms.authorized": "Erlaubt.",
-"health.alarms.denied": "In den Einstellungen deaktiviert. Statt lauter Alarme kommen zeitkritische Mitteilungen.",
+"health.alarms.denied": "In den Einstellungen deaktiviert. Statt lauter Alarme kommen Mitteilungen: zeitkritisch, wo verfügbar, sonst normal.",
 "health.alarms.notDetermined": "Noch nicht erlaubt. Tabula fragt, wenn du einen lauten Alarm wählst.",
 "health.alarms.unavailable": "Auf diesem Gerät nicht verfügbar.",
 "health.focus.title": "Fokus",

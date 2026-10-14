@@ -829,7 +829,7 @@
 "health.timeSensitive.notSupported": "Niedostępne w tej wersji aplikacji: pilne przypomnienia przychodzą jak zwykłe.",
 "health.alarms.title": "Głośne alarmy",
 "health.alarms.authorized": "Dozwolone.",
-"health.alarms.denied": "Wyłączone w Ustawieniach. Zamiast głośnych alarmów przychodzą pilne powiadomienia.",
+"health.alarms.denied": "Wyłączone w Ustawieniach. Zamiast głośnych alarmów przychodzą powiadomienia: pilne, jeśli to możliwe, w przeciwnym razie zwykłe.",
 "health.alarms.notDetermined": "Jeszcze niedozwolone. Tabula zapyta, gdy wybierzesz głośny alarm.",
 "health.alarms.unavailable": "Niedostępne na tym urządzeniu.",
 "health.focus.title": "Skupienie",

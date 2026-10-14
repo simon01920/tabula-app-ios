@@ -14,6 +14,8 @@ public actor InMemoryNotificationCenterClient: NotificationCenterClient {
     public private(set) var foreign: [String: PendingNotificationInfo] = [:]
     public private(set) var categories: [NotificationCategorySpec] = []
     public private(set) var removedDelivered: [String] = []
+    /// Delivered notifications still shown in Notification Center.
+    public private(set) var delivered: [String: PendingNotificationInfo] = [:]
     public private(set) var addCount = 0
     public private(set) var removeCount = 0
     public var snapshot: NotificationSettingsSnapshot
@@ -50,7 +52,12 @@ public actor InMemoryNotificationCenterClient: NotificationCenterClient {
         removeCount += ids.count
     }
 
-    public func removeDelivered(ids: [String]) { removedDelivered += ids }
+    public func deliveredNotifications() -> [PendingNotificationInfo] { delivered.values.sorted { $0.id < $1.id } }
+
+    public func removeDelivered(ids: [String]) {
+        removedDelivered += ids
+        for id in ids { delivered[id] = nil }
+    }
     public func settings() -> NotificationSettingsSnapshot { snapshot }
 
     public func requestAuthorization() -> NotificationAuthorization {
@@ -64,13 +71,20 @@ public actor InMemoryNotificationCenterClient: NotificationCenterClient {
     public func seedForeign(_ info: PendingNotificationInfo) { foreign[info.id] = info }
     public func setFailing(_ ids: Set<String>) { failingIDs = ids }
     public func setAuthorization(_ value: NotificationAuthorization) { snapshot.authorization = value }
-    /// Simulates delivery: the request leaves the pending list.
-    public func deliver(_ id: String) { requests[id] = nil }
+    /// Simulates delivery: the request leaves the pending list and is shown in Notification Center.
+    public func deliver(_ id: String) {
+        if let request = requests[id] {
+            delivered[id] = PendingNotificationInfo(id: id, userInfo: request.userInfo)
+        }
+        requests[id] = nil
+    }
 }
 
 /// Fake AlarmKit.
 public actor InMemoryAlarmClient: AlarmClient {
     public private(set) var alarms: [UUID: AlarmSpec] = [:]
+    /// Daemon state per alarm (absent = `.scheduled`).
+    public private(set) var states: [UUID: ScheduledAlarmInfo.State] = [:]
     /// Alarms scheduled by "someone else" (the debug probe).
     public private(set) var foreign: Set<UUID> = []
     public private(set) var cancelled: [UUID] = []
@@ -95,19 +109,23 @@ public actor InMemoryAlarmClient: AlarmClient {
         return state
     }
 
-    public func scheduledAlarmIDs() -> [UUID]? { Array(alarms.keys) + Array(foreign) }
+    public func scheduledAlarms() -> [ScheduledAlarmInfo]? {
+        (Array(alarms.keys) + Array(foreign)).map { ScheduledAlarmInfo(id: $0, state: states[$0] ?? .scheduled) }
+    }
 
     public func schedule(_ alarm: AlarmSpec) -> AlarmScheduleOutcome {
         guard state == .authorized else { return .notAuthorized }
         let isReplacement = alarms[alarm.id] != nil
         if let limit, !isReplacement, alarms.count + foreign.count >= limit { return .limitReached }
         alarms[alarm.id] = alarm
+        states[alarm.id] = nil
         scheduleCount += 1
         return .scheduled
     }
 
     public func cancel(id: UUID) {
         alarms[id] = nil
+        states[id] = nil
         foreign.remove(id)
         cancelled.append(id)
     }
@@ -136,5 +154,11 @@ public actor InMemoryAlarmClient: AlarmClient {
     public func setLimit(_ value: Int?) { limit = value }
     public func seedForeign(_ id: UUID) { foreign.insert(id) }
     /// Simulates the alarm firing and being stopped (one-shot alarms leave the daemon, ALARMKIT.md F16).
-    public func fire(_ id: UUID) { alarms[id] = nil }
+    public func fire(_ id: UUID) {
+        alarms[id] = nil
+        states[id] = nil
+    }
+
+    /// Simulates a daemon state change: `.alerting` (ringing), `.countdown` (snoozed), `.paused`.
+    public func setState(_ id: UUID, _ state: ScheduledAlarmInfo.State) { states[id] = state }
 }

@@ -829,7 +829,7 @@
 "health.timeSensitive.notSupported": "Није доступно у овој верзији апликације: хитни подсетници стижу као обични.",
 "health.alarms.title": "Гласни аларми",
 "health.alarms.authorized": "Дозвољено.",
-"health.alarms.denied": "Искључено у Подешавањима. Уместо гласних аларма стижу хитна обавештења.",
+"health.alarms.denied": "Искључено у Подешавањима. Уместо гласних аларма стижу обавештења: хитна где је могуће, иначе обична.",
 "health.alarms.notDetermined": "Још није дозвољено. Tabula ће питати када изаберете гласан аларм.",
 "health.alarms.unavailable": "Није доступно на овом уређају.",
 "health.focus.title": "Фокус",

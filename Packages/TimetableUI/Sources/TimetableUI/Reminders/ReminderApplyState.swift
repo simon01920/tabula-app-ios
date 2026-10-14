@@ -28,6 +28,26 @@ public struct LearnedAlarmLimit: Hashable, Sendable, Codable {
     }
 }
 
+/// What rendered notification text depends on besides the plan: when any of it changes, every pending planner
+/// notification is replaced so its language, date/time format and wording are current (QA Stage A finding 2).
+public struct ReminderRenderSignature: Hashable, Sendable, Codable {
+    /// The bundle's chosen localization (`Bundle.main.preferredLocalizations.first`).
+    public var language: String
+    /// The formatter's locale identifier.
+    public var localeIdentifier: String
+    /// `AppSettings.hourCycle.rawValue`.
+    public var hourCycle: String
+    /// The plan's zone identifier.
+    public var timeZoneIdentifier: String
+
+    public init(language: String, localeIdentifier: String, hourCycle: String, timeZoneIdentifier: String) {
+        self.language = language
+        self.localeIdentifier = localeIdentifier
+        self.hourCycle = hourCycle
+        self.timeZoneIdentifier = timeZoneIdentifier
+    }
+}
+
 /// Counts and problems of one apply pass (debug screen, health check).
 public struct ReminderApplyReport: Hashable, Sendable, Codable {
     public var notificationsAdded: Int
@@ -44,10 +64,15 @@ public struct ReminderApplyReport: Hashable, Sendable, Codable {
     public var alarmFailures: [String]
     /// `true` when AlarmKit answered `maximumLimitReached` in this run.
     public var alarmLimitReached: Bool
+    /// In-progress (ringing / snoozed / paused) alarms kept despite not being in the new plan.
+    public var alarmsInProgressKept: Int
+    /// `true` when the render signature changed and every planner notification was replaced.
+    public var renderSignatureChanged: Bool
 
     public init(notificationsAdded: Int = 0, notificationsRemoved: Int = 0, notificationsUnchanged: Int = 0,
                 alarmsScheduled: Int = 0, alarmsCancelled: Int = 0, alarmsUnchanged: Int = 0, staleSnoozesRemoved: Int = 0,
-                notificationFailures: [String] = [], alarmFailures: [String] = [], alarmLimitReached: Bool = false) {
+                notificationFailures: [String] = [], alarmFailures: [String] = [], alarmLimitReached: Bool = false,
+                alarmsInProgressKept: Int = 0, renderSignatureChanged: Bool = false) {
         self.notificationsAdded = notificationsAdded
         self.notificationsRemoved = notificationsRemoved
         self.notificationsUnchanged = notificationsUnchanged
@@ -58,6 +83,8 @@ public struct ReminderApplyReport: Hashable, Sendable, Codable {
         self.notificationFailures = notificationFailures
         self.alarmFailures = alarmFailures
         self.alarmLimitReached = alarmLimitReached
+        self.alarmsInProgressKept = alarmsInProgressKept
+        self.renderSignatureChanged = renderSignatureChanged
     }
 
     /// `true` when nothing had to change.
@@ -70,7 +97,8 @@ public struct ReminderApplyReport: Hashable, Sendable, Codable {
 /// The adapter's persisted state.
 public struct AppliedReminderState: Hashable, Sendable, Codable {
     /// Bumped when the shape changes incompatibly (an unreadable state is treated as "nothing applied").
-    public static let currentVersion = 1
+    /// 2: `activeAlarms` and `renderSignature` (Stage A QA fixes).
+    public static let currentVersion = 2
 
     public var version: Int
     /// The plan as applied: only notifications/alarms that are really pending (failed adds are left out so the next
@@ -80,16 +108,24 @@ public struct AppliedReminderState: Hashable, Sendable, Codable {
     /// so an alarm can never exist without being in the ledger (a lost plan must not leave an orphan alarm ringing for
     /// a completed exam). Debug-probe and test alarms are never in it and therefore never cancelled by the diff.
     public var alarmLedger: [UUID]
+    /// Planner alarms that are past their fire time but still in the daemon (ringing, snoozed, paused). Kept so a
+    /// re-plan never cancels them unless their task/exam is no longer open; pruned when the daemon drops them.
+    public var activeAlarms: [PlannedAlarm]
+    /// The render signature of the applied notifications (`nil` before the first run).
+    public var renderSignature: ReminderRenderSignature?
     public var learnedAlarmLimit: LearnedAlarmLimit?
     public var lastReport: ReminderApplyReport?
     /// When the last run finished.
     public var lastRunAt: Date?
 
-    public init(plan: ReminderPlan? = nil, alarmLedger: [UUID] = [], learnedAlarmLimit: LearnedAlarmLimit? = nil,
+    public init(plan: ReminderPlan? = nil, alarmLedger: [UUID] = [], activeAlarms: [PlannedAlarm] = [],
+                renderSignature: ReminderRenderSignature? = nil, learnedAlarmLimit: LearnedAlarmLimit? = nil,
                 lastReport: ReminderApplyReport? = nil, lastRunAt: Date? = nil) {
         version = Self.currentVersion
         self.plan = plan
         self.alarmLedger = alarmLedger.sorted { $0.uuidString < $1.uuidString }
+        self.activeAlarms = activeAlarms
+        self.renderSignature = renderSignature
         self.learnedAlarmLimit = learnedAlarmLimit
         self.lastReport = lastReport
         self.lastRunAt = lastRunAt

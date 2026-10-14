@@ -829,7 +829,7 @@
 "health.timeSensitive.notSupported": "Az alkalmazás ezen verziójában nem érhető el: az időérzékeny emlékeztetők normál emlékeztetőként érkeznek.",
 "health.alarms.title": "Hangos riasztások",
 "health.alarms.authorized": "Engedélyezve.",
-"health.alarms.denied": "Kikapcsolva a Beállításokban. A hangos riasztások helyett időérzékeny értesítések érkeznek.",
+"health.alarms.denied": "Kikapcsolva a Beállításokban. A hangos riasztások helyett értesítések érkeznek: ha lehet, időérzékenyek, egyébként normálok.",
 "health.alarms.notDetermined": "Még nincs engedélyezve. A Tabula akkor kérdez rá, amikor hangos riasztást választasz.",
 "health.alarms.unavailable": "Ezen az eszközön nem érhető el.",
 "health.focus.title": "Fókusz",

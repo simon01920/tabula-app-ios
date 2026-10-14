@@ -2,7 +2,7 @@
 // UserNotifications. No decisions here (the planner and `ReminderEngine` make them).
 // APIs (developer.apple.com DocC JSON, checked 2026-10-10; docs/ENVIRONMENT.md §21):
 //   UNUserNotificationCenter.current(), pendingNotificationRequests() async, add(_:) async throws,
-//   removePendingNotificationRequests(withIdentifiers:), removeDeliveredNotifications(withIdentifiers:),
+//   removePendingNotificationRequests(withIdentifiers:), deliveredNotifications() async, removeDeliveredNotifications(withIdentifiers:),
 //   notificationSettings() async, requestAuthorization(options:) async throws -> Bool, setNotificationCategories(_:);
 //   UNMutableNotificationContent (title, subtitle, body, sound, interruptionLevel (iOS 15), threadIdentifier,
 //   categoryIdentifier, userInfo (plist types only), targetContentIdentifier); UNNotificationSound.default;
@@ -56,6 +56,11 @@ struct LiveNotificationCenterClient: NotificationCenterClient {
 
     func removePending(ids: [String]) async {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ids)
+    }
+
+    func deliveredNotifications() async -> [PendingNotificationInfo] {
+        let delivered = await UNUserNotificationCenter.current().deliveredNotifications()
+        return delivered.map { PendingNotificationInfo(id: $0.request.identifier, userInfo: Self.strings($0.request.content.userInfo)) }
     }
 
     func removeDelivered(ids: [String]) async {

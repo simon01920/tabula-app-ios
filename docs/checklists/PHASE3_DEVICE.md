@@ -146,6 +146,135 @@ Implements NOTIFICATIONS.md "Test matrix (on device)", extended with the Phase 0
 
 ---
 
+## B2. Exams tab (Stage B2) — device only; the UI was written without being seen
+
+Setup: seed or real data. Useful states: (1) no exams, (2) one exam, (3) exams today / tomorrow / in 3 days / in 6 days /
+in 20 days, (4) completed and past exams, (5) university profile with 3+ exams and with an exam-period break
+(Terms & breaks editor, kind "Exam period"), (6) a timetable with room/building/notes switched off. Repeat key rows with
+Dynamic Type AX5, dark mode, German/Hungarian (long), Japanese/Chinese, and VoiceOver. Launch routes for screenshots:
+`exams`, `exams.history`, `exams.detail`, `exams.editor`, `exams.editor-new`.
+
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| B2.1 | Exams tab with no exams | Empty state (graduation cap, "No Exams Yet", explanation) + "Add Exam" button; "+" in the top right | | |
+| B2.2 | Add one exam 20 days away | Big card on top: "Next Exam", "in 20 days" in large type, subject badge, title, type, date, time/room only if set; neutral (grey) frame | | |
+| B2.3 | Change the date to 6 / 3 / 1 / 0 days away | Frame colour escalates (accent, orange, red, red; thicker from 3 days), icon changes, countdown text reads "in 6 days", "in 3 days", "Tomorrow", "Today" — meaning is readable without colour (try greyscale filter) | | |
+| B2.4 | Add several more exams across weeks | Below the card: sections "This week" / "Next week" / "Week of 2 Nov"; next exam is not repeated; order by date then start time (exam without start time after those with) | | |
+| B2.5 | First weekday Sunday vs Monday with an exam on a Sunday | Lands in the week group the chosen first weekday implies | | |
+| B2.6 | Row content | Order: when (icon + text), title, "Subject · Type", date, time, room/building, topics preview (first 3, "…" if more). Absent fields leave no blank line, dash or placeholder | | |
+| B2.7 | Timetable field visibility: switch Room off (timetable editor) | Room disappears from card, rows, detail, editor; its stored value is not lost (switch on again: back). Same for Building and Notes | | |
+| B2.8 | Swipe a row left | "Mark Done" (green); the exam moves to History; if it was the next exam the following one becomes the card | | |
+| B2.9 | History segment | Completed and past exams, newest first, checkmark for completed; swipe: "Mark Done" (past, open) or "Mark as Not Done" (completed; future ones return to Upcoming) | | |
+| B2.10 | History with nothing in it | "No Past Exams" empty state inside the list; segment control stays | | |
+| B2.11 | Only past exams exist, Upcoming segment | "No Upcoming Exams" empty state | | |
+| B2.12 | University profile, 2+ exams, no exam-period break | One "Exam period" section with the range first-last exam and "n exams" | | |
+| B2.13 | Add an exam-period break (Terms & breaks, kind Exam period) around two exams | Section titled with the break's name, dates, count, "In progress" badge while today is inside; those exams are listed under it (not under weeks); a break of another timetable does not claim exams of this one | | |
+| B2.14 | Tap an exam | Detail pushed: title, status/countdown, date, time, type, subject, room, building (only existing ones), topics list, notes, Mark Done button; "Edit" top right | | |
+| B2.15 | Detail, Edit, Delete Exam, confirm | Editor closes, detail pops back to the list; exam gone | | |
+| B2.16 | Editor: empty title | Save disabled, hint "Enter a title…"; enables with a title | | |
+| B2.17 | Editor: start time on, end time on, set end before start | Red "end time must be after the start time", Save disabled; fixing re-enables. Turning start off hides end and stores neither | | |
+| B2.18 | Editor topics: add 3, drag to reorder, delete one, leave one blank | Drag handles and delete controls are always visible; blank topic is dropped on save; order kept | | |
+| B2.19 | Editor: Cancel after a change | "Discard changes?" confirmation; swipe-down blocked while dirty; Cancel without change closes at once | | |
+| B2.20 | Editor: reminder section | Shows the (stub) reminder row until stage B4; saving keeps an existing override unchanged | | |
+| B2.21 | Exam with a type outside the 7 known (e.g. imported "viva") | Shown with its own word; the editor keeps it selectable | | |
+| B2.22 | Notification tap for an exam (section A) | Exams tab + detail sheet of that exam ("Done" closes it; "Mark Done" works) | | |
+| B2.23 | VoiceOver on card / row | One element: "Title, Subject, Type, Tomorrow, Tuesday 20 October 2026, 10:00 - 10:45, Room X"; swipe actions offered as actions; week/period headers have header trait | | |
+| B2.24 | Dynamic Type AX5, de, ja | Card, rows, editor wrap without clipping; toolbar "+" and all buttons at least 44 pt; segment control usable | | |
+| B2.25 | Dark mode / Increase Contrast | Card frame and fill legible; subject badge text legible; no text drawn on the escalation colour | | |
+| B2.26 | Midnight rollover with the Exams tab open | Countdown texts update ("Tomorrow" becomes "Today") after the day changes / app becomes active | | |
+| B2.27 | Plurals: exam 2, 5, 21 days away in sk, pl, uk, cs | Grammatically correct forms | | |
+## B4. Reminder settings, rule editor, override section, permission explainer, health check (Stage B4)
+UI written without being seen (no Simulator): check layout, wording and behaviour on the device. Routes for CI screenshots:
+`settings.reminders`, `settings.reminder-rule` (homework rule), `settings.reminder-health`, `reminders.permission`.
+Repeat the visual checks in: empty (no rules) / normal / long text, Dynamic Type XXL and AX5, dark mode, German
+(longest strings), Japanese or Chinese, Slovak (plural forms 1/2/5 minutes), VoiceOver.
+
+### B4.1 Settings → Reminders
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| B4.1.1 | Open Settings → Reminders (fresh install, no permission yet) | No system prompt appears. Rows: health link, one switch per kind (Homework, Assignments, Exams, Before a lesson/class, To-dos; "Pack your bag" only if the bring list is an enabled lesson field), Time Sensitive, loud alarms, quiet hours, explanations | | |
+| B4.1.2 | Switch Homework on while notifications are "not determined" | Pre-explainer sheet opens (no system prompt yet). "Not Now" closes it and keeps the rule on | | |
+| B4.1.3 | In the sheet tap "Allow Notifications" | System prompt appears; sheet closes; health shows Notifications OK after allowing | | |
+| B4.1.4 | Deny in the prompt, switch another kind on | No explainer again (permission is determined); health row says "Turned off in Settings" with Open Settings | | |
+| B4.1.5 | Row under each enabled kind: "Times and delivery" | Opens the rule editor, 44 pt row | | |
+| B4.1.6 | Switch a kind off and on | Rule keeps its edited values (rule disabled, not deleted); summary line shows times and a non-Standard tier name | | |
+| B4.1.7 | Time Sensitive switch + stepper (5–240 min) | Footer explains: breaks through Focus, not the silent switch; stepper text uses correct plural (sk: 1 minúta / 2 minúty / 5 minút) | | |
+| B4.1.8 | Loud alarms switch on | Policy on, AlarmKit prompt appears (own permission); deny: note "Turned off in Settings…"; switch off turns the policy off | | |
+| B4.1.9 | Global quiet hours on, set 22:00 to 07:00 | Two time rows appear; a reminder planned inside the window moves to 07:00 (Debug screen plan / next notification); off removes rows | | |
+| B4.1.10 | Read-only store | Controls disabled | | |
+
+### B4.2 Rule editor (Settings → Reminders → kind → Times and delivery)
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| B4.2.1 | Open the editor of a kind with no rule yet | "Remind me" off, nothing else shown; switching on creates the rule with the profile preset's times | | |
+| B4.2.2 | Add Reminder Time menu | Presets (15 minutes, 1 hour, on the day at 07:00, 1/3/7 days before at 18:00) not already present, plus "Custom Time…"; adding the same twice is impossible | | |
+| B4.2.3 | Tap a time row | Editor: type picker, amount stepper (plural text updates), clock time for "days before"; back arrow keeps the change | | |
+| B4.2.4 | Swipe a time row to delete, delete all | Footer warns "Add at least one reminder time"; no crash, rule plans nothing | | |
+| B4.2.5 | Follow-up: None / A while later / Next morning | Delay picker (30 min to 6 h) or time row appears; footer says "only if not done" and never loud | | |
+| B4.2.6 | Tier rows: Standard, Time Sensitive, Loud alarm | Each shows title + honest explanation; selected row has check mark and VoiceOver "selected"; Time Sensitive footer shows the N-minute policy (or "turned off" when the policy is off) | | |
+| B4.2.7 | Select Loud alarm | Policy turns on, AlarmKit prompt; after deny the denied note and Open Settings appear. Plan (Debug screen) contains an alarm only after allowing | | |
+| B4.2.8 | Quiet hours for this kind | Toggle and two time rows; a reminder inside moves to the end, skipped when after the due time | | |
+| B4.2.9 | After any edit | The rule is user-made (alarms possible); Debug screen shows a re-plan within about 1 s | | |
+
+### B4.3 Per-item override (inside the task and exam editors, after B1/B2 embed it)
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| B4.3.1 | Open a task editor, section "Reminders" | "Use default reminders" on; footer lists the default (e.g. "1 day before, at 18:00"); if the kind is off: "No default reminders are switched on…" | | |
+| B4.3.2 | Turn "Use default" off | Rows: Remind me, Times (Same as default / Custom), Delivery, Follow-up. First time with notifications "not determined": pre-explainer sheet | | |
+| B4.3.3 | Remind me off | Other rows disappear; saving the task plans no reminders for it | | |
+| B4.3.4 | Times: Custom | Seeds with the default times; add/remove/edit as in B4.2 (rows push inside the sheet's navigation) | | |
+| B4.3.5 | Delivery: Loud alarm | Policy on + AlarmKit prompt; the item's reminder rings at the chosen time (A4) | | |
+| B4.3.6 | Follow-up: Same as default / None / A while later / Next morning | Planner follows it (Debug screen) | | |
+| B4.3.7 | Turn "Use default" back on and save | `reminderOverride` is gone (default reminders apply again) | | |
+
+### B4.4 Pre-explainer sheet (`reminders.permission`)
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| B4.4.1 | Open it from the health check ("Allow Notifications" action) | Explains why and what arrives; buttons 44 pt+; nothing requested until "Allow Notifications" | | |
+| B4.4.2 | Open it while the permission is denied | Footer says notifications are off; primary button becomes "Open Settings" and opens the app's notification settings | | |
+| B4.4.3 | Cold launch | The sheet never appears at launch | | |
+
+### B4.5 Health check (`settings.reminder-health`)
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| B4.5.1 | Open it | Summary line plus rows; every row has a symbol AND a status word (OK / Info / Check / Problem); pull to refresh works | | |
+| B4.5.2 | Toggle Low Power Mode in Control Center, come back | Low Power row updates (warning) | | |
+| B4.5.3 | Turn Background App Refresh off in iOS Settings, return | Row shows the warning with "Open Settings" | | |
+| B4.5.4 | Change the notification permission in iOS Settings, return | Row follows; "Open Settings" lands on the app's notification settings page | | |
+| B4.5.5 | With a Loud-alarm rule and alarm permission not determined | Alarms row warns with "Allow Loud Alarms"; tapping asks AlarmKit | | |
+| B4.5.6 | Send Test Notification | "Sent. It arrives in a few seconds." then a banner after about 5 s (Standard) | | |
+| B4.5.7 | Send Test Alarm (only visible once alarms are allowed) | Rings after about 60 s with Stop/Snooze; result line says scheduled | | |
+| B4.5.8 | Create 70+ reminders (many tasks) | Scheduled row shows x of 64 and the "reminder limit" warning with explanation | | |
+| B4.5.9 | Silent mode / Focus rows | Readable at AX5; VoiceOver reads title, status word, detail as one element | | |
+
+Unverifiable without a device: the system permission prompts, delivery, Focus behaviour, whether the notification settings URL lands on the app's page, and every visual aspect.
+## B1. Tasks tab (Stage B1 — unverified on device; the UI was never run or seen)
+Seed launches: `-TabulaSeed secondary` (tasks due 14/15/16/19 Oct, one completed; none overdue/today at the reference time). Routes: `tasks`, `tasks.upcoming|overdue|completed`, `tasks.editor`, `tasks.editor-new`, `tasks.detail`.
+
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| B1.1 | Empty store: open Tasks | Empty state (icon, title, text); quick-add visible; no placeholders/dashes anywhere | | |
+| B1.2 | Quick-add "Homework", subject Maths | Row appears in Upcoming; footer before adding shows "Due <date>, at the subject's next lesson"; without subject "Due tomorrow"; due matches the next non-cancelled Maths lesson | | |
+| B1.3 | Segment chips | Counts correct; Overdue chip red with warning icon while it has tasks; chips scroll sideways in German/AX5 | | |
+| B1.4 | Row look | Circle in subject colour (outline when open, filled + checkmark when done), strikethrough when done; high/urgent badge with icon+text; "2/5", paperclip, repeat icons only when present; light subject colours still visible in dark mode | | |
+| B1.5 | Tap circle / swipe right | Task completes, moves to Completed; repeating task creates next occurrence; swipe again on Completed reopens | | |
+| B1.6 | Swipe left, Delete | Confirmation naming the task; Delete removes it, Cancel keeps it | | |
+| B1.7 | Filter by subject, sort by priority | List and counts follow; filtered-empty message when nothing matches; filter icon filled while active | | |
+| B1.8 | Make a task due today 08:00 (time passed) | Appears under Overdue; leave app open across a due time: moves within a minute | | |
+| B1.9 | Detail sheet | Title, subject, type, due (relative), priority (only if not Normal), repeat lines, notes only if set, subtasks tappable inline, Complete/Reopen, Delete, Edit | | |
+| B1.10 | Editor new: empty title | Save disabled, hint under title; Cancel with edits asks to discard; swipe-down blocked while dirty | | |
+| B1.11 | Due "Next lesson of the subject" with no subject / subject without lesson | Inline red messages, Save disabled; with lesson: resolved date shown, saved task has due date + link | | |
+| B1.12 | Repeat weekly Mon+Wed, every 2 weeks, end date before due | Error shown; fix; complete the task: next due follows ISO-week rule | | |
+| B1.13 | Subtasks: add, check, Reorder (drag handles), swipe delete | Order and checks persist after Save; reorder mode works inside the Form (unverified API behaviour) | | |
+| B1.14 | Reminder-override and attachments sections | Present (stubs or B3/B4); editing other fields does not lose them | | |
+| B1.15 | Edit task, delete in editor | Editor and detail close | | |
+| B1.16 | Notification tap on a task | Tasks tab with the detail sheet of that task | | |
+| B1.17 | VoiceOver on a row | One sentence (title, subject, due, priority, subtasks...); actions: open, mark done/not done, delete | | |
+| B1.18 | Dynamic Type AX5, dark mode, long title, ja/zh, German | No clipping, 44 pt targets, texts wrap; chips scroll | | |
+| B1.19 | Plurals sk/pl/uk/ro: "In 3 days", "5 days overdue", "Every 3 weeks" | Correct forms | | |
+
+---
+
 ## B3. Attachments (photos, files, links, voice notes)
 
 Nothing in this section has been seen running: the UI compiles (xtool, 0 warnings) but was never displayed. Storage

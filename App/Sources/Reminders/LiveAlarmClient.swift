@@ -1,5 +1,6 @@
 // The real `AlarmClient` (Phase 3 Stage A): fixed-time AlarmKit alarms for the planner's loud-alarm reminders.
 // APIs (developer.apple.com DocC JSON; docs/spikes/ALARMKIT.md §2, re-checked 2026-10-10):
+//   Alarm (.id, .state: Alarm.State .scheduled/.alerting/.countdown/.paused),
 //   AlarmManager.shared, .authorizationState, .requestAuthorization() async throws, .authorizationUpdates,
 //   .alarms { get throws }, .schedule(id:configuration:) async throws, .cancel(id:) throws,
 //   AlarmManager.AlarmError.maximumLimitReached, AlarmManager.AlarmConfiguration<M>.alarm(schedule:attributes:) /
@@ -38,9 +39,9 @@ struct LiveAlarmClient: AlarmClient {
         }
     }
 
-    func scheduledAlarmIDs() async -> [UUID]? {
+    func scheduledAlarms() async -> [ScheduledAlarmInfo]? {
         do {
-            return try AlarmManager.shared.alarms.map(\.id)
+            return try AlarmManager.shared.alarms.map { ScheduledAlarmInfo(id: $0.id, state: Self.map($0.state)) }
         } catch {
             return nil
         }
@@ -111,6 +112,17 @@ struct LiveAlarmClient: AlarmClient {
                                            stopButton: AlarmButton(text: "alarm.button.stop", textColor: .white,
                                                                    systemImageName: "stop.circle"),
                                            secondaryButton: secondaryButton, secondaryButtonBehavior: secondaryButtonBehavior)
+        }
+    }
+
+    /// `Alarm.State` (alerting, countdown, paused, scheduled; ALARMKIT.md §2.3).
+    static func map(_ state: Alarm.State) -> ScheduledAlarmInfo.State {
+        switch state {
+        case .scheduled: return .scheduled
+        case .alerting: return .alerting
+        case .countdown: return .countdown
+        case .paused: return .paused
+        @unknown default: return .unknown
         }
     }
 

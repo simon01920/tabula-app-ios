@@ -93,3 +93,11 @@ recorder), English + model-authored translations for the 11 authored languages (
 ja "ボイスメモ", zh "语音备忘"); keep `https://example.com` literal. `attachments.usage.*` / `attachments.error.quota`
 insert locale-formatted byte sizes ("12,3 MB"). The Stage A key `attachments.placeholder` is no longer used by code
 (left in place; remove in a cleanup pass). `NSMicrophoneUsageDescription` is English-only like the other usage strings.
+### Phase 3 Stage B2 additions (2026-10-10, swiftui-engineer-sonnet)
+72 new keys (`exams.segment.*`, `exams.week.*`, `exams.period.*`, `exams.when.*`, `exams.kind.*`, `exams.detail.*`,
+`exams.editor.*`, `exams.a11y.*`, `exams.subtitle`, `exams.action.*`, `exams.empty.*`), model-authored for 11 languages
+(`sr-Latn` derived), all `needs_review`. Reviewer: exam-type terms (sk "Polsemestrálna skúška", pl "Kolokwium" for
+midterm, ja 中間試験/期末試験), plural forms of `exams.when.inDays/daysAgo` and `exams.period.count` (sk/cs/pl/uk/ro/sr
+categories), and "Exam period" (sk "Skúškové obdobie", de "Prüfungszeitraum").
+### Phase 3 Stage B4 additions (2026-10-10, localization-engineer-sonnet)
+91 new keys (`reminders.*`, `health.*`, `settings.reminder-health.*`, `settings.reminders.*`: reminder rule editor, follow-up, reminder times, override section, permission sheet, quiet hours, health check and test results), machine-translated (model-authored) for all 11 authored languages, `sr-Latn` derived, all `needs_review`. Not native quality. 8 plural keys (hours/minutes/days/reminder counts, Time Sensitive lead) use the full CLDR categories for sk/cs/pl/uk/sr/ro; reviewers please check Slavic genitive/accusative forms ("minúty" vs "minút", "hodinu pred") and Hungarian wording without a case suffix after the time argument. Terminology reuses existing strings (Time Sensitive, Loud alarm, Standard, Focus, Quiet hours = sk "Pokojné hodiny", cs "Tiché hodiny", de "Ruhezeiten"). Quiet hours wording is new and worth a native check.

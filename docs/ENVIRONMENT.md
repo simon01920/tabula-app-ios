@@ -462,11 +462,24 @@ clients). Device behaviour: `docs/checklists/PHASE3_DEVICE.md` §A.
 | `userInfo` keys/values must be plist types; `removePendingNotificationRequests` runs asynchronously; `removeDeliveredNotifications` ignores ids not displayed | VERIFIED (docs) | [userInfo](https://developer.apple.com/documentation/usernotifications/unmutablenotificationcontent/userinfo), [removePending](https://developer.apple.com/documentation/usernotifications/unusernotificationcenter/removependingnotificationrequests(withidentifiers:)) |
 | `UIApplication.openNotificationSettingsURLString` (iOS 16) deep-links to the app's notification settings | VERIFIED (docs) | [openNotificationSettingsURLString](https://developer.apple.com/documentation/uikit/uiapplication/opennotificationsettingsurlstring) (health check action for B4) |
 | AlarmKit (re-checked): `alarms` = this client's alarms, one-shot alarms disappear after firing + stopping ("persist your alarms in your own store"); `maximumLimitReached` = "A maximum number of alarms is already scheduled" (no number); `authorizationUpdates` exists (initial emission not documented) | VERIFIED (docs) | [alarms](https://developer.apple.com/documentation/alarmkit/alarmmanager/alarms), [maximumLimitReached](https://developer.apple.com/documentation/alarmkit/alarmmanager/alarmerror/maximumlimitreached). Hence: alarm **ledger** written before scheduling; learned soft limit (24 h) after a refusal, overflow → Time Sensitive notifications (planner `alarmOverflow`) |
+| `Alarm.state` (`.scheduled`, `.alerting`, `.countdown` = snoozed, `.paused`) is read with `alarms`; ringing/snoozed/paused alarms are never cancelled by a re-plan (only when their item closed) | VERIFIED (docs, ALARMKIT.md §2.3) + COMPILED | `LiveAlarmClient.scheduledAlarms()`, `ReminderApplyOperations` |
 | **Alarm-count limit**: still undocumented and dynamic (Phase 0 F5); the app imposes a soft limit of **10** loud alarms per plan and learns a lower one from `maximumLimitReached` | RESEARCH-ONLY → device A7.6 (+ probe F1/F2) | Record the measured N here after the device run |
 | Snooze on loud alarms = `secondaryButtonBehavior: .countdown` + `postAlert` **9 min** (iOS Clock default; product choice), needs the TabulaWidgets Live Activity, which now renders `AlarmAttributes<TabulaAlarmMetadata>` (shared with the DEBUG probes) | COMPILED (xtool base + macro), device A4.9 | `LiveAlarmClient.swift`, `WidgetExtension/Sources/AlarmLiveActivity.swift` |
-| Build evidence | VERIFIED | `validate.sh` ALL CHECKS PASSED (TimetableUI 210 tests incl. 34 reminder-adapter tests), `xtool-dev.sh build` and `--macro-probes build`: 0 errors / 0 warnings, watchOS type-check OK |
+| Build evidence | VERIFIED | `validate.sh` ALL CHECKS PASSED (TimetableUI 218 tests incl. 42 reminder-adapter tests; QA fix pass: in-progress alarms kept, due notifications kept, render signature, dynamic reserve), `xtool-dev.sh build` and `--macro-probes build`: 0 errors / 0 warnings, watchOS type-check OK |
 
-## 22. Attachments (Phase 3 stage B3, sync-storage-engineer, 2026-10-14)
+## 22. Failed assumption: exit codes through `wsl.exe --` (found 2026-10-11)
+`wsl.exe -d Ubuntu -- bash -lc '…; echo $?'` runs the command line through the WSL user's login shell **first**. That shell expands `$?` and `$VAR` before the inner `bash` runs, so exit codes print as 0.
+
+Verified:
+- `wsl.exe -d Ubuntu -- bash -lc 'bash -c "exit 3"; echo $?'` prints `0`.
+- With `--exec` instead of `--` it prints `3`.
+
+Consequences:
+- Every "EXIT=…" value printed in orchestrator or agent logs through `--` before this date is meaningless.
+- Gate verdicts were based on the scripts' own `ALL CHECKS PASSED` / `N CHECK(S) FAILED` summary lines, which are unaffected.
+- **Always use `wsl.exe -d Ubuntu --exec bash -lc '…'`** (CLAUDE.md Commands updated).
+
+## 23. Attachments (Phase 3 stage B3, sync-storage-engineer, 2026-10-14)
 
 Apple docs read as DocC JSON (`developer.apple.com/tutorials/data/documentation/<path>.json`) on 2026-10-10/14. Code:
 `Packages/TimetableUI/Sources/TimetableUI/Attachments/` (pure Foundation store + rules, Linux-tested on temp dirs) and

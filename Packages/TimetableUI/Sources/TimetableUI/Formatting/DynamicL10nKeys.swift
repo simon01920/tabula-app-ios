@@ -13,6 +13,7 @@ public enum DynamicL10nKeys {
     public static func lessonField(_ value: LessonField) -> String { "editor.field." + value.rawValue }
     public static func defaultView(_ value: TimetableViewKind) -> String { "editor.view." + value.rawValue }
     public static func reminderTarget(_ value: ReminderTarget) -> String { "onboarding.reminders.target." + value.rawValue }
+    public static func examKind(_ value: ExamKind) -> String { "exams.kind." + value.rawValue }
     /// Name of an attachment kind (stage B3); unknown kinds (newer app versions) → "Attachment".
     public static func attachmentKind(_ value: AttachmentKind) -> String {
         AttachmentKind.knownValues.contains(value) ? "attachments.kind." + value.rawValue : "attachments.kind.unknown"
@@ -55,6 +56,9 @@ public enum DynamicL10nKeys {
         keys += LessonField.knownValues.map(lessonField)
         keys += TimetableViewKind.knownValues.map(defaultView)
         keys += ReminderTarget.knownValues.map(reminderTarget)
+        keys += ExamKind.knownValues.map(examKind)
+        keys += ExamWhen.allKeys
+        keys += ExamDraft.Issue.allCases.map(\.l10nKey)
         for base in termBases {
             keys += ProfilePreset.Terminology.allCases.map { term(base, $0) }
         }
@@ -74,6 +78,9 @@ public enum DynamicL10nKeys {
         keys += LessonType.knownValues.compactMap(VisibleLessonFields.nameKey(of:))
         keys += ["timetable.cycle.namedWeek", "timetable.cycle.numberedWeek", "timetable.cycle.namedDay",
                  "timetable.cycle.numberedDay"]
+        keys += ReminderUIKeys.allKeys
+        keys += ReminderRuleDefaults.targets.map { ReminderKindList.titleKey($0, terminology: .classLecture) }
+        keys += TaskL10nKeys.allKeys
         keys += AttachmentKind.knownValues.map(attachmentKind) + [attachmentKind(AttachmentKind(rawValue: "future"))]
         return Array(Set(keys)).sorted()
     }
