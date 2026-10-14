@@ -108,6 +108,16 @@ struct AttachmentFileNameTests {
         #expect(AttachmentFileName.pathExtension(of: "Board.JPG") == "jpg")
     }
 
+    @Test func generatedNamesUseTheGivenZone() throws {
+        let bratislava = try #require(TimeZone(identifier: "Europe/Bratislava"))
+        // 2026-10-10 07:00:00 UTC = 09:00:00 CEST.
+        let date = Date(timeIntervalSince1970: 1_791_615_600)
+        #expect(AttachmentFileName.generated(prefix: "VoiceNote", fileExtension: "m4a", date: date,
+                                             timeZone: bratislava) == "VoiceNote-20261010-090000.m4a")
+        #expect(AttachmentFileName.generated(prefix: "Photo", fileExtension: "heic", date: date,
+                                             timeZone: try #require(TimeZone(identifier: "UTC"))) == "Photo-20261010-070000.heic")
+    }
+
     @Test func contentTypeFallsBackToTheExtensionTable() {
         #expect(AttachmentContentType.resolve(provided: "public.heic", fileName: "x.jpg") == "public.heic")
         #expect(AttachmentContentType.resolve(provided: nil, fileName: "x.JPG") == "public.jpeg")

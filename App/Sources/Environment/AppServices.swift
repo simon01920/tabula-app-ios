@@ -32,6 +32,7 @@ final class AppServices {
             await reminders.handle(action, delivered)   // both live as long as the app (no cycle: the coordinator does not hold the delegate)
         }
         reminders.attach()
+        AttachmentMaintenance.install(on: model)   // orphan attachment cleanup after load + changes (B3); chains onChange
     }
 }
 

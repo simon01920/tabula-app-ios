@@ -52,6 +52,17 @@ public enum AttachmentFileName {
         return base + suffix
     }
 
+    /// A language-neutral generated name, `<prefix>-<yyyyMMdd>-<HHmmss>.<ext>` in `timeZone` (Gregorian digits), for
+    /// photos and voice notes that have no name of their own. The display title is localised separately.
+    public static func generated(prefix: String, fileExtension: String, date: Date, timeZone: TimeZone) -> String {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = timeZone
+        let c = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
+        func two(_ value: Int?) -> String { let v = value ?? 0; return v < 10 ? "0\(v)" : "\(v)" }
+        let stamp = "\(c.year ?? 0)\(two(c.month))\(two(c.day))-\(two(c.hour))\(two(c.minute))\(two(c.second))"
+        return sanitize("\(prefix)-\(stamp)", fallbackExtension: fileExtension)
+    }
+
     /// `true` when `name` is exactly what `sanitize` would produce for it (one safe component, within limits).
     public static func isSafeStoredName(_ name: String) -> Bool {
         !name.isEmpty && sanitize(name) == name

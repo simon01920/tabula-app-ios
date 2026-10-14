@@ -51,6 +51,8 @@ struct AppEnvironment: Sendable {
     let saveDebounce: Duration
     /// Notification centre, AlarmKit, applied-plan store, background refresh and device state for the reminder adapter.
     let reminders: ReminderDependencies
+    /// Attachment files (stage B3): `<store directory>/Attachments`; a throwaway temp folder for seed runs.
+    let attachments: any AttachmentStore
 
     /// The environment for this process.
     static func make(launchOptions: LaunchOptions) -> AppEnvironment {
@@ -71,7 +73,9 @@ struct AppEnvironment: Sendable {
                 nowProvider: now, deviceTimeZone: { zone }, locale: { Locale.current }, catalogLookup: lookup,
                 entitlements: AllAccessEntitlements(), dataSource: .seed(seed), launchOptions: launchOptions,
                 saveDebounce: .milliseconds(100),
-                reminders: launchOptions.liveReminders ? .live(defaults: .standard) : .inMemory())
+                reminders: launchOptions.liveReminders ? .live(defaults: .standard) : .inMemory(),
+                attachments: FileAttachmentStore(root: FileManager.default.temporaryDirectory
+                    .appendingPathComponent("TabulaSeedAttachments", isDirectory: true)))
         }
         #endif
         // The real store always uses the real clock and the system zone: -TabulaNow/-TabulaTimeZone are honoured only
@@ -84,7 +88,8 @@ struct AppEnvironment: Sendable {
             catalogLookup: lookup, entitlements: AllAccessEntitlements(),
             dataSource: .file(directory: location.directory, isAppGroup: location.isAppGroup),
             launchOptions: launchOptions, saveDebounce: .milliseconds(400),
-            reminders: .live(defaults: location.defaults))
+            reminders: .live(defaults: location.defaults),
+            attachments: FileAttachmentStore(root: FileAttachmentStore.root(forStoreDirectory: location.directory)))
     }
 }
 

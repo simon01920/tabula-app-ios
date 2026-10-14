@@ -63,6 +63,8 @@
 	<string>Tabula schedules loud alarms only for reminders you explicitly mark as important, such as an exam tomorrow.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Tabula uses the camera to scan a printed timetable so it can be imported.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Tabula records voice notes that you attach to your tasks.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Tabula reads a photo or screenshot of a timetable you choose so it can be imported.</string>
 </dict>
