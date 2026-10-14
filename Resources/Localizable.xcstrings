@@ -2815,6 +2815,90 @@
         }
       }
     },
+    "attachments.adding.banner" : {
+      "comment" : "Bar at the bottom of the task editor while an attachment is being copied; Save is disabled until it finishes.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Přidává se příloha… Uložit budete moci po dokončení."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Anhang wird hinzugefügt … Sichern ist danach möglich."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adding attachment… You can save when it’s done."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ajout de la pièce jointe… Vous pourrez enregistrer ensuite."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Melléklet hozzáadása… A befejezés után menthet."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "添付ファイルを追加中… 完了すると保存できます。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dodawanie załącznika… Zapisać można po zakończeniu."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Se adaugă atașamentul… Poți salva după ce se termină."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pridáva sa príloha… Uložiť budete môcť po dokončení."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Додавање прилога… Сачувати можете када се заврши."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dodavanje priloga… Sačuvati možete kada se završi."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Додавання вкладення… Зберегти можна після завершення."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "正在添加附件… 完成后即可存储。"
+          }
+        }
+      }
+    },
     "attachments.delete.confirm" : {
       "comment" : "Destructive button in the delete-attachment confirmation.",
       "extractionState" : "manual",
@@ -3147,6 +3231,90 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "暂无附件"
+          }
+        }
+      }
+    },
+    "attachments.error.folder" : {
+      "comment" : "Alert message when the user picked a folder or a package (e.g. a Pages document bundle) as an attachment.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Složky a balíčky nelze přiložit. Vyberte jeden soubor nebo složku nejdřív zkomprimujte."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ordner und Pakete können nicht angehängt werden. Wähle eine einzelne Datei oder komprimiere den Ordner zuerst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folders and packages can’t be attached. Choose a single file, or compress the folder first."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Impossible de joindre un dossier ou un paquet. Choisissez un seul fichier ou compressez d’abord le dossier."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Mappák és csomagok nem csatolhatók. Válasszon egyetlen fájlt, vagy előbb tömörítse a mappát."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "フォルダやパッケージは添付できません。ファイルを1つ選ぶか、先にフォルダを圧縮してください。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nie można dołączać folderów ani pakietów. Wybierz pojedynczy plik lub najpierw skompresuj folder."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dosarele și pachetele nu pot fi atașate. Alege un singur fișier sau comprimă mai întâi dosarul."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Priečinky a balíky nemožno priložiť. Vyberte jeden súbor alebo priečinok najprv skomprimujte."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Фасцикле и пакети не могу да се приложе. Изаберите једну датотеку или прво компримујте фасциклу."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fascikle i paketi ne mogu da se prilože. Izaberite jednu datoteku ili prvo komprimujte fasciklu."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Папки й пакети не можна вкласти. Виберіть один файл або спершу стисніть папку."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "无法附加文件夹或软件包。请选择单个文件，或先压缩文件夹。"
           }
         }
       }
@@ -5671,6 +5839,90 @@
         }
       }
     },
+    "attachments.voice.deleteRecording" : {
+      "comment" : "Destructive button in the error alert when a recorded voice note could not be added: discard the recording.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Smazat nahrávku"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Aufnahme löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Recording"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Supprimer l’enregistrement"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Felvétel törlése"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "録音を削除"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Usuń nagranie"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Șterge înregistrarea"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vymazať nahrávku"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Обриши снимак"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Obriši snimak"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Видалити запис"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "删除录音"
+          }
+        }
+      }
+    },
     "attachments.voice.denied.message" : {
       "comment" : "Alert message when microphone permission is denied.",
       "extractionState" : "manual",
@@ -6511,6 +6763,90 @@
         }
       }
     },
+    "attachments.voice.retry" : {
+      "comment" : "Button in the error alert when a recorded voice note could not be added: try adding the same recording again.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zkusit znovu"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Erneut versuchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try Again"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Réessayer"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Újra"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "もう一度試す"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Spróbuj ponownie"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Încearcă din nou"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Skúsiť znova"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Покушај поново"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pokušaj ponovo"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Спробувати ще раз"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "重试"
+          }
+        }
+      }
+    },
     "attachments.voice.stop" : {
       "comment" : "Button that stops recording a voice note.",
       "extractionState" : "manual",
@@ -6591,6 +6927,258 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "停止"
+          }
+        }
+      }
+    },
+    "attachments.voice.stopped.failed" : {
+      "comment" : "Voice-note sheet: the audio encoder failed; the part recorded so far can still be saved.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nahrávání se zastavilo kvůli chybě. Dosavadní nahrávka zůstává."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Die Aufnahme wurde wegen eines Fehlers beendet. Das bisher Aufgenommene bleibt erhalten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recording stopped because of an error. What was recorded is kept."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "L’enregistrement s’est arrêté à cause d’une erreur. Ce qui a été enregistré est conservé."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A felvétel hiba miatt leállt. Az eddig rögzített rész megmarad."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "エラーのため録音を停止しました。録音済みの部分は保持されます。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nagrywanie zatrzymało się z powodu błędu. Dotychczasowe nagranie zostaje zachowane."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Înregistrarea s-a oprit din cauza unei erori. Ce s-a înregistrat se păstrează."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nahrávanie sa zastavilo pre chybu. Doterajšia nahrávka zostáva."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Снимање је заустављено због грешке. Оно што је снимљено је сачувано."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Snimanje je zaustavljeno zbog greške. Ono što je snimljeno je sačuvano."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Запис зупинено через помилку. Уже записане збережено."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "录音因出错而停止。已录制的部分会保留。"
+          }
+        }
+      }
+    },
+    "attachments.voice.stopped.interrupted" : {
+      "comment" : "Voice-note sheet: the recording stopped because another app, a call or an alarm took the audio.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nahrávání se zastavilo kvůli přerušení, například hovoru."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Die Aufnahme wurde durch eine Unterbrechung, z. B. einen Anruf, beendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recording stopped because of an interruption, such as a call."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "L’enregistrement s’est arrêté à cause d’une interruption, par exemple un appel."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A felvétel egy megszakítás, például hívás miatt leállt."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "電話などの割り込みにより録音を停止しました。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nagrywanie zatrzymało się z powodu przerwania, np. połączenia."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Înregistrarea s-a oprit din cauza unei întreruperi, de exemplu un apel."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nahrávanie sa zastavilo pre prerušenie, napríklad hovor."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Снимање је заустављено због прекида, на пример позива."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Snimanje je zaustavljeno zbog prekida, na primer poziva."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Запис зупинено через переривання, наприклад дзвінок."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "录音因来电等中断而停止。"
+          }
+        }
+      }
+    },
+    "attachments.voice.stopped.limit" : {
+      "comment" : "Voice-note sheet: the recording stopped automatically because it reached the maximum length.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nahrávání se zastavilo po dosažení limitu 10 minut."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Die Aufnahme wurde beim Limit von 10 Minuten beendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recording stopped at the 10-minute limit."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "L’enregistrement s’est arrêté à la limite de 10 minutes."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A felvétel a 10 perces korlát elérésekor leállt."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "10分の上限に達したため録音を停止しました。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nagrywanie zatrzymało się po osiągnięciu limitu 10 minut."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Înregistrarea s-a oprit la limita de 10 minute."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nahrávanie sa zastavilo po dosiahnutí limitu 10 minút."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Снимање је заустављено на ограничењу од 10 минута."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Snimanje je zaustavljeno na ograničenju od 10 minuta."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Запис зупинено після досягнення ліміту 10 хвилин."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "已达到 10 分钟上限，录音已停止。"
           }
         }
       }

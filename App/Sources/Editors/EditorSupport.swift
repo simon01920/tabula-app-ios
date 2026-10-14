@@ -27,6 +27,8 @@ struct EditorScaffold<Draft: Equatable, Content: View>: View {
     /// Applies the draft; `nil` = nothing to apply. `.applied` dismisses the sheet (after an acknowledgement when the
     /// change introduced validation warnings).
     let save: (Draft) -> ApplyResult?
+    /// Work outside the draft is still running (e.g. an attachment copy): Save and swipe-to-dismiss are disabled.
+    var isBusy = false
     @ViewBuilder let content: (Binding<Draft>) -> Content
 
     @Environment(\.dismiss) private var dismiss
@@ -68,7 +70,7 @@ struct EditorScaffold<Draft: Equatable, Content: View>: View {
                     } label: {
                         Text("editor.common.save")
                     }
-                    .disabled(!canSave(current))
+                    .disabled(isBusy || !canSave(current))
                 }
             }
             .confirmationDialog("editor.common.discard.title", isPresented: $confirmingDiscard, titleVisibility: .visible) {
@@ -84,7 +86,7 @@ struct EditorScaffold<Draft: Equatable, Content: View>: View {
             Text(verbatim: warningText)
         }
         // A swipe-down would lose edits silently: while dirty, only Cancel (with confirmation) or Save leave the sheet.
-        .interactiveDismissDisabled(isDirty)
+        .interactiveDismissDisabled(isDirty || isBusy)
     }
 
     private var warningText: String {
@@ -101,7 +103,7 @@ struct EditorScaffold<Draft: Equatable, Content: View>: View {
     }
 
     private func commit() {
-        guard let outcome = save(current) else { return }
+        guard !isBusy, let outcome = save(current) else { return }
         if case .applied(let warnings) = outcome {
             // The change is stored; warnings never block (spec), but the user sees them before the sheet closes.
             let lines = ApplyWarnings.lines(from: warnings)

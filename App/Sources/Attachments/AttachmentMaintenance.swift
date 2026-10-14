@@ -7,7 +7,8 @@
 //
 // The rules live in TimetableUI (`AttachmentStore.swift`): live refs are never touched, orphans are deleted only after
 // the grace period and when no open editor protects them. Cleanup is skipped entirely unless the database loaded
-// and is writable, and for the rest of a session whose load recovered from a backup or discarded a write.
+// and is writable, while the last save failed (the in-memory state is not on disk), and for the rest of a session
+// whose load recovered from a backup or discarded a write.
 import Foundation
 import TimetableCore
 import TimetableUI
@@ -64,9 +65,11 @@ final class AttachmentCleanupRunner {
 
     private func run() async {
         guard let model else { return }
+        var lastSaveFailed = model.banners.contains(.saveFailed)
+        if case .failed? = model.lastSaveOutcome { lastSaveFailed = true }
         guard AttachmentCleanupGate.mayRun(databaseLoaded: model.database != nil && !model.isLoading,
                                            isReadOnly: model.isReadOnly, hasProblem: model.problem != nil,
-                                           recoveredThisSession: recoveredThisSession),
+                                           recoveredThisSession: recoveredThisSession, lastSaveFailed: lastSaveFailed),
               let database = model.database else { return }
         // The live set is taken from the snapshot at this moment; anything added later is younger than the grace
         // period or protected by its open editor, so it cannot be deleted by this run.

@@ -24,6 +24,7 @@ struct AttachmentRow: View {
     @State private var duration: TimeInterval?
     @ScaledMetric(relativeTo: .body) private var iconSize: CGFloat = 44
     @Environment(\.displayScale) private var displayScale
+    @Environment(AppModel.self) private var model
 
     private var isLink: Bool { ref.kind == .link }
     private var isMissing: Bool { !isLink && fileURL == nil }
@@ -131,17 +132,17 @@ struct AttachmentRow: View {
     /// row's identity stay the same when it changes.
     private var accessibilityValue: String {
         guard ref.kind == .voiceNote, isPlaying else { return String() }
-        return String(localized: "attachments.voice.playing")
+        return model.renderer.string(forKey: "attachments.voice.playing")
     }
 
     /// What activating the row does; empty for a missing file (the row is disabled and says why).
     private var accessibilityHint: String {
         switch ref.kind {
-        case .link: return String(localized: "attachments.hint.link")
+        case .link: return model.renderer.string(forKey: "attachments.hint.link")
         case .voiceNote:
             if isMissing { return String() }
-            return isPlaying ? String(localized: "attachments.voice.pause") : String(localized: "attachments.voice.play")
-        default: return isMissing ? String() : String(localized: "attachments.hint.preview")
+            return model.renderer.string(forKey: isPlaying ? "attachments.voice.pause" : "attachments.voice.play")
+        default: return isMissing ? String() : model.renderer.string(forKey: "attachments.hint.preview")
         }
     }
 

@@ -22,6 +22,16 @@ final class VoiceNoteRecorder {
         case failed
     }
 
+    /// Why a recording stopped without the user tapping Stop.
+    enum AutoStop: Equatable {
+        /// The 10-minute cap (`record(forDuration:)`) was reached.
+        case limitReached
+        /// A phone call, Siri, an alarm or another app took the audio session.
+        case interrupted
+        /// The encoder failed; what was recorded so far is kept.
+        case failed
+    }
+
     /// Longest recording (seconds).
     static let maxDuration: TimeInterval = 600
 
@@ -30,7 +40,38 @@ final class VoiceNoteRecorder {
     private(set) var recordedURL: URL?
     private(set) var startedAt: Date?
     private(set) var recordedDuration: TimeInterval = 0
+    /// Set when the recording stopped by itself (shown under the timer).
+    private(set) var autoStop: AutoStop?
     @ObservationIgnored private var recorder: AVAudioRecorder?
+    @ObservationIgnored private let delegate = RecorderDelegate()
+    // Written once in init, removed in deinit (no other access).
+    @ObservationIgnored nonisolated(unsafe) private var interruptionObserver: (any NSObjectProtocol)?
+
+    init() {
+        delegate.onFinish = { [weak self] successfully in
+            self?.finishedByItself(successfully ? .limitReached : .failed)
+        }
+        // Posted on the main thread (AVAudioSession.interruptionNotification docs).
+        interruptionObserver = NotificationCenter.default.addObserver(
+            forName: AVAudioSession.interruptionNotification, object: nil, queue: .main) { [weak self] note in
+            let began = (note.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt)
+                .flatMap(AVAudioSession.InterruptionType.init(rawValue:)) == .began
+            MainActor.assumeIsolated {
+                if began { self?.finishedByItself(.interrupted) }
+            }
+        }
+    }
+
+    deinit {
+        if let interruptionObserver { NotificationCenter.default.removeObserver(interruptionObserver) }
+    }
+
+    /// The recorder stopped on its own (limit, interruption, encoder error): keep the file, show why.
+    private func finishedByItself(_ reason: AutoStop) {
+        guard isRecording else { return }
+        stop()
+        autoStop = reason
+    }
 
     /// Starts recording, asking for microphone access first when it was never asked.
     func start() async -> Failure? {
@@ -58,6 +99,8 @@ final class VoiceNoteRecorder {
                 AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue,
             ]
             let recorder = try AVAudioRecorder(url: url, settings: settings)
+            recorder.delegate = delegate
+            autoStop = nil
             guard recorder.record(forDuration: Self.maxDuration) else {
                 try? FileManager.default.removeItem(at: url)
                 deactivateSession()
@@ -106,6 +149,7 @@ final class VoiceNoteRecorder {
         if let recordedURL { try? FileManager.default.removeItem(at: recordedURL) }
         recordedURL = nil
         recordedDuration = 0
+        autoStop = nil
     }
 
     private func deactivateSession() {
@@ -165,6 +209,22 @@ final class VoiceNotePlayer {
         await Task.detached(priority: .utility) { () -> TimeInterval? in
             (try? AVAudioPlayer(contentsOf: url)).map(\.duration)
         }.value
+    }
+}
+
+/// AVAudioRecorder's delegate: the recorder finished by itself (time limit) or failed to encode.
+private final class RecorderDelegate: NSObject, AVAudioRecorderDelegate, @unchecked Sendable {
+    // Written once on the main actor before any recording starts; read in the callbacks.
+    var onFinish: (@MainActor @Sendable (Bool) -> Void)?
+
+    func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
+        let finish = onFinish
+        Task { @MainActor in finish?(flag) }
+    }
+
+    func audioRecorderEncodeErrorDidOccur(_ recorder: AVAudioRecorder, error: (any Error)?) {
+        let finish = onFinish
+        Task { @MainActor in finish?(false) }
     }
 }
 

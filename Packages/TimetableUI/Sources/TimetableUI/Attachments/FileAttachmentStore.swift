@@ -51,8 +51,16 @@ public actor FileAttachmentStore: AttachmentStore {
     public func importFile(at source: URL, id: AttachmentRef.ID, suggestedName: String, contentType: String?,
                            quota: AttachmentQuota) async throws -> StoredAttachmentFile {
         let fileManager = FileManager.default
+        // Only single regular files: a folder or package (e.g. a .pages bundle) would be copied recursively and
+        // mis-measured, and a symbolic link could point anywhere. attributesOfItem does not follow links.
+        guard let attributes = try? fileManager.attributesOfItem(atPath: source.path) else {
+            throw AttachmentStoreError.sourceUnreadable
+        }
+        guard (attributes[.type] as? FileAttributeType) == .typeRegular else {
+            throw AttachmentStoreError.notARegularFile
+        }
         // Early refusal from the source's size (the definitive check is on the copied bytes).
-        if let size = (try? fileManager.attributesOfItem(atPath: source.path))?[.size] as? NSNumber {
+        if let size = attributes[.size] as? NSNumber {
             try checkQuota(adding: size.int64Value, quota: quota)
         }
         return try stage(id: id, suggestedName: suggestedName, contentType: contentType, quota: quota) { destination in
@@ -209,7 +217,8 @@ public actor FileAttachmentStore: AttachmentStore {
 
     // MARK: Scanning
 
-    /// Every `<UUID>/` folder under the root (non-UUID names, `.staging` and loose files are ignored).
+    /// Every real `<UUID>/` folder under the root. Non-UUID names, `.staging`, loose files and symbolic links (even to
+    /// a folder) are ignored, so they are neither counted nor ever deleted.
     func entries() -> [AttachmentDirectoryEntry] {
         let fileManager = FileManager.default
         guard let children = try? fileManager.contentsOfDirectory(atPath: root.path) else { return [] }
@@ -217,8 +226,9 @@ public actor FileAttachmentStore: AttachmentStore {
         for child in children {
             guard let id = UUID(uuidString: child) else { continue }
             let url = root.appendingPathComponent(child, isDirectory: true)
-            var isDirectory: ObjCBool = false
-            guard fileManager.fileExists(atPath: url.path, isDirectory: &isDirectory), isDirectory.boolValue else { continue }
+            // attributesOfItem does not traverse a final symbolic link (fileExists(atPath:isDirectory:) would).
+            guard let type = (try? fileManager.attributesOfItem(atPath: url.path))?[.type] as? FileAttributeType,
+                  type == .typeDirectory else { continue }
             let (bytes, newest) = Self.folderStats(url)
             result.append(AttachmentDirectoryEntry(id: id, byteCount: bytes, lastModified: newest))
         }

@@ -56,7 +56,9 @@ struct AttachmentFileNameTests {
         #expect(AttachmentFileName.sanitize("") == "attachment")
         #expect(AttachmentFileName.sanitize("   ") == "attachment")
         #expect(AttachmentFileName.sanitize("", fallbackExtension: "m4a") == "attachment.m4a")
-        #expect(AttachmentFileName.sanitize(".pdf") == "attachment.pdf" || AttachmentFileName.sanitize(".pdf") == "pdf")
+        // A leading dot is stripped first (no hidden files), so ".pdf" is the plain name "pdf", not an extension.
+        #expect(AttachmentFileName.sanitize(".pdf") == "pdf")
+        #expect(AttachmentFileName.sanitize("..pdf.pdf") == "pdf.pdf")
         #expect(AttachmentFileName.sanitize("notes", fallbackExtension: "txt") == "notes.txt")
         #expect(AttachmentFileName.sanitize("notes.md", fallbackExtension: "txt") == "notes.md")
         #expect(AttachmentFileName.sanitize("x", fallbackExtension: "../evil") == "x")
@@ -186,12 +188,40 @@ struct AttachmentPolicyTests {
         #expect(moved.first { $0.id == gone }?.sortIndex == 9)   // tombstones untouched
     }
 
-    @Test func cleanupGateRequiresALoadedWritableDatabase() {
-        #expect(AttachmentCleanupGate.mayRun(databaseLoaded: true, isReadOnly: false, hasProblem: false, recoveredThisSession: false))
-        #expect(!AttachmentCleanupGate.mayRun(databaseLoaded: false, isReadOnly: false, hasProblem: false, recoveredThisSession: false))
-        #expect(!AttachmentCleanupGate.mayRun(databaseLoaded: true, isReadOnly: true, hasProblem: false, recoveredThisSession: false))
-        #expect(!AttachmentCleanupGate.mayRun(databaseLoaded: true, isReadOnly: false, hasProblem: true, recoveredThisSession: false))
-        #expect(!AttachmentCleanupGate.mayRun(databaseLoaded: true, isReadOnly: false, hasProblem: false, recoveredThisSession: true))
+    @Test func cleanupGateRequiresALoadedWritableSavedDatabase() {
+        func gate(loaded: Bool = true, readOnly: Bool = false, problem: Bool = false, recovered: Bool = false,
+                  saveFailed: Bool = false) -> Bool {
+            AttachmentCleanupGate.mayRun(databaseLoaded: loaded, isReadOnly: readOnly, hasProblem: problem,
+                                         recoveredThisSession: recovered, lastSaveFailed: saveFailed)
+        }
+        #expect(gate())
+        #expect(!gate(loaded: false))
+        #expect(!gate(readOnly: true))
+        #expect(!gate(problem: true))
+        #expect(!gate(recovered: true))
+        #expect(!gate(saveFailed: true))   // the in-memory state is not on disk: never clean against it
+    }
+
+    @Test func unknownKindRefsAreLive() {
+        var database = SampleScenarios.blank()
+        let future = newID()
+        var futureRef = ref(future)
+        futureRef.kind = AttachmentKind(rawValue: "sketch")   // written by a newer app version
+        database.tasks = [TaskItem(id: TaskItem.ID(UUID()), meta: EntityMeta(createdAt: .zero, updatedAt: .zero),
+                                   title: "T", kind: .homework, due: nil, attachments: [futureRef])]
+        #expect(AttachmentReferences.liveIDs(in: database) == [future.uuid])
+        #expect(DynamicL10nKeys.attachmentKind(futureRef.kind) == "attachments.kind.unknown")
+    }
+
+    @Test func editorProtectionOnlyGrows() {
+        var protection = AttachmentEditorProtection()
+        let a = newID(), b = newID(), c = newID()
+        let first = protection.record([ref(a), ref(b, deleted: true)])
+        let afterRemovingB = protection.record([ref(a)])   // removing b from the draft does not unprotect it
+        let copying = protection.record(c)                  // an import still copying
+        let again = protection.record(c)
+        #expect(first && !afterRemovingB && copying && !again)
+        #expect(protection.ids == [a.uuid, b.uuid, c.uuid])
     }
 
     @Test func policyKeepsLiveProtectedAndRecentFolders() {
@@ -380,6 +410,62 @@ struct FileAttachmentStoreTests {
         #expect(!fileManager.fileExists(atPath: stale.path))
         #expect(fileManager.fileExists(atPath: current.path))
         #expect(await store.totalUsage() == 0)   // staging and foreign entries are not usage
+    }
+
+    @Test func foldersPackagesAndLinksAreNotImported() async throws {
+        let clock = TestClock(t0)
+        let (store, base) = try makeStore(clock)
+        defer { try? FileManager.default.removeItem(at: base) }
+        let fileManager = FileManager.default
+        let folder = base.appendingPathComponent("Essay.pages", isDirectory: true)   // a package is a folder
+        try fileManager.createDirectory(at: folder, withIntermediateDirectories: true)
+        try Data(count: 10).write(to: folder.appendingPathComponent("index.xml"))
+        let real = base.appendingPathComponent("real.txt")
+        try Data("x".utf8).write(to: real)
+        let link = base.appendingPathComponent("link.txt")
+        try fileManager.createSymbolicLink(at: link, withDestinationURL: real)
+        for source in [folder, link] {
+            await #expect(throws: AttachmentStoreError.notARegularFile) {
+                try await store.importFile(at: source, id: newID(), suggestedName: source.lastPathComponent,
+                                           contentType: nil, quota: .unlimited)
+            }
+        }
+        #expect(await store.entries().isEmpty)
+    }
+
+    @Test func symlinkedUUIDFolderIsIgnoredAndItsTargetSurvives() async throws {
+        let clock = TestClock(t0)
+        let (store, base) = try makeStore(clock, policy: AttachmentCleanupPolicy(gracePeriod: hour))
+        defer { try? FileManager.default.removeItem(at: base) }
+        let fileManager = FileManager.default
+        let outside = base.appendingPathComponent("outside", isDirectory: true)
+        try fileManager.createDirectory(at: outside, withIntermediateDirectories: true)
+        try Data(count: 7).write(to: outside.appendingPathComponent("precious.bin"))
+        try fileManager.createDirectory(at: store.root, withIntermediateDirectories: true)
+        let linked = store.root.appendingPathComponent(UUID().uuidString)
+        try fileManager.createSymbolicLink(at: linked, withDestinationURL: outside)
+        clock.now = t0 + 100 * hour
+        let report = await store.cleanUpOrphans(liveIDs: [])
+        #expect(report.deleted.isEmpty)
+        #expect(await store.entries().isEmpty)
+        #expect(await store.totalUsage() == 0)
+        #expect(fileManager.fileExists(atPath: outside.appendingPathComponent("precious.bin").path))
+        #expect((try? fileManager.destinationOfSymbolicLink(atPath: linked.path)) != nil)
+    }
+
+    @Test func replacingAnEditorsProtectionUnprotectsStaleIDs() async throws {
+        let clock = TestClock(t0)
+        let (store, base) = try makeStore(clock, policy: AttachmentCleanupPolicy(gracePeriod: hour))
+        defer { try? FileManager.default.removeItem(at: base) }
+        let kept = newID(), stale = newID(), editor = UUID()
+        for id in [kept, stale] {
+            _ = try await store.importData(Data(count: 1), id: id, suggestedName: "f.bin", contentType: nil, quota: .unlimited)
+        }
+        await store.setProtectedIDs([kept.uuid, stale.uuid], owner: editor)
+        await store.setProtectedIDs([kept.uuid], owner: editor)   // the owner's set is replaced, not merged
+        clock.now = t0 + 2 * hour
+        #expect(await store.cleanUpOrphans(liveIDs: []).deleted == [stale.uuid])
+        #expect(await store.entries().map(\.id) == [kept.uuid])
     }
 
     @Test func cleanupOnAMissingRootIsANoOp() async throws {

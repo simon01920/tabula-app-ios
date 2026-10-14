@@ -43,6 +43,15 @@ struct VoiceNoteRecorderSheet: View {
                 .buttonStyle(.borderedProminent)
                 .tint(recorder.isRecording ? .red : .accentColor)
                 .disabled(isStarting)
+                if let autoStop = recorder.autoStop {
+                    Label {
+                        Text(autoStopKey(autoStop))
+                    } icon: {
+                        Image(systemName: "exclamationmark.circle")
+                    }
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                }
                 Text("attachments.voice.hint")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
@@ -82,6 +91,14 @@ struct VoiceNoteRecorderSheet: View {
         }
         .interactiveDismissDisabled(recorder.isRecording || recorder.recordedURL != nil)
         .onDisappear { recorder.discard() }   // no-op after Save (take() released the file)
+    }
+
+    private func autoStopKey(_ reason: VoiceNoteRecorder.AutoStop) -> LocalizedStringKey {
+        switch reason {
+        case .limitReached: return "attachments.voice.stopped.limit"
+        case .interrupted: return "attachments.voice.stopped.interrupted"
+        case .failed: return "attachments.voice.stopped.failed"
+        }
     }
 
     private func toggleRecording() {

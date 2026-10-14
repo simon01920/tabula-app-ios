@@ -36,6 +36,8 @@ public enum AttachmentStoreError: Error, Equatable, Sendable {
     case quotaExceeded(needed: Int64, available: Int64)
     /// The source file could not be read.
     case sourceUnreadable
+    /// The source is a folder, package, symbolic link or other non-regular file (only single files are attached).
+    case notARegularFile
     /// A folder for this attachment ID already exists (IDs are never reused).
     case alreadyExists
     /// A file-system operation failed (message for logs only).
@@ -155,12 +157,37 @@ public enum AttachmentReferences {
     }
 }
 
+/// The IDs an open attachment editor protects: every ID it has shown or added since it opened (also the ones removed
+/// again), so nothing this editor touched can be cleaned up before the editor closes (protection lifetime = editor
+/// lifetime). Grows only.
+public struct AttachmentEditorProtection: Equatable, Sendable {
+    public private(set) var ids: Set<UUID> = []
+
+    public init() {}
+
+    /// Adds the IDs of `refs` (tombstones included); `true` when the set grew.
+    @discardableResult
+    public mutating func record(_ refs: [AttachmentRef]) -> Bool {
+        let before = ids.count
+        ids.formUnion(refs.map(\.id.uuid))
+        return ids.count != before
+    }
+
+    /// Adds one ID (an import that is still copying); `true` when the set grew.
+    @discardableResult
+    public mutating func record(_ id: AttachmentRef.ID) -> Bool {
+        ids.insert(id.uuid).inserted
+    }
+}
+
 /// Whether a cleanup may run now (rule 5). The app evaluates it from its model state.
 public enum AttachmentCleanupGate {
-    /// `true` only for a loaded, writable database that was not recovered from a backup or a discarded write in this
-    /// session (after a recovery the files of the lost changes are kept until the next launch).
-    public static func mayRun(databaseLoaded: Bool, isReadOnly: Bool, hasProblem: Bool, recoveredThisSession: Bool) -> Bool {
-        databaseLoaded && !isReadOnly && !hasProblem && !recoveredThisSession
+    /// `true` only for a loaded, writable database whose last save did not fail (never clean against an in-memory
+    /// state that is not on disk), and that was not recovered from a backup or a discarded write in this session
+    /// (after a recovery the files of the lost changes are kept until the next launch).
+    public static func mayRun(databaseLoaded: Bool, isReadOnly: Bool, hasProblem: Bool, recoveredThisSession: Bool,
+                              lastSaveFailed: Bool) -> Bool {
+        databaseLoaded && !isReadOnly && !hasProblem && !recoveredThisSession && !lastSaveFailed
     }
 }
 
@@ -183,7 +210,7 @@ public struct AttachmentCleanupReport: Equatable, Sendable {
 /// File storage for attachment bytes. Implementations serialise operations (the file store is an actor).
 public protocol AttachmentStore: Sendable {
     /// Copies the file at `source` in atomically as `Attachments/<id>/<sanitized suggestedName>`.
-    /// Throws `quotaExceeded` (nothing stored) when it does not fit `quota`.
+    /// Throws `notARegularFile` for folders/packages/links and `quotaExceeded` (nothing stored) when it does not fit.
     func importFile(at source: URL, id: AttachmentRef.ID, suggestedName: String, contentType: String?,
                     quota: AttachmentQuota) async throws -> StoredAttachmentFile
     /// Writes `data` atomically as `Attachments/<id>/<sanitized suggestedName>`.
