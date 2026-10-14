@@ -293,6 +293,11 @@ To inspect files on a device: Finder/Xcode "Download Container" on a Mac later, 
 | B3.6 | Voice Note → Record (first time) | Microphone permission prompt appears only now, with the English usage text; after Allow: timer runs; Stop; Save → row "Voice note", duration, play button | | |
 | B3.7 | Deny microphone (Settings → Privacy → Microphone → Tabula off) → Record | Alert "Microphone Access Is Off" with Open Settings (opens Tabula's Settings page) | | |
 | B3.8 | Record, then Cancel; also swipe down while recording | Cancel discards; swipe-down is blocked while recording or with an unsaved recording | | |
+| B3.8a | Add a large file (≥ 100 MB video via Files) and immediately try Save / swipe the editor down | Bottom bar "Adding attachment… You can save when it’s done."; Save greyed out; swipe-down blocked; when the bar disappears the row is there and Save works; reopen → attachment present | | |
+| B3.8b | File → pick a folder or a Pages/Keynote package | Alert "Folders and packages can’t be attached…"; nothing added | | |
+| B3.8c | Record a voice note, receive a phone call (or start Siri / an alarm) while recording | Recording stops, footnote "Recording stopped because of an interruption…"; Save keeps what was recorded | | |
+| B3.8d | Record for 10 minutes | Stops by itself at 10:00 with "Recording stopped at the 10-minute limit."; Save works | | |
+| B3.8e | (Quota, after Phase 10 or with a debug Free tier) record a voice note that does not fit | Error alert with **Try Again** / **Delete Recording**; the recording is not lost until Delete is chosen | | |
 
 ### B3b. Using, editing, cleanup (data-loss sensitive)
 | ID | Steps | Expected | Observed | ✔/✘ |
@@ -303,7 +308,7 @@ To inspect files on a device: Finder/Xcode "Download Container" on a Mac later, 
 | B3.12 | Rename, Move Up/Down (context menu), drag to reorder, swipe → Delete (confirm); Save; reopen | Order and names persist; deleted row gone; other attachments intact | | |
 | B3.13 | Add a large photo, **Cancel** the editor; reopen | Not listed (orphan). Usage footer may still include it for up to 24 h (grace period), then drops after the next launch / change | | |
 | B3.14 | Delete a task that has attachments; wait ~5 s; open another task's editor and read the usage footer | Usage drops (files of the deleted task removed after save; they were older than 24 h) — for a task created today the files stay until 24 h have passed | | |
-| B3.15 | Add an attachment, keep the editor open > 1 min while switching apps; come back; Save | The file is still there (open editor protects it) | | |
+| B3.15 | Add an attachment, keep the editor open > 1 min while switching apps, scroll the Attachments section off screen and back, open Quick Look; Save | The file is still there (the editor protects every ID it touched until it closes) | | |
 | B3.16 | Force-quit during a large file copy ("Adding…"), relaunch | No half file listed; nothing breaks (abandoned staging is cleaned after 1 h) | | |
 | B3.17 | Device backup (Finder or iCloud), restore to the same/another device | Attachments come back with the tasks (App Group container in backup — record result) | | |
 
