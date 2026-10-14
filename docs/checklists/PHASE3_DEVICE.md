@@ -248,3 +248,27 @@ Repeat the visual checks in: empty (no rules) / normal / long text, Dynamic Type
 | B4.5.9 | Silent mode / Focus rows | Readable at AX5; VoiceOver reads title, status word, detail as one element | | |
 
 Unverifiable without a device: the system permission prompts, delivery, Focus behaviour, whether the notification settings URL lands on the app's page, and every visual aspect.
+## B1. Tasks tab (Stage B1 — unverified on device; the UI was never run or seen)
+Seed launches: `-TabulaSeed secondary` (tasks due 14/15/16/19 Oct, one completed; none overdue/today at the reference time). Routes: `tasks`, `tasks.upcoming|overdue|completed`, `tasks.editor`, `tasks.editor-new`, `tasks.detail`.
+
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| B1.1 | Empty store: open Tasks | Empty state (icon, title, text); quick-add visible; no placeholders/dashes anywhere | | |
+| B1.2 | Quick-add "Homework", subject Maths | Row appears in Upcoming; footer before adding shows "Due <date>, at the subject's next lesson"; without subject "Due tomorrow"; due matches the next non-cancelled Maths lesson | | |
+| B1.3 | Segment chips | Counts correct; Overdue chip red with warning icon while it has tasks; chips scroll sideways in German/AX5 | | |
+| B1.4 | Row look | Circle in subject colour (outline when open, filled + checkmark when done), strikethrough when done; high/urgent badge with icon+text; "2/5", paperclip, repeat icons only when present; light subject colours still visible in dark mode | | |
+| B1.5 | Tap circle / swipe right | Task completes, moves to Completed; repeating task creates next occurrence; swipe again on Completed reopens | | |
+| B1.6 | Swipe left, Delete | Confirmation naming the task; Delete removes it, Cancel keeps it | | |
+| B1.7 | Filter by subject, sort by priority | List and counts follow; filtered-empty message when nothing matches; filter icon filled while active | | |
+| B1.8 | Make a task due today 08:00 (time passed) | Appears under Overdue; leave app open across a due time: moves within a minute | | |
+| B1.9 | Detail sheet | Title, subject, type, due (relative), priority (only if not Normal), repeat lines, notes only if set, subtasks tappable inline, Complete/Reopen, Delete, Edit | | |
+| B1.10 | Editor new: empty title | Save disabled, hint under title; Cancel with edits asks to discard; swipe-down blocked while dirty | | |
+| B1.11 | Due "Next lesson of the subject" with no subject / subject without lesson | Inline red messages, Save disabled; with lesson: resolved date shown, saved task has due date + link | | |
+| B1.12 | Repeat weekly Mon+Wed, every 2 weeks, end date before due | Error shown; fix; complete the task: next due follows ISO-week rule | | |
+| B1.13 | Subtasks: add, check, Reorder (drag handles), swipe delete | Order and checks persist after Save; reorder mode works inside the Form (unverified API behaviour) | | |
+| B1.14 | Reminder-override and attachments sections | Present (stubs or B3/B4); editing other fields does not lose them | | |
+| B1.15 | Edit task, delete in editor | Editor and detail close | | |
+| B1.16 | Notification tap on a task | Tasks tab with the detail sheet of that task | | |
+| B1.17 | VoiceOver on a row | One sentence (title, subject, due, priority, subtasks...); actions: open, mark done/not done, delete | | |
+| B1.18 | Dynamic Type AX5, dark mode, long title, ja/zh, German | No clipping, 44 pt targets, texts wrap; chips scroll | | |
+| B1.19 | Plurals sk/pl/uk/ro: "In 3 days", "5 days overdue", "Every 3 weeks" | Correct forms | | |

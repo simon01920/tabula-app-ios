@@ -76,6 +76,7 @@ public enum DynamicL10nKeys {
                  "timetable.cycle.numberedDay"]
         keys += ReminderUIKeys.allKeys
         keys += ReminderRuleDefaults.targets.map { ReminderKindList.titleKey($0, terminology: .classLecture) }
+        keys += TaskL10nKeys.allKeys
         return Array(Set(keys)).sorted()
     }
 }
