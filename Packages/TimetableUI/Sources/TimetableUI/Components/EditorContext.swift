@@ -21,6 +21,8 @@ public struct EditorContext: Hashable, Sendable {
         case newSubject
         /// Change one date ("Change for this day"): optionally about one occurrence.
         case dayChange(date: LocalDate, occurrence: OccurrenceID?, lessonID: Lesson.ID?)
+        /// A new task for one lesson occurrence ("Add homework for this lesson", route `tasks.editor-new`).
+        case newTask(TaskPrefill)
     }
 
     public var timetableID: Timetable.ID
@@ -36,6 +38,40 @@ public struct EditorContext: Hashable, Sendable {
         public static let lesson = "editor.lesson"
         public static let subject = "editor.subject"
         public static let dayChange = "editor.day-change"
+        /// The task editor for a new task (Phase 3 C1: opened prefilled from the lesson detail).
+        public static let newTask = "tasks.editor-new"
+    }
+}
+
+/// What "Add homework for this lesson" prefills in the task editor: the subject, the occurrence's date as the due date
+/// and, for a recurring lesson, the occurrence as `linkedLesson` (a one-off lesson cannot be linked; its date is used).
+public struct TaskPrefill: Hashable, Sendable {
+    public var subjectID: Subject.ID
+    public var date: LocalDate
+    public var startTime: LocalTime?
+    /// The recurring lesson; `nil` for a one-off lesson added by a day change.
+    public var lessonID: Lesson.ID?
+
+    public init(subjectID: Subject.ID, date: LocalDate, startTime: LocalTime?, lessonID: Lesson.ID?) {
+        self.subjectID = subjectID
+        self.date = date
+        self.startTime = startTime
+        self.lessonID = lessonID
+    }
+
+    /// The prefill for `lesson`'s occurrence.
+    public init(lesson: ResolvedLesson) {
+        var lessonID: Lesson.ID?
+        if case .lesson(let id) = lesson.source { lessonID = id }
+        self.init(subjectID: lesson.subject.id, date: lesson.date, startTime: lesson.startTime, lessonID: lessonID)
+    }
+
+    /// The occurrence as the editor's "lesson" due (due = its date, linked when recurring).
+    public var lesson: NextLesson { NextLesson(date: date, startTime: startTime, lessonID: lessonID) }
+
+    /// A new homework draft for this occurrence (`timetableID`: the lesson's timetable).
+    public func draft(newWithID id: TaskItem.ID, today: LocalDate, timetableID: Timetable.ID?) -> TaskDraft {
+        TaskDraft(newWithID: id, today: today, timetableID: timetableID, subjectID: subjectID, nextLesson: lesson)
     }
 }
 

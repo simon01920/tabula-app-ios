@@ -3,6 +3,8 @@
 // (view kind remembered per timetable via `model.apply(.upsert(timetable with defaultView))`, density, "show week
 // A/B" for week cycles, "Change for this day…" in day views, "Today").
 // Taps: a lesson → `LessonDetailView` sheet; a free grid slot → `QuickAddSheet`.
+// Task / exam badges (Phase 3 C1): `TimetableContent` puts the `LessonWorkIndex` of the shown week into the environment
+// (`\.lessonWork`); every lesson view of the tab reads it (LessonWorkBadges.swift).
 // Navigation state is `TimetableSelection` (TimetableUI, Linux-tested); "now" is `model.now`, refreshed once a minute
 // by a TimelineView unless the clock is fixed (screenshot mode).
 // APIs: NavigationStack, toolbar { ToolbarItem(placement: .topBarTrailing / .topBarLeading) }, Menu, Picker
@@ -247,6 +249,9 @@ private struct TimetableContent: View {
     var body: some View {
         let today = resolver.context.localDate(of: now)
         let strip = WeekStripModel.make(selection: selection, today: today, resolver: resolver)
+        let work = LessonWorkSupport.index(dates: (0..<7).map { selection.weekStart.adding(days: $0) }
+                                               + [selection.selectedDate],
+                                           resolver: resolver, database: model.database)
         VStack(spacing: 0) {
             WeekNavigationBar(strip: strip, onPrevious: { shift(-1) }, onNext: { shift(1) })
                 .padding(.horizontal, 8)
@@ -259,6 +264,7 @@ private struct TimetableContent: View {
             content(today: today, strip: strip)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .environment(\.lessonWork, work)
         .simultaneousGesture(
             DragGesture(minimumDistance: 40).onEnded { value in
                 let horizontal = value.translation.width

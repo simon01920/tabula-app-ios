@@ -85,6 +85,7 @@ struct TimeBlockCanvas: View {
     let onOpen: (ResolvedLesson) -> Void
 
     @Environment(AppModel.self) private var model
+    @Environment(\.lessonWork) private var work
     @ScaledMetric(relativeTo: .caption) private var comfortableHourHeight: CGFloat = 72
     @ScaledMetric(relativeTo: .caption) private var compactHourHeight: CGFloat = 54
     @ScaledMetric(relativeTo: .caption) private var minimumBlockHeight: CGFloat = 24
@@ -150,7 +151,8 @@ struct TimeBlockCanvas: View {
                     onOpen(block.entry)
                 } label: {
                     TimeBlockView(block: block, reasons: reasons[block.entry.id] ?? [],
-                                  visibility: timetable.fieldVisibility, detailed: detailed, height: blockHeight)
+                                  visibility: timetable.fieldVisibility, detailed: detailed, height: blockHeight,
+                                  badges: work.badges(for: block.entry.id))
                         .frame(width: laneWidth - 3, height: blockHeight - 2)
                         .frame(height: CGFloat(hit.length))
                         .contentShape(Rectangle())
@@ -181,7 +183,8 @@ struct TimeBlockCanvas: View {
 
     private func blockLabel(_ block: TimeBlockLayout.Block) -> String {
         let lesson = LessonAccessibilityLabel.make(lesson: block.entry, visibility: timetable.fieldVisibility,
-                                                   reasons: reasons[block.entry.id] ?? [], renderer: model.renderer)
+                                                   reasons: reasons[block.entry.id] ?? [],
+                                                   badges: work.badges(for: block.entry.id), renderer: model.renderer)
         guard !detailed else { return lesson }
         return model.renderer.format(key: "timetable.a11y.cell", arguments: [
             .text(model.formatter.date(block.entry.date, style: .full)), .text(lesson),
@@ -189,13 +192,15 @@ struct TimeBlockCanvas: View {
     }
 }
 
-/// One proportional block.
+/// One proportional block. Task / exam badges (Phase 3 C1): full capsules in the day view when the block is tall
+/// enough, else the compact "☑2 🎓" line (week view: from 40 pt; shorter blocks rely on VoiceOver and the detail).
 struct TimeBlockView: View {
     let block: TimeBlockLayout.Block
     let reasons: [ModificationReason]
     let visibility: FieldVisibility
     let detailed: Bool
     let height: CGFloat
+    var badges: LessonBadges?
     @Environment(AppModel.self) private var model
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.colorSchemeContrast) private var contrast
@@ -226,8 +231,15 @@ struct TimeBlockView: View {
                 LessonFieldLinesView(lines: LessonFieldLines.make(lesson: lesson, visibility: visibility,
                                                                   only: [.room, .building, .teacher, .lessonType]),
                                      font: .caption)
-            } else if height >= 56, let room = VisibleLessonFields(lesson: lesson, visibility: visibility).room {
+            } else if height >= 56, badges == nil, let room = VisibleLessonFields(lesson: lesson, visibility: visibility).room {
                 Text(verbatim: room).font(.caption2).lineLimit(1).minimumScaleFactor(0.6)
+            }
+            if let badges, height >= 40 {
+                if detailed && height >= 88 {
+                    LessonWorkBadgeRow(badges: badges)
+                } else {
+                    CompactLessonWorkBadges(badges: badges)
+                }
             }
             Spacer(minLength: 0)
         }

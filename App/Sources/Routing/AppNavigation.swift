@@ -9,7 +9,10 @@
 // `exams.detail`) in your *Routes.swift. The route's view reads `navigation.presentedItem` (`.task(id)` / `.exam(id)`)
 // and shows that item; when it is `nil` (launched with `-TabulaScreen tasks.detail` for screenshots) it picks a
 // sample from the seed data, like `timetable.lesson-detail` does.
+// In-app links (Phase 3 C1): Today's "N overdue" chip calls `showTasks(.overdue)`; the shell then shows the Tasks tab
+// rebuilt on that segment (`taskSegmentRequest`, see MainTabView), so App/Sources/Tasks needs no extra state.
 // APIs: Observation.Observable (macro; allowed in app code outside Debug, PHASE2_PLAN §0.1).
+import Foundation
 import Observation
 import TimetableCore
 import TimetableUI
@@ -21,6 +24,20 @@ final class AppNavigation {
     var selectedTab: AppTab?
     /// The item a deep link presents with its feature's detail route (sheet over the item's tab).
     var presentedItem: ItemLink?
+    /// The last in-app request to show the Tasks tab on a segment (each request has its own `id`).
+    private(set) var taskSegmentRequest: TaskSegmentRequest?
+
+    /// A request to show the Tasks tab on `segment`; a new `id` per request rebuilds the tab even for the same segment.
+    struct TaskSegmentRequest: Equatable {
+        let segment: TaskSegment
+        let id = UUID()
+    }
+
+    /// Selects the Tasks tab on `segment` (Today's overdue chip).
+    func showTasks(_ segment: TaskSegment) {
+        taskSegmentRequest = TaskSegmentRequest(segment: segment)
+        selectedTab = .tasks
+    }
 
     /// Opens `link`: selects its tab and, when the feature registered a detail route, presents it.
     func open(_ link: ItemLink?) {

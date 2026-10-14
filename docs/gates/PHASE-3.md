@@ -11,9 +11,9 @@ Status: **DRAFT — B1/B3 finishing, integration pending** · Plan: `docs/specs/
 | A delta QA | qa-reviewer · **Opus high** | **All 5 findings fixed; Stage A ready for the gate.** Tests judged meaningful. Residual: a time-zone change during a snoozed loud alarm reschedules it, ending the snooze (device-checklist row) | 253 UI tests, real exit 0 |
 | B2 Exams | swiftui-engineer-sonnet · **Sonnet medium** | Exams tab: prominent next exam, countdown, escalation (text + colour), history, editor, exam-period section | `a272a72`, `6452a58`; ~30 tests |
 | B4 Reminder settings + health check | swiftui-engineer-sonnet · **Sonnet medium** | Per-kind rules, rule editor (offsets, follow-up, tier with honest explanations, quiet hours), permission pre-explainer (never at launch), health check, per-item override section | `6704172`…`ccc52b3`; 10 tests |
-| B1 Tasks | swiftui-engineer-sonnet · **Sonnet medium** | _finishing_ | |
+| B1 Tasks | swiftui-engineer-sonnet · **Sonnet medium** | Tasks tab: disjoint segments (Today/Upcoming/Overdue/Completed; a past-time task due today counts as Overdue; undated → Upcoming), subject filter, sort, quick-add, subject-colour completion, swipe actions, editor (subtasks, repeat, "next <subject> lesson" → date + linkedLesson), detail | `20de12b`, `2061d45`, `41d16c1`; merged `738dfe7` (270 UI tests, 1,133 keys) |
 | B3 Attachments | sync-storage-engineer · **Opus high** | _finishing_ | |
-| C1 Cross-feature integration | swiftui-engineer · **Opus high** | _pending_ | |
+| C1 Cross-feature integration | swiftui-engineer · **Opus high** | _running_ (Today due/next exam, lesson badges, lesson-detail homework, deep links, richer seeds, screenshot list) | |
 | QA final | qa-reviewer · **Opus high** | _pending_ | |
 
 After merging A + A fixes + B2 + B4 (`779f743`), the orchestrator verified: `validate.sh` **ALL CHECKS PASSED**, with **502 core + 253 UI tests** and **1,021 keys complete in 12 languages**; the xtool build passes; pushed.

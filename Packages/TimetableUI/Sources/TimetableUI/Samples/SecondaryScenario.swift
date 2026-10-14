@@ -181,6 +181,43 @@ extension SampleScenarios {
                              title: "Test – stavba bunky", kind: .test, date: d(2026, 10, 27), start: t(8),
                              reminderOverride: ReminderOverride(tier: .alarm)))
 
+        // 7. Phase 3 C1 cross-feature scenarios (appended after everything above, so the earlier IDs/clock ticks and
+        // the engine report's entities keep their values). Relative to the reference day Tue 2026-10-13:
+        //   overdue (due Mon 12th), due today with 2/5 subtasks + weekly repeat, a high-priority assignment next week
+        //   linked to one lesson occurrence, a completed task due today (no badge), a past History exam (Mon 12th).
+        let yesterday = d(2026, 10, 12)
+        let eveningBefore = bootstrap.date(yesterday, t(19))
+        db.tasks.append(TaskItem(id: ids.next(), meta: meta(), title: "Laboratórny protokol – hustota telies",
+                                 kind: .homework, subjectID: subjects["FYZ"]!.id, timetableID: timetable.id,
+                                 due: .date(yesterday)))
+        let vocabularyID: TaskItem.ID = ids.next()
+        let vocabularyMeta = meta()
+        let steps = ["Slovíčka 1–10", "Slovíčka 11–20", "Gramatika: Perfekt", "Cvičenie 4 v pracovnom zošite",
+                     "Nahrať výslovnosť"]
+        var vocabularySubtasks: [Subtask] = []
+        for (index, title) in steps.enumerated() {
+            vocabularySubtasks.append(Subtask(id: ids.next(), meta: meta(), title: title,
+                                              completedAt: index < 2 ? eveningBefore : nil, sortIndex: index))
+        }
+        db.tasks.append(TaskItem(id: vocabularyID, meta: vocabularyMeta, title: "Nemčina – Lektion 3",
+                                 kind: .homework, subjectID: subjects["NEJ"]!.id, timetableID: timetable.id,
+                                 due: .date(today), notes: "Každý utorok nová lekcia.",
+                                 repeatRule: RepeatRule(frequency: .weekly, interval: 1, weekdays: [.tuesday]),
+                                 subtasks: vocabularySubtasks))
+        let projectDate = d(2026, 10, 21)
+        db.tasks.append(TaskItem(id: ids.next(), meta: meta(), title: "Projekt – prvá verzia webovej stránky triedy",
+                                 kind: .assignment, subjectID: subjects["INF"]!.id, timetableID: timetable.id,
+                                 due: .date(projectDate),
+                                 linkedLesson: LessonLink(lessonID: keyed["3-4-INF"]!.id, date: projectDate),
+                                 priority: .high))
+        db.tasks.append(TaskItem(id: ids.next(), meta: meta(), title: "Prečítať kapitolu Bunka", kind: .homework,
+                                 subjectID: subjects["BIO"]!.id, timetableID: timetable.id, due: .date(today),
+                                 completedAt: eveningBefore))
+        db.exams.append(Exam(id: ids.next(), meta: meta(), timetableID: timetable.id, subjectID: subjects["DEJ"]!.id,
+                             title: "Písomka – Veľká Morava", kind: .test, date: yesterday,
+                             start: periods[4].start, end: periods[4].end, room: "214",
+                             topics: ["Samova ríša", "Cyril a Metod"]))
+
         return SecondaryScenario(answers: answers, onboardedDatabase: onboarded, database: db, context: context,
                                  timetable: timetable, regularBell: regularBell, shortBell: shortBell,
                                  overrideDate: overrideDate, onboardingInstant: onboardingInstant)

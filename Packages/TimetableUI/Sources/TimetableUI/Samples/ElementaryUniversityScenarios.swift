@@ -164,6 +164,19 @@ extension SampleScenarios {
                              subjectID: subjects["MA"]!.id, title: "Priebežný test 1", kind: .midterm,
                              date: d(2026, 10, 28), start: t(8), end: t(9, 30), room: "Aula Minor", building: "FIIT",
                              topics: ["limity", "derivácie"]))
+        // Phase 3 C1: the winter exam period (an `examPeriod` break, so the Exams tab groups the finals under it; it
+        // lies after the semester, so the shown weeks keep their lessons) with two finals inside it.
+        db.breaks.append(CalendarBreak(id: ids.next(), meta: .created(at: clock.tick(now: editInstant)),
+                                       timetableID: timetable.id, name: "Skúškové obdobie – zimný semester",
+                                       range: LocalDateRange(start: d(2027, 1, 4), end: d(2027, 2, 12)),
+                                       kind: .examPeriod))
+        db.exams.append(Exam(id: ids.next(), meta: .created(at: clock.tick(now: editInstant)), timetableID: timetable.id,
+                             subjectID: subjects["MA"]!.id, title: "Skúška – Matematická analýza", kind: .final,
+                             date: d(2027, 1, 12), start: t(8), end: t(11), room: "Aula Minor", building: "FIIT",
+                             topics: ["limity", "derivácie", "integrály", "rady"]))
+        db.exams.append(Exam(id: ids.next(), meta: .created(at: clock.tick(now: editInstant)), timetableID: timetable.id,
+                             subjectID: subjects["DBS"]!.id, title: "Skúška – Databázové systémy", kind: .oral,
+                             date: d(2027, 1, 21), start: t(9), room: "4.23", building: "FIIT"))
         return db
     }
 }

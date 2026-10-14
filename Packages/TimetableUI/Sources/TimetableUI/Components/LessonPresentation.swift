@@ -80,16 +80,16 @@ public struct LessonStatusBadgeModel: Equatable, Sendable {
 /// Each part is one complete catalog phrase (its own format with arguments); parts are joined with the catalog's
 /// list separator (`a11y.separator`, ", " in English, "、" in Japanese). Hidden or empty fields are omitted.
 public enum LessonAccessibilityLabel {
-    /// The sentence for `lesson`.
+    /// The sentence for `lesson`; `badges` (tasks / exam of this occurrence, `LessonWorkIndex`) are read last.
     public static func make(lesson: ResolvedLesson, visibility: FieldVisibility, reasons: [ModificationReason],
-                            renderer: LocalizedTextRenderer) -> String {
-        parts(lesson: lesson, visibility: visibility, reasons: reasons, renderer: renderer)
+                            badges: LessonBadges? = nil, renderer: LocalizedTextRenderer) -> String {
+        parts(lesson: lesson, visibility: visibility, reasons: reasons, badges: badges, renderer: renderer)
             .joined(separator: renderer.string(forKey: "a11y.separator"))
     }
 
     /// The individual phrases, in reading order (exposed for tests).
     public static func parts(lesson: ResolvedLesson, visibility: FieldVisibility, reasons: [ModificationReason],
-                             renderer: LocalizedTextRenderer) -> [String] {
+                             badges: LessonBadges? = nil, renderer: LocalizedTextRenderer) -> [String] {
         let fields = VisibleLessonFields(lesson: lesson, visibility: visibility)
         let formatter = renderer.formatter
         var parts: [String] = [lesson.subject.name]
@@ -130,6 +130,7 @@ public enum LessonAccessibilityLabel {
                 parts.append(renderer.format(key: "a11y.lesson.modifiedReasons", arguments: [.text(what)]))
             }
         }
+        if let badges { parts += badges.accessibilityParts(renderer: renderer) }
         return parts
     }
 }

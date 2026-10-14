@@ -27,7 +27,7 @@ Specs: PRODUCT.md (Tasks, Exams), NOTIFICATIONS.md, `docs/spikes/ALARMKIT.md`, D
 7. **Attachments:**
    - Files live in the App Group container under `Attachments/<attachmentID>/<fileName>`; the database holds only an `AttachmentRef`.
    - Sources: photos (PhotosPicker), files (fileImporter, copied in), links (never opened automatically; open with confirmation), voice notes (AVAudioRecorder, which needs `NSMicrophoneUsageDescription`).
-   - Free/Pro quota comes from `EntitlementsProvider.limit(.attachmentBytes)` (all-access for now).
+   - Free/Pro quota comes from `EntitlementsProvider.limit(.attachmentQuotaMB)` (all-access for now). *Corrected: the plan originally said `.attachmentBytes`, an orchestrator error; the frozen code name is `attachmentQuotaMB`.*
    - Orphaned files (no live reference) are cleaned up after deletion and at launch. Atomic copy-in; never delete a file a live ref points to.
 8. **Tasks:**
    - Tabs: Today / Upcoming / Overdue / Completed. Filter by subject; sort by due or priority.
@@ -38,6 +38,11 @@ Specs: PRODUCT.md (Tasks, Exams), NOTIFICATIONS.md, `docs/spikes/ALARMKIT.md`, D
     - Today shows "Due today" tasks and the next exam.
     - Timetable lesson tiles get badges ("2 tasks", "Exam") — the reference pattern.
     - Lesson detail lists linked tasks with "Add homework for this lesson".
+    - *C1 decisions (2026-10-14):* badge matching rule in `TimetableUI/Components/LessonWork.swift` (linked task →
+      its occurrence; else subject + due date → the subject's first non-cancelled lesson that day; exam → the lesson
+      containing its start, else that first lesson; each item counted once; open tasks only, exams even when done).
+      Today shows the next exam when ≤ 14 days away (`TodayWork.examHorizonDays`). Today opens task/exam details as
+      sheets in place; the overdue chip switches to Tasks → Overdue via `AppNavigation.showTasks(_:)`.
 11. **Release hygiene:** `-TabulaScreen` routes work only in DEBUG (Phase 2 decision P2-6).
 12. **Info.plist strings** (camera/microphone/AlarmKit, display name) get localised via `InfoPlist.xcstrings` on the Xcode path and generated `InfoPlist.strings` on the xtool path.
 13. **Unchanged constraints:**

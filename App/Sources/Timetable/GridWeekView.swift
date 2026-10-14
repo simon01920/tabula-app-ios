@@ -4,7 +4,8 @@
 //   period column is always visible);
 // - cells span rows (double periods include the break between), break/lunch rows are thin bands, holidays shade
 //   their column, free lesson slots are dashed and tappable (quick add);
-// - short names/emoji in cells (user short name, else the name, scaled down), status icon + conflict icon;
+// - short names/emoji in cells (user short name, else the name, scaled down), status icon + conflict icon, and the
+//   task / exam badges ("☑2 🎓", Phase 3 C1) in place of the room line (the room stays in VoiceOver and the detail);
 // - at accessibility text sizes, or when the columns would be narrower than `GridMode.minimumColumnWidth`, the same
 //   layout is shown as a list (`GridListView`).
 // VoiceOver: cells read "<date>: <lesson sentence>" column by column (sort priority), free slots read
@@ -25,6 +26,7 @@ struct GridWeekView: View {
     let onAdd: (QuickAddTarget) -> Void
 
     @Environment(AppModel.self) private var model
+    @Environment(\.lessonWork) private var work
     @Environment(\.dynamicTypeSize) private var typeSize
     @ScaledMetric(relativeTo: .caption) private var periodColumnWidth: CGFloat = 46
     @ScaledMetric(relativeTo: .caption) private var comfortableRowHeight: CGFloat = 64
@@ -210,14 +212,14 @@ struct GridWeekView: View {
                 onOpen(cell.entry)
             } label: {
                 GridCellView(cell: cell, reasons: reasons[cell.entry.id] ?? [], visibility: timetable.fieldVisibility,
-                             showsDetails: !isCompact)
+                             showsDetails: !isCompact, badges: work.badges(for: cell.entry.id))
             }
             .buttonStyle(.plain)
             .frame(width: columnWidth - 4, height: spanHeight - 4)
             .offset(x: periodColumnWidth + CGFloat(cell.column) * columnWidth + 2, y: tops[cell.row] + 2)
             .accessibilityLabel(Text(verbatim: GridPresentation.cellAccessibilityLabel(
                 cell, reasons: reasons[cell.entry.id] ?? [], visibility: timetable.fieldVisibility,
-                renderer: model.renderer)))
+                badges: work.badges(for: cell.entry.id), renderer: model.renderer)))
             .accessibilityHint(Text("timetable.a11y.openHint"))
             .accessibilitySortPriority(sortPriority(column: cell.column, row: cell.row))
         }
@@ -255,12 +257,14 @@ struct GridWeekView: View {
     }
 }
 
-/// One lesson in the grid: subject colour, emoji, short name, optional room, status/conflict icons.
+/// One lesson in the grid: subject colour, emoji, short name, the task / exam badges or else the optional room,
+/// status/conflict icons.
 struct GridCellView: View {
     let cell: TimetableCore.GridLayout.Cell
     let reasons: [ModificationReason]
     let visibility: FieldVisibility
     let showsDetails: Bool
+    var badges: LessonBadges?
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.colorSchemeContrast) private var contrast
 
@@ -279,7 +283,10 @@ struct GridCellView: View {
                 .lineLimit(2)
                 .minimumScaleFactor(0.6)
                 .strikethrough(cancelled, pattern: .solid, color: foreground)
-            if showsDetails, let room = VisibleLessonFields(lesson: lesson, visibility: visibility).room {
+            if let badges {
+                // Replaces the room line: the cell has no room for both (44 pt columns, Phase 2).
+                CompactLessonWorkBadges(badges: badges)
+            } else if showsDetails, let room = VisibleLessonFields(lesson: lesson, visibility: visibility).room {
                 Text(verbatim: room)
                     .font(.caption2)
                     .lineLimit(1)

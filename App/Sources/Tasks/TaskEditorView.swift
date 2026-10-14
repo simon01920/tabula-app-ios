@@ -22,6 +22,10 @@ enum TaskEditorMode {
 
 struct TaskEditorView: View {
     let mode: TaskEditorMode
+    /// Phase 3 C1: a new task for one lesson occurrence (subject, due date, link); ignored when editing.
+    var prefill: TaskPrefill?
+    /// The timetable of the prefilled lesson.
+    var prefillTimetableID: Timetable.ID?
     @Environment(AppModel.self) private var model
 
     var body: some View {
@@ -39,6 +43,10 @@ struct TaskEditorView: View {
             guard let task = database.tasks.first(where: { $0.id == id && !$0.isDeleted }) else { return nil }
             return TaskDraft(task: task, today: model.today)
         case .new(let id):
+            if let prefill {
+                return prefill.draft(newWithID: id, today: model.today,
+                                     timetableID: prefillTimetableID ?? model.activeTimetable?.id)
+            }
             return TaskDraft(newWithID: id, today: model.today, timetableID: model.activeTimetable?.id)
         }
     }
