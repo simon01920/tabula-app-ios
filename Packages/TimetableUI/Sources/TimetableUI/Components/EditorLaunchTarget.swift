@@ -28,6 +28,9 @@ public enum EditorLaunchTarget: Equatable, Sendable {
             self = .newSubject(timetableID: id)
         case .dayChange(let date, _, let lessonID):
             self = .dayChange(date: date, lessonID: lessonID, timetableID: id)
+        case .newTask:
+            // Not a timetable editor: the task editor route reads `TaskPrefill` itself (TasksRoutes.swift).
+            return nil
         }
     }
 }

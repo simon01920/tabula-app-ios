@@ -107,9 +107,10 @@ public enum GridPresentation {
 
     /// VoiceOver sentence of a grid/list cell with its column context: "Tuesday, 13 October: Matematika, period 2, …".
     public static func cellAccessibilityLabel(_ cell: GridLayout.Cell, reasons: [ModificationReason],
-                                              visibility: FieldVisibility, renderer: LocalizedTextRenderer) -> String {
+                                              visibility: FieldVisibility, badges: LessonBadges? = nil,
+                                              renderer: LocalizedTextRenderer) -> String {
         let lesson = LessonAccessibilityLabel.make(lesson: cell.entry, visibility: visibility, reasons: reasons,
-                                                   renderer: renderer)
+                                                   badges: badges, renderer: renderer)
         var text = renderer.format(key: "timetable.a11y.cell", arguments: [
             .text(renderer.formatter.date(cell.entry.date, style: .full)), .text(lesson),
         ])

@@ -29,8 +29,8 @@ struct SampleScenarioTests {
         #expect(scenario.database.subjects.count == 12)
         #expect(scenario.database.lessons.count == 32)
         #expect(scenario.database.overrides.count == 4)
-        #expect(scenario.database.tasks.count == 4)
-        #expect(scenario.database.exams.count == 2)
+        #expect(scenario.database.tasks.count == 8)   // 4 original + 4 Phase 3 C1 scenarios
+        #expect(scenario.database.exams.count == 3)   // + the past History test (C1)
         #expect(scenario.context == CalendarContext(timeZone: SampleScenarios.timeZone, firstWeekday: .monday))
         // The reference day (docs/checklists/PHASE2_DEVICE.md A5): ISO week 42 = week B → Etická výchova in period 7.
         let resolver = ScheduleResolver(database: scenario.database, timetableID: scenario.timetable.id,

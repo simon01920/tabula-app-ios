@@ -94,3 +94,12 @@ midterm, ja 中間試験/期末試験), plural forms of `exams.when.inDays/daysA
 categories), and "Exam period" (sk "Skúškové obdobie", de "Prüfungszeitraum").
 ### Phase 3 Stage B4 additions (2026-10-10, localization-engineer-sonnet)
 91 new keys (`reminders.*`, `health.*`, `settings.reminder-health.*`, `settings.reminders.*`: reminder rule editor, follow-up, reminder times, override section, permission sheet, quiet hours, health check and test results), machine-translated (model-authored) for all 11 authored languages, `sr-Latn` derived, all `needs_review`. Not native quality. 8 plural keys (hours/minutes/days/reminder counts, Time Sensitive lead) use the full CLDR categories for sk/cs/pl/uk/sr/ro; reviewers please check Slavic genitive/accusative forms ("minúty" vs "minút", "hodinu pred") and Hungarian wording without a case suffix after the time argument. Terminology reuses existing strings (Time Sensitive, Loud alarm, Standard, Focus, Quiet hours = sk "Pokojné hodiny", cs "Tiché hodiny", de "Ruhezeiten"). Quiet hours wording is new and worth a native check.
+
+### Phase 3 Stage C1 additions (2026-10-14, swiftui-engineer)
+9 new keys (`lesson.badge.tasks/exam`, `a11y.lesson.tasks/exam`, `today.section.dueToday`, `today.tasks.overdue(.hint)`,
+`timetable.detail.tasks/addHomework`), model-authored for 11 languages (`sr-Latn` derived), all `needs_review`.
+Reviewer: `lesson.badge.tasks` must stay very short (it sits on lesson tiles next to an icon); the VoiceOver phrases
+`a11y.lesson.tasks/exam` are appended to the comma-separated lesson sentence (lowercase mid-sentence); the overdue chip
+`today.tasks.overdue` agrees with an implied "tasks" (sk/cs "po termíne", pl/uk/sr/ro gender/number forms). Terminology
+reuses Task = sk "Úloha", cs "Úkol", de "Aufgabe"; Exam = sk "Skúška", de "Prüfung"; homework = sk "domáca úloha",
+de "Hausaufgabe", fr "devoir", ja 宿題, zh 作业.
