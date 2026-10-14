@@ -143,3 +143,44 @@ Implements NOTIFICATIONS.md "Test matrix (on device)", extended with the Phase 0
 | A8.1 | Launch normally | Tab bar: Today · Timetable · Tasks · Exams · Settings (Liquid Glass), localised in sk/de/ja | | |
 | A8.2 | Tasks / Exams tabs (before B1/B2) | Empty state with icon, title, explanation; Dynamic Type AX5 wraps; VoiceOver reads title + text | | |
 | A8.3 | Release/TestFlight build launched with `-TabulaScreen settings` (Xcode scheme) | Ignored: the normal shell opens (P2-6) | | |
+
+---
+
+## B3. Attachments (photos, files, links, voice notes)
+
+Nothing in this section has been seen running: the UI compiles (xtool, 0 warnings) but was never displayed. Storage
+rules are Linux-tested (`AttachmentStoreTests`). Open a task in the task editor (B1) → Attachments section.
+Files: `<store directory>/Attachments/<ATTACHMENT-UUID>/<name>` (Settings → Developer shows the store directory).
+To inspect files on a device: Finder/Xcode "Download Container" on a Mac later, or count rows + the usage footer.
+
+### B3a. Adding
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| B3.1 | Add Attachment → Photo → pick a HEIC photo; Save the task; reopen | Row with a sharp, correctly rotated thumbnail, title "Photo", size; still there after reopening and after force-quit | | |
+| B3.2 | Add Attachment → File → pick a PDF from On My iPhone; then several files at once | One row per file, PDF icon + file name + size; "Adding…" row while copying | | |
+| B3.3 | File → pick a file in iCloud Drive that shows a cloud icon (not downloaded) | It is copied (or a clear "Couldn’t Add Attachment" alert) — never a 0-byte file; note which | | |
+| B3.4 | Add Attachment → Link → type `example.com/x` | Row shows host `example.com`, detail `https://example.com/x` | | |
+| B3.5 | Link → `javascript:alert(1)`, `file:///etc/hosts`, `https://bank.com@evil.example` | "Not a Web Address" alert, nothing added | | |
+| B3.6 | Voice Note → Record (first time) | Microphone permission prompt appears only now, with the English usage text; after Allow: timer runs; Stop; Save → row "Voice note", duration, play button | | |
+| B3.7 | Deny microphone (Settings → Privacy → Microphone → Tabula off) → Record | Alert "Microphone Access Is Off" with Open Settings (opens Tabula's Settings page) | | |
+| B3.8 | Record, then Cancel; also swipe down while recording | Cancel discards; swipe-down is blocked while recording or with an unsaved recording | | |
+
+### B3b. Using, editing, cleanup (data-loss sensitive)
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| B3.9 | Tap photo / PDF row | Quick Look opens; Done returns to the editor | | |
+| B3.10 | Tap a link row | Confirmation "Open this link?" showing the **full URL**; only "Open Link" opens Safari | | |
+| B3.11 | Voice note: tap row (play), tap again (pause); start another one | Only one plays at a time; icon toggles play/pause; stops when the editor closes | | |
+| B3.12 | Rename, Move Up/Down (context menu), drag to reorder, swipe → Delete (confirm); Save; reopen | Order and names persist; deleted row gone; other attachments intact | | |
+| B3.13 | Add a large photo, **Cancel** the editor; reopen | Not listed (orphan). Usage footer may still include it for up to 24 h (grace period), then drops after the next launch / change | | |
+| B3.14 | Delete a task that has attachments; wait ~5 s; open another task's editor and read the usage footer | Usage drops (files of the deleted task removed after save; they were older than 24 h) — for a task created today the files stay until 24 h have passed | | |
+| B3.15 | Add an attachment, keep the editor open > 1 min while switching apps; come back; Save | The file is still there (open editor protects it) | | |
+| B3.16 | Force-quit during a large file copy ("Adding…"), relaunch | No half file listed; nothing breaks (abandoned staging is cleaned after 1 h) | | |
+| B3.17 | Device backup (Finder or iCloud), restore to the same/another device | Attachments come back with the tasks (App Group container in backup — record result) | | |
+
+### B3c. Accessibility and languages
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| B3.18 | VoiceOver on a row | Reads title + details; hint ("Opens a preview." / "Asks before opening the link." / "Plays the voice note."); rotor actions Rename, Move Up, Move Down, Delete | | |
+| B3.19 | Dynamic Type AX5 | Thumbnails scale, titles wrap (3 lines), no clipped buttons | | |
+| B3.20 | sk / de / ja | All attachment strings translated (no raw `attachments.*` keys); sizes formatted per locale ("1,2 MB") | | |

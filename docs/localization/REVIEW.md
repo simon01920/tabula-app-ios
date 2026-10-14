@@ -85,3 +85,11 @@ all `needs_review`. Terminology follows the existing `settings.reminders.*` stri
 de "Zeitkritisch", ja "即時通知"). French uses NBSP before ":"; Serbian keeps the app name "Tabula" in Latin script, as
 the existing strings do. Apple UI terms (Focus, Low Power Mode, Background App Refresh, Action button, Control Center)
 should be checked against each language's iOS wording during review. Recorded in `translations/<lang>.json`.
+
+### Phase 3 stage B3 additions (2026-10-14, sync-storage-engineer)
+49 new `attachments.*` keys (add menu, row titles/hints, rename/delete/link dialogs, quota and error messages, voice
+recorder), English + model-authored translations for the 11 authored languages (`sr-Latn` derived), all
+`needs_review`. Terms: "Voice note" follows the iOS app name where natural (de "Sprachnotiz", fr "Mémo vocal",
+ja "ボイスメモ", zh "语音备忘"); keep `https://example.com` literal. `attachments.usage.*` / `attachments.error.quota`
+insert locale-formatted byte sizes ("12,3 MB"). The Stage A key `attachments.placeholder` is no longer used by code
+(left in place; remove in a cleanup pass). `NSMicrophoneUsageDescription` is English-only like the other usage strings.
