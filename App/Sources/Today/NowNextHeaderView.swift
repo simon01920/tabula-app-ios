@@ -18,6 +18,8 @@ struct NowNextHeaderView: View {
     /// Modification reasons of today's / the next day's occurrences (for badges and VoiceOver).
     let reasons: [OccurrenceID: [ModificationReason]]
     @Environment(AppModel.self) private var model
+    /// Task / exam badges of the shown lessons (Phase 3 C1; set by `TodayRootView`).
+    @Environment(\.lessonWork) private var work
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -186,7 +188,8 @@ struct NowNextHeaderView: View {
         var parts = [model.renderer.string(forKey: captionKey)]
         if let day = whenDay(lesson) { parts.append(day) }
         parts.append(LessonAccessibilityLabel.make(lesson: lesson, visibility: visibility,
-                                                   reasons: reasons[lesson.id] ?? [], renderer: model.renderer))
+                                                   reasons: reasons[lesson.id] ?? [],
+                                                   badges: work.badges(for: lesson.id), renderer: model.renderer))
         return parts.joined(separator: model.renderer.string(forKey: "a11y.separator"))
     }
 
@@ -208,11 +211,15 @@ struct NowNextHeaderView: View {
                 if let badge = LessonStatusBadgeModel.make(status: lesson.status, reasons: reasons[lesson.id] ?? []) {
                     LessonStatusBadge(badge)
                 }
+                if let badges = work.badges(for: lesson.id) {
+                    LessonWorkBadgeRow(badges: badges)
+                }
             }
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(verbatim: LessonAccessibilityLabel.make(lesson: lesson, visibility: visibility,
                                                                          reasons: reasons[lesson.id] ?? [],
+                                                                         badges: work.badges(for: lesson.id),
                                                                          renderer: model.renderer)))
     }
 

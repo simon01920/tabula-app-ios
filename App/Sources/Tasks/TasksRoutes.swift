@@ -5,7 +5,9 @@
 //   tasks.overdue       → the tab with the Overdue segment selected
 //   tasks.completed     → the tab with the Completed segment selected
 //   tasks.editor        → sheet: the editor of a task from the `-TabulaSeed` data (the first open task by due date)
-//   tasks.editor-new    → sheet: the editor for a new task
+//   tasks.editor-new    → sheet: the editor for a new task; opened by the lesson detail ("Add homework for this
+//                         lesson", Phase 3 C1) with `EditorContext(.newTask(TaskPrefill))` in the environment, which
+//                         prefills subject, due = the lesson's date and the linked occurrence
 //   tasks.detail        → sheet: the detail of the task a notification deep link asked for
 //                         (`AppNavigation.presentedItem`); without one (screenshot launch) a sample task from the seed
 // The detail route is also the notification deep-link target (Routing/AppNavigation.swift).
@@ -72,11 +74,17 @@ private struct TaskEditorRouteView: View {
     }
 }
 
-/// `tasks.editor-new`: a new task (the ID is generated once per presentation).
+/// `tasks.editor-new`: a new task (the ID is generated once per presentation), prefilled when the presenter passed an
+/// `EditorContext` with a `.newTask` target (Phase 3 C1, lesson detail).
 private struct TaskEditorNewRouteView: View {
     @State private var newID = TaskItem.ID(UUID())
+    @Environment(\.editorContext) private var editorContext
 
     var body: some View {
-        TaskEditorView(mode: .new(newID))
+        if case .newTask(let prefill)? = editorContext?.target {
+            TaskEditorView(mode: .new(newID), prefill: prefill, prefillTimetableID: editorContext?.timetableID)
+        } else {
+            TaskEditorView(mode: .new(newID))
+        }
     }
 }

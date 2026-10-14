@@ -6,8 +6,8 @@
 //                         `.exam`); launched without an item it shows the next exam of the seed data
 //   exams.editor        → sheet: the editor for that same sample exam (a new exam when the seed has none)
 //   exams.editor-new    → sheet: the editor for a new exam
-// Seed data: every scenario of `-TabulaSeed` has at least one upcoming exam (none has a past one or an exam-period
-// break, so the History segment and the period header show their empty / absent state in screenshots).
+// Seed data: every scenario of `-TabulaSeed` has at least one upcoming exam; since Phase 3 C1 `secondary` also has a
+// past History test (History segment) and `university` an exam-period break with two finals (period header).
 import SwiftUI
 import TimetableCore
 

@@ -249,7 +249,7 @@ Repeat the visual checks in: empty (no rules) / normal / long text, Dynamic Type
 
 Unverifiable without a device: the system permission prompts, delivery, Focus behaviour, whether the notification settings URL lands on the app's page, and every visual aspect.
 ## B1. Tasks tab (Stage B1 — unverified on device; the UI was never run or seen)
-Seed launches: `-TabulaSeed secondary` (tasks due 14/15/16/19 Oct, one completed; none overdue/today at the reference time). Routes: `tasks`, `tasks.upcoming|overdue|completed`, `tasks.editor`, `tasks.editor-new`, `tasks.detail`.
+Seed launches: `-TabulaSeed secondary` (since C1: 8 tasks — 1 overdue, 1 due today, 4 upcoming, 2 completed; see C1). Routes: `tasks`, `tasks.upcoming|overdue|completed`, `tasks.editor`, `tasks.editor-new`, `tasks.detail`.
 
 | ID | Steps | Expected | Observed | ✔/✘ |
 |---|---|---|---|---|
@@ -272,3 +272,69 @@ Seed launches: `-TabulaSeed secondary` (tasks due 14/15/16/19 Oct, one completed
 | B1.17 | VoiceOver on a row | One sentence (title, subject, due, priority, subtasks...); actions: open, mark done/not done, delete | | |
 | B1.18 | Dynamic Type AX5, dark mode, long title, ja/zh, German | No clipping, 44 pt targets, texts wrap; chips scroll | | |
 | B1.19 | Plurals sk/pl/uk/ro: "In 3 days", "5 days overdue", "Every 3 weeks" | Correct forms | | |
+
+## C1. Cross-feature integration (Stage C1 — Today work, lesson badges, lesson detail tasks; never run or seen)
+Seed: `-TabulaSeed secondary` at the fixed clock Tue 2026-10-13 10:20 (Europe/Bratislava). Since C1 it has: FYZ lab
+report **overdue** (due Mon 12), NEJ "Nemčina – Lektion 3" **due today** (2/5 subtasks, weekly repeat), ANJ due Wed 14,
+MAT due Thu 15, SJL due Mon 19 08:00, INF **high-priority assignment linked to Wed 21's double period**, two completed
+(DEJ, BIO due today), exams: **past DEJ test Mon 12** (History segment), CHE test Thu 22 (9 days → Today card), BIO Tue 27.
+`-TabulaSeed university`: "Skúškové obdobie – zimný semester" (4 Jan – 12 Feb 2027, `examPeriod`) with two finals.
+
+**Badge rule** (LessonWork.swift): a linked task → exactly its occurrence; otherwise subject + due date → the first
+non-cancelled lesson of that subject that day; an exam → the lesson containing its start, else that first lesson. Each
+task/exam counts once. Open tasks only (completed tasks are listed in the lesson detail, not counted); exams count even
+when marked done.
+
+### C1.1 Today
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| C1.1.1 | `today@secondary` | Order: Now & Next header → "Due today" (one row: Nemčina – Lektion 3, 2/5, repeat icon) with a red "1 overdue" chip → CHE "Next exam" card ("in 9 days") → today's tiles | | |
+| C1.1.2 | Tap the row's text | Task detail sheet over Today (Today stays selected); Done closes it | | |
+| C1.1.3 | Tap the row's circle | Task completes and leaves "Due today"; the repeat creates next Tuesday's task (Tasks → Upcoming); the NEJ tile badge disappears | | |
+| C1.1.4 | Tap "1 overdue" | Tasks tab opens on the Overdue segment (FYZ lab report); tapping it again from Today later re-selects Overdue | | |
+| C1.1.5 | Tap the exam card | Exam detail sheet of the CHE test; Done closes it | | |
+| C1.1.6 | Nothing due + nothing overdue (complete/delete them) | The "Due today" section is absent (no empty placeholder); card still shows when an exam is ≤ 14 days away, absent otherwise | | |
+| C1.1.7 | Empty store / blank seed | Unchanged empty states; no badges, no sections | | |
+| C1.1.8 | Today's NEJ tile and the header (when NEJ is current/next) | "☑ 1 task" capsule under the tile's fields; BIO tile shows no badge (its task is completed) | | |
+
+### C1.2 Lesson badges (grid / week / day / tiles / list fallback)
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| C1.2.1 | `timetable.grid@secondary` (week of 12 Oct) | Compact "☑1" on Mon FYZ, Tue NEJ, Wed ANJ, Thu MAT; graduation cap on Mon DEJ; these cells drop their room line; nothing else badged | | |
+| C1.2.2 | Next week (swipe) | "☑1" on Mon SJL and Wed INF (double period, once), cap on Thu CHE | | |
+| C1.2.3 | Week time-blocks view | Same badges on blocks ≥ 40 pt tall; short blocks rely on VoiceOver | | |
+| C1.2.4 | Day view / big tiles (`timetable.tiles@secondary`) | Full capsules "☑ 1 task" / "🎓 Exam" on the tile; wrap under each other in German/AX sizes | | |
+| C1.2.5 | Dynamic Type AX5 on the grid | List fallback rows show the full capsules; 44 pt rows; nothing clipped | | |
+| C1.2.6 | Cell tap targets | Grid cells still ≥ 44 pt wide (5-day week on iPhone 16 Pro Max); badges do not steal taps | | |
+| C1.2.7 | Dark mode, light subject colours (yellow) | Compact badge uses the tile's legible foreground; capsules readable on material | | |
+| C1.2.8 | VoiceOver on a badged cell | One sentence ending "…, 1 open task" / "…, exam on this day" (no separate badge element) | | |
+| C1.2.9 | Add a task due today for a subject with two lessons today | Badge only on the first (or the first non-cancelled) lesson | | |
+
+### C1.3 Lesson detail "Homework & tasks"
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| C1.3.1 | `timetable.lesson-detail@secondary` (Thu MAT, room change) | Header shows status badge + "☑ 1 task"; section "Homework & tasks" lists the worksheet; "Add homework for this lesson" button | | |
+| C1.3.2 | Tap the circle | Completes; row stays, struck through (completed listed after open); header badge disappears; tap again reopens | | |
+| C1.3.3 | Tap the row text | Task detail sheet on top of the lesson detail | | |
+| C1.3.4 | "Add homework for this lesson" on Wed 21 INF | Task editor: kind Homework, subject Informatika, due "lesson" showing Wed 21 Oct with its start time; Save → badge "☑ 2 tasks" on that cell only | | |
+| C1.3.5 | Same on a one-off (added) lesson (Thu 15 INF consultation) | Saved task has due = that date, no link; shows on that lesson (subject rule) | | |
+| C1.3.6 | Change the subject inside the prefilled editor | Due re-resolves to that subject's next lesson (existing editor behaviour) | | |
+| C1.3.7 | Lesson without tasks | Section shows only the add button (no "no tasks" placeholder) | | |
+
+### C1.4 Deep links (notification tap, Stage A delegate) — verified in code, not on device
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| C1.4.1 | Tap a task reminder, app in background | Tasks tab + task detail sheet (`tasks.detail` reads `presentedItem`) | | |
+| C1.4.2 | Tap an exam reminder, app killed (cold launch) | Exams tab + exam detail sheet after loading | | |
+| C1.4.3 | Tap a reminder while a Today sheet (lesson detail) is open | Known risk: the shell's sheet cannot present over another sheet; note what happens | | |
+
+### C1.5 Text and languages
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| C1.5.1 | `tasks@secondary@sk`, `exams@secondary@de`, Today in de/hu/fr | "1 úloha"/"2 úlohy"/"5 úloh", "1 Aufgabe"; "Heute fällig"; overdue chip fits or wraps under the heading | | |
+| C1.5.2 | ja / zh-Hans | タスク1件 / 1 项任务 fit on tiles; no clipping | | |
+| C1.5.3 | Long task title (100+ chars) in "Due today" and the lesson detail | Wraps, no truncation of the circle control | | |
+
+Unverifiable without a device: every visual aspect (badge fit inside 44 pt grid cells, ViewThatFits wrapping, capsule
+contrast on subject colours), sheet-over-sheet presentation from the lesson detail, the Tasks-tab rebuild on the overdue
+chip (state of filters resets by design), and notification deep links.

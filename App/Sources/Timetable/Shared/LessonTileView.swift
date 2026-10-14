@@ -1,7 +1,7 @@
 // Subject-coloured lesson tile shared by Today and the big-tiles view, plus the compact list row used by the grid's
 // list fallback. Every optional field goes through `LessonFieldLines` (field rule), text on the subject colour uses
 // `LessonTileStyle.foreground` (WCAG black/white), the status is an icon + text badge, and VoiceOver reads the single
-// `LessonAccessibilityLabel` sentence.
+// `LessonAccessibilityLabel` sentence (which ends with the task / exam badges of `\.lessonWork`, Phase 3 C1).
 // APIs: RoundedRectangle(cornerRadius:style:), strokeBorder(_:lineWidth:), Label(title:icon:), Text(verbatim:),
 //       strikethrough(_:pattern:color:), monospacedDigit(), accessibilityElement(children:), accessibilityLabel(_:),
 //       accessibilityValue(_:), accessibilityHint(_:), accessibilityAddTraits(_:), @ScaledMetric,
@@ -28,12 +28,14 @@ struct LessonTileView: View {
     var density: Density = .comfortable
 
     @Environment(AppModel.self) private var model
+    @Environment(\.lessonWork) private var work
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.colorSchemeContrast) private var contrast
     @ScaledMetric(relativeTo: .body) private var padding: CGFloat = 14
 
     var body: some View {
         let style = LessonTileStyle(color: lesson.subject.color)
+        let badges = work.badges(for: lesson.id)
         let foreground = Color(style.foreground)
         let isCancelled = lesson.status == .cancelled
         let compact = density.effective == .compact
@@ -72,6 +74,10 @@ struct LessonTileView: View {
                     .foregroundStyle(Color.primary)
                     .padding(.top, 2)
             }
+            if let badges {
+                LessonWorkBadgeRow(badges: badges)
+                    .padding(.top, 2)
+            }
         }
         .foregroundStyle(foreground)
         .padding(padding * (size == .large ? 1.25 : 1))
@@ -88,7 +94,8 @@ struct LessonTileView: View {
         .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(verbatim: LessonAccessibilityLabel.make(lesson: lesson, visibility: visibility,
-                                                                         reasons: reasons, renderer: model.renderer)))
+                                                                         reasons: reasons, badges: badges,
+                                                                         renderer: model.renderer)))
         .accessibilityValue(ifPresent: timingValue)
     }
 
@@ -173,8 +180,10 @@ struct LessonRowView: View {
     let visibility: FieldVisibility
     var isInConflict = false
     @Environment(AppModel.self) private var model
+    @Environment(\.lessonWork) private var work
 
     var body: some View {
+        let badges = work.badges(for: lesson.id)
         HStack(alignment: .top, spacing: 12) {
             SubjectBadge(subject: lesson.subject, size: 40)
             VStack(alignment: .leading, spacing: 4) {
@@ -190,6 +199,9 @@ struct LessonRowView: View {
                 if let badge = LessonStatusBadgeModel.make(status: lesson.status, reasons: reasons) {
                     LessonStatusBadge(badge)
                 }
+                if let badges {
+                    LessonWorkBadgeRow(badges: badges)
+                }
                 if isInConflict {
                     Label { Text("timetable.conflict.badge") } icon: { Image(systemName: "exclamationmark.triangle") }
                         .font(.caption.weight(.semibold))
@@ -202,6 +214,7 @@ struct LessonRowView: View {
         .contentShape(Rectangle())
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(verbatim: LessonAccessibilityLabel.make(lesson: lesson, visibility: visibility,
-                                                                         reasons: reasons, renderer: model.renderer)))
+                                                                         reasons: reasons, badges: badges,
+                                                                         renderer: model.renderer)))
     }
 }

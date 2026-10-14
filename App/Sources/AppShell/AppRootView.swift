@@ -97,7 +97,12 @@ struct MainTabView: View {
                 root(for: .timetable) { TimetableRootView() }
             }
             Tab("shell.tab.tasks", systemImage: "checklist", value: AppTab.tasks) {
-                root(for: .tasks) { TasksRootView() }
+                if let request = navigation.taskSegmentRequest {
+                    // Phase 3 C1: Today's overdue chip asked for a segment; a new request id rebuilds the tab on it.
+                    TasksRootView(initialSegment: request.segment).id(request.id)
+                } else {
+                    root(for: .tasks) { TasksRootView() }
+                }
             }
             Tab("shell.tab.exams", systemImage: "graduationcap", value: AppTab.exams) {
                 root(for: .exams) { ExamsRootView() }
