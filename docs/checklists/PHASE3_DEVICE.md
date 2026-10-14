@@ -183,3 +183,68 @@ Dynamic Type AX5, dark mode, German/Hungarian (long), Japanese/Chinese, and Voic
 | B2.25 | Dark mode / Increase Contrast | Card frame and fill legible; subject badge text legible; no text drawn on the escalation colour | | |
 | B2.26 | Midnight rollover with the Exams tab open | Countdown texts update ("Tomorrow" becomes "Today") after the day changes / app becomes active | | |
 | B2.27 | Plurals: exam 2, 5, 21 days away in sk, pl, uk, cs | Grammatically correct forms | | |
+## B4. Reminder settings, rule editor, override section, permission explainer, health check (Stage B4)
+UI written without being seen (no Simulator): check layout, wording and behaviour on the device. Routes for CI screenshots:
+`settings.reminders`, `settings.reminder-rule` (homework rule), `settings.reminder-health`, `reminders.permission`.
+Repeat the visual checks in: empty (no rules) / normal / long text, Dynamic Type XXL and AX5, dark mode, German
+(longest strings), Japanese or Chinese, Slovak (plural forms 1/2/5 minutes), VoiceOver.
+
+### B4.1 Settings → Reminders
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| B4.1.1 | Open Settings → Reminders (fresh install, no permission yet) | No system prompt appears. Rows: health link, one switch per kind (Homework, Assignments, Exams, Before a lesson/class, To-dos; "Pack your bag" only if the bring list is an enabled lesson field), Time Sensitive, loud alarms, quiet hours, explanations | | |
+| B4.1.2 | Switch Homework on while notifications are "not determined" | Pre-explainer sheet opens (no system prompt yet). "Not Now" closes it and keeps the rule on | | |
+| B4.1.3 | In the sheet tap "Allow Notifications" | System prompt appears; sheet closes; health shows Notifications OK after allowing | | |
+| B4.1.4 | Deny in the prompt, switch another kind on | No explainer again (permission is determined); health row says "Turned off in Settings" with Open Settings | | |
+| B4.1.5 | Row under each enabled kind: "Times and delivery" | Opens the rule editor, 44 pt row | | |
+| B4.1.6 | Switch a kind off and on | Rule keeps its edited values (rule disabled, not deleted); summary line shows times and a non-Standard tier name | | |
+| B4.1.7 | Time Sensitive switch + stepper (5–240 min) | Footer explains: breaks through Focus, not the silent switch; stepper text uses correct plural (sk: 1 minúta / 2 minúty / 5 minút) | | |
+| B4.1.8 | Loud alarms switch on | Policy on, AlarmKit prompt appears (own permission); deny: note "Turned off in Settings…"; switch off turns the policy off | | |
+| B4.1.9 | Global quiet hours on, set 22:00 to 07:00 | Two time rows appear; a reminder planned inside the window moves to 07:00 (Debug screen plan / next notification); off removes rows | | |
+| B4.1.10 | Read-only store | Controls disabled | | |
+
+### B4.2 Rule editor (Settings → Reminders → kind → Times and delivery)
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| B4.2.1 | Open the editor of a kind with no rule yet | "Remind me" off, nothing else shown; switching on creates the rule with the profile preset's times | | |
+| B4.2.2 | Add Reminder Time menu | Presets (15 minutes, 1 hour, on the day at 07:00, 1/3/7 days before at 18:00) not already present, plus "Custom Time…"; adding the same twice is impossible | | |
+| B4.2.3 | Tap a time row | Editor: type picker, amount stepper (plural text updates), clock time for "days before"; back arrow keeps the change | | |
+| B4.2.4 | Swipe a time row to delete, delete all | Footer warns "Add at least one reminder time"; no crash, rule plans nothing | | |
+| B4.2.5 | Follow-up: None / A while later / Next morning | Delay picker (30 min to 6 h) or time row appears; footer says "only if not done" and never loud | | |
+| B4.2.6 | Tier rows: Standard, Time Sensitive, Loud alarm | Each shows title + honest explanation; selected row has check mark and VoiceOver "selected"; Time Sensitive footer shows the N-minute policy (or "turned off" when the policy is off) | | |
+| B4.2.7 | Select Loud alarm | Policy turns on, AlarmKit prompt; after deny the denied note and Open Settings appear. Plan (Debug screen) contains an alarm only after allowing | | |
+| B4.2.8 | Quiet hours for this kind | Toggle and two time rows; a reminder inside moves to the end, skipped when after the due time | | |
+| B4.2.9 | After any edit | The rule is user-made (alarms possible); Debug screen shows a re-plan within about 1 s | | |
+
+### B4.3 Per-item override (inside the task and exam editors, after B1/B2 embed it)
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| B4.3.1 | Open a task editor, section "Reminders" | "Use default reminders" on; footer lists the default (e.g. "1 day before, at 18:00"); if the kind is off: "No default reminders are switched on…" | | |
+| B4.3.2 | Turn "Use default" off | Rows: Remind me, Times (Same as default / Custom), Delivery, Follow-up. First time with notifications "not determined": pre-explainer sheet | | |
+| B4.3.3 | Remind me off | Other rows disappear; saving the task plans no reminders for it | | |
+| B4.3.4 | Times: Custom | Seeds with the default times; add/remove/edit as in B4.2 (rows push inside the sheet's navigation) | | |
+| B4.3.5 | Delivery: Loud alarm | Policy on + AlarmKit prompt; the item's reminder rings at the chosen time (A4) | | |
+| B4.3.6 | Follow-up: Same as default / None / A while later / Next morning | Planner follows it (Debug screen) | | |
+| B4.3.7 | Turn "Use default" back on and save | `reminderOverride` is gone (default reminders apply again) | | |
+
+### B4.4 Pre-explainer sheet (`reminders.permission`)
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| B4.4.1 | Open it from the health check ("Allow Notifications" action) | Explains why and what arrives; buttons 44 pt+; nothing requested until "Allow Notifications" | | |
+| B4.4.2 | Open it while the permission is denied | Footer says notifications are off; primary button becomes "Open Settings" and opens the app's notification settings | | |
+| B4.4.3 | Cold launch | The sheet never appears at launch | | |
+
+### B4.5 Health check (`settings.reminder-health`)
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| B4.5.1 | Open it | Summary line plus rows; every row has a symbol AND a status word (OK / Info / Check / Problem); pull to refresh works | | |
+| B4.5.2 | Toggle Low Power Mode in Control Center, come back | Low Power row updates (warning) | | |
+| B4.5.3 | Turn Background App Refresh off in iOS Settings, return | Row shows the warning with "Open Settings" | | |
+| B4.5.4 | Change the notification permission in iOS Settings, return | Row follows; "Open Settings" lands on the app's notification settings page | | |
+| B4.5.5 | With a Loud-alarm rule and alarm permission not determined | Alarms row warns with "Allow Loud Alarms"; tapping asks AlarmKit | | |
+| B4.5.6 | Send Test Notification | "Sent. It arrives in a few seconds." then a banner after about 5 s (Standard) | | |
+| B4.5.7 | Send Test Alarm (only visible once alarms are allowed) | Rings after about 60 s with Stop/Snooze; result line says scheduled | | |
+| B4.5.8 | Create 70+ reminders (many tasks) | Scheduled row shows x of 64 and the "reminder limit" warning with explanation | | |
+| B4.5.9 | Silent mode / Focus rows | Readable at AX5; VoiceOver reads title, status word, detail as one element | | |
+
+Unverifiable without a device: the system permission prompts, delivery, Focus behaviour, whether the notification settings URL lands on the app's page, and every visual aspect.

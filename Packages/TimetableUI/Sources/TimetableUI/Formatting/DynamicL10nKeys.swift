@@ -74,6 +74,8 @@ public enum DynamicL10nKeys {
         keys += LessonType.knownValues.compactMap(VisibleLessonFields.nameKey(of:))
         keys += ["timetable.cycle.namedWeek", "timetable.cycle.numberedWeek", "timetable.cycle.namedDay",
                  "timetable.cycle.numberedDay"]
+        keys += ReminderUIKeys.allKeys
+        keys += ReminderRuleDefaults.targets.map { ReminderKindList.titleKey($0, terminology: .classLecture) }
         return Array(Set(keys)).sorted()
     }
 }
