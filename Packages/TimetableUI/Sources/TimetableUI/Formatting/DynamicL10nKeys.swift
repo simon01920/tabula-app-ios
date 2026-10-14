@@ -14,6 +14,10 @@ public enum DynamicL10nKeys {
     public static func defaultView(_ value: TimetableViewKind) -> String { "editor.view." + value.rawValue }
     public static func reminderTarget(_ value: ReminderTarget) -> String { "onboarding.reminders.target." + value.rawValue }
     public static func examKind(_ value: ExamKind) -> String { "exams.kind." + value.rawValue }
+    /// Name of an attachment kind (stage B3); unknown kinds (newer app versions) → "Attachment".
+    public static func attachmentKind(_ value: AttachmentKind) -> String {
+        AttachmentKind.knownValues.contains(value) ? "attachments.kind." + value.rawValue : "attachments.kind.unknown"
+    }
     /// Catalog key of a lesson field's name in the lesson detail list (`LessonDetailView`).
     public static func lessonDetailField(_ field: LessonField) -> String {
         switch field {
@@ -77,6 +81,7 @@ public enum DynamicL10nKeys {
         keys += ReminderUIKeys.allKeys
         keys += ReminderRuleDefaults.targets.map { ReminderKindList.titleKey($0, terminology: .classLecture) }
         keys += TaskL10nKeys.allKeys
+        keys += AttachmentKind.knownValues.map(attachmentKind) + [attachmentKind(AttachmentKind(rawValue: "future"))]
         return Array(Set(keys)).sorted()
     }
 }
