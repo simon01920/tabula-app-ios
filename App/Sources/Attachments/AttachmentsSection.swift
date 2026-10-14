@@ -117,7 +117,7 @@ struct AttachmentsSection: View {
             VoiceNoteRecorderSheet { url in importVoiceNote(url) }
         }
         .alert(Text("attachments.link.title"), isPresented: $showLinkPrompt) {
-            TextField(text: $linkText, prompt: Text(verbatim: "https://")) { Text("attachments.link.field") }
+            TextField(text: $linkText) { Text("attachments.link.field") }
                 .keyboardType(.URL)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()

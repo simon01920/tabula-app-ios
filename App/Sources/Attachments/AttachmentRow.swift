@@ -127,16 +127,21 @@ struct AttachmentRow: View {
         }
     }
 
-    private var accessibilityValue: Text {
-        guard ref.kind == .voiceNote, isPlaying else { return Text(verbatim: "") }
-        return Text("attachments.voice.playing")
+    /// "Playing" while this voice note plays, else empty (no value announced). A String, so the modifier and the
+    /// row's identity stay the same when it changes.
+    private var accessibilityValue: String {
+        guard ref.kind == .voiceNote, isPlaying else { return String() }
+        return String(localized: "attachments.voice.playing")
     }
 
-    private var accessibilityHint: Text {
+    /// What activating the row does; empty for a missing file (the row is disabled and says why).
+    private var accessibilityHint: String {
         switch ref.kind {
-        case .link: return Text("attachments.hint.link")
-        case .voiceNote: return Text(isPlaying ? "attachments.voice.pause" : "attachments.voice.play")
-        default: return isMissing ? Text(verbatim: "") : Text("attachments.hint.preview")
+        case .link: return String(localized: "attachments.hint.link")
+        case .voiceNote:
+            if isMissing { return String() }
+            return isPlaying ? String(localized: "attachments.voice.pause") : String(localized: "attachments.voice.play")
+        default: return isMissing ? String() : String(localized: "attachments.hint.preview")
         }
     }
 
