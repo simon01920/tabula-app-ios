@@ -110,3 +110,7 @@ Reviewer: `lesson.badge.tasks` must stay very short (it sits on lesson tiles nex
 `today.tasks.overdue` agrees with an implied "tasks" (sk/cs "po termíne", pl/uk/sr/ro gender/number forms). Terminology
 reuses Task = sk "Úloha", cs "Úkol", de "Aufgabe"; Exam = sk "Skúška", de "Prüfung"; homework = sk "domáca úloha",
 de "Hausaufgabe", fr "devoir", ja 宿題, zh 作业.
+
+## Screenshot fixes (Phase 3)
+
+New keys `tasks.quickAdd.due.tomorrow`, `tasks.quickAdd.due.nextLesson` (replace `tasks.quickAdd.dueTomorrow` / `dueNextLesson`) and `settings.reminders.kind.edit.a11y` are machine-translated into all 12 languages (needs_review). The date comes first in the next-lesson value; check the middle dot reads naturally in ja/zh.

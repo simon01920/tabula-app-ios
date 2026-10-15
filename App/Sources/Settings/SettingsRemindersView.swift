@@ -92,6 +92,9 @@ struct SettingsRemindersView: View {
             NavigationLink { RemindersRuleEditorView(target: target) } label: {
                 Text("settings.reminders.kind.edit").frame(minHeight: 44, alignment: .leading)
             }
+            .accessibilityLabel(Text(verbatim: model.renderer.format(key: "settings.reminders.kind.edit.a11y", arguments: [
+                .text(model.renderer.string(forKey: ReminderKindList.titleKey(target, terminology: terminology))),
+            ])))
         }
     }
 
