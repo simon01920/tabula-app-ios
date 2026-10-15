@@ -1,5 +1,13 @@
 # Tabula: what exists right now
 
+> **Update after Phase 3 (2026-10-15):** five tabs: Today · Timetable · **Tasks** · **Exams** · Settings.
+> - **Tasks:** Today / Upcoming / Overdue / Completed, quick add, subtasks, repeat, attachments with photos, files, links and voice notes.
+> - **Exams:** countdown, history, exam period.
+> - **Reminders:** notifications, Time Sensitive (paid account) and AlarmKit loud alarms. Settings has per-kind rules and a health check.
+> - **Integration:** task and exam badges on timetable tiles; Today shows tasks due today and the next exam.
+>
+> Screenshots: [`screenshots/phase3/`](screenshots/phase3/). Gate report: `docs/gates/PHASE-3.md`. Delivery behaviour (lock screen, alarms, Focus) is still unverified on a device: `docs/checklists/PHASE3_DEVICE.md`.
+
 > **Update after Phase 2 (2026-10-10):** the app now has real screens: onboarding, Today, Timetable (grid / week / day / tiles), editors, settings, in 12 languages. Current screenshots are in [`screenshots/phase2/`](screenshots/phase2/). The gate report is `docs/gates/PHASE-2.md`. The sections below describe the state after Phase 1 and are kept for history.
 
 # Phase 1 state (historical)
