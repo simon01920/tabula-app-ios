@@ -503,3 +503,11 @@ Apple docs read as DocC JSON (`developer.apple.com/tutorials/data/documentation/
 **Storage layout:** `<store directory>/Attachments/<ATTACHMENT-UUID>/<sanitized name>` (store directory = App Group
 `Tabula/` or the Application Support fallback, next to `tabula.json`); staging in `Attachments/.staging/<random>/`,
 renamed into place. Seed runs (`-TabulaSeed`) use `tmp/TabulaSeedAttachments`.
+
+## 24. Phase 3 final QA fixes (2026-10-15)
+| Fact / assumption | Status | Source / evidence |
+|---|---|---|
+| `UIViewController.presentedViewController` (iOS 5): "The view controller that is presented by this view controller, or one of its ancestors in the view controller hierarchy"; nil when nothing was presented modally | VERIFIED (docs) + COMPILED | [presentedViewController](https://developer.apple.com/documentation/uikit/uiviewcontroller/presentedviewcontroller). Used read-only by `WindowPresentationProbe` (RootPresentation.swift) to know whether a SwiftUI sheet/alert/Quick Look is up. That SwiftUI sheets presented from a tab's content always show up on the window root's `presentedViewController` is **not documented** → device rows Q6.1–Q6.7 |
+| `onChange(of:initial:_:)` with a zero-parameter action (iOS 17) | VERIFIED (docs) + COMPILED | [onChange(of:initial:_:)](https://developer.apple.com/documentation/swiftui/view/onchange(of:initial:_:)-8wgw9) |
+| Failed assumption: Windows Python `write_text` / text-mode writes produce **CRLF**; `scripts/l10n-add.py --check` (run by validate.sh in WSL) then fails. Run the l10n scripts inside WSL (via a script file: PowerShell 5.1 strips the inner double quotes of `bash -lc '…"path with spaces"…'`) | FACT (observed) | this fix pass |
+| Git inside WSL cannot use a worktree created by Windows git (`.git` file points to a `C:/…` gitdir) → run git from Windows, builds/tests from WSL | FACT (observed) | this fix pass |

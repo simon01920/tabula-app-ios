@@ -110,3 +110,9 @@ Reviewer: `lesson.badge.tasks` must stay very short (it sits on lesson tiles nex
 `today.tasks.overdue` agrees with an implied "tasks" (sk/cs "po termíne", pl/uk/sr/ro gender/number forms). Terminology
 reuses Task = sk "Úloha", cs "Úkol", de "Aufgabe"; Exam = sk "Skúška", de "Prüfung"; homework = sk "domáca úloha",
 de "Hausaufgabe", fr "devoir", ja 宿題, zh 作业.
+
+### Phase 3 final QA fixes (2026-10-15, Opus fix agent)
+1 new key (`attachments.unavailable`, neutral text when the attachments section is shown without its editor host) and
+1 changed English text (`health.notifications.notDetermined`: Tabula now asks once, after the first save of a task or
+exam that has a reminder; old translations dropped, re-authored). Model-authored for 11 languages (`sr-Latn` derived),
+all `needs_review`. Reviewer: "asks once" must not read as a promise to ask again; ro uses "reamintire" as elsewhere.
