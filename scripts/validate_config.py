@@ -255,6 +255,29 @@ for plist_name in ("Config/App-Info.plist", "Config/Widgets-Info.plist"):
     check(declared is not None and set(declared) == set(L10N.LANGS) and len(declared) == len(L10N.LANGS),
           f"{plist_name}: CFBundleLocalizations lists the shipped languages ({len(L10N.LANGS)} ids)",
           f"{plist_name}: CFBundleLocalizations {declared} != {list(L10N.LANGS)}")
+# Info.plist strings (display name + usage descriptions): Resources/InfoPlist.xcstrings, same 12-language completeness.
+# XcodeGen path: Xcode compiles it (project.yml app target resources). xtool path: scripts/infoplist-strings.py.
+ip_catalog = json.loads((ROOT / "Resources/InfoPlist.xcstrings").read_text(encoding="utf-8"))["strings"]
+app_plist = plistlib.load(open(ROOT / "Config/App-Info.plist", "rb"))
+ip_wanted = {k for k in app_plist if k == "CFBundleDisplayName" or (k.startswith("NS") and k.endswith("UsageDescription"))}
+check(ip_wanted == set(ip_catalog),
+      f"InfoPlist.xcstrings: keys == user-visible keys of Config/App-Info.plist ({len(ip_wanted)}: {', '.join(sorted(ip_wanted))})",
+      f"InfoPlist.xcstrings keys differ from App-Info.plist: {sorted(ip_wanted ^ set(ip_catalog))}")
+ip_en = {k: v["localizations"]["en"]["stringUnit"]["value"] for k, v in ip_catalog.items() if "en" in v.get("localizations", {})}
+check(all(ip_en.get(k) == app_plist[k] for k in ip_wanted),
+      "InfoPlist.xcstrings: English values == the Info.plist fallback strings",
+      f"InfoPlist.xcstrings English differs from App-Info.plist: {[k for k in ip_wanted if ip_en.get(k) != app_plist[k]]}")
+ip_gaps = L10N.all_problems({"strings": ip_catalog})
+check(not ip_gaps and all(str(v.get("comment", "")).strip() for v in ip_catalog.values()),
+      f"InfoPlist.xcstrings: {len(ip_catalog)} keys complete in all {len(L10N.TARGETS)} translations, with comments",
+      f"InfoPlist.xcstrings: {len(ip_gaps)} problem(s) or missing comments: {ip_gaps[:10]}")
+ip_langs = {lang for v in ip_catalog.values() for lang in v.get("localizations", {})}
+check(ip_langs == set(L10N.LANGS), "InfoPlist.xcstrings uses exactly the shipped languages",
+      f"InfoPlist.xcstrings languages differ: {sorted(ip_langs ^ set(L10N.LANGS))}")
+ip_sources = [s.get("path") for s in pj["targets"]["TabulaApp"]["sources"]]
+check("Resources/InfoPlist.xcstrings" in ip_sources,
+      "project.yml: TabulaApp target includes Resources/InfoPlist.xcstrings (Xcode compiles it to InfoPlist.strings)",
+      "project.yml: TabulaApp sources lack Resources/InfoPlist.xcstrings")
 KEY_USE = re.compile(r'(?:(?<![A-Za-z_.])(?:Text|Label|Button|Toggle|Picker|Section|Tab|navigationTitle|LocalizedStringKey|'
                      r'LocalizedStringResource)\(\s*|String\(localized:\s*|(?:forKey|key):\s*)"((?:[^"\\]|\\.)*)"')
 VERBATIM_LITERAL = re.compile(r'Text\(\s*verbatim:\s*"')

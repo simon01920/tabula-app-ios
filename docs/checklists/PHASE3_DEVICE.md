@@ -384,3 +384,14 @@ To inspect files on a device: Finder/Xcode "Download Container" on a Mac later, 
 | B3.18 | VoiceOver on a row | Reads title + details; hint ("Opens a preview." / "Asks before opening the link." / "Plays the voice note."); rotor actions Rename, Move Up, Move Down, Delete | | |
 | B3.19 | Dynamic Type AX5 | Thumbnails scale, titles wrap (3 lines), no clipped buttons | | |
 | B3.20 | sk / de / ja | All attachment strings translated (no raw `attachments.*` keys); sizes formatted per locale ("1,2 MB") | | |
+
+## C2. Localised Info.plist strings
+Machine-translated, `needs_review` (docs/localization/REVIEW.md). Delete and reinstall the app (or Settings > General > Transfer or Reset > Reset Location & Privacy) so the permission prompts appear again.
+
+| ID | Check | Expected | Result | Notes |
+|---|---|---|---|---|
+| C2.1 | Device language sk (then de, ja, Srpski latinica, Српски) | Home Screen name stays "Tabula" | | |
+| C2.2 | Trigger the camera (timetable scan), microphone (voice note), photo library (timetable import) and AlarmKit (important reminder) prompts in sk | Each system dialog shows the Slovak text, not English | | |
+| C2.3 | Same prompts in de and zh-Hans | Translated text, dialog not clipped | | |
+| C2.4 | Device language Srpski (latinica) vs Српски | Latin vs Cyrillic dialog text | | |
+| C2.5 | Settings > Tabula (device in sk) | Permission rows localised | | |

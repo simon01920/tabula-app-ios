@@ -1,0 +1,426 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "CFBundleDisplayName" : {
+      "comment" : "App name on the Home Screen. Brand name, intentionally identical in every language.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabula"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula"
+          }
+        }
+      }
+    },
+    "NSAlarmKitUsageDescription" : {
+      "comment" : "Permission prompt text (AlarmKit): why Tabula wants to schedule loud alarms. Shown by iOS in the system dialog.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula plánuje hlasité budíky jen pro připomínky, které výslovně označíte jako důležité, například zkoušku zítra."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula plant laute Alarme nur für Erinnerungen, die du ausdrücklich als wichtig markierst, zum Beispiel eine Prüfung morgen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabula schedules loud alarms only for reminders you explicitly mark as important, such as an exam tomorrow."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula programme des alarmes sonores uniquement pour les rappels que vous marquez explicitement comme importants, par exemple un examen demain."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A Tabula hangos riasztásokat csak azokhoz az emlékeztetőkhöz ütemez, amelyeket kifejezetten fontosnak jelölsz meg, például egy holnapi vizsgához."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabulaは、明日の試験など、重要として明示的に設定したリマインダーに対してのみ、大音量のアラームを設定します。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula planuje głośne alarmy tylko dla przypomnień, które wyraźnie oznaczysz jako ważne, na przykład jutrzejszy egzamin."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula programează alarme sonore puternice doar pentru mementourile pe care le marchezi explicit ca importante, de exemplu un examen mâine."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula nastavuje hlasné budíky len pre pripomienky, ktoré výslovne označíte ako dôležité, napríklad skúšku zajtra."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula заказује гласне аларме само за подсетнике које изричито означите као важне, на пример испит сутра."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula zakazuje glasne alarme samo za podsetnike koje izričito označite kao važne, na primer ispit sutra."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula планує гучні будильники лише для нагадувань, які ви самі позначите як важливі, наприклад іспит завтра."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula 仅会为你明确标记为重要的提醒（例如明天的考试）设置响亮的闹钟。"
+          }
+        }
+      }
+    },
+    "NSCameraUsageDescription" : {
+      "comment" : "Permission prompt text (camera): why Tabula wants camera access. Shown by iOS in the system dialog.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula používá fotoaparát ke skenování vytištěného rozvrhu, aby jej bylo možné importovat."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula verwendet die Kamera, um einen gedruckten Stundenplan zu scannen, damit er importiert werden kann."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabula uses the camera to scan a printed timetable so it can be imported."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula utilise l’appareil photo pour scanner un emploi du temps imprimé afin de pouvoir l’importer."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A Tabula a kamerát egy kinyomtatott órarend beolvasására használja, hogy importálni lehessen."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabulaは、印刷された時間割をスキャンして読み込むためにカメラを使用します。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula używa aparatu do zeskanowania wydrukowanego planu lekcji, aby można go było zaimportować."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula folosește camera pentru a scana un orar tipărit, astfel încât să poată fi importat."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula používa fotoaparát na naskenovanie vytlačeného rozvrhu, aby sa dal importovať."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula користи камеру за скенирање одштампаног распореда како би могао да се увезе."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula koristi kameru za skeniranje odštampanog rasporeda kako bi mogao da se uveze."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula використовує камеру, щоб сканувати надрукований розклад і імпортувати його."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula 使用相机扫描打印的课程表，以便导入。"
+          }
+        }
+      }
+    },
+    "NSMicrophoneUsageDescription" : {
+      "comment" : "Permission prompt text (microphone): why Tabula wants microphone access. Shown by iOS in the system dialog.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula nahrává hlasové poznámky, které připojujete ke svým úkolům."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula nimmt Sprachnotizen auf, die du an deine Aufgaben anhängst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabula records voice notes that you attach to your tasks."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula enregistre des notes vocales que vous joignez à vos tâches."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A Tabula hangjegyzeteket rögzít, amelyeket a feladataidhoz csatolsz."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabulaは、タスクに添付するボイスメモを録音します。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula nagrywa notatki głosowe, które dołączasz do swoich zadań."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula înregistrează note vocale pe care le atașezi sarcinilor tale."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula nahráva hlasové poznámky, ktoré pripájate k úlohám."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula снима гласовне белешке које прилажете својим задацима."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula snima glasovne beleške koje prilažete svojim zadacima."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula записує голосові нотатки, які ви додаєте до своїх завдань."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula 会录制你附加到任务中的语音备忘录。"
+          }
+        }
+      }
+    },
+    "NSPhotoLibraryUsageDescription" : {
+      "comment" : "Permission prompt text (photo library): why Tabula wants to read a photo. Shown by iOS in the system dialog.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula čte fotografii nebo snímek obrazovky rozvrhu, který vyberete, aby jej bylo možné importovat."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula liest ein von dir ausgewähltes Foto oder einen Screenshot eines Stundenplans, damit er importiert werden kann."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabula reads a photo or screenshot of a timetable you choose so it can be imported."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula lit une photo ou une capture d’écran d’emploi du temps que vous choisissez afin de pouvoir l’importer."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A Tabula beolvassa az általad kiválasztott órarendi fényképet vagy képernyőképet, hogy importálni lehessen."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabulaは、読み込みのために、選択した時間割の写真またはスクリーンショットを読み取ります。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula odczytuje wybrane przez Ciebie zdjęcie lub zrzut ekranu planu lekcji, aby można go było zaimportować."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula citește o fotografie sau o captură de ecran a unui orar pe care o alegi, astfel încât să poată fi importat."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula číta fotografiu alebo snímku obrazovky rozvrhu, ktorú vyberiete, aby sa dal importovať."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula чита фотографију или снимак екрана распореда који изаберете како би могао да се увезе."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula čita fotografiju ili snimak ekrana rasporeda koji izaberete kako bi mogao da se uveze."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula зчитує вибране вами фото або знімок екрана розкладу, щоб імпортувати його."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula 会读取你选择的课程表照片或截图，以便导入。"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

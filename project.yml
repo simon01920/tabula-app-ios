@@ -65,6 +65,10 @@ targets:
       - path: App/Sources
       - path: Resources/Localizable.xcstrings
         buildPhase: resources
+      # Localised Info.plist strings (display name + usage descriptions): Xcode compiles it into
+      # <lang>.lproj/InfoPlist.strings; the xtool path generates the same files with scripts/infoplist-strings.py.
+      - path: Resources/InfoPlist.xcstrings
+        buildPhase: resources
       - path: Resources/Assets.xcassets
         buildPhase: resources
       - path: Config/Privacy/App/PrivacyInfo.xcprivacy
