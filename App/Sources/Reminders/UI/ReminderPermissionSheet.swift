@@ -1,5 +1,7 @@
 // Pre-explainer for the notification permission (route `reminders.permission`). Shown in context: the first time a
-// reminder rule is switched on, or from the health check while the permission is "not determined". Never at launch.
+// reminder rule is switched on, from the health check while the permission is "not determined", and once after the
+// user saves a task or exam that would get a reminder (QA fix Q1: ReminderCoordinator.permissionOffer, presented by
+// the shell's root presenter; closing it without allowing is remembered per install). Never at launch.
 // "Allow notifications" is the only place that triggers the system prompt (`requestNotificationAuthorization()`).
 // If the permission was already refused, the sheet offers the system settings instead of a prompt that cannot appear.
 // APIs: NavigationStack, Form/List, Button, EnvironmentValues.dismiss, EnvironmentValues.openURL,

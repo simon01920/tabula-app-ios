@@ -51,8 +51,9 @@ struct AttachmentsSection: View {
                 }
                 addMenu(session)
             } else {
-                // Not hosted (programming error): never offer actions without the host's presenters.
-                Text("attachments.empty")
+                // Not hosted (programming error): never offer actions without the host's presenters, and never claim
+                // "No attachments" when there may be some (B3 QA low finding): a neutral message instead.
+                Text("attachments.unavailable")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }

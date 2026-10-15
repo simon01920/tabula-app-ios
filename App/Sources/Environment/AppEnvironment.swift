@@ -148,6 +148,8 @@ struct ReminderDependencies: Sendable {
     let stateStore: any ReminderStateStore
     let backgroundScheduler: any BackgroundRefreshScheduling
     let deviceState: @MainActor @Sendable () -> DeviceReminderState
+    /// Remembers "Not Now" on the in-context notification pre-explainer (per install; QA fix Q1).
+    let offerStore: any ReminderPermissionOfferStore
     /// `true` when the real system clients are used (debug screen).
     let isLive: Bool
 
@@ -155,7 +157,8 @@ struct ReminderDependencies: Sendable {
         ReminderDependencies(notifications: LiveNotificationCenterClient(), alarms: LiveAlarmClient(),
                              stateStore: UserDefaultsReminderStateStore(defaults: defaults),
                              backgroundScheduler: LiveBackgroundRefreshScheduler(),
-                             deviceState: { DeviceStateReader.live() }, isLive: true)
+                             deviceState: { DeviceStateReader.live() },
+                             offerStore: UserDefaultsReminderPermissionOfferStore(defaults: defaults), isLive: true)
     }
 
     /// Plausible fixed state for screenshots: everything allowed, Time Sensitive not available (as in xtool builds).
@@ -166,6 +169,6 @@ struct ReminderDependencies: Sendable {
                              stateStore: InMemoryReminderStateStore(),
                              backgroundScheduler: RecordingBackgroundRefreshScheduler(),
                              deviceState: { DeviceReminderState(isLowPowerModeEnabled: false, backgroundRefresh: .available) },
-                             isLive: false)
+                             offerStore: InMemoryReminderPermissionOfferStore(), isLive: false)
     }
 }

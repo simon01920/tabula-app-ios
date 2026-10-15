@@ -104,6 +104,7 @@ struct SettingsRootView: View {
                         .foregroundStyle(.primary)
                 }
                 .sheet(isPresented: $showsTimetables) { route.makeView() }
+                .closesForDeepLink { showsTimetables = false }   // QA fix Q6
             } header: {
                 Text("settings.timetables.title")
             }

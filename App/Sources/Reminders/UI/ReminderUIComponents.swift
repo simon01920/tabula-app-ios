@@ -30,9 +30,10 @@ extension ReminderCoordinator {
 }
 
 extension View {
-    /// Presents the notification pre-explainer (`reminders.permission`) as a sheet.
+    /// Presents the notification pre-explainer (`reminders.permission`) as a sheet (closed for a notification deep link).
     func reminderPermissionSheet(isPresented: Binding<Bool>) -> some View {
         sheet(isPresented: isPresented) { ReminderPermissionSheet() }
+            .closesForDeepLink { isPresented.wrappedValue = false }
     }
 }
 

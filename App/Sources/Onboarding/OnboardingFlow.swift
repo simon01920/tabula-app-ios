@@ -47,7 +47,8 @@ final class OnboardingFlow {
         let mutation = draft.finishMutation(
             existing: model.database, names: names, localeFirstWeekday: model.calendarContext.firstWeekday,
             localize: { renderer.string($0) }, now: model.now)
-        if case .applied = model.apply(mutation) { return }
+        // A user save: if the new rules already have something to deliver, the notification explainer is offered (Q1).
+        if case .applied = model.apply(mutation, origin: .userSave) { return }
         failureShown = true
     }
 }

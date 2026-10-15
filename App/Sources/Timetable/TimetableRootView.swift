@@ -73,6 +73,11 @@ struct TimetableRootView: View {
         }
         .editorSheet($editor)
         .sheet(item: $management) { item in item.route.makeView() }
+        .closesForDeepLink {   // QA fix Q6: a notification tap needs the screen
+            detail = nil
+            quickAdd = nil
+            management = nil
+        }
     }
 
     // MARK: State

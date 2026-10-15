@@ -55,6 +55,9 @@ final class AttachmentEditorSession {
     @ObservationIgnored private var protection = AttachmentEditorProtection()
     @ObservationIgnored private let owner = UUID()
     @ObservationIgnored private var started = false
+    /// The editor is gone (`end()`, until a re-appear calls `begin` again): a recording whose copy fails now cannot be
+    /// retried, so its temporary file is deleted instead of being kept as `pendingVoiceNote`.
+    @ObservationIgnored private var isEnded = false
 
     private var store: (any AttachmentStore)? { model?.environment.attachments }
     private var quota: AttachmentQuota { model.map { AttachmentQuota(entitlements: $0.entitlements) } ?? .unlimited }
@@ -65,6 +68,7 @@ final class AttachmentEditorSession {
     /// The editor appeared: protect its refs and load file URLs. Re-appearing (after Quick Look) re-protects.
     func begin(model: AppModel, initial: [AttachmentRef]) {
         self.model = model
+        isEnded = false
         if !started {
             started = true
             refs = initial
@@ -75,6 +79,7 @@ final class AttachmentEditorSession {
 
     /// The editor disappeared: stop playback, end protection (orphans are then subject to the grace period).
     func end() {
+        isEnded = true
         player.stop()
         guard let store else { return }
         let owner = owner
@@ -224,7 +229,13 @@ final class AttachmentEditorSession {
         runImport(kind: .voiceNote, onSuccess: {
             try? FileManager.default.removeItem(at: temporaryURL)
         }, onFailure: { [weak self] in
-            self?.pendingVoiceNote = temporaryURL
+            // Editor still open: keep the recording for Try Again / Delete. Editor (or session) gone: nobody can retry,
+            // so delete the temporary file now (B3 QA low finding: it used to leak).
+            if let self, !self.isEnded {
+                self.pendingVoiceNote = temporaryURL
+            } else {
+                try? FileManager.default.removeItem(at: temporaryURL)
+            }
         }) { store, id, quota in
             try await store.importFile(at: temporaryURL, id: id, suggestedName: name,
                                        contentType: UTType.mpeg4Audio.identifier, quota: quota)

@@ -57,6 +57,7 @@ struct AppRootView: View {
 /// Today · Timetable · Tasks · Exams · Settings (standard `TabView`, so iOS 26 applies Liquid Glass to the tab bar).
 /// The selected tab lives in `AppNavigation` so notification taps (deep links) can switch it; a deep link to a task or
 /// exam also presents the feature's detail route (`tasks.detail` / `exams.detail`) as a sheet when registered.
+/// Root sheets come from `rootPresenter()`, which waits for or closes the tab sheets first (never unsaved editors).
 struct MainTabView: View {
     let launchRoute: AppRoute?
     @Environment(AppNavigation.self) private var navigation
@@ -72,10 +73,6 @@ struct MainTabView: View {
     // `nil` in `navigation.selectedTab` = not changed by the user yet → the launch route's choice.
     private var selection: Binding<AppTab> {
         Binding(get: { navigation.selectedTab ?? initialTab }, set: { navigation.selectedTab = $0 })
-    }
-
-    private var presentedItem: Binding<ItemLink?> {
-        Binding(get: { navigation.presentedItem }, set: { navigation.presentedItem = $0 })
     }
 
     private var isSheetPresented: Binding<Bool> {
@@ -114,15 +111,9 @@ struct MainTabView: View {
         .sheet(isPresented: isSheetPresented) {
             launchRoute?.makeView()
         }
-        // Second sheet on a background view: two `.sheet` modifiers on the same view are not reliable.
-        .background {
-            Color.clear
-                .sheet(item: presentedItem) { link in
-                    if let id = AppNavigation.detailRouteID(for: link), let route = RouteRegistry.route(id: id) {
-                        route.makeView()
-                    }
-                }
-        }
+        .closesForDeepLink { sheetDismissed = true }
+        // Deep links and the in-context notification pre-explainer (RootPresentation.swift, QA fixes Q1 + Q6).
+        .rootPresenter()
     }
 
     /// The launch route's view when it targets `tab`, else the tab's normal root.

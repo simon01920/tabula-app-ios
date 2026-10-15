@@ -48,8 +48,11 @@ final class VoiceNoteRecorder {
     @ObservationIgnored nonisolated(unsafe) private var interruptionObserver: (any NSObjectProtocol)?
 
     init() {
-        delegate.onFinish = { [weak self] successfully in
-            self?.finishedByItself(successfully ? .limitReached : .failed)
+        delegate.onFinish = { [weak self] finished, successfully in
+            // Only the CURRENT recorder may stop the session: a stopped recorder's late callback (delivered after a new
+            // recording started) must not end the new one (B3 QA low finding).
+            guard let self, let current = self.recorder, current === finished.recorder else { return }
+            self.finishedByItself(successfully ? .limitReached : .failed)
         }
         // Posted on the main thread (AVAudioSession.interruptionNotification docs).
         interruptionObserver = NotificationCenter.default.addObserver(
@@ -212,19 +215,30 @@ final class VoiceNotePlayer {
     }
 }
 
-/// AVAudioRecorder's delegate: the recorder finished by itself (time limit) or failed to encode.
+/// The recorder a delegate callback is about. Holds it strongly until the main actor compared it, so the identity check
+/// (`===`) can never match a new recorder allocated at a freed one's address.
+private final class FinishedRecorder: @unchecked Sendable {
+    // Immutable; only compared by identity on the main actor.
+    let recorder: AVAudioRecorder
+    init(_ recorder: AVAudioRecorder) { self.recorder = recorder }
+}
+
+/// AVAudioRecorder's delegate: the recorder finished by itself (time limit) or failed to encode. Reports WHICH recorder
+/// finished so the owner can ignore callbacks of recorders it already stopped or replaced.
 private final class RecorderDelegate: NSObject, AVAudioRecorderDelegate, @unchecked Sendable {
     // Written once on the main actor before any recording starts; read in the callbacks.
-    var onFinish: (@MainActor @Sendable (Bool) -> Void)?
+    var onFinish: (@MainActor @Sendable (FinishedRecorder, Bool) -> Void)?
 
     func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
         let finish = onFinish
-        Task { @MainActor in finish?(flag) }
+        let finished = FinishedRecorder(recorder)
+        Task { @MainActor in finish?(finished, flag) }
     }
 
     func audioRecorderEncodeErrorDidOccur(_ recorder: AVAudioRecorder, error: (any Error)?) {
         let finish = onFinish
-        Task { @MainActor in finish?(false) }
+        let finished = FinishedRecorder(recorder)
+        Task { @MainActor in finish?(finished, false) }
     }
 }
 

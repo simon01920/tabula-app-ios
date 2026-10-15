@@ -87,6 +87,9 @@ struct EditorScaffold<Draft: Equatable, Content: View>: View {
         }
         // A swipe-down would lose edits silently: while dirty, only Cancel (with confirmation) or Save leave the sheet.
         .interactiveDismissDisabled(isDirty || isBusy)
+        // Same rule for notification deep links (QA fix Q6): an editor with unsaved edits or a running copy is never
+        // closed for one; the link is shown after the user saves or cancels (RootPresentation.swift).
+        .protectsUnsavedWork(isDirty || isBusy)
     }
 
     private var warningText: String {
