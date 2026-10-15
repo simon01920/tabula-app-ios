@@ -18,8 +18,9 @@
 // .userSave)`) arms the offer; the re-plan that covers it asks `ReminderPermissionOffer.shouldOffer` (permission not
 // determined, ≥ 1 planned request, not declined before) and, if so, publishes `permissionOffer`. The shell
 // (MainTabView) presents the pre-explainer from the root when the screen allows it (RootPresentationPolicy) and calls
-// `permissionOfferShown()` / `permissionOfferClosed()`. Launch, foreground, background refresh and timer re-plans
-// never offer it.
+// `permissionOfferShown()`; every explainer (root offer or an explicit entry point) reports its close through
+// `permissionExplainerClosed()` (Phase 3 polish). Launch, foreground, background refresh, timer and other data-change
+// re-plans never offer it.
 // APIs: Observation.Observable (app code), NotificationCenter.addObserver(forName:object:queue:using:),
 //       ProcessInfo / UIApplication notifications (see ReminderSystemServices.swift), Task.sleep(for:).
 import Foundation
@@ -237,12 +238,21 @@ final class ReminderCoordinator {
         permissionOffer = nil
     }
 
-    /// The offer sheet closed: without an answer from the system (Not Now, swipe), remember it and never offer again
-    /// from a save. The Settings toggles and the health check still offer the explainer.
-    func permissionOfferClosed() async {
+    /// The shell's offer sheet was set but never appeared (RootPresentationPolicy `.clearStaleRootSheet`): queue it
+    /// again with its original request time, unless a newer offer is pending or the user declined meanwhile.
+    func restorePermissionOffer(requestedAt: Date) {
+        guard permissionOffer == nil, !offerStore.isDeclined else { return }
+        permissionOffer = PermissionOfferRequest(requestedAt: requestedAt)
+    }
+
+    /// Any pre-explainer closed (`ReminderPermissionSheet.onDisappear`: the root offer, the override section, the
+    /// Settings toggles, the rule editor, the health check). Without an answer from the system (Not Now, swipe) it is
+    /// remembered and a save never offers it again; an offer armed but not shown yet is dropped, so the same explainer
+    /// cannot appear twice in a row (Phase 3 polish). The explicit entry points still show the explainer.
+    func permissionExplainerClosed() async {
         let authorization = await engine.notifications.settings().authorization
-        if ReminderPermissionOffer.closingRecordsDecline(authorizationAfterClose: authorization) {
-            offerStore.recordDeclined()
+        if ReminderPermissionOffer.recordClose(authorizationAfterClose: authorization, in: offerStore) {
+            permissionOffer = nil
         }
         await refreshHealthIfShown()
     }

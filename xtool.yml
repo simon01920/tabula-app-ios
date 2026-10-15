@@ -27,18 +27,19 @@ extensions:
   - product: TabulaWidgets          # bundle ID defaults to sk.simondev.tabula.TabulaWidgets
     infoPath: Config/Widgets-Info.plist
     entitlementsPath: Config/TabulaWidgets.entitlements
-    resources:
-      - .build-l10n/en.lproj
-      - .build-l10n/sk.lproj
-      - .build-l10n/cs.lproj
-      - .build-l10n/pl.lproj
-      - .build-l10n/hu.lproj
-      - .build-l10n/ro.lproj
-      - .build-l10n/de.lproj
-      - .build-l10n/fr.lproj
-      - .build-l10n/uk.lproj
-      - .build-l10n/sr.lproj
-      - .build-l10n/sr-Latn.lproj
-      - .build-l10n/ja.lproj
-      - .build-l10n/zh-Hans.lproj
+    resources:                      # Localizable only (a separate compile, no InfoPlist.strings): like project.yml,
+                                    # the app's display name + usage descriptions must not reach the widget appex.
+      - .build-l10n/widget/en.lproj
+      - .build-l10n/widget/sk.lproj
+      - .build-l10n/widget/cs.lproj
+      - .build-l10n/widget/pl.lproj
+      - .build-l10n/widget/hu.lproj
+      - .build-l10n/widget/ro.lproj
+      - .build-l10n/widget/de.lproj
+      - .build-l10n/widget/fr.lproj
+      - .build-l10n/widget/uk.lproj
+      - .build-l10n/widget/sr.lproj
+      - .build-l10n/widget/sr-Latn.lproj
+      - .build-l10n/widget/ja.lproj
+      - .build-l10n/widget/zh-Hans.lproj
       - Config/Privacy/Widgets/PrivacyInfo.xcprivacy

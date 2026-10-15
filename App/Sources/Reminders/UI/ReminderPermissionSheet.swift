@@ -1,7 +1,8 @@
 // Pre-explainer for the notification permission (route `reminders.permission`). Shown in context: the first time a
 // reminder rule is switched on, from the health check while the permission is "not determined", and once after the
 // user saves a task or exam that would get a reminder (QA fix Q1: ReminderCoordinator.permissionOffer, presented by
-// the shell's root presenter; closing it without allowing is remembered per install). Never at launch.
+// the shell's root presenter). Closing it from any entry point without allowing is remembered per install
+// (`ReminderCoordinator.permissionExplainerClosed()`), so a later save does not offer it again. Never at launch.
 // "Allow notifications" is the only place that triggers the system prompt (`requestNotificationAuthorization()`).
 // If the permission was already refused, the sheet offers the system settings instead of a prompt that cannot appear.
 // APIs: NavigationStack, Form/List, Button, EnvironmentValues.dismiss, EnvironmentValues.openURL,
@@ -66,6 +67,9 @@ struct ReminderPermissionSheet: View {
             .task { await reminders.refreshHealth() }
         }
         .presentationDetents([.large])
+        // Every entry point (root offer, override section, Settings toggles, rule editor, health check): closing while
+        // the permission is still not determined records the decline, so the root offer never repeats it.
+        .onDisappear { Task { await reminders.permissionExplainerClosed() } }
     }
 
     private func point(_ key: LocalizedStringKey, _ symbol: String) -> some View {
