@@ -51,15 +51,31 @@ Silent switch on/off · each Focus (DND, Sleep, custom) · Low Power Mode · app
   lesson detail "Add homework" → task editor, onboarding finish; `AppModel.apply(_:origin: .userSave)`), the re-plan
   that covers it offers the pre-explainer once when `ReminderPermissionOffer.shouldOffer` holds: permission
   `.notDetermined`, ≥ 1 planner request in the plan (`ReminderRunResult.plannedRequestCount`, counted before add
-  failures), and not declined before. Closing it while still not determined ("Not Now" or a swipe) is remembered per
-  install (`tabula.reminders.permissionOfferDeclined.v1` in the App Group defaults) and the save trigger never offers
-  it again; the Settings toggles, the override section and the health check's Allow button still do. Launch,
-  foreground, background refresh, timer and notification-action re-plans never offer it. The shell presents it from
-  the root (`RootPresentation.swift`) only when no other sheet is open.
+  failures), and not declined before. Closing **any** pre-explainer while still not determined ("Not Now" or a swipe;
+  the root offer and every explicit entry point: the Settings toggles, the rule editor, the override section, the
+  health check) is remembered per install (`tabula.reminders.permissionOfferDeclined.v1` in the App Group defaults,
+  `ReminderPermissionSheet.onDisappear` → `ReminderCoordinator.permissionExplainerClosed()` →
+  `ReminderPermissionOffer.recordClose`); an offer already armed by the same save is dropped, so the explainer never
+  appears twice in a row (Phase 3 polish). The save trigger then never offers it again; the explicit entry points still
+  show it. Launch, foreground, background refresh, timer and notification-action re-plans never offer it, and neither
+  does any other data change: reopening a completed item, Mark done in the app, a delete or a settings change re-plan
+  with the trigger `.other`. The offer decision looks at the **whole plan** (`plannedRequestCount` counts every planned
+  request, not just the saved item's), so saving an item that itself gets no reminder still offers the explainer when
+  other items would be reminded; "no explainer because nothing would be scheduled" holds only on a fresh install with
+  nothing else in the plan. The shell presents it from the root (`RootPresentation.swift`) only when no other sheet is
+  open and no root sheet (e.g. a deep link's detail on its way up) is set or shown.
 - **Deep links over open sheets (QA fix Q6):** a tap is kept as `AppNavigation.pendingLink`; clean tab sheets are asked
   to close (`.closesForDeepLink`), then the item's tab and detail are shown. Editors with unsaved changes, running
   attachment copies and voice recordings (`.protectsUnsavedWork`) are never closed: the target appears right after
-  that sheet closes. Links not shown within 10 minutes are dropped (`RootPresentationPolicy`).
+  that sheet closes. Links not shown within 10 minutes are dropped (`RootPresentationPolicy`). Whether the root sheet
+  is on screen comes from its content's onAppear/onDisappear (not the binding); a root sheet that was set but has not
+  appeared 2 s later (`RootPresentationPolicy.appearTimeout`, e.g. it lost a race with a tab sheet opening in the same
+  tick) is cleared and its link queued again with its original request time, so it is retried rather than lost
+  (Phase 3 polish).
+- **Editor open while the item is completed elsewhere (QA fix Q5, known edge):** for a **repeating** task completed
+  from a notification (or another screen) while its editor is open, Save writes the edits onto the completed original
+  (it stays completed); the successor was generated at completion time from the old values and keeps them (e.g. the
+  old title). Device note in `docs/checklists/PHASE3_DEVICE.md` Q5.4.
 - **Health check model:** `ReminderHealthCheck` (rows for notifications, Time Sensitive, loud alarms, Focus, Silent mode,
   Low Power, Background App Refresh, pending vs 64, saturation, alarm overflow, hidden/locked app). UI in B4.
 - **Device matrix:** `docs/checklists/PHASE3_DEVICE.md` §A.

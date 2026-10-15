@@ -3,7 +3,8 @@
 #
 # Why a wrapper:
 #  - xtool builds into ./xtool and ./xtool/.xtool-tmp/.build relative to the CWD; on /mnt/c (9P) that is slow.
-#  - xtool cannot compile .xcstrings, so the catalog is compiled to .build-l10n/*.lproj first (xtool.yml copies them).
+#  - xtool cannot compile .xcstrings, so the catalog is compiled to .build-l10n/*.lproj first (xtool.yml copies them):
+#    app = Localizable + InfoPlist.strings, widget = .build-l10n/widget/*.lproj with Localizable only (as project.yml).
 #  - Macro isolation (CLAUDE.md rule 5): the default build is the macro-free BASE variant. `--macro-probes`
 #    sets TABULA_MACRO_PROBES=1 for manifest evaluation (Package.swift) and builds the MACRO variant in a
 #    separate work dir, so the two variants never share build state.
@@ -55,6 +56,11 @@ rsync -a --delete \
 rm -rf "$WORK/.build-l10n"
 python3 "$WORK/scripts/l10n-compile.py" "$WORK/Resources/Localizable.xcstrings" "$WORK/.build-l10n"
 python3 "$WORK/scripts/infoplist-strings.py" "$WORK/.build-l10n"
+# The widget gets its own Localizable-only copy (xtool.yml): InfoPlist.strings (the app's display name and usage
+# descriptions) must not reach the appex, matching project.yml where InfoPlist.xcstrings is an app-only resource.
+python3 "$WORK/scripts/l10n-compile.py" "$WORK/Resources/Localizable.xcstrings" "$WORK/.build-l10n/widget"
+# Package into a fresh .app so files from an older layout cannot linger in it (the build cache stays).
+rm -rf "$WORK/xtool/TabulaApp.app"
 
 cd "$WORK"
 if [ "$SIMULATOR" -eq 1 ]; then
@@ -73,6 +79,11 @@ for bundle in "$WORK/xtool/TabulaApp.app" "$WORK/xtool/TabulaApp.app/PlugIns/Tab
     echo "+ InfoPlist.strings in ${bundle#"$WORK"/xtool/}: $(cd "$bundle" && ls ./*.lproj/InfoPlist.strings 2>/dev/null | wc -l) files"
   fi
 done
+WIDGET_BUNDLE="$WORK/xtool/TabulaApp.app/PlugIns/TabulaWidgets.appex"
+if [ -d "$WIDGET_BUNDLE" ] && ls "$WIDGET_BUNDLE"/*.lproj/InfoPlist.strings >/dev/null 2>&1; then
+  echo "error: the widget appex contains InfoPlist.strings (the app's display name would override 'Tabula Widgets'); see xtool.yml." >&2
+  exit 4
+fi
 APPEX="$WORK/xtool/TabulaApp.app/PlugIns/TabulaWidgets.appex/TabulaWidgets"
 if [ -f "$APPEX" ] && command -v llvm-objdump >/dev/null 2>&1; then
   sections="$(llvm-objdump --macho --section-headers "$APPEX" 2>/dev/null || true)"

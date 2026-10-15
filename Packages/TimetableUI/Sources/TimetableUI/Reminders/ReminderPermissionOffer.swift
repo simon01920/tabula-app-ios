@@ -4,10 +4,12 @@
 // The app (ReminderCoordinator) arms the offer when the user saves a task or exam (editor Save, quick add, lesson
 // detail "Add homework", onboarding finish: `AppModel.apply(_:origin: .userSave)`). The re-plan that follows asks
 // `shouldOffer`: only for that trigger, only while the permission is "not determined", only when the plan really has a
-// reminder to deliver, and never again after the user closed the offer without allowing ("Not Now" or a swipe),
-// which `UserDefaultsReminderPermissionOfferStore` remembers per install (App Group defaults, never synced).
-// Launch, foreground, background refresh, timer and notification-action re-plans never offer it. The explicit entry
-// points (the Settings reminder toggles, the override section, the health check's "Allow" action) are unaffected.
+// reminder to deliver (in the whole plan, not just the saved item), and never again after the user closed any
+// pre-explainer without allowing ("Not Now" or a swipe; `recordClose`), which `UserDefaultsReminderPermissionOfferStore`
+// remembers per install (App Group defaults, never synced). Launch, foreground, background refresh, timer,
+// notification-action and other data-change re-plans (e.g. reopening an item) never offer it. The explicit entry
+// points (the Settings reminder toggles, the rule editor, the override section, the health check's "Allow" action)
+// still show the explainer; closing any of them without allowing records the same decline (Phase 3 polish).
 import Foundation
 
 /// Decides whether the shell offers the notification pre-explainer after a re-plan.
@@ -43,6 +45,18 @@ public enum ReminderPermissionOffer {
     /// tapped Not Now or swiped the sheet away). After "Allow" the system answered, so nothing is recorded.
     public static func closingRecordsDecline(authorizationAfterClose: NotificationAuthorization) -> Bool {
         authorizationAfterClose == .notDetermined
+    }
+
+    /// Any pre-explainer closed (the root offer, the override section, the Settings toggles, the rule editor, the
+    /// health check, Phase 3 polish): records the decline in `store` when the permission is still not determined.
+    /// Returns `true` when it did, so the caller drops an offer that is armed but not shown yet (the user must not see
+    /// the same explainer twice in a row).
+    @discardableResult
+    public static func recordClose(authorizationAfterClose: NotificationAuthorization,
+                                   in store: any ReminderPermissionOfferStore) -> Bool {
+        guard closingRecordsDecline(authorizationAfterClose: authorizationAfterClose) else { return false }
+        store.recordDeclined()
+        return true
     }
 }
 

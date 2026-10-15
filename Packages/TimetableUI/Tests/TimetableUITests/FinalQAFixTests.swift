@@ -35,6 +35,23 @@ struct ReminderPermissionOfferTests {
         #expect(!ReminderPermissionOffer.closingRecordsDecline(authorizationAfterClose: .provisional))
     }
 
+    @Test func anyExplainerClosedWithoutAnAnswerSuppressesTheRootOffer() {
+        // Phase 3 polish: fresh install → new task → "Use default" off → the override section's explainer → Not Now →
+        // Save. The save's re-plan must not offer the same explainer again.
+        let store = InMemoryReminderPermissionOfferStore()
+        #expect(ReminderPermissionOffer.recordClose(authorizationAfterClose: .notDetermined, in: store))   // drop armed offer
+        #expect(store.isDeclined)
+        #expect(!ReminderPermissionOffer.shouldOffer(authorization: .notDetermined, trigger: .userSave,
+                                                     alreadyDeclined: store.isDeclined, plannedRequestCount: 3))
+
+        // "Allow" (the system answered either way): nothing recorded, nothing dropped.
+        for answered in NotificationAuthorization.allCases where answered != .notDetermined {
+            let fresh = InMemoryReminderPermissionOfferStore()
+            #expect(!ReminderPermissionOffer.recordClose(authorizationAfterClose: answered, in: fresh), "\(answered)")
+            #expect(!fresh.isDeclined, "\(answered)")
+        }
+    }
+
     @Test func declineIsRememberedPerInstall() throws {
         let memory = InMemoryReminderPermissionOfferStore()
         #expect(!memory.isDeclined)
@@ -202,20 +219,55 @@ struct RootPresentationPolicyTests {
         asked.dismissRequested = true
         #expect(Policy.step(for: .deepLink, screen: asked, age: 1) == .wait)
         // The shell's own sheet only: replaced at once.
-        #expect(Policy.step(for: .deepLink, screen: .init(isAnySheetShown: true, isRootSheetShown: true), age: 1) == .present)
+        #expect(Policy.step(for: .deepLink, screen: .init(isAnySheetShown: true, rootSheet: .shown), age: 1) == .present)
     }
 
     @Test func unsavedWorkIsNeverClosed() {
         let dirty = Policy.Screen(isAnySheetShown: true, hasUnsavedWork: true)
         #expect(Policy.step(for: .deepLink, screen: dirty, age: 1) == .wait)
         #expect(Policy.step(for: .permissionOffer, screen: dirty, age: 1) == .wait)
-        let dirtyOverRoot = Policy.Screen(isAnySheetShown: true, isRootSheetShown: true, hasUnsavedWork: true)
+        let dirtyOverRoot = Policy.Screen(isAnySheetShown: true, rootSheet: .shown, hasUnsavedWork: true)
         #expect(Policy.step(for: .deepLink, screen: dirtyOverRoot, age: 1) == .wait)
     }
 
     @Test func permissionOfferNeverClosesAnything() {
         #expect(Policy.step(for: .permissionOffer, screen: .init(isAnySheetShown: true), age: 1) == .wait)
-        #expect(Policy.step(for: .permissionOffer, screen: .init(isAnySheetShown: true, isRootSheetShown: true), age: 1) == .wait)
+        #expect(Policy.step(for: .permissionOffer, screen: .init(isAnySheetShown: true, rootSheet: .shown), age: 1) == .wait)
+    }
+
+    @Test func permissionOfferNeverOverwritesARootSheetThatIsSetButNotShownYet() {
+        // Phase 3 polish: a deep link's sheet was just set (UIKit shows nothing yet): the offer must wait for it.
+        let linkOnItsWay = Policy.Screen(isAnySheetShown: false, rootSheet: .pending(age: 0.1))
+        #expect(Policy.step(for: .permissionOffer, screen: linkOnItsWay, age: 1) == .wait)
+        // The root sheet is up (even if UIKit briefly reports nothing, e.g. mid-animation): still wait.
+        #expect(Policy.step(for: .permissionOffer, screen: .init(isAnySheetShown: false, rootSheet: .shown), age: 1) == .wait)
+        // A newer deep link also waits for the sheet on its way up instead of replacing it mid-presentation.
+        #expect(Policy.step(for: .deepLink, screen: linkOnItsWay, age: 1) == .wait)
+        // Only an empty screen with no root sheet presents the offer.
+        #expect(Policy.step(for: .permissionOffer, screen: .init(isAnySheetShown: false, rootSheet: .none), age: 1) == .present)
+    }
+
+    @Test func aRootSheetThatNeverAppearedIsClearedSoTheLinkIsRetried() {
+        // Phase 3 polish: the root sheet lost a race with a tab sheet opening in the same tick; the binding stays set.
+        let stale = Policy.RootSheetState.pending(age: Policy.appearTimeout + 0.5)
+        #expect(Policy.rootSheetStep(stale) == .clearStaleRootSheet)
+        #expect(Policy.rootSheetStep(.pending(age: Policy.appearTimeout)) == .wait)
+        #expect(Policy.rootSheetStep(.pending(age: .infinity)) == .clearStaleRootSheet)
+        #expect(Policy.rootSheetStep(.none) == nil)
+        #expect(Policy.rootSheetStep(.shown) == nil)
+        // A link over an open tab sheet with a stale root sheet: clear it first (the old binding said "shown" and the
+        // link took `.present` and was lost)...
+        let overTabSheet = Policy.Screen(isAnySheetShown: true, rootSheet: stale)
+        #expect(Policy.step(for: .deepLink, screen: overTabSheet, age: 1) == .clearStaleRootSheet)
+        #expect(Policy.step(for: .permissionOffer, screen: overTabSheet, age: 1) == .clearStaleRootSheet)
+        // ...then, with the root sheet cleared, the tab sheet is asked to close and the link is shown afterwards.
+        #expect(Policy.step(for: .deepLink, screen: .init(isAnySheetShown: true, rootSheet: .none), age: 3) == .dismissSheets)
+        #expect(Policy.step(for: .deepLink, screen: .init(isAnySheetShown: false, rootSheet: .none), age: 3) == .present)
+        // A root sheet that only exists in the binding is not "shown": a link over a tab sheet never takes `.present`.
+        #expect(Policy.step(for: .deepLink, screen: .init(isAnySheetShown: true, rootSheet: .pending(age: 0.2)), age: 1)
+                == .wait)
+        // Expiry still wins (a retried link keeps its original request time).
+        #expect(Policy.step(for: .deepLink, screen: overTabSheet, age: Policy.maxAge + 1) == .expire)
     }
 
     @Test func oldRequestsExpire() {

@@ -419,10 +419,12 @@ notification permission is "not determined" and the "Not Now" memory is cleared.
 | Q1.6 | Fresh install, quick add in Tasks ("Read chapter 3" → Add) | Explainer appears once (quick add counts as a save) | | |
 | Q1.7 | Fresh install, Timetable → lesson → **Add homework** → Save while the lesson detail is still open | No explainer over the lesson detail; it appears right **after** you close the lesson detail | | |
 | Q1.8 | Fresh install, Exams → + → exam in 3 days → Save | Explainer appears once | | |
-| Q1.9 | Fresh install, a task **without** a due date (or with homework reminders switched off) → Save | No explainer (nothing would be scheduled) | | |
+| Q1.9 | **Fresh install only** (no other task or exam yet), first item: a task **without** a due date (or with homework reminders switched off) → Save | No explainer (nothing would be scheduled). Note: the decision uses the **whole plan**, not just the saved item, so once any other item would get a reminder, saving an item without one still offers the explainer (expected, not a failure) | | |
 | Q1.10 | With the permission still not determined: background the app, wait, foreground; leave it overnight (background refresh) | No explainer on foreground, launch or background refresh | | |
 | Q1.11 | Settings → Reminders: switch a rule off and on (permission not determined, after Not Now in Q1.4) | The Settings explainer still appears (explicit entry point is unaffected) | | |
 | Q1.12 | sk / de / ja: health row text with the permission not determined | "asks once, when you first save a task or exam…" translated, no raw key | | |
+| Q1.13 | Fresh install → Tasks → + → title, due tomorrow → switch **Use default reminders** off → the explainer appears → **Not Now** → Save | The explainer does **not** appear again after the editor closes (wait 5 s). Same with Settings → Reminders (switch a rule on → explainer → Not Now), then save a task: no explainer from the save | | |
+| Q1.14 | Permission not determined, offer not declined yet: Tasks → Completed → reopen a completed task (or mark one done in the app, or delete one) | No explainer: only a save (editor, quick add, Add homework, onboarding) offers it | | |
 
 ### Q5. An open editor never undoes "Mark as Done"
 | ID | Steps | Expected | Observed | ✔/✘ |
@@ -430,6 +432,7 @@ notification permission is "not determined" and the "Not Now" memory is cleared.
 | Q5.1 | Repeating weekly task with a reminder in 1–2 min. Open it in the editor, change the title, leave the editor open; when the notification arrives pull it down → **Mark as Done**; then tap **Save** | The task stays **completed** (Completed segment) with the new title; exactly **one** open successor next week; no reminder for the completed one | | |
 | Q5.2 | Same with an exam (exam reminder → Mark as Done while its editor is open, then Save) | Exam stays done (History); the edit is kept | | |
 | Q5.3 | Deleted while editing: not reproducible on one device before sync (no screen can delete a task while its editor is open); covered by `FinalQAFixTests`. Once sync exists: edit on device A, delete on device B, Save on A | The editor shows "This task is no longer available" (or Save shows "The change could not be applied."); the task does **not** come back | | |
+| Q5.4 | Known edge (note, not a failure): in Q5.1, look at next week's **successor** | The completed original has the new title; the successor keeps the **old** title (and any other edited field): it was created at Mark as Done from the values stored then. Edit the successor if needed | | |
 
 ### Q6. A notification tap always shows something
 | ID | Steps | Expected | Observed | ✔/✘ |
@@ -440,10 +443,11 @@ notification permission is "not determined" and the "Not Now" memory is cleared.
 | Q6.4 | Task editor with an attachment copy running ("Adding attachment…"), tap a reminder | Editor stays; the detail appears after you save/cancel | | |
 | Q6.5 | Voice-note recorder open and recording, tap a reminder | Recording continues; nothing closes; target shown after you finish and close the editor | | |
 | Q6.6 | Exams → open an exam (pushed) → Edit (no changes) → tap a task reminder | Editor closes; Tasks tab + task detail | | |
-| Q6.7 | Settings → Reminders → explainer open (permission not determined). Tap a reminder (e.g. a snooze from before) | Explainer closes; target shown | | |
+| Q6.7 | Dropped: it needed a delivered notification while the permission is not determined, which cannot happen (nothing is delivered before the user allows). An explainer closing for a deep link uses the same `.closesForDeepLink` as Q6.1/Q6.2 | — | | |
 | Q6.8 | Leave an unsaved editor open > 10 min after tapping a reminder, then Save | The old target is **not** shown any more (dropped after 10 min) | | |
 | Q6.9 | Task detail opened by a reminder (root sheet), tap another reminder | The detail switches to the new item | | |
 | Q6.10 | App killed; tap a reminder (cold launch) | Opens on the item's tab with its detail sheet | | |
+| Q6.11 | Race (best effort, Phase 3 polish): tap a task reminder banner and immediately tap **+** in Tasks (or open a lesson detail) so a tab sheet opens in the same moment | The tapped task's detail is **never lost**: at the latest ~2–3 s later the tab sheet closes (if nothing unsaved) and the detail appears; with text typed, it appears after Save/Cancel | | |
 
 ### Q-B3. Attachment lows
 | ID | Steps | Expected | Observed | ✔/✘ |

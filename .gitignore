@@ -35,6 +35,8 @@ models/
 # --- Python helper scripts ---
 __pycache__/
 *.pyc
+# scratch output of ad-hoc helper runs (e.g. l10n gap lists) in the repo root
+.scratch_*
 
 # --- Node (backend Worker, later) ---
 node_modules/

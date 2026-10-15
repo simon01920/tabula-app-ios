@@ -6,7 +6,8 @@ cannot compile any .xcstrings. This is a thin wrapper over scripts/l10n-compile.
 catalog's file stem, so the output is InfoPlist.strings) that also checks the catalog covers every
 user-visible key of Config/App-Info.plist, so a new NS*UsageDescription cannot ship unlocalised.
 scripts/xtool-dev.sh runs it after the Localizable compile into the same .build-l10n/ directory; xtool.yml
-copies the <lang>.lproj folders (InfoPlist.strings + Localizable.strings) into the .app and the widget appex.
+copies those <lang>.lproj folders (InfoPlist.strings + Localizable.strings) into the .app only. The widget appex
+gets .build-l10n/widget/<lang>.lproj (a separate Localizable-only compile), as on the XcodeGen path.
 Output is git-ignored (.build-l10n/), so there is nothing to keep in sync.
 
 Usage: python3 scripts/infoplist-strings.py [OUT_DIR]      (default .build-l10n)

@@ -272,6 +272,8 @@ jobs:
         run: |
           python3 scripts/l10n-compile.py Resources/Localizable.xcstrings .build-l10n
           python3 scripts/infoplist-strings.py .build-l10n
+          # Widget: Localizable only (xtool.yml), no InfoPlist.strings, as on the XcodeGen path.
+          python3 scripts/l10n-compile.py Resources/Localizable.xcstrings .build-l10n/widget
       - name: xtool dev build (no login needed without --sign; TABULA_MACRO_PROBES unset = base variant)
         if: steps.smoke.outcome == 'success'
         timeout-minutes: 10
@@ -302,7 +304,12 @@ jobs:
           done
           need "$APP/PrivacyInfo.xcprivacy"
           need "$WIDGET/PrivacyInfo.xcprivacy"
+          need "$APP/en.lproj/InfoPlist.strings"
           if [ "$missing" -ne 0 ]; then find "$APP" -maxdepth 3 | sort | head -150; exit 1; fi
+          # The app's display name + usage descriptions must not reach the widget (same as the XcodeGen path).
+          widget_ips="$(find "$WIDGET" -name InfoPlist.strings | wc -l | tr -d ' ')"
+          echo "InfoPlist.strings: app $(find "$APP" -maxdepth 2 -name InfoPlist.strings | wc -l | tr -d ' '), widget $widget_ips"
+          [ "$widget_ips" = "0" ] || { echo "::error::the widget appex contains InfoPlist.strings (see xtool.yml)"; exit 1; }
           plutil -p "$APP/Info.plist" | grep -E 'CFBundleIdentifier|CFBundleDisplayName|NSAlarmKitUsageDescription|ITSAppUsesNonExemptEncryption'
           # Regression guard (WSL finding 2026-10-06): the widget appex must contain its Swift code and the
           # @main entry record; without `-u _main` (Package.swift) the linker dropped all of it.

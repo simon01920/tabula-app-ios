@@ -278,6 +278,24 @@ ip_sources = [s.get("path") for s in pj["targets"]["TabulaApp"]["sources"]]
 check("Resources/InfoPlist.xcstrings" in ip_sources,
       "project.yml: TabulaApp target includes Resources/InfoPlist.xcstrings (Xcode compiles it to InfoPlist.strings)",
       "project.yml: TabulaApp sources lack Resources/InfoPlist.xcstrings")
+# The widget must not get the app's InfoPlist.strings (CFBundleDisplayName "Tabula" would override "Tabula Widgets",
+# plus the microphone/camera texts). XcodeGen: InfoPlist.xcstrings is an app-only resource. xtool: the widget's
+# .lproj come from a separate Localizable-only compile into .build-l10n/widget/ (Phase 3 polish).
+widget_sources = [s.get("path") for s in pj["targets"]["TabulaWidgets"]["sources"]]
+xt_app_l10n = [str(r) for r in xt.get("resources", []) if str(r).startswith(".build-l10n/")]
+xt_widget_l10n = [str(r) for r in ext.get("resources", []) if str(r).startswith(".build-l10n/")]
+widget_compile = re.compile(r"l10n-compile\.py\"? \S*Resources/Localizable\.xcstrings\"? \S*\.build-l10n/widget\"?")
+dev_sh = (ROOT / "scripts/xtool-dev.sh").read_text(encoding="utf-8")
+ios_yml = (ROOT / ".github/workflows/ios.yml").read_text(encoding="utf-8")
+check("Resources/InfoPlist.xcstrings" not in widget_sources
+      and all(r.startswith(".build-l10n/widget/") for r in xt_widget_l10n)
+      and not any(r.startswith(".build-l10n/widget/") for r in xt_app_l10n)
+      and bool(widget_compile.search(dev_sh)) and bool(widget_compile.search(ios_yml))
+      and "infoplist-strings.py" not in "".join(l for l in (dev_sh + ios_yml).splitlines() if ".build-l10n/widget" in l),
+      "widget gets no InfoPlist.strings on either path (project.yml app-only; xtool.yml widget .lproj = Localizable-only "
+      ".build-l10n/widget, compiled by xtool-dev.sh + ios.yml)",
+      "widget InfoPlist.strings divergence: the widget's .lproj must come from .build-l10n/widget/ (Localizable only), "
+      "compiled by scripts/xtool-dev.sh and ios.yml, and InfoPlist.xcstrings must stay out of the TabulaWidgets target")
 KEY_USE = re.compile(r'(?:(?<![A-Za-z_.])(?:Text|Label|Button|Toggle|Picker|Section|Tab|navigationTitle|LocalizedStringKey|'
                      r'LocalizedStringResource)\(\s*|String\(localized:\s*|(?:forKey|key):\s*)"((?:[^"\\]|\\.)*)"')
 VERBATIM_LITERAL = re.compile(r'Text\(\s*verbatim:\s*"')
