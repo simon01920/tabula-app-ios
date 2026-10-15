@@ -269,7 +269,9 @@ jobs:
           perl -e 'alarm shift; exec @ARGV' 60 xtool --version </dev/null
       - name: Compile String Catalog for the xtool path
         if: steps.smoke.outcome == 'success'
-        run: python3 scripts/l10n-compile.py Resources/Localizable.xcstrings .build-l10n
+        run: |
+          python3 scripts/l10n-compile.py Resources/Localizable.xcstrings .build-l10n
+          python3 scripts/infoplist-strings.py .build-l10n
       - name: xtool dev build (no login needed without --sign; TABULA_MACRO_PROBES unset = base variant)
         if: steps.smoke.outcome == 'success'
         timeout-minutes: 10

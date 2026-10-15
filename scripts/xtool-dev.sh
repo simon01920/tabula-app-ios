@@ -54,6 +54,7 @@ rsync -a --delete \
 
 rm -rf "$WORK/.build-l10n"
 python3 "$WORK/scripts/l10n-compile.py" "$WORK/Resources/Localizable.xcstrings" "$WORK/.build-l10n"
+python3 "$WORK/scripts/infoplist-strings.py" "$WORK/.build-l10n"
 
 cd "$WORK"
 if [ "$SIMULATOR" -eq 1 ]; then
@@ -69,6 +70,7 @@ xtool dev "$@"
 for bundle in "$WORK/xtool/TabulaApp.app" "$WORK/xtool/TabulaApp.app/PlugIns/TabulaWidgets.appex"; do
   if [ -d "$bundle" ]; then
     echo "+ localisations in ${bundle#"$WORK"/xtool/}: $(cd "$bundle" && ls -d ./*.lproj | sed 's|^\./||; s|\.lproj$||' | tr '\n' ' ')"
+    echo "+ InfoPlist.strings in ${bundle#"$WORK"/xtool/}: $(cd "$bundle" && ls ./*.lproj/InfoPlist.strings 2>/dev/null | wc -l) files"
   fi
 done
 APPEX="$WORK/xtool/TabulaApp.app/PlugIns/TabulaWidgets.appex/TabulaWidgets"

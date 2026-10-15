@@ -393,3 +393,13 @@ To inspect files on a device: Finder/Xcode "Download Container" on a Mac later, 
 | SF2 | Task detail of a task with a date-only due date and weekly repeat (seed secondary, "Nemčina – Lektion 3") | Due row shows "Today" (overdue: red with warning icon); the Repeat row follows immediately, no blank gap or stray separator; a task without due date / linked lesson / priority shows none of those rows | | |
 | SF3 | Exams tab at Dynamic Type AX-XXXL, German: next-exam card and list rows | Subject badge sits above the title; the title wraps by words over the full width (no one-syllable lines); normal sizes keep the badge beside the title | | |
 | SF4 | Settings → Reminders with VoiceOver, enabled kinds | Each "Times and delivery" row is read as "<kind>, times and delivery" (e.g. "Homework, times and delivery"), translated in sk/de/ja | | |
+## C2. Localised Info.plist strings
+Machine-translated, `needs_review` (docs/localization/REVIEW.md). Delete and reinstall the app (or Settings > General > Transfer or Reset > Reset Location & Privacy) so the permission prompts appear again.
+
+| ID | Check | Expected | Result | Notes |
+|---|---|---|---|---|
+| C2.1 | Device language sk (then de, ja, Srpski latinica, Српски) | Home Screen name stays "Tabula" | | |
+| C2.2 | Trigger the camera (timetable scan), microphone (voice note), photo library (timetable import) and AlarmKit (important reminder) prompts in sk | Each system dialog shows the Slovak text, not English | | |
+| C2.3 | Same prompts in de and zh-Hans | Translated text, dialog not clipped | | |
+| C2.4 | Device language Srpski (latinica) vs Српски | Latin vs Cyrillic dialog text | | |
+| C2.5 | Settings > Tabula (device in sk) | Permission rows localised | | |

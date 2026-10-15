@@ -31,6 +31,7 @@ APP_RELEVANT = (
     "project.yml",
     "xtool.yml",
     "scripts/l10n-compile.py",
+    "scripts/infoplist-strings.py",
     "scripts/identity.py",
     ".github/workflows/ios.yml",
 )
