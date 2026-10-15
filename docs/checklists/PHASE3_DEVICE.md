@@ -403,3 +403,50 @@ Machine-translated, `needs_review` (docs/localization/REVIEW.md). Delete and rei
 | C2.3 | Same prompts in de and zh-Hans | Translated text, dialog not clipped | | |
 | C2.4 | Device language Srpski (latinica) vs Српски | Latin vs Cyrillic dialog text | | |
 | C2.5 | Settings > Tabula (device in sk) | Permission rows localised | | |
+## Q. Final Phase 3 QA fixes (Q1 permission in context, Q5 editor vs. Mark done, Q6 deep links over sheets, B3 lows)
+
+Setup for Q1: delete Tabula (or Settings → General → Transfer or Reset iPhone → Reset Location & Privacy) so the
+notification permission is "not determined" and the "Not Now" memory is cleared. Never expected at launch.
+
+### Q1. Notification permission is asked in context
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| Q1.1 | Fresh install, launch | **No** explainer and no system prompt at launch, also after onboarding finishes (no tasks yet → nothing to deliver) | | |
+| Q1.2 | Tasks → + → title "Essay", due tomorrow → Save | About 1–2 s after the editor closes, the **Allow Notifications** explainer appears once (from the shell, not the editor) | | |
+| Q1.3 | In Q1.2 tap **Allow Notifications** → Allow | System prompt, then the sheet closes; Settings → Reminders → health "Allowed."; pending count > 0 | | |
+| Q1.4 | Fresh install again, Q1.2, tap **Not Now** | Sheet closes, no system prompt. Add more tasks/exams, force-quit, relaunch, add more: the explainer **never** comes back from saving; health row still "Not allowed yet. Tabula asks once…" with its **Allow** button, which still shows the explainer | | |
+| Q1.5 | Fresh install, Q1.2 but swipe the explainer down | Same as Not Now (remembered; no nagging) | | |
+| Q1.6 | Fresh install, quick add in Tasks ("Read chapter 3" → Add) | Explainer appears once (quick add counts as a save) | | |
+| Q1.7 | Fresh install, Timetable → lesson → **Add homework** → Save while the lesson detail is still open | No explainer over the lesson detail; it appears right **after** you close the lesson detail | | |
+| Q1.8 | Fresh install, Exams → + → exam in 3 days → Save | Explainer appears once | | |
+| Q1.9 | Fresh install, a task **without** a due date (or with homework reminders switched off) → Save | No explainer (nothing would be scheduled) | | |
+| Q1.10 | With the permission still not determined: background the app, wait, foreground; leave it overnight (background refresh) | No explainer on foreground, launch or background refresh | | |
+| Q1.11 | Settings → Reminders: switch a rule off and on (permission not determined, after Not Now in Q1.4) | The Settings explainer still appears (explicit entry point is unaffected) | | |
+| Q1.12 | sk / de / ja: health row text with the permission not determined | "asks once, when you first save a task or exam…" translated, no raw key | | |
+
+### Q5. An open editor never undoes "Mark as Done"
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| Q5.1 | Repeating weekly task with a reminder in 1–2 min. Open it in the editor, change the title, leave the editor open; when the notification arrives pull it down → **Mark as Done**; then tap **Save** | The task stays **completed** (Completed segment) with the new title; exactly **one** open successor next week; no reminder for the completed one | | |
+| Q5.2 | Same with an exam (exam reminder → Mark as Done while its editor is open, then Save) | Exam stays done (History); the edit is kept | | |
+| Q5.3 | Deleted while editing: not reproducible on one device before sync (no screen can delete a task while its editor is open); covered by `FinalQAFixTests`. Once sync exists: edit on device A, delete on device B, Save on A | The editor shows "This task is no longer available" (or Save shows "The change could not be applied."); the task does **not** come back | | |
+
+### Q6. A notification tap always shows something
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| Q6.1 | Today → open a lesson detail sheet (no edits). Tap a task reminder banner | The lesson sheet closes, the **Tasks** tab opens and the task detail sheet appears | | |
+| Q6.2 | Tasks → + (new task editor) **without typing**. Tap an exam reminder | Editor closes (nothing to lose), Exams tab, exam detail appears | | |
+| Q6.3 | Tasks → + → type a title (unsaved). Tap a task reminder | Editor **stays** with your text (nothing discarded, no tab switch). Tap **Save** (or Cancel → Discard): right after it closes, the Tasks tab shows the tapped task's detail | | |
+| Q6.4 | Task editor with an attachment copy running ("Adding attachment…"), tap a reminder | Editor stays; the detail appears after you save/cancel | | |
+| Q6.5 | Voice-note recorder open and recording, tap a reminder | Recording continues; nothing closes; target shown after you finish and close the editor | | |
+| Q6.6 | Exams → open an exam (pushed) → Edit (no changes) → tap a task reminder | Editor closes; Tasks tab + task detail | | |
+| Q6.7 | Settings → Reminders → explainer open (permission not determined). Tap a reminder (e.g. a snooze from before) | Explainer closes; target shown | | |
+| Q6.8 | Leave an unsaved editor open > 10 min after tapping a reminder, then Save | The old target is **not** shown any more (dropped after 10 min) | | |
+| Q6.9 | Task detail opened by a reminder (root sheet), tap another reminder | The detail switches to the new item | | |
+| Q6.10 | App killed; tap a reminder (cold launch) | Opens on the item's tab with its detail sheet | | |
+
+### Q-B3. Attachment lows
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| QB.1 | Recorder: Record → Stop → Record again immediately | The second recording keeps running (the first recorder's late "finished" callback does not stop it) | | |
+| QB.2 | (Debug quota or full storage) record a voice note whose copy fails, and close the editor before the error appears | No orphaned `tabula-voice-*.m4a` left in tmp (Developer → storage, or Files via debug) | | |

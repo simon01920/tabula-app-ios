@@ -65,8 +65,14 @@ private struct TaskEditorBody: View {
             initial: initial,
             canSave: { $0.canSave },
             save: { draft in
-                guard let task = draft.makeTask(now: model.now) else { return nil }
-                return model.apply(.upsert(task))
+                // QA fix Q5: merged with the task as stored NOW, so a "Mark as Done" from a notification while the
+                // editor was open is kept, and a task deleted meanwhile is not resurrected (inline error instead).
+                let stored = model.database?.tasks.first { $0.id == draft.taskID }
+                switch draft.taskForSave(now: model.now, stored: stored) {
+                case nil: return nil
+                case .deletedMeanwhile?: return .failed(.notFound(.task, draft.taskID.uuid))
+                case .save(let task)?: return model.apply(.upsert(task), origin: .userSave)
+                }
             },
             isBusy: attachmentSession.importingCount > 0,
             content: { draft in TaskFormContent(draft: draft) })

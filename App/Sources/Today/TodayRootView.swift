@@ -47,6 +47,7 @@ struct TodayRootView: View {
             case .exam(let id): ExamDetailSheet(examID: id)
             }
         }
+        .closesForDeepLink { sheet = nil }   // QA fix Q6: a notification tap needs the screen
     }
 
     @ViewBuilder

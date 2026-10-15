@@ -229,6 +229,9 @@ public struct TaskDraft: Equatable, Sendable {
         subtasks = rest
     }
 
+    /// `completedAt` of the task when the editor opened (the editor never changes it; `EditorStoreMerge`).
+    public var openedCompletedAt: Date? { base.completedAt }
+
     // MARK: Validation
 
     /// The due date the task will have (`nil` = undated).

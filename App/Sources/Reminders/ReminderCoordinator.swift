@@ -14,6 +14,12 @@
 //
 // Permission service (for B4's UI): `requestNotificationAuthorization()` / `requestAlarmAuthorization()` only from
 // explicit UI (never at launch; the pre-explainer is B4's), `refreshHealth()` → `healthItems`, test notification/alarm.
+// In-context offer (final QA fix Q1, PHASE3_PLAN §0.5): a user save of a task or exam (`AppModel.apply(_:origin:
+// .userSave)`) arms the offer; the re-plan that covers it asks `ReminderPermissionOffer.shouldOffer` (permission not
+// determined, ≥ 1 planned request, not declined before) and, if so, publishes `permissionOffer`. The shell
+// (MainTabView) presents the pre-explainer from the root when the screen allows it (RootPresentationPolicy) and calls
+// `permissionOfferShown()` / `permissionOfferClosed()`. Launch, foreground, background refresh and timer re-plans
+// never offer it.
 // APIs: Observation.Observable (app code), NotificationCenter.addObserver(forName:object:queue:using:),
 //       ProcessInfo / UIApplication notifications (see ReminderSystemServices.swift), Task.sleep(for:).
 import Foundation
@@ -43,6 +49,14 @@ final class ReminderCoordinator {
     private(set) var health: ReminderHealthInput?
     private(set) var healthItems: [ReminderHealthItem] = []
     private(set) var isRunning = false
+    /// A pending in-context offer of the notification pre-explainer (presented by MainTabView), else `nil`.
+    private(set) var permissionOffer: PermissionOfferRequest?
+
+    /// One in-context offer; `requestedAt` (wall clock) lets the shell drop it when it could not be shown for long.
+    struct PermissionOfferRequest: Equatable {
+        let id = UUID()
+        let requestedAt: Date
+    }
 
     // MARK: Dependencies
 
@@ -60,15 +74,19 @@ final class ReminderCoordinator {
     @ObservationIgnored private var observers: [any NSObjectProtocol] = []
     @ObservationIgnored private var authorizationTask: Task<Void, Never>?
     @ObservationIgnored private var started = false
+    @ObservationIgnored private let offerStore: any ReminderPermissionOfferStore
+    /// A user save happened since the last run started (consumed by the next run).
+    @ObservationIgnored private var offerArmed = false
 
     init(engine: ReminderEngine, model: AppModel, navigation: AppNavigation,
          backgroundScheduler: any BackgroundRefreshScheduling, deviceState: @escaping @MainActor () -> DeviceReminderState,
-         debounce: Duration = .seconds(1)) {
+         offerStore: any ReminderPermissionOfferStore, debounce: Duration = .seconds(1)) {
         self.engine = engine
         self.model = model
         self.navigation = navigation
         self.backgroundScheduler = backgroundScheduler
         self.deviceState = deviceState
+        self.offerStore = offerStore
         self.debounce = debounce
     }
 
@@ -79,7 +97,9 @@ final class ReminderCoordinator {
         model.onChange = { [weak self] change in
             switch change {
             case .loaded: self?.start()
-            case .data: self?.requestReplan(.dataChange)
+            case .data(let origin):
+                if origin == .userSave { self?.offerArmed = true }
+                self?.requestReplan(.dataChange)
             case .environment: self?.requestReplan(.environment)
             }
         }
@@ -166,6 +186,8 @@ final class ReminderCoordinator {
         guard !model.isLoading, model.problem == nil else { return }
         let reasons = pendingReasons.sorted { $0.rawValue < $1.rawValue }
         pendingReasons = []
+        let offerTrigger: ReminderPermissionOffer.Trigger = offerArmed ? .userSave : Self.offerTrigger(for: reasons)
+        offerArmed = false
         let database = model.database ?? DatabaseMutation.emptyBase
         let resolvers = model.database == nil ? [] : model.resolvers.values.sorted { $0.timetable.id < $1.timetable.id }
         let signature = ReminderRenderSignature(language: Bundle.main.preferredLocalizations.first ?? "",
@@ -187,6 +209,41 @@ final class ReminderCoordinator {
             lastBackgroundRequest = earliest.formatted(date: .abbreviated, time: .shortened)
         }
         scheduleTimer(at: result.replanDate)
+        if offerTrigger == .userSave { await evaluatePermissionOffer(result) }
+        await refreshHealthIfShown()
+    }
+
+    /// The offer trigger of a run without a user save (such runs never offer; spelled out for the debug trail).
+    private static func offerTrigger(for reasons: [ReplanReason]) -> ReminderPermissionOffer.Trigger {
+        if reasons.contains(.backgroundRefresh) { return .backgroundRefresh }
+        if reasons.contains(.launch) { return .launch }
+        if reasons.contains(.environment) { return .foreground }
+        if reasons.contains(.notificationAction) { return .notificationAction }
+        return .other
+    }
+
+    /// After a user save: publish the in-context offer when `ReminderPermissionOffer` says so.
+    private func evaluatePermissionOffer(_ result: ReminderRunResult) async {
+        guard permissionOffer == nil else { return }
+        let authorization = await engine.notifications.settings().authorization
+        guard ReminderPermissionOffer.shouldOffer(authorization: authorization, trigger: .userSave,
+                                                  alreadyDeclined: offerStore.isDeclined,
+                                                  plannedRequestCount: result.plannedRequestCount) else { return }
+        permissionOffer = PermissionOfferRequest(requestedAt: Date())
+    }
+
+    /// The shell put the offer on screen (or dropped it because it could not be shown in time).
+    func permissionOfferShown() {
+        permissionOffer = nil
+    }
+
+    /// The offer sheet closed: without an answer from the system (Not Now, swipe), remember it and never offer again
+    /// from a save. The Settings toggles and the health check still offer the explainer.
+    func permissionOfferClosed() async {
+        let authorization = await engine.notifications.settings().authorization
+        if ReminderPermissionOffer.closingRecordsDecline(authorizationAfterClose: authorization) {
+            offerStore.recordDeclined()
+        }
         await refreshHealthIfShown()
     }
 

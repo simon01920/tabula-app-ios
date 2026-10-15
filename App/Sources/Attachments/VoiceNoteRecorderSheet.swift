@@ -90,6 +90,7 @@ struct VoiceNoteRecorderSheet: View {
             }
         }
         .interactiveDismissDisabled(recorder.isRecording || recorder.recordedURL != nil)
+        .protectsUnsavedWork(recorder.isRecording || recorder.recordedURL != nil)   // never closed for a deep link (Q6)
         .onDisappear { recorder.discard() }   // no-op after Save (take() released the file)
     }
 

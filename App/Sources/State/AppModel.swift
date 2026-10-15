@@ -32,12 +32,21 @@ enum ApplyResult: Equatable {
     case failed(MutationError)
 }
 
+/// Who asked for a change (`AppModel.apply(_:origin:)`).
+enum ApplyOrigin: Equatable, Sendable {
+    /// The user saved a task or exam (editor Save, quick add, lesson detail "Add homework", onboarding finish): the
+    /// re-plan after it may offer the notification pre-explainer in context (ReminderPermissionOffer, QA fix Q1).
+    case userSave
+    /// Everything else (toggles, completion, deletes, settings, notification actions, debug tools).
+    case other
+}
+
 /// What `AppModel.onChange` reports.
 enum AppModelChange: Equatable, Sendable {
     /// The store finished loading.
     case loaded
-    /// An accepted `apply(_:)`.
-    case data
+    /// An accepted `apply(_:origin:)`, with its origin.
+    case data(ApplyOrigin)
     /// Calendar context / formatters rebuilt (zone, locale, significant time change, scene active).
     case environment
 }
@@ -167,8 +176,9 @@ final class AppModel {
 
     /// Applies a change: stamps it, validates (new errors block, new warnings are returned), updates the snapshot
     /// and schedules a debounced save. Never touches the database when it returns anything but `.applied`.
+    /// `origin: .userSave` only for the task / exam saves listed at `ApplyOrigin.userSave`.
     @discardableResult
-    func apply(_ mutation: DatabaseMutation) -> ApplyResult {
+    func apply(_ mutation: DatabaseMutation, origin: ApplyOrigin = .other) -> ApplyResult {
         guard !isReadOnly, problem == nil, !isLoading else { return .readOnly }
         guard database != nil || mutation.replacesDatabase else { return .readOnly }
         lastMutationLabel = mutation.label
@@ -195,7 +205,7 @@ final class AppModel {
             generation += 1
             rebuildDerived()
             scheduleSave()
-            onChange?(.data)
+            onChange?(.data(origin))
             return .applied(warnings: warnings)
         }
     }

@@ -114,3 +114,8 @@ de "Hausaufgabe", fr "devoir", ja 宿題, zh 作业.
 ## Screenshot fixes (Phase 3)
 
 New keys `tasks.quickAdd.due.tomorrow`, `tasks.quickAdd.due.nextLesson` (replace `tasks.quickAdd.dueTomorrow` / `dueNextLesson`) and `settings.reminders.kind.edit.a11y` are machine-translated into all 12 languages (needs_review). The date comes first in the next-lesson value; check the middle dot reads naturally in ja/zh.
+### Phase 3 final QA fixes (2026-10-15, Opus fix agent)
+1 new key (`attachments.unavailable`, neutral text when the attachments section is shown without its editor host) and
+1 changed English text (`health.notifications.notDetermined`: Tabula now asks once, after the first save of a task or
+exam that has a reminder; old translations dropped, re-authored). Model-authored for 11 languages (`sr-Latn` derived),
+all `needs_review`. Reviewer: "asks once" must not read as a promise to ask again; ro uses "reamintire" as elsewhere.

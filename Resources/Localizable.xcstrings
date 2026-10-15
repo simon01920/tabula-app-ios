@@ -6049,6 +6049,90 @@
         }
       }
     },
+    "attachments.unavailable" : {
+      "comment" : "Attachments section shown in a place that cannot add or open attachments (neutral, does not claim there are none).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Přílohy tu nejsou k dispozici."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Anhänge sind hier nicht verfügbar."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attachments aren't available here."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Les pièces jointes ne sont pas disponibles ici."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A mellékletek itt nem érhetők el."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ここでは添付ファイルを利用できません。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Załączniki nie są tu dostępne."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Atașamentele nu sunt disponibile aici."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Prílohy tu nie sú k dispozícii."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Прилози овде нису доступни."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Prilozi ovde nisu dostupni."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Вкладення тут недоступні."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "此处无法使用附件。"
+          }
+        }
+      }
+    },
     "attachments.usage.limited" : {
       "comment" : "Footer of the Attachments section. %1$@ = storage used, %2$@ = storage quota, e.g. 12.3 MB of 100 MB.",
       "extractionState" : "manual",
@@ -45236,85 +45320,85 @@
       }
     },
     "health.notifications.notDetermined" : {
-      "comment" : "Health check: the notification permission has not been requested yet.",
+      "comment" : "Health check: the notification permission has not been requested yet. Tabula offers the permission explainer once, after the user saves a task or exam that would get a reminder; the row's button also offers it.",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Zatím nepovoleno. Tabula se zeptá, až poprvé nastavíte připomínku."
+            "value" : "Zatím nepovoleno. Tabula se zeptá jednou, když poprvé uložíte úkol nebo zkoušku s připomínkou. Oznámení můžete povolit i zde."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Noch nicht erlaubt. Tabula fragt, wenn du zum ersten Mal eine Erinnerung einrichtest."
+            "value" : "Noch nicht erlaubt. Tabula fragt einmal, wenn du zum ersten Mal eine Aufgabe oder Prüfung mit Erinnerung sicherst. Du kannst Mitteilungen auch hier erlauben."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Not allowed yet. Tabula asks the first time you set up a reminder."
+            "value" : "Not allowed yet. Tabula asks once, when you first save a task or exam that has a reminder. You can also allow notifications here."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Pas encore autorisées. Tabula vous le demandera la première fois que vous configurerez un rappel."
+            "value" : "Pas encore autorisées. Tabula le demande une seule fois, lorsque vous enregistrez pour la première fois une tâche ou un examen avec un rappel. Vous pouvez aussi autoriser les notifications ici."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Még nincs engedélyezve. A Tabula akkor kérdez rá, amikor először beállítasz egy emlékeztetőt."
+            "value" : "Még nincs engedélyezve. A Tabula egyszer rákérdez, amikor először mentesz egy emlékeztetővel rendelkező feladatot vagy vizsgát. Az értesítéseket itt is engedélyezheted."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "まだ許可されていません。初めてリマインダーを設定するときにTabulaが確認します。"
+            "value" : "まだ許可されていません。リマインダー付きのタスクや試験を初めて保存したときに、Tabulaが一度だけ確認します。ここから通知を許可することもできます。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Jeszcze niedozwolone. Tabula zapyta, gdy po raz pierwszy ustawisz przypomnienie."
+            "value" : "Jeszcze niedozwolone. Tabula zapyta raz, gdy po raz pierwszy zapiszesz zadanie lub egzamin z przypomnieniem. Powiadomienia możesz też włączyć tutaj."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Încă nepermise. Tabula te întreabă prima dată când setezi o reamintire."
+            "value" : "Încă nepermise. Tabula întreabă o singură dată, când salvezi prima dată o sarcină sau un examen cu reamintire. Poți permite notificările și de aici."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Zatiaľ nepovolené. Tabula sa opýta, keď prvýkrát nastavíte pripomienku."
+            "value" : "Zatiaľ nepovolené. Tabula sa spýta raz, keď prvýkrát uložíte úlohu alebo skúšku s pripomienkou. Oznámenia môžete povoliť aj tu."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Још није дозвољено. Tabula ће питати када први пут подесите подсетник."
+            "value" : "Још није дозвољено. Tabula пита једном, када први пут сачувате задатак или испит са подсетником. Обавештења можете дозволити и овде."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Još nije dozvoljeno. Tabula će pitati kada prvi put podesite podsetnik."
+            "value" : "Još nije dozvoljeno. Tabula pita jednom, kada prvi put sačuvate zadatak ili ispit sa podsetnikom. Obaveštenja možete dozvoliti i ovde."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ще не дозволено. Tabula запитає, коли ви вперше налаштуєте нагадування."
+            "value" : "Ще не дозволено. Tabula запитає один раз, коли ви вперше збережете завдання або іспит із нагадуванням. Сповіщення також можна дозволити тут."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "尚未允许。你第一次设置提醒时，Tabula 会询问你。"
+            "value" : "尚未允许。当你首次保存带有提醒的任务或考试时，Tabula 会询问一次。你也可以在此处允许通知。"
           }
         }
       }

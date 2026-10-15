@@ -53,6 +53,10 @@ public struct ReminderRunResult: Sendable, Hashable {
     public var plan: ReminderPlan
     public var report: ReminderApplyReport
     public var alarmAuthorization: AlarmAuthorization
+    /// Planner requests (notifications + loud alarms) in the last computed plan, counted before any add failed. The
+    /// in-context permission offer uses it: while the permission is "not determined" adds may fail or never show, but
+    /// the plan still says a reminder would be scheduled (`ReminderPermissionOffer`).
+    public var plannedRequestCount: Int = 0
     /// Gentle in-app notices (saturation, loud alarms that fell back to notifications), in that order.
     public var notices: [LocalizedText] {
         [plan.saturationNotice, plan.alarmOverflowNotice].compactMap { $0 }
@@ -88,6 +92,7 @@ public final class ReminderEngine {
         let openSources = ReminderApplyOperations.openSources(in: input.database)
         var report = ReminderApplyReport()
         var applied: ReminderPlan
+        var plannedRequestCount = 0
         var attempt = 0
         while true {
             attempt += 1
@@ -101,6 +106,7 @@ public final class ReminderEngine {
             let plan = ReminderPlanner.plan(ReminderInputBuilder.input(database: input.database, resolvers: input.resolvers,
                                                                        context: input.context, now: input.now,
                                                                        options: options))
+            plannedRequestCount = plan.notifications.count + plan.alarms.count
             let valuesKnown = input.renderSignature == nil || input.renderSignature == state.renderSignature
             if !valuesKnown { report.renderSignatureChanged = true }
             let ops = ReminderApplyOperations.compute(lastApplied: state.plan, activeAlarms: state.activeAlarms,
@@ -140,7 +146,8 @@ public final class ReminderEngine {
         state.lastReport = report
         state.lastRunAt = input.now
         store.save(state)
-        return ReminderRunResult(plan: applied, report: report, alarmAuthorization: authorization)
+        return ReminderRunResult(plan: applied, report: report, alarmAuthorization: authorization,
+                                 plannedRequestCount: plannedRequestCount)
     }
 
     private struct Pass {

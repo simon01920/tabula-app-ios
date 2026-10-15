@@ -57,6 +57,7 @@ struct ExamDetailContent: View {
         .sheet(item: $editor) { target in
             ExamEditorView(target: target)
         }
+        .closesForDeepLink { editor = nil }   // QA fix Q6 (pushed in the Exams tab, not nested in a tab sheet)
         // Deleted from the editor: leave the detail (pop / dismiss) instead of showing an empty page.
         .onChange(of: exam == nil) { _, isMissing in
             if isMissing { dismiss() }

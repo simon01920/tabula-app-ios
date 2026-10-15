@@ -155,6 +155,9 @@ public struct ExamDraft: Equatable, Sendable {
 
     public var canSave: Bool { issues.isEmpty }
 
+    /// `completedAt` of the exam when the editor opened (the editor never changes it; `EditorStoreMerge`).
+    public var openedCompletedAt: Date? { base?.completedAt }
+
     /// The exam to store (`AppModel.apply(.upsert(_:))` stamps the metadata).
     public func makeExam(visibility: FieldVisibility) -> Exam? {
         guard canSave, let cleanTitle = EditorText.trimmedOrNil(title) else { return nil }

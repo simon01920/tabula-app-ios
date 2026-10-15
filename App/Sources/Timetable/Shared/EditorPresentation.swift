@@ -33,12 +33,14 @@ enum EditorRouteLookup {
 }
 
 extension View {
-    /// Presents `presentation`'s editor as a sheet with its `EditorContext` in the environment.
+    /// Presents `presentation`'s editor as a sheet with its `EditorContext` in the environment. A notification deep
+    /// link closes it unless it holds unsaved changes (`closesForDeepLink`, RootPresentation.swift).
     func editorSheet(_ presentation: Binding<EditorPresentation?>) -> some View {
         sheet(item: presentation) { item in
             item.route.makeView()
                 .environment(\.editorContext, item.context)
         }
+        .closesForDeepLink { presentation.wrappedValue = nil }
     }
 }
 

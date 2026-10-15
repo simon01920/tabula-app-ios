@@ -47,6 +47,19 @@ Silent switch on/off · each Focus (DND, Sleep, custom) · Low Power Mode · app
   (docs/ENVIRONMENT.md §21).
 - **Permissions:** never at launch; notification prompt only from explicit UI (B4's pre-explainer), AlarmKit prompt only
   when the user picks a Loud-alarm rule; the adapter never triggers AlarmKit's implicit prompt.
+- **In-context offer (Phase 3 final QA fix Q1):** after a user save of a task or exam (editor Save, Tasks quick add,
+  lesson detail "Add homework" → task editor, onboarding finish; `AppModel.apply(_:origin: .userSave)`), the re-plan
+  that covers it offers the pre-explainer once when `ReminderPermissionOffer.shouldOffer` holds: permission
+  `.notDetermined`, ≥ 1 planner request in the plan (`ReminderRunResult.plannedRequestCount`, counted before add
+  failures), and not declined before. Closing it while still not determined ("Not Now" or a swipe) is remembered per
+  install (`tabula.reminders.permissionOfferDeclined.v1` in the App Group defaults) and the save trigger never offers
+  it again; the Settings toggles, the override section and the health check's Allow button still do. Launch,
+  foreground, background refresh, timer and notification-action re-plans never offer it. The shell presents it from
+  the root (`RootPresentation.swift`) only when no other sheet is open.
+- **Deep links over open sheets (QA fix Q6):** a tap is kept as `AppNavigation.pendingLink`; clean tab sheets are asked
+  to close (`.closesForDeepLink`), then the item's tab and detail are shown. Editors with unsaved changes, running
+  attachment copies and voice recordings (`.protectsUnsavedWork`) are never closed: the target appears right after
+  that sheet closes. Links not shown within 10 minutes are dropped (`RootPresentationPolicy`).
 - **Health check model:** `ReminderHealthCheck` (rows for notifications, Time Sensitive, loud alarms, Focus, Silent mode,
   Low Power, Background App Refresh, pending vs 64, saturation, alarm overflow, hidden/locked app). UI in B4.
 - **Device matrix:** `docs/checklists/PHASE3_DEVICE.md` §A.

@@ -47,8 +47,14 @@ private struct ExamEditorBody: View {
             canSave: { $0.canSave },
             save: { draft in
                 let visibility = model.database.map { ExamFacts.visibility(timetableID: draft.timetableID, in: $0) } ?? .all
-                guard let exam = draft.makeExam(visibility: visibility) else { return nil }
-                return model.apply(.upsert(exam))
+                // QA fix Q5: merged with the exam as stored NOW (a "Mark as Done" meanwhile is kept; a deletion
+                // meanwhile is not undone: inline error instead).
+                let stored = model.database?.exams.first { $0.id == draft.examID }
+                switch draft.examForSave(visibility: visibility, stored: stored) {
+                case nil: return nil
+                case .deletedMeanwhile?: return .failed(.notFound(.exam, draft.examID.uuid))
+                case .save(let exam)?: return model.apply(.upsert(exam), origin: .userSave)
+                }
             },
             content: { draft in ExamFormContent(draft: draft) })
     }

@@ -24,7 +24,8 @@ final class AppServices {
                                     alarms: environment.reminders.alarms, store: environment.reminders.stateStore)
         let reminders = ReminderCoordinator(engine: engine, model: model, navigation: navigation,
                                             backgroundScheduler: environment.reminders.backgroundScheduler,
-                                            deviceState: environment.reminders.deviceState)
+                                            deviceState: environment.reminders.deviceState,
+                                            offerStore: environment.reminders.offerStore)
         self.model = model
         self.navigation = navigation
         self.reminders = reminders

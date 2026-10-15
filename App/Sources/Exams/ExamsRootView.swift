@@ -73,6 +73,7 @@ struct ExamsRootView: View {
         .sheet(item: $editor) { target in
             ExamEditorView(target: target)
         }
+        .closesForDeepLink { editor = nil }   // QA fix Q6: a notification tap needs the screen
     }
 
     @ViewBuilder

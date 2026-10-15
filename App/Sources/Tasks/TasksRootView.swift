@@ -67,6 +67,7 @@ struct TasksRootView: View {
             case .new(let id): TaskEditorView(mode: .new(id))
             }
         }
+        .closesForDeepLink { sheet = nil }   // QA fix Q6: a notification tap needs the screen
         .confirmationDialog("tasks.delete.title", isPresented: deleteDialogBinding, titleVisibility: .visible) {
             Button("tasks.delete.confirm", role: .destructive) {
                 if let id = pendingDelete { model.apply(.delete(id)) }
@@ -292,7 +293,7 @@ struct TasksRootView: View {
         guard let task = TaskQuickAdd.makeTask(id: TaskItem.ID(UUID()), title: quickTitle, subject: subject,
                                                nextLesson: next, today: model.today,
                                                fallbackTimetableID: model.activeTimetable?.id) else { return }
-        let result = model.apply(.upsert(task))
+        let result = model.apply(.upsert(task), origin: .userSave)   // may offer the notification explainer (Q1)
         quickResult = result
         if case .applied = result {
             quickTitle = ""
