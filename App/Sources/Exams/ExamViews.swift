@@ -98,6 +98,7 @@ struct ExamFeaturedCard: View {
     let row: ExamRow
     let facts: ExamFacts
     let texts: ExamTexts
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         let tint = row.urgency.tint
@@ -109,11 +110,20 @@ struct ExamFeaturedCard: View {
             Label { Text(verbatim: texts.when(row.when)).font(.largeTitle.weight(.bold)) } icon: {
                 Image(systemName: row.urgency.symbolName).foregroundStyle(tint)
             }
-            HStack(alignment: .top, spacing: 12) {
-                ExamBadge(subject: row.subject, size: 44)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(verbatim: row.exam.title).font(.title3.weight(.semibold))
-                    ExamSubtitle(row: row, texts: texts).foregroundStyle(.secondary)
+            // Accessibility sizes: the badge sits above the title so the title keeps the full width.
+            let titleStack = VStack(alignment: .leading, spacing: 2) {
+                Text(verbatim: row.exam.title).font(.title3.weight(.semibold))
+                ExamSubtitle(row: row, texts: texts).foregroundStyle(.secondary)
+            }
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 8) {
+                    ExamBadge(subject: row.subject, size: 44)
+                    titleStack
+                }
+            } else {
+                HStack(alignment: .top, spacing: 12) {
+                    ExamBadge(subject: row.subject, size: 44)
+                    titleStack
                 }
             }
             ExamFactLines(exam: row.exam, facts: facts, texts: texts)
@@ -142,9 +152,13 @@ struct ExamRowView: View {
     let row: ExamRow
     let facts: ExamFacts
     let texts: ExamTexts
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
+        let layout = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 8))
+            : AnyLayout(HStackLayout(alignment: .top, spacing: 12))
+        layout {
             ExamBadge(subject: row.subject, size: 36)
             VStack(alignment: .leading, spacing: 3) {
                 Label { Text(verbatim: texts.when(row.when)).font(.subheadline.weight(.semibold)) } icon: {

@@ -384,3 +384,12 @@ To inspect files on a device: Finder/Xcode "Download Container" on a Mac later, 
 | B3.18 | VoiceOver on a row | Reads title + details; hint ("Opens a preview." / "Asks before opening the link." / "Plays the voice note."); rotor actions Rename, Move Up, Move Down, Delete | | |
 | B3.19 | Dynamic Type AX5 | Thumbnails scale, titles wrap (3 lines), no clipped buttons | | |
 | B3.20 | sk / de / ja | All attachment strings translated (no raw `attachments.*` keys); sizes formatted per locale ("1,2 MB") | | |
+
+## Screenshot fixes (CI simulator findings on b854087)
+
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| SF1 | Tasks tab, quick-add section, no subject; then pick a subject with an upcoming lesson | Between Subject and Add a non-tappable row "Due" with value "Tomorrow", then a "Thu, Oct 15 · next lesson" style date; no footer under the section, so the task list below has no stray "Due tomorrow" caption; sk/de/ja translated; AX5 wraps the value | | |
+| SF2 | Task detail of a task with a date-only due date and weekly repeat (seed secondary, "Nemčina – Lektion 3") | Due row shows "Today" (overdue: red with warning icon); the Repeat row follows immediately, no blank gap or stray separator; a task without due date / linked lesson / priority shows none of those rows | | |
+| SF3 | Exams tab at Dynamic Type AX-XXXL, German: next-exam card and list rows | Subject badge sits above the title; the title wraps by words over the full width (no one-syllable lines); normal sizes keep the badge beside the title | | |
+| SF4 | Settings → Reminders with VoiceOver, enabled kinds | Each "Times and delivery" row is read as "<kind>, times and delivery" (e.g. "Homework, times and delivery"), translated in sk/de/ja | | |

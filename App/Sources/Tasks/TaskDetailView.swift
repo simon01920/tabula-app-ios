@@ -147,10 +147,18 @@ struct TaskDetailView: View {
             }
             if let due = row.due {
                 LabeledContent {
-                    Label {
-                        Text(verbatim: due.text(renderer: model.renderer))
-                    } icon: {
-                        if row.isOverdue { Image(systemName: "exclamationmark.triangle.fill") }
+                    // Only an overdue task gets an icon: a Label whose icon closure can be empty lays out with a
+                    // stretched, blank icon slot, so the plain Text is used otherwise.
+                    Group {
+                        if row.isOverdue {
+                            Label {
+                                Text(verbatim: due.text(renderer: model.renderer))
+                            } icon: {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                            }
+                        } else {
+                            Text(verbatim: due.text(renderer: model.renderer))
+                        }
                     }
                     .foregroundStyle(row.isOverdue ? Color.red : Color.primary)
                     .multilineTextAlignment(.trailing)

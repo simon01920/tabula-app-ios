@@ -40,6 +40,7 @@ struct TasksRootView: View {
     @State private var quickTitle = ""
     @State private var quickSubjectID: Subject.ID?
     @State private var quickNextLesson: NextLesson?
+    @Environment(\.scenePhase) private var scenePhase
     @State private var quickResult: ApplyResult?
     @State private var minuteTick = 0
 
@@ -75,6 +76,11 @@ struct TasksRootView: View {
         } message: {
             Text(verbatim: deleteMessage)
         }
+        // The quick-add "Due" row must not show a lesson that has already passed.
+        .onAppear { resolveQuickNextLesson() }
+        .onChange(of: model.today) { _, _ in resolveQuickNextLesson() }
+        .onChange(of: minuteTick) { _, _ in resolveQuickNextLesson() }
+        .onChange(of: scenePhase) { _, phase in if phase == .active { resolveQuickNextLesson() } }
         // Overdue-by-time and "today" change while the app is open: re-evaluate once a minute (not in screenshot mode).
         .task {
             while !Task.isCancelled {
@@ -254,23 +260,26 @@ struct TasksRootView: View {
                 Text("tasks.field.subject")
             }
             .onChange(of: quickSubjectID) { _, _ in resolveQuickNextLesson() }
+            LabeledContent {
+                Text(verbatim: quickDueText).multilineTextAlignment(.trailing)
+            } label: {
+                Text("tasks.field.due")
+            }
             Button(action: addQuick) {
                 Label { Text("tasks.quickAdd.add") } icon: { Image(systemName: "plus.circle.fill") }
                     .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
             }
             .disabled(EditorText.trimmedOrNil(quickTitle) == nil)
-        } footer: {
-            Text(verbatim: quickDueText)
         }
     }
 
     private var quickDueText: String {
         if let nextLesson = quickNextLesson, quickSubjectID != nil {
-            return model.renderer.format(key: "tasks.quickAdd.dueNextLesson", arguments: [
+            return model.renderer.format(key: "tasks.quickAdd.due.nextLesson", arguments: [
                 .text(model.formatter.date(nextLesson.date, style: .weekdayDayMonth)),
             ])
         }
-        return model.renderer.string(forKey: "tasks.quickAdd.dueTomorrow")
+        return model.renderer.string(forKey: "tasks.quickAdd.due.tomorrow")
     }
 
     private func resolveQuickNextLesson() {

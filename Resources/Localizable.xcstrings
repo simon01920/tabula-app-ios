@@ -84295,6 +84295,90 @@
         }
       }
     },
+    "settings.reminders.kind.edit.a11y" : {
+      "comment" : "VoiceOver label of the Times and delivery row of one reminder kind. Arg 1 = the reminder kind name (e.g. Homework).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@, časy a doručení"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@, Zeiten und Zustellung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@, times and delivery"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@, horaires et mode de remise"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@, időpontok és kézbesítés"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@、時刻と通知方法"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@, godziny i sposób dostarczania"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@, ore și livrare"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@, časy a doručovanie"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@, времена и достава"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@, vremena i dostava"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@, час і доставлення"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@，时间与送达方式"
+          }
+        }
+      }
+    },
     "settings.reminders.kinds.footer" : {
       "comment" : "Footer of the reminder kinds list.",
       "extractionState" : "manual",
@@ -101305,170 +101389,170 @@
         }
       }
     },
-    "tasks.quickAdd.dueNextLesson" : {
-      "comment" : "Footer of the quick-add section. Arg 1 = formatted date (weekday, day, month) of the next lesson of the chosen subject.",
+    "tasks.quickAdd.due.nextLesson" : {
+      "comment" : "Value of the Due row in the Tasks quick-add section. Arg 1 = formatted date (weekday, day, month) of the next lesson of the chosen subject, e.g. Thu, Oct 15.",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Termín %@, na nejbližší hodině předmětu"
+            "value" : "%@ · příští hodina"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Fällig %@, in der nächsten Stunde des Fachs"
+            "value" : "%@ · nächste Stunde"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Due %@, at the subject's next lesson"
+            "value" : "%@ · next lesson"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Échéance : %@, au prochain cours de la matière"
+            "value" : "%@ · prochain cours"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Határidő: %@, a tantárgy következő óráján"
+            "value" : "%@ · következő óra"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "期限: %@（この科目の次の授業）"
+            "value" : "%@ · 次の授業"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Termin: %@, na najbliższej lekcji przedmiotu"
+            "value" : "%@ · następna lekcja"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Termen %@, la următoarea oră a materiei"
+            "value" : "%@ · următoarea oră"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Termín %@, na najbližšej hodine predmetu"
+            "value" : "%@ · nasledujúca hodina"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Рок: %@, на следећем часу предмета"
+            "value" : "%@ · следећи час"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Rok: %@, na sledećem času predmeta"
+            "value" : "%@ · sledeći čas"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Термін: %@, на наступному уроці предмета"
+            "value" : "%@ · наступний урок"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "截止：%@，该科目的下一节课"
+            "value" : "%@ · 下一节课"
           }
         }
       }
     },
-    "tasks.quickAdd.dueTomorrow" : {
-      "comment" : "Footer of the quick-add section when no subject is chosen or it has no upcoming lesson.",
+    "tasks.quickAdd.due.tomorrow" : {
+      "comment" : "Value of the non-interactive Due row in the Tasks quick-add section when no subject is chosen or it has no upcoming lesson.",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Termín zítra"
+            "value" : "Zítra"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Fällig morgen"
+            "value" : "Morgen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Due tomorrow"
+            "value" : "Tomorrow"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Échéance : demain"
+            "value" : "Demain"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Határidő: holnap"
+            "value" : "Holnap"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "期限: 明日"
+            "value" : "明日"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Termin: jutro"
+            "value" : "Jutro"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Termen mâine"
+            "value" : "Mâine"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Termín zajtra"
+            "value" : "Zajtra"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Рок: сутра"
+            "value" : "Сутра"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Rok: sutra"
+            "value" : "Sutra"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Термін: завтра"
+            "value" : "Завтра"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "截止：明天"
+            "value" : "明天"
           }
         }
       }
