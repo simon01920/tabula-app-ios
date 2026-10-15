@@ -72,7 +72,7 @@ The Sonnet work needed one orchestrator-found fix round (the screenshot findings
 ### Final verification of the merged result
 - **Last full CI:** iOS CI 38731163246 at `d227674` is green (Linux core and UI tests, XcodeGen iOS + watchOS build, xtool build). Xcode log: `Compile XCStrings InfoPlist.xcstrings` for TabulaApp.
 - **Polish merge, verified locally:** `validate.sh` ALL CHECKS PASSED (**502 core + 334 UI tests**, 1,200 keys + 5 InfoPlist keys × 12 languages). The xtool build has 0 warnings, the app 13 `InfoPlist.strings`, the widget 0.
-- **CI on the final push:** listed below under *Gate push*.
+- **Gate push:** iOS CI [38734651111](https://github.com/simon01920/tabula-app-ios/actions/runs/38734651111) at `4bd6828` (includes the polish merge) is **green on all jobs**: Linux core and UI tests and validation; xtool/SwiftPM build (with the widget `InfoPlist.strings` = 0 check); XcodeGen iOS + watchOS build.
 
 ### CI
 - **Segfault on `b854087`:** iOS CI run 38600687712 failed once. `swift-package` itself segfaulted inside libdispatch during the Linux `swift test Packages/TimetableUI`; it was not a test failure.
