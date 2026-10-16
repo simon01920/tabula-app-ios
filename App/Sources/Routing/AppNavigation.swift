@@ -5,6 +5,7 @@
 //   task  → Tasks tab, then the route `tasks.detail` as a sheet if a feature registered it (stage B1)
 //   exam  → Exams tab, then `exams.detail` (stage B2)
 //   lesson → Timetable tab; pack tonight → Today tab (no detail sheet)
+//   today  → Today tab (widget taps, Phase 4 A: `tabula://open/…` URLs from `ItemLinkURL`, handled by `onOpenURL`)
 // Contract for B1/B2: register `AppRoute("tasks.detail", .sheet(over: .tasks)) { TaskDetailRouteView() }` (resp.
 // `exams.detail`) in your *Routes.swift. The route's view reads `navigation.presentedItem` (`.task(id)` / `.exam(id)`)
 // and shows that item; when it is `nil` (launched with `-TabulaScreen tasks.detail` for screenshots) it picks a
@@ -186,7 +187,7 @@ final class AppNavigation {
         case .task: return .tasks
         case .exam: return .exams
         case .lesson: return .timetable
-        case .packTonight: return .today
+        case .packTonight, .today: return .today
         }
     }
 
@@ -195,7 +196,7 @@ final class AppNavigation {
         switch link {
         case .task: return "tasks.detail"
         case .exam: return "exams.detail"
-        case .lesson, .packTonight: return nil
+        case .lesson, .packTonight, .today: return nil
         }
     }
 }

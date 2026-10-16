@@ -16,6 +16,8 @@ final class AppServices {
     let navigation: AppNavigation
     let reminders: ReminderCoordinator
     let notificationDelegate: NotificationResponseDelegate
+    /// Widget snapshot writer (Phase 4 A): App Group snapshot + WidgetKit reload after every change.
+    let widgets: WidgetSnapshotWriter
 
     init(environment: AppEnvironment) {
         let model = AppModel(environment: environment)
@@ -34,6 +36,7 @@ final class AppServices {
         }
         reminders.attach()
         AttachmentMaintenance.install(on: model)   // orphan attachment cleanup after load + changes (B3); chains onChange
+        widgets = WidgetSnapshotWriter.install(on: model)   // widget snapshot after load + changes (Phase 4 A); chains onChange
     }
 }
 

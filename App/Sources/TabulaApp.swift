@@ -6,7 +6,8 @@
 //       View.environment(_:) for Observable objects, View.task(_:), View.onChange(of:_:) (two-parameter closure, iOS 17),
 //       Scene.backgroundTask(_:action:) + BackgroundTask.appRefresh(_:) (iOS 16; the action's return completes the task,
 //       SwiftUI registers the identifier), UIApplication.beginBackgroundTask(withName:expirationHandler:),
-//       UIApplication.endBackgroundTask(_:).
+//       UIApplication.endBackgroundTask(_:), View.onOpenURL(perform:) (iOS 14; WidgetKit passes widgetURL / Link URLs to it:
+//       "Linking to specific app scenes from your widget or Live Activity", checked 2026-10-16).
 import SwiftUI
 import UIKit
 import TimetableUI
@@ -44,12 +45,18 @@ struct TabulaRootApp: App {
                 .environment(services.navigation)
                 .environment(services.reminders)
                 .task { await services.model.load() }
+                // Widget taps (Phase 4 A): `tabula://open/…` (ItemLinkURL) → the same path as a notification tap.
+                // Anything else is ignored (any app or web page can send the app a URL).
+                .onOpenURL { url in
+                    services.navigation.open(ItemLinkURL.link(from: url))
+                }
         }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
                 services.model.refreshEnvironment()   // day / time zone / locale may have changed; also re-plans reminders
             } else {
                 BackgroundSave.flush(services.model)
+                services.widgets.flushNow()           // a change made just before leaving reaches the widgets
             }
         }
         // The BGAppRefreshTask handler: loads the store if the app was launched for it, re-plans, submits the next

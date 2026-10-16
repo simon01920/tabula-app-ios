@@ -53,6 +53,9 @@ struct AppEnvironment: Sendable {
     let reminders: ReminderDependencies
     /// Attachment files (stage B3): `<store directory>/Attachments`; a throwaway temp folder for seed runs.
     let attachments: any AttachmentStore
+    /// The App Group container the widget snapshot is written to (Phase 4 A); `nil` without an App Group (free team:
+    /// the widgets show "Open Tabula") and in seed mode (seed data must never reach the real widgets).
+    let widgetContainer: URL?
 
     /// The environment for this process.
     static func make(launchOptions: LaunchOptions) -> AppEnvironment {
@@ -78,7 +81,8 @@ struct AppEnvironment: Sendable {
                     ? .live(defaults: UserDefaults(suiteName: "sk.simondev.tabula.seed-reminders") ?? .standard)
                     : .inMemory(),
                 attachments: FileAttachmentStore(root: FileManager.default.temporaryDirectory
-                    .appendingPathComponent("TabulaSeedAttachments", isDirectory: true)))
+                    .appendingPathComponent("TabulaSeedAttachments", isDirectory: true)),
+                widgetContainer: nil)
         }
         #endif
         // The real store always uses the real clock and the system zone: -TabulaNow/-TabulaTimeZone are honoured only
@@ -92,7 +96,8 @@ struct AppEnvironment: Sendable {
             dataSource: .file(directory: location.directory, isAppGroup: location.isAppGroup),
             launchOptions: launchOptions, saveDebounce: .milliseconds(400),
             reminders: .live(defaults: location.defaults),
-            attachments: FileAttachmentStore(root: FileAttachmentStore.root(forStoreDirectory: location.directory)))
+            attachments: FileAttachmentStore(root: FileAttachmentStore.root(forStoreDirectory: location.directory)),
+            widgetContainer: location.groupContainer)
     }
 }
 
@@ -101,6 +106,8 @@ struct StoreLocation {
     let directory: URL
     let isAppGroup: Bool
     let defaults: UserDefaults
+    /// The App Group container itself (`nil` for the Application Support fallback).
+    let groupContainer: URL?
 
     /// `<App Group container>/Tabula`, else `<Application Support>/Tabula`.
     static func resolve(bundleIdentifier: String? = Bundle.main.bundleIdentifier) -> StoreLocation {
@@ -108,13 +115,13 @@ struct StoreLocation {
         let fileManager = FileManager.default
         if let container = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupID) {
             return StoreLocation(directory: container.appendingPathComponent("Tabula", isDirectory: true), isAppGroup: true,
-                                 defaults: UserDefaults(suiteName: groupID) ?? .standard)
+                                 defaults: UserDefaults(suiteName: groupID) ?? .standard, groupContainer: container)
         }
         let support = (try? fileManager.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil,
                                              create: true))
             ?? fileManager.temporaryDirectory
         return StoreLocation(directory: support.appendingPathComponent("Tabula", isDirectory: true), isAppGroup: false,
-                             defaults: .standard)
+                             defaults: .standard, groupContainer: nil)
     }
 }
 
