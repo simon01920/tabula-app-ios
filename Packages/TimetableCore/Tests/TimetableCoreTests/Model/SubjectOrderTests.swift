@@ -310,6 +310,18 @@ struct SubjectReorderPlanTests {
         }
     }
 
+    /// QA C1: `max + 1` must not trap on a stored `Int.max` (crafted backup or synced record).
+    @Test func insertionAfterIntMaxRenumbersInsteadOfTrapping() {
+        let db = F.database([F.subject(1, "A", 0), F.subject(2, "B", Int.max), F.subject(3, "C", 5)])
+        let plan = SubjectOrder.insertion(in: db, timetableID: F.timetable, locale: F.english)
+        #expect(plan.sortIndex == 3)
+        #expect(F.names(plan.renumbered) == ["C", "B"] && plan.renumbered.map(\.sortIndex) == [1, 2])
+        #expect(SubjectOrder.appendedIndex(after: [Int.max]) == nil)
+        #expect(SubjectOrder.appendedIndex(after: [Int.max - 1]) == Int.max)
+        #expect(SubjectOrder.appendedIndex(after: [Int]()) == 0)
+        #expect(SubjectOrder.appendedIndex(after: [Int.min]) == Int.min + 1)
+    }
+
     @Test func movingUpAndDown() {
         let ids = [F.id(1), F.id(2), F.id(3)]
         #expect(SubjectOrder.moving(F.id(2), by: -1, in: ids) == [F.id(2), F.id(1), F.id(3)])

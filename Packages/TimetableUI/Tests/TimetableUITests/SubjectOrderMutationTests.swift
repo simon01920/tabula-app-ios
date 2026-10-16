@@ -40,7 +40,8 @@ struct SubjectOrderMutationTests {
         let ids = TimetableManagement.subjects(of: timetableID, in: database, locale: english).map(\.id)
         var order = ids
         order.swapAt(0, ids.count - 1)
-        let mutation = TimetableManagement.reorderSubjectsMutation(order, timetableID: timetableID, in: database, locale: english)
+        let mutation = try #require(TimetableManagement.reorderSubjectsMutation(order, timetableID: timetableID, in: database,
+                                                                                 locale: english))
         #expect(mutation.label == "reorder subjects")
         let reordered = try apply(mutation, to: database, clock: &clock)
         #expect(TimetableManagement.subjects(of: timetableID, in: reordered, locale: english).map(\.id) == order)
@@ -50,10 +51,60 @@ struct SubjectOrderMutationTests {
         #expect(live.allSatisfy { $0.meta.fieldClocks["sortIndex"] == $0.meta.updatedAt })
         #expect(reordered.validate().filter { $0.severity == .error }.isEmpty)
 
-        // The same order again changes nothing (empty batch, database unchanged).
-        let again = try apply(TimetableManagement.reorderSubjectsMutation(order, timetableID: timetableID, in: reordered,
-                                                                          locale: english), to: reordered, clock: &clock)
-        #expect(again == reordered)
+        // The same order again (a row dropped where it was) is no mutation at all: the UI applies nothing.
+        #expect(TimetableManagement.reorderSubjectsMutation(order, timetableID: timetableID, in: reordered, locale: english) == nil)
+        #expect(TimetableManagement.reorderSubjectsMutation([], timetableID: timetableID, in: reordered, locale: english) == nil)
+    }
+
+    @Test func timetableReorderNoOpIsDetected() throws {
+        let (database, _) = scenario()
+        let order = TimetableManagement.live(database).map(\.id)
+        #expect(TimetableManagement.reorderIsNoOp(order, in: database))
+        #expect(TimetableManagement.reorderIsNoOp([], in: database))
+    }
+
+    /// QA C1: a stored `Int.max` (crafted backup / synced record) must never make `max + 1` trap.
+    @Test func appendingAfterIntMaxNeverTraps() throws {
+        let (base, timetableID) = scenario()
+        var clock = HybridLogicalClock(node: 0xC1)
+        // Subjects: one at Int.max, the others ordered.
+        var database = base
+        let ids = TimetableManagement.subjects(of: timetableID, in: database, locale: english).map(\.id)
+        for (index, id) in ids.enumerated() {
+            let position = try #require(database.subjects.firstIndex { $0.id == id })
+            database.subjects[position].sortIndex = index == 0 ? Int.max : index
+        }
+        let timetable = try #require(database.timetables.first { $0.id == timetableID })
+        var draft = SubjectDraft(newIn: timetable, pack: .classic, usedColors: [], id: Subject.ID(UUID()))
+        draft.name = "After max"
+        let subject = try #require(draft.makeSubject())
+        let saved = try apply(TimetableManagement.saveSubjectMutation(subject, in: database, locale: english), to: database,
+                              clock: &clock)
+        let shown = TimetableManagement.subjects(of: timetableID, in: saved, locale: english)
+        #expect(shown.last?.id == subject.id)
+        #expect(shown.map(\.sortIndex) == Array(0..<shown.count).map { Optional($0) })   // renumbered densely
+
+        // Timetables: add and duplicate after a timetable at Int.max.
+        var tables = base
+        tables.timetables[0].sortIndex = Int.max
+        var newIDs = SequentialIDGenerator(namespace: 0xC1C1)
+        let added = TimetableManagement.addMutation(name: "New", emoji: nil, structure: .freeForm(minutes: 45), like: nil,
+                                                    in: tables, ids: &newIDs)
+        let withAdded = try apply(added.mutation, to: tables, clock: &clock)
+        #expect(TimetableManagement.live(withAdded).map(\.id).last == added.timetableID)
+        #expect(TimetableManagement.live(withAdded).map(\.sortIndex) == [0, 1])
+        let copy = try #require(TimetableManagement.duplicateMutation(tables.timetables[0].id, name: "Copy", in: tables,
+                                                                      ids: &newIDs))
+        let withCopy = try apply(copy.mutation, to: tables, clock: &clock)
+        #expect(TimetableManagement.live(withCopy).map(\.id).last == copy.timetableID)
+        #expect(TimetableManagement.live(withCopy).map(\.sortIndex) == [0, 1])
+        #expect(TimetableManagement.appendIndex(in: base).steps.isEmpty)
+
+        // Attachments saturate instead of trapping.
+        let ref = AttachmentRef(id: AttachmentRef.ID(UUID()), meta: EditorEntities.placeholderMeta, kind: .link,
+                                url: "https://example.com", sortIndex: Int.max)
+        #expect(AttachmentReferences.nextSortIndex([ref]) == Int.max)
+        #expect(AttachmentReferences.nextSortIndex([]) == 0)
     }
 
     @Test func moveUpAndDownForVoiceOver() throws {
@@ -112,8 +163,8 @@ struct SubjectOrderMutationTests {
         let opened = try #require(database.subjects.first { $0.id == ids.last })
         var draft = SubjectDraft(subject: opened)
         // … meanwhile it is moved to the top (e.g. synced from another device).
-        let reordered = try apply(TimetableManagement.reorderSubjectsMutation([opened.id], timetableID: timetableID,
-                                                                             in: database, locale: english),
+        let reordered = try apply(try #require(TimetableManagement.reorderSubjectsMutation([opened.id], timetableID: timetableID,
+                                                                                           in: database, locale: english)),
                                   to: database, clock: &clock)
         draft.name = "Renamed"
         let edited = try #require(draft.makeSubject())
@@ -131,8 +182,9 @@ struct SubjectOrderMutationTests {
         var clock = HybridLogicalClock(node: 0xC1)
         let ids = TimetableManagement.subjects(of: timetableID, in: database, locale: english).map(\.id)
         let order = Array(ids.reversed())
-        let reordered = try apply(TimetableManagement.reorderSubjectsMutation(order, timetableID: timetableID, in: database,
-                                                                             locale: english), to: database, clock: &clock)
+        let reordered = try apply(try #require(TimetableManagement.reorderSubjectsMutation(order, timetableID: timetableID,
+                                                                                           in: database, locale: english)),
+                                  to: database, clock: &clock)
         #expect(QuickAddSubjects.list(reordered, timetableID: timetableID, locale: english).map(\.id) == order)
         let tasks = reordered.tasks.filter { !$0.isDeleted }
         let filter = TaskListModel.filterSubjects(tasks: tasks, subjects: reordered.subjects, timetableOrder: [timetableID],

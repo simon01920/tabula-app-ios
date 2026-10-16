@@ -19,15 +19,15 @@ data or a manually built timetable), so the upgrade path is tested. Optional sec
 
 | ID | Steps | Expected | Observed | ✔/✘ |
 |---|---|---|---|---|
-| C1.1 | Install this build over the Phase 3 build (keep data), open Timetable → options → Subjects | All subjects present; order is **alphabetical** (no order stored yet); no error banner; footer "Tap Edit to change the order. New subjects are added at the end." | | |
-| C1.2 | Tap **Edit** (top left) | Reorder handles appear on every row; no delete buttons; Edit becomes Done. With 0–1 subjects, Edit is disabled | | |
-| C1.3 | Drag the last subject to the top, tap Done | The row stays at the top; reopening the Subjects sheet and relaunching the app keep the order | | |
+| C1.1 | Install this build over the Phase 3 build (keep data), open Timetable → options → Subjects | All subjects present; order is **alphabetical** (no order stored yet); no error banner; footer "Tap Reorder to change the order. New subjects are added at the end." (with only one subject: "New subjects are added at the end of the list.") | | |
+| C1.2 | Tap **Reorder** (top left) | Drag handles appear on every row; no delete buttons; Reorder becomes **Done** and the sheet's own Done (top right) is hidden, so only one Done is visible; VoiceOver reads it as "Done reordering". With 0–1 subjects, Reorder is disabled | | |
+| C1.3 | Drag the last subject to the top, tap Done. Then drag a row and drop it where it was | The row stays at the top; reopening the Subjects sheet and relaunching the app keep the order. The drop in place changes nothing (Developer screen: last mutation label not "reorder subjects") | | |
 | C1.4 | Open the subject picker in: lesson editor (new lesson), day-change editor (substitute / extra lesson), timetable quick add (tap an empty grid slot), Tasks → quick-add subject menu, task editor, exam editor | Every list shows the **same order** as the Subjects sheet (moved subject first) | | |
 | C1.5 | Tasks tab → options menu → Subject filter (have tasks for ≥ 3 subjects) | Filter subjects follow the manual order; with several timetables, grouped in the timetables-list order | | |
 | C1.6 | Subjects → **+**, create "Aaa test" | New subject appears at the **end** of the list (not alphabetically first), and at the end of every picker in C1.4 | | |
 | C1.7 | Edit an existing subject (rename it), Save | Its position does not change | | |
-| C1.8 | VoiceOver on, Subjects sheet: focus the 2nd row, swipe up/down (rotor Actions) | Actions "Move up" and "Move down" are offered; the first row offers only "Move down", the last only "Move up". Activating one moves the row immediately (check the new position by swiping through the list) | | |
-| C1.9 | Repeat C1.8 in Slovak (or another non-English language) | Action names are translated ("Posunúť vyššie" / "Posunúť nižšie" in sk); footer translated | | |
+| C1.8 | VoiceOver on, Subjects sheet: focus the 2nd row, swipe up/down (rotor Actions) | Actions "Move up" and "Move down" are offered; the first row offers only "Move down", the last only "Move up". Activating one moves the row immediately and VoiceOver announces "Moved to position N of M" | | |
+| C1.9 | Repeat C1.8 in Slovak (or another non-English language) | Action names, the announcement ("Presunuté na pozíciu N z M") and the Reorder button are translated in sk; footer translated | | |
 | C1.10 | Dynamic Type at the largest accessibility size, Edit mode | Rows wrap, reorder handles stay reachable; the footer is readable | | |
 | C1.11 | *(only once the share UI exists — not built yet; core-tested: `SubjectOrderShareBackupTests`)* Share the timetable (link or QR), import it on the same device | The imported timetable's subjects appear in the **same manual order** as the source | | |
 | C1.12 | (optional, two devices or an older build) Reorder differently on two devices offline, then sync / exchange data | Both devices end with the same order (deterministic merge, DOMAIN_MODEL §3.3); a later full reorder on one device wins | | |

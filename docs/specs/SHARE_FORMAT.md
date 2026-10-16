@@ -143,7 +143,9 @@ name (`a–z 0–9 .`) · `r` default room? · `bd` default building? · `te` de
 `o` is the **dense rank** of the source subject's `Subject.sortIndex` among the exported subjects that have one: equal
 indices share a rank, gaps are closed, subjects without an index have no `o`. Range `0 ..< maxSubjects` (200), else
 `invalidValue(s[i].o)`; a non-integer is `malformedPayload`; equal values are allowed. Import stores `o` as the new subject's
-`sortIndex` (absent → `nil`), so the recipient sees the sender's order (DOMAIN_MODEL §3.3: index, then name, then ID).
+`sortIndex` (absent → `nil`), so the recipient sees the sender's order wherever ranks differ. Subjects with equal ranks (or none) are
+ordered by the recipient's own tie-break (DOMAIN_MODEL §3.3: name in the recipient's locale, then the **new** IDs from
+import), which can differ from the sender's for case-insensitively equal names or across locales.
 Payloads written before the key existed import with no order (alphabetical); older apps ignore the key. The ranks are
 locale-independent and do not depend on array order, so the canonical-envelope guarantee (§3) holds. The golden payload
 has no index, so it is unchanged.
@@ -395,7 +397,10 @@ limit (pre-freeze; the count is not shown, the user sees it in the app). Total: 
   is an open vocabulary like the persisted `Density`; neither changes the golden payload.
 - D2D-8 (Phase 4 C1, 2026-10-16, P3-2) Optional `s[i].o` (subject display order, dense rank of `Subject.sortIndex`) added
   within `v` = 1 — an optional key old apps ignore (§10). Ranks rather than raw indices keep values small (< 200, cheap to
-  validate), close gaps left by deletions and keep ties as ties, so the recipient's name/ID tie-break matches the sender's.
+  validate), close gaps left by deletions and keep ties as ties. Ties are then broken by the recipient (name in the recipient's
+  locale, then the IDs created on import), so for tied subjects the order matches the sender's only when the names differ
+  and both locales collate them the same way; equal names fall back to the new IDs. Accepted: ties only arise after
+  concurrent reorders.
   Cost: +33 B DEFLATE for the 14-subject secondary fixture (still inline, 1438 of 2048 B).
 - Open: overrides in a later `v`; whether the Worker should re-validate payloads with the same rules (port of §5/§7);
   App Attest for uploads (SHARING.md).

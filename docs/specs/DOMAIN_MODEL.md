@@ -250,7 +250,9 @@ alphabetical, exactly as before P3-2.
 
 **Writing the order** (always through `MutationStamper`, so `fieldClocks.sortIndex` and `updatedAt` move):
 - *Reorder* (`SubjectOrder.reordered`): the live subjects of the timetable get the dense indices `0..<n` of the new order;
-  only subjects whose index changes are rewritten (unchanged ones keep their clocks). IDs not named keep their relative
+  only subjects whose index changes are rewritten (unchanged ones keep their clocks). How many that is: the **first**
+  reorder or addition in a never-ordered timetable (all `nil`) rewrites **every** live subject; afterwards, moving one
+  subject from position *i* to *j* rewrites the |i − j| + 1 subjects between them (a swap of neighbours: 2). IDs not named keep their relative
   canonical order behind the named ones.
 - *New subject* (`SubjectOrder.insertion`): added at the end. If every live subject has an index it gets `max + 1` (`0`
   in an empty timetable). If some have none (pre-P3-2 data, an older share link, a subject created by an older app
@@ -264,7 +266,8 @@ reorders that each rewrite every index resolve to the later one as a whole. When
 index unchanged, that subject keeps the earlier device's index, so indices can tie; the display order then decides by
 name and ID — deterministically and identically on every device — and the next reorder writes dense indices again
 (tests: `SubjectReorderSyncTests`, including a 150-seed convergence property). Known edge: a reorder on a device that has not
-seen a delete rewrites the moved subjects, and a moved subject's newer write resurrects it (tombstone rule, §2.2;
+seen a delete rewrites every subject whose index changes (all of them on never-ordered data, else the |i − j| + 1 between
+the old and new position), and such a newer write resurrects a deleted subject (tombstone rule, §2.2;
 RISKS #61).
 
 ### 3.4 `BellSchedule` (`bellSchedule`) and `Period`

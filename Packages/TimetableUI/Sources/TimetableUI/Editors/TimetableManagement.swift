@@ -133,15 +133,35 @@ public enum TimetableManagement {
 
     /// Re-orders the live timetables to `order` (IDs not named keep their relative position behind).
     public static func reorderMutation(_ order: [Timetable.ID], in database: TabulaDatabase) -> DatabaseMutation {
-        let named = order.compactMap { id in live(database).first { $0.id == id } }
-        let rest = live(database).filter { timetable in !order.contains(timetable.id) }
+        .batch(reorderSteps(order, in: database), label: "reorder timetables")
+    }
+
+    /// `true` when `reorderMutation(order, in:)` would change nothing (the UI then skips the apply: no save, no
+    /// change notification for a row dropped where it was).
+    public static func reorderIsNoOp(_ order: [Timetable.ID], in database: TabulaDatabase) -> Bool {
+        reorderSteps(order, in: database).isEmpty
+    }
+
+    private static func reorderSteps(_ order: [Timetable.ID], in database: TabulaDatabase) -> [DatabaseMutation] {
+        let current = live(database)
+        let named = order.compactMap { id in current.first { $0.id == id } }
+        let rest = current.filter { timetable in !order.contains(timetable.id) }
         var steps: [DatabaseMutation] = []
         for (index, timetable) in (named + rest).enumerated() where timetable.sortIndex != index {
             var edited = timetable
             edited.sortIndex = index
             steps.append(.upsert(edited))
         }
-        return .batch(steps, label: "reorder timetables")
+        return steps
+    }
+
+    /// The `sortIndex` for a timetable appended at the end (`max + 1`) and the steps to run first. When `max + 1`
+    /// would overflow (a stored `Int.max` from a crafted backup or a synced record) the live timetables are renumbered
+    /// densely in display order and the new one gets the count, so adding never traps.
+    public static func appendIndex(in database: TabulaDatabase) -> (sortIndex: Int, steps: [DatabaseMutation]) {
+        let current = live(database)
+        if let next = SubjectOrder.appendedIndex(after: current.map(\.sortIndex)) { return (next, []) }
+        return (current.count, reorderSteps(current.map(\.id), in: database))
     }
 
     /// A new, empty timetable. Presentation settings are taken from `like` when given.
@@ -184,13 +204,14 @@ public enum TimetableManagement {
                 timeStructure = .freeForm(defaultDurationMinutes: 45)
             }
         }
-        let nextIndex = (live(database).map(\.sortIndex).max() ?? -1) + 1
+        let append = appendIndex(in: database)
+        steps.insert(contentsOf: append.steps, at: 0)
         let timetable = Timetable(
             id: newID, meta: EditorEntities.placeholderMeta, name: name, emoji: emoji,
             enabledDays: Weekday.workweek, rotation: .none, rotationWeekStart: like?.rotationWeekStart ?? .monday,
             timeStructure: timeStructure, fieldVisibility: like?.fieldVisibility ?? FieldVisibility(),
             defaultView: like?.defaultView ?? .grid, density: like?.density ?? .comfortable,
-            palettePackID: like?.palettePackID, sortIndex: nextIndex)
+            palettePackID: like?.palettePackID, sortIndex: append.sortIndex)
         steps.append(.upsert(timetable))
         return (.batch(steps, label: "add timetable"), newID)
     }
@@ -292,7 +313,9 @@ public enum TimetableManagement {
         timetable.id = newID
         timetable.meta = EditorEntities.placeholderMeta
         timetable.name = name
-        timetable.sortIndex = (live(database).map(\.sortIndex).max() ?? -1) + 1
+        let append = appendIndex(in: database)
+        steps.insert(contentsOf: append.steps, at: 0)
+        timetable.sortIndex = append.sortIndex
         if case let .bellSchedule(defaultID, perWeekday) = source.timeStructure {
             timetable.timeStructure = .bellSchedule(defaultID: bellMap[defaultID] ?? defaultID,
                                                     perWeekday: perWeekday.mapValues { bellMap[$0] ?? $0 })
@@ -322,10 +345,13 @@ public enum TimetableManagement {
 
     /// Re-orders the live subjects of `timetableID` to `order` with dense indices (IDs not named keep their relative
     /// position behind). Only subjects whose index changes are written (one stamped upsert each), so untouched
-    /// subjects keep their field clocks. An unchanged order is an empty batch.
+    /// subjects keep their field clocks.
+    /// `nil` when the order is unchanged (e.g. a row dropped where it was): the UI then applies nothing, so there is no
+    /// save and no change notification.
     public static func reorderSubjectsMutation(_ order: [Subject.ID], timetableID: Timetable.ID,
-                                               in database: TabulaDatabase, locale: Locale) -> DatabaseMutation {
+                                               in database: TabulaDatabase, locale: Locale) -> DatabaseMutation? {
         let changed = SubjectOrder.reordered(order, in: database, timetableID: timetableID, locale: locale)
+        guard !changed.isEmpty else { return nil }
         return .batch(changed.map { .upsert($0) }, label: "reorder subjects")
     }
 

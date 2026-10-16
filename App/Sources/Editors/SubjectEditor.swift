@@ -3,13 +3,14 @@
 // (the list: add, edit, delete with an impact confirmation, reorder).
 //
 // Order (P3-2, Phase 4 C1): subjects have a manual order (`Subject.sortIndex`) shown everywhere through `SubjectOrder`.
-// The list reorders in Edit mode (drag handles, `onMove`) and, for VoiceOver, with the "Move up" / "Move down"
-// accessibility actions on each row. New subjects are added at the end; the editor never changes the order
+// The list reorders in reorder mode (toolbar "Reorder", drag handles, `onMove`) and, for VoiceOver, with the "Move up" /
+// "Move down" accessibility actions on each row, which announce the new position. New subjects are added at the end; the editor never changes the order
 // (`TimetableManagement.saveSubjectMutation` keeps the stored index). Changes apply immediately, like the timetables
 // manager.
 // APIs: ColorPicker(_:selection:supportsOpacity:), LazyVGrid(columns:) with GridItem(.adaptive(minimum:)), Menu, Label,
 //   sheet(item:), swipeActions(edge:allowsFullSwipe:content:), accessibilityAddTraits(.isSelected), List, EditButton,
-//   onMove(perform:), accessibilityActions(_:) (iOS 16+, verified in Apple's documentation JSON 2026-10-16).
+//   onMove(perform:), environment(\.editMode), accessibilityActions(_:) (iOS 16+) and
+//   AccessibilityNotification.Announcement(_:).post() (iOS 17+), both verified in Apple's documentation JSON 2026-10-16.
 import SwiftUI
 import TimetableCore
 import TimetableUI
@@ -357,6 +358,10 @@ struct SubjectsListView: View {
     @State private var editing: SubjectEditTarget?
     @State private var deleting: Subject?
     @State private var failure: ApplyResult?
+    /// Reorder mode (drag handles). Driven by our own toggle, not `EditButton`: the system button turns into a second
+    /// "Done" next to the sheet's Done (QA C1), so the sheet's Done is hidden while reordering and the toggle has a
+    /// distinct VoiceOver label.
+    @State private var editMode: EditMode = .inactive
 
     private var timetable: Timetable? {
         timetableID.flatMap { id in model.timetables.first { $0.id == id } } ?? model.activeTimetable
@@ -389,15 +394,26 @@ struct SubjectsListView: View {
                     list
                 }
             }
+            .environment(\.editMode, $editMode)
+            .onChange(of: subjects.count) { _, count in if count < 2 { editMode = .inactive } }
             .navigationTitle(Text("editor.subjects.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button { dismiss() } label: { Text("editor.common.done") }
+                    if !editMode.isEditing {
+                        Button { dismiss() } label: { Text("editor.common.done") }
+                    }
                 }
                 ToolbarItem(placement: .topBarLeading) {
-                    // Edit mode shows the reorder handles (there is nothing to order with fewer than two subjects).
-                    EditButton().disabled(subjects.count < 2)
+                    // Reorder mode shows the drag handles (nothing to order with fewer than two subjects).
+                    if editMode.isEditing {
+                        Button { withAnimation { editMode = .inactive } } label: { Text("editor.common.done") }
+                            .fontWeight(.semibold)
+                            .accessibilityLabel(Text("editor.subjects.reorder.done"))
+                    } else {
+                        Button { withAnimation { editMode = .active } } label: { Text("editor.subjects.reorder") }
+                            .disabled(subjects.count < 2)
+                    }
                 }
                 ToolbarItem(placement: .primaryAction) {
                     Button { editing = SubjectEditTarget(subjectID: nil) } label: {
@@ -461,30 +477,50 @@ struct SubjectsListView: View {
                 }
                 .onMove(perform: move)
             } footer: {
-                Text("editor.subjects.footer")
+                // The reorder hint only when reordering is possible (two or more subjects).
+                if ordered.count > 1 {
+                    Text("editor.subjects.footer")
+                } else {
+                    Text("editor.subjects.footer.single")
+                }
             }
         }
     }
 
     // MARK: Reorder (applied immediately, like the timetables manager)
 
-    private func run(_ mutation: DatabaseMutation) {
+    /// Applies `mutation`; `true` when it was applied.
+    @discardableResult
+    private func run(_ mutation: DatabaseMutation) -> Bool {
         let result = model.apply(mutation)
-        if case .applied = result { failure = nil } else { failure = result }
+        if case .applied = result {
+            failure = nil
+            return true
+        }
+        failure = result
+        return false
     }
 
     private func move(from source: IndexSet, to destination: Int) {
         guard let database = model.database, let timetable else { return }
         var order = subjects.map(\.id)
         order.move(fromOffsets: source, toOffset: destination)
-        run(TimetableManagement.reorderSubjectsMutation(order, timetableID: timetable.id, in: database,
-                                                        locale: model.formatter.locale))
+        // A row dropped where it was changes nothing: no apply (no save, no change notification).
+        guard let mutation = TimetableManagement.reorderSubjectsMutation(order, timetableID: timetable.id, in: database,
+                                                                        locale: model.formatter.locale) else { return }
+        run(mutation)
     }
 
+    /// The VoiceOver "Move up" / "Move down" actions: move, then announce the new position (`editor.subjects.moved`).
     private func step(_ id: Subject.ID, by offset: Int) {
         guard let database = model.database,
               let mutation = TimetableManagement.moveSubjectMutation(id, by: offset, in: database, locale: model.formatter.locale)
         else { return }
-        run(mutation)
+        guard run(mutation) else { return }
+        let order = subjects.map(\.id)
+        guard let index = order.firstIndex(of: id) else { return }
+        let text = model.renderer.format(key: "editor.subjects.moved",
+                                         arguments: [.integer(Int64(index + 1)), .integer(Int64(order.count))])
+        AccessibilityNotification.Announcement(text).post()
     }
 }

@@ -12,7 +12,8 @@ import Foundation
 /// DOMAIN_MODEL §2.2); steps 2 and 3 then decide deterministically, and the next reorder writes dense indices again.
 ///
 /// Every function is pure and deterministic (the locale is explicit); mutations are applied by the caller through
-/// `MutationStamper` (the app's `DatabaseMutation.upsert`), which stamps only the subjects whose index changed.
+/// `MutationStamper` (the app's `DatabaseMutation.upsert`). Only subjects whose index changes are written: every live
+/// subject on the first reorder/addition in a never-ordered timetable, then |i − j| + 1 subjects for a move from i to j.
 public enum SubjectOrder {
     /// `true` when `lhs` is shown before `rhs`.
     public static func precedes(_ lhs: Subject, _ rhs: Subject, locale: Locale) -> Bool {
@@ -96,16 +97,24 @@ public enum SubjectOrder {
     ///
     /// When every live subject has an index, the new one gets `max + 1` (0 in an empty timetable) and nothing else
     /// changes. When some have none (data from before P3-2, an import of an older share link, or a subject added
-    /// by an older app version), the visible order is first written down densely (`reordered` of the canonical
-    /// order) and the new subject gets the count — so a new subject is always added at the end.
+    /// by an older app version), or when `max + 1` would overflow (a stored `Int.max` from a crafted backup or a
+    /// synced record), the visible order is first written down densely (`reordered` of the canonical order) and the
+    /// new subject gets the count — so a new subject is always added at the end and adding never traps.
     public static func insertion(in database: TabulaDatabase, timetableID: Timetable.ID, locale: Locale) -> Insertion {
         let current = live(database, timetableID: timetableID, locale: locale)
-        if current.allSatisfy({ $0.sortIndex != nil }) {
-            let next = (current.compactMap(\.sortIndex).max() ?? -1) + 1
+        if current.allSatisfy({ $0.sortIndex != nil }),
+           let next = appendedIndex(after: current.compactMap(\.sortIndex)) {
             return Insertion(sortIndex: next, renumbered: [])
         }
         let renumbered = reordered(current.map(\.id), in: database, timetableID: timetableID, locale: locale)
         return Insertion(sortIndex: current.count, renumbered: renumbered)
+    }
+
+    /// `max(indices) + 1` (0 for none), or `nil` when that overflows `Int`. Overflow-safe "append at the end" for any
+    /// ascending integer order (subjects, timetables, attachments); on `nil` the caller renumbers densely.
+    public static func appendedIndex<S: Sequence>(after indices: S) -> Int? where S.Element == Int {
+        let (next, overflow) = (indices.max() ?? -1).addingReportingOverflow(1)
+        return overflow ? nil : next
     }
 
     /// `ids` with `id` moved by `offset` positions (negative = towards the start), or `nil` when `id` is not in
