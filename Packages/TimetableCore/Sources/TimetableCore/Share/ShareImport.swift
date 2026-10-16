@@ -149,7 +149,7 @@ public enum ShareImport {
                                     shortName: shared.shortName, color: shared.color, colorName: colorName,
                                     symbol: shared.symbol, defaultRoom: shared.defaultRoom,
                                     defaultBuilding: shared.defaultBuilding, defaultTeacher: shared.defaultTeacher,
-                                    notes: shared.notes))
+                                    notes: shared.notes, sortIndex: shared.sortIndex))
         }
 
         var terms: [Term] = []

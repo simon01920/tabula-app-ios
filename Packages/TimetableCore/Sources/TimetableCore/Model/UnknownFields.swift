@@ -33,7 +33,7 @@ public enum EntityFieldCatalog {
                     "defaultView", "density", "palettePackID", "sortIndex"]
         case .subject:
             return ["timetableID", "name", "shortName", "color", "colorName", "symbol", "defaultRoom",
-                    "defaultBuilding", "defaultTeacher", "notes"]
+                    "defaultBuilding", "defaultTeacher", "notes", "sortIndex"]
         case .bellSchedule:
             return ["timetableID", "name", "periods"]
         case .lesson:

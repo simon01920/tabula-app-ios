@@ -157,6 +157,9 @@ struct ShareValidator {
         try optionalName(subject.defaultBuilding, path: "\(path).bd")
         try optionalName(subject.defaultTeacher, path: "\(path).te")
         try optionalNotes(subject.notes, path: "\(path).no")
+        if let order = subject.sortIndex, !(0..<ShareLimits.maxSubjects).contains(order) {
+            throw .invalidValue(path: "\(path).o")
+        }
     }
 
     private mutating func checkSchedule(_ schedule: ShareBellSchedule, _ index: Int) throws(ShareError) {
