@@ -28,12 +28,16 @@ Source of truth: `Resources/Localizable.xcstrings` (797 keys after the follow-up
 ### Store listing
 **Serbian is not an App Store Connect metadata language** (Phase 0, RISKS #25, gate decision D10). The in-app Serbian (Cyrillic and Latin) is fine; the store page needs a fallback language (default proposal: English). Human decides.
 
-## How a reviewer works
-1. Pick a language, open the catalog in Xcode (String Catalog editor, filter "Needs Review") or review `docs/localization/translations/<lang>.json`.
-2. Read each string with its **comment** (context, arguments, where it appears).
-3. Fix wording; keep format specifiers (`%@`, `%lld`, `%1$lld`, ...) identical in type and count; keep plural categories complete.
-4. Mark reviewed units `translated`, record the reviewer and date in the table below.
-5. `bash scripts/validate.sh` must stay green (completeness is a FAIL, not a warning).
+## How a reviewer works (review document, Phase 4 C2, decision P3-3)
+Everything a reviewer needs is generated into `docs/localization/review/` (see its `README.md`); nobody edits the catalog by hand.
+1. Open `docs/localization/review/index.html` (self-contained, offline, phone and desktop, light/dark): one row per string and plural form with key, "where it is used" (the catalog comment), English and the 12 languages. A language picker shows e.g. only English + Slovak; search; filter all / needs_review / translated / changed since last review. Placeholders (`%@`, `%lld`, `%1$@`) are highlighted. A short "How to review" is at the top in English and Slovak.
+2. Fill the **`corrected`** (and optionally `note`) column in the language's CSV (`<lang>.csv`: key, plural_form, context, english, current, corrected, note; UTF-8 with BOM). Empty = skip, `[ok]` = current text is right, any other text = the correction. Keep format specifiers identical in type and count; translate every plural form on its own row. Excel with `;` separators and files without BOM are fine.
+3. The maintainer runs `python3 scripts/l10n-review-import.py --dry-run <lang>.csv`, then without `--dry-run`. Accepted rows become `translated` (reviewed); rows whose placeholders differ from English, or whose key/plural form does not exist, are rejected and listed. Corrected `sr` rows re-derive `sr-Latn`. The catalog stays in canonical form.
+4. `python3 scripts/l10n-review-export.py` regenerates the folder (also run it whenever strings change); commit catalogs and folder together. Record reviewer, date and scope in the table below.
+5. `bash scripts/validate.sh` must stay green (completeness is a FAIL, not a warning). It runs the round-trip test (`scripts/l10n-review-test.py`) and **warns** (does not fail) when the review folder is stale. Staleness is a **hash** check (`docs/localization/review/SOURCE_HASH` = sha256 of both catalogs + `baseline.json`), not a file-time comparison, because git checkouts reset times.
+6. `baseline.json` records what a reviewer last signed off (written only by the import); the "changed since last review" filter compares against it. Without an entry a row counts as changed until it is `translated`.
+
+Row counts (2026-10-16): 1,205 keys (1,200 `Localizable` + 5 `InfoPlist`), 1,391 rows in the HTML; CSV rows per language: sk, cs, pl, uk 1,391; ro 1,329; sr, sr-Latn 1,329; hu, de, fr 1,267; ja, zh-Hans 1,205. All still machine translations until reviewed.
 
 | Language | Reviewer | Date | Scope | Result |
 |---|---|---|---|---|
