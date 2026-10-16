@@ -119,3 +119,11 @@ New keys `tasks.quickAdd.due.tomorrow`, `tasks.quickAdd.due.nextLesson` (replace
 1 changed English text (`health.notifications.notDetermined`: Tabula now asks once, after the first save of a task or
 exam that has a reminder; old translations dropped, re-authored). Model-authored for 11 languages (`sr-Latn` derived),
 all `needs_review`. Reviewer: "asks once" must not read as a promise to ask again; ro uses "reamintire" as elsewhere.
+
+### Phase 4 Stage C1 additions (2026-10-16, core-domain-engineer)
+2 new keys (`editor.subjects.moveUp`, `editor.subjects.moveDown`: VoiceOver actions on a subjects-list row) and 1 changed
+English text (`editor.subjects.footer`: the list is no longer alphabetical; it now says how to reorder — old translations
+dropped, re-authored). Model-authored for 11 languages (`sr-Latn` derived), all `needs_review`. Reviewer: the footer
+names the system Edit button, so it must match the iOS label in each language (sk "Upraviť", cs "Upravit", pl "Edytuj",
+hu "Szerkesztés", ro "Editează", de "Bearbeiten", fr "Modifier", uk "Редагувати", sr "Уреди", ja 編集, zh 编辑); the move
+actions are short imperative labels read by VoiceOver.

@@ -28856,85 +28856,253 @@
       }
     },
     "editor.subjects.footer" : {
-      "comment" : "Footer of the subjects list.",
+      "comment" : "Footer of the subjects list. 'Edit' is the system Edit button that shows the reorder handles.",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Předměty jsou seřazeny abecedně."
+            "value" : "Pořadí změníte klepnutím na Upravit. Nové předměty se přidají na konec."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Fächer sind alphabetisch sortiert."
+            "value" : "Tippe auf „Bearbeiten“, um die Reihenfolge zu ändern. Neue Fächer werden am Ende hinzugefügt."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Subjects are listed alphabetically."
+            "value" : "Tap Edit to change the order. New subjects are added at the end."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Les matières sont classées par ordre alphabétique."
+            "value" : "Touchez Modifier pour changer l’ordre. Les nouvelles matières sont ajoutées à la fin."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "A tantárgyak betűrendben vannak."
+            "value" : "A sorrend módosításához koppints a Szerkesztés gombra. Az új tantárgyak a lista végére kerülnek."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "科目は五十音順に並びます。"
+            "value" : "「編集」をタップすると順番を変更できます。新しい科目は末尾に追加されます。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Przedmioty są ułożone alfabetycznie."
+            "value" : "Stuknij Edytuj, aby zmienić kolejność. Nowe przedmioty są dodawane na końcu."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Materiile sunt în ordine alfabetică."
+            "value" : "Atinge Editează pentru a schimba ordinea. Materiile noi se adaugă la sfârșit."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Predmety sú zoradené abecedne."
+            "value" : "Poradie zmeníte klepnutím na Upraviť. Nové predmety sa pridajú na koniec."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Предмети су поређани по абецеди."
+            "value" : "Додирните „Уреди“ да бисте променили редослед. Нови предмети се додају на крај."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Predmeti su poređani po abecedi."
+            "value" : "Dodirnite „Uredi“ da biste promenili redosled. Novi predmeti se dodaju na kraj."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Предмети впорядковано за абеткою."
+            "value" : "Торкніться «Редагувати», щоб змінити порядок. Нові предмети додаються в кінець."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "科目按拼音顺序排列。"
+            "value" : "轻点“编辑”可更改顺序。新科目会添加到末尾。"
+          }
+        }
+      }
+    },
+    "editor.subjects.moveDown" : {
+      "comment" : "VoiceOver action on a row of the subjects list: moves the subject one place later in the order.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Posunout níž"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nach unten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move down"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Descendre"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Mozgatás lejjebb"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "下へ移動"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Przenieś niżej"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Mută mai jos"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Posunúť nižšie"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Помери надоле"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pomeri nadole"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Перемістити нижче"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "下移"
+          }
+        }
+      }
+    },
+    "editor.subjects.moveUp" : {
+      "comment" : "VoiceOver action on a row of the subjects list: moves the subject one place earlier in the order.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Posunout výš"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nach oben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move up"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Monter"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Mozgatás feljebb"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "上へ移動"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Przenieś wyżej"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Mută mai sus"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Posunúť vyššie"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Помери нагоре"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pomeri nagore"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Перемістити вище"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "上移"
           }
         }
       }

@@ -1,5 +1,6 @@
 // Pure planning of the multi-entity changes behind the timetables manager and the subjects list: add, duplicate,
-// reorder, set active, reset, delete (with the data-loss guard) and subject deletion. Every function returns a
+// reorder, set active, reset, delete (with the data-loss guard), subject order (P3-2: reorder, move, add at the end)
+// and subject deletion. Every function returns a
 // `DatabaseMutation` (or nil when the guard refuses) that the app applies in ONE `model.apply` call, so the
 // database never contains half of a change. Linux-tested.
 //
@@ -313,6 +314,47 @@ public enum TimetableManagement {
     }
 
     // MARK: Subjects
+
+    /// Live subjects of `timetableID` in display order (`SubjectOrder`).
+    public static func subjects(of timetableID: Timetable.ID, in database: TabulaDatabase, locale: Locale) -> [Subject] {
+        SubjectOrder.live(database, timetableID: timetableID, locale: locale)
+    }
+
+    /// Re-orders the live subjects of `timetableID` to `order` with dense indices (IDs not named keep their relative
+    /// position behind). Only subjects whose index changes are written (one stamped upsert each), so untouched
+    /// subjects keep their field clocks. An unchanged order is an empty batch.
+    public static func reorderSubjectsMutation(_ order: [Subject.ID], timetableID: Timetable.ID,
+                                               in database: TabulaDatabase, locale: Locale) -> DatabaseMutation {
+        let changed = SubjectOrder.reordered(order, in: database, timetableID: timetableID, locale: locale)
+        return .batch(changed.map { .upsert($0) }, label: "reorder subjects")
+    }
+
+    /// Moves a subject one or more places within its timetable (the accessibility "Move up" / "Move down" actions).
+    /// `nil` when the subject is not live or cannot move that far.
+    public static func moveSubjectMutation(_ id: Subject.ID, by offset: Int, in database: TabulaDatabase,
+                                           locale: Locale) -> DatabaseMutation? {
+        guard let subject = database.subjects.first(where: { $0.id == id && !$0.isDeleted }) else { return nil }
+        let ids = subjects(of: subject.timetableID, in: database, locale: locale).map(\.id)
+        guard let order = SubjectOrder.moving(id, by: offset, in: ids) else { return nil }
+        return reorderSubjectsMutation(order, timetableID: subject.timetableID, in: database, locale: locale)
+    }
+
+    /// Saves a subject from the subject editor.
+    /// - New subject (no stored entity with its ID): it is added at the END of its timetable's list
+    ///   (`SubjectOrder.insertion`; subjects without an index are numbered in their visible order first, in the same
+    ///   batch).
+    /// - Existing subject: the editor never changes the order, so the stored `sortIndex` is kept — a reorder made
+    ///   meanwhile (on this device or synced from another) is never overwritten by the editor's stale copy.
+    public static func saveSubjectMutation(_ subject: Subject, in database: TabulaDatabase, locale: Locale) -> DatabaseMutation {
+        var edited = subject
+        if let stored = database.subjects.first(where: { $0.id == subject.id }) {
+            edited.sortIndex = stored.sortIndex
+            return .upsert(edited)
+        }
+        let plan = SubjectOrder.insertion(in: database, timetableID: subject.timetableID, locale: locale)
+        edited.sortIndex = plan.sortIndex
+        return .batch(plan.renumbered.map { .upsert($0) } + [.upsert(edited)], label: "add subject")
+    }
 
     /// What deleting a subject removes: its lessons, the changes that refer to it; tasks/exams lose the link.
     public static func subjectImpact(of id: Subject.ID, in database: TabulaDatabase) -> (lessons: Int, changes: Int, linkedItems: Int) {

@@ -1,11 +1,15 @@
 // Subject editing: `editor.subject` (one subject: name, short name, colour from palette packs or a custom colour, emoji
 // or SF Symbol, default room / building / teacher, live tile preview with contrast information) and `editor.subjects`
-// (the list: add, edit, delete with an impact confirmation).
+// (the list: add, edit, delete with an impact confirmation, reorder).
 //
-// Subjects have no persisted order (DOMAIN_MODEL is frozen), so the list is alphabetical; manual reordering would need
-// a schema change and is reported to the orchestrator.
+// Order (P3-2, Phase 4 C1): subjects have a manual order (`Subject.sortIndex`) shown everywhere through `SubjectOrder`.
+// The list reorders in Edit mode (drag handles, `onMove`) and, for VoiceOver, with the "Move up" / "Move down"
+// accessibility actions on each row. New subjects are added at the end; the editor never changes the order
+// (`TimetableManagement.saveSubjectMutation` keeps the stored index). Changes apply immediately, like the timetables
+// manager.
 // APIs: ColorPicker(_:selection:supportsOpacity:), LazyVGrid(columns:) with GridItem(.adaptive(minimum:)), Menu, Label,
-//   sheet(item:), swipeActions(edge:allowsFullSwipe:content:), accessibilityAddTraits(.isSelected), List.
+//   sheet(item:), swipeActions(edge:allowsFullSwipe:content:), accessibilityAddTraits(.isSelected), List, EditButton,
+//   onMove(perform:), accessibilityActions(_:) (iOS 16+, verified in Apple's documentation JSON 2026-10-16).
 import SwiftUI
 import TimetableCore
 import TimetableUI
@@ -57,8 +61,9 @@ private struct SubjectEditorBody: View {
             initial: initial,
             canSave: { $0.canSave },
             save: { draft in
-                guard let subject = draft.makeSubject() else { return nil }
-                let result = model.apply(.upsert(subject))
+                guard let subject = draft.makeSubject(), let database = model.database else { return nil }
+                let result = model.apply(TimetableManagement.saveSubjectMutation(subject, in: database,
+                                                                                 locale: model.formatter.locale))
                 if case .applied = result { onSaved?(subject.id) }
                 return result
             },
@@ -344,22 +349,22 @@ private struct SubjectEditTarget: Identifiable {
     let subjectID: Subject.ID?
 }
 
-/// `editor.subjects`: all subjects of a timetable (alphabetical): add, edit, delete.
+/// `editor.subjects`: all subjects of a timetable in display order: add, edit, delete, reorder.
 struct SubjectsListView: View {
     var timetableID: Timetable.ID?
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
     @State private var editing: SubjectEditTarget?
     @State private var deleting: Subject?
+    @State private var failure: ApplyResult?
 
     private var timetable: Timetable? {
         timetableID.flatMap { id in model.timetables.first { $0.id == id } } ?? model.activeTimetable
     }
 
     private var subjects: [Subject] {
-        guard let timetable else { return [] }
-        return (model.database?.subjects ?? []).filter { !$0.isDeleted && $0.timetableID == timetable.id }
-            .sorted { ($0.name, $0.id) < ($1.name, $1.id) }
+        guard let timetable, let database = model.database else { return [] }
+        return TimetableManagement.subjects(of: timetable.id, in: database, locale: model.formatter.locale)
     }
 
     var body: some View {
@@ -390,6 +395,10 @@ struct SubjectsListView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button { dismiss() } label: { Text("editor.common.done") }
                 }
+                ToolbarItem(placement: .topBarLeading) {
+                    // Edit mode shows the reorder handles (there is nothing to order with fewer than two subjects).
+                    EditButton().disabled(subjects.count < 2)
+                }
                 ToolbarItem(placement: .primaryAction) {
                     Button { editing = SubjectEditTarget(subjectID: nil) } label: {
                         Label { Text("editor.subjects.add") } icon: { Image(systemName: "plus") }
@@ -407,9 +416,11 @@ struct SubjectsListView: View {
     }
 
     private var list: some View {
-        List {
+        let ordered = subjects
+        return List {
+            if let failure { ApplyResultSection(result: failure) }
             Section {
-                ForEach(subjects) { subject in
+                ForEach(Array(ordered.enumerated()), id: \.element.id) { position, subject in
                     Button {
                         editing = SubjectEditTarget(subjectID: subject.id)
                     } label: {
@@ -438,10 +449,42 @@ struct SubjectsListView: View {
                             Label { Text("editor.common.delete") } icon: { Image(systemName: "trash") }
                         }
                     }
+                    // VoiceOver: reorder without dragging (rotor "Actions").
+                    .accessibilityActions {
+                        if position > 0 {
+                            Button { step(subject.id, by: -1) } label: { Text("editor.subjects.moveUp") }
+                        }
+                        if position < ordered.count - 1 {
+                            Button { step(subject.id, by: 1) } label: { Text("editor.subjects.moveDown") }
+                        }
+                    }
                 }
+                .onMove(perform: move)
             } footer: {
                 Text("editor.subjects.footer")
             }
         }
+    }
+
+    // MARK: Reorder (applied immediately, like the timetables manager)
+
+    private func run(_ mutation: DatabaseMutation) {
+        let result = model.apply(mutation)
+        if case .applied = result { failure = nil } else { failure = result }
+    }
+
+    private func move(from source: IndexSet, to destination: Int) {
+        guard let database = model.database, let timetable else { return }
+        var order = subjects.map(\.id)
+        order.move(fromOffsets: source, toOffset: destination)
+        run(TimetableManagement.reorderSubjectsMutation(order, timetableID: timetable.id, in: database,
+                                                        locale: model.formatter.locale))
+    }
+
+    private func step(_ id: Subject.ID, by offset: Int) {
+        guard let database = model.database,
+              let mutation = TimetableManagement.moveSubjectMutation(id, by: offset, in: database, locale: model.formatter.locale)
+        else { return }
+        run(mutation)
     }
 }

@@ -73,8 +73,10 @@ private struct ExamFormContent: View {
 
     private var subjects: [Subject] {
         let timetableID = draft.timetableID ?? model.activeTimetable?.id
-        return (model.database?.subjects ?? []).filter { !$0.isDeleted && ($0.timetableID == timetableID || $0.id == draft.subjectID) }
-            .sorted { ($0.name, $0.id) < ($1.name, $1.id) }
+        let candidates = (model.database?.subjects ?? []).filter { !$0.isDeleted && ($0.timetableID == timetableID || $0.id == draft.subjectID) }
+        // Display order (`SubjectOrder`); a selected subject of another timetable is grouped by the timetables order.
+        return SubjectOrder.sorted(candidates, timetableOrder: [timetableID].compactMap { $0 } + model.timetables.map(\.id),
+                                   locale: model.formatter.locale)
     }
 
     private var texts: ExamTexts { ExamTexts(renderer: model.renderer) }

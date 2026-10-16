@@ -110,11 +110,13 @@ public enum TaskListModel {
         }
     }
 
-    /// The subjects (live, referenced by at least one live task) a filter menu should offer, by name.
-    public static func filterSubjects(tasks: [TaskItem], subjects: [Subject]) -> [Subject] {
+    /// The subjects (live, referenced by at least one live task) a filter menu should offer: grouped by timetable in
+    /// `timetableOrder` (the timetables list order), each timetable's subjects in display order (`SubjectOrder`).
+    public static func filterSubjects(tasks: [TaskItem], subjects: [Subject], timetableOrder: [Timetable.ID],
+                                      locale: Locale) -> [Subject] {
         let used = Set(tasks.filter { !$0.isDeleted }.compactMap(\.subjectID))
-        return subjects.filter { !$0.isDeleted && used.contains($0.id) }
-            .sorted { ($0.name, $0.id) < ($1.name, $1.id) }
+        return SubjectOrder.sorted(subjects.filter { !$0.isDeleted && used.contains($0.id) },
+                                   timetableOrder: timetableOrder, locale: locale)
     }
 
     // MARK: Internals
