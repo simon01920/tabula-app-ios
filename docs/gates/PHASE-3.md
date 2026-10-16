@@ -134,3 +134,12 @@ The Sonnet work needed one orchestrator-found fix round (the screenshot findings
 - **Widgets:** WidgetKit in all families (Home, Lock Screen, StandBy) with Now/Next, today's lessons, due tasks and the next exam.
 - **Live Activity:** the current lesson, and the exam countdown (P3-6).
 - **App Intents:** "Mark done" from widgets and alarms (P3-5). Whether `LiveActivityIntent` works on both build paths must be proven first (RISKS #51).
+
+## Gate outcome (2026-10-16)
+The human approved Phase 3 and asked to proceed to Phase 4.
+- **P3-1:** approved.
+- **P3-2:** approved. Add an optional `sortIndex` to `Subject` (additive schema change) in Phase 4.
+- **P3-3:** the human reviews Slovak first, then other people review the rest. Requested: a review document listing every phrase and word in the app side by side in all languages (English, Slovak, German, …). It is built in Phase 4.
+- **P3-4:** keep "Not now" final for the save trigger.
+- **P3-5 / P3-6:** loud-alarm Mark done (App Intents) and the exam-day live countdown (Live Activity) are done in Phase 4.
+- **P3-7:** the human will connect the iPhone during Phase 4 and say so. Then the orchestrator routes it to WSL, installs the dev build and guides the human. Prepare the runbook beforehand.
