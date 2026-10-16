@@ -29,12 +29,16 @@ public struct Subject: SyncEntity {
     public var defaultTeacher: String?
     /// Free-form notes.
     public var notes: String?
+    /// Manual display order within the timetable (ascending); `nil` = never ordered, shown after every indexed
+    /// subject. Added in schema version 1 with the P3-2 approval (2026-10-16), optional so that older data decodes
+    /// unchanged. Display order everywhere: `SubjectOrder`.
+    public var sortIndex: Int?
 
     /// Creates a subject.
     public init(id: ID, meta: EntityMeta, timetableID: Timetable.ID, name: String, shortName: String? = nil,
                 color: ColorValue, colorName: TextValue? = nil, symbol: SubjectSymbol? = nil,
                 defaultRoom: String? = nil, defaultBuilding: String? = nil, defaultTeacher: String? = nil,
-                notes: String? = nil) {
+                notes: String? = nil, sortIndex: Int? = nil) {
         self.id = id
         self.meta = meta
         self.timetableID = timetableID
@@ -47,6 +51,7 @@ public struct Subject: SyncEntity {
         self.defaultBuilding = defaultBuilding
         self.defaultTeacher = defaultTeacher
         self.notes = notes
+        self.sortIndex = sortIndex
     }
 }
 

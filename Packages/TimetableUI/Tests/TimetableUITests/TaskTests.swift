@@ -66,7 +66,8 @@ struct TaskListModelTests {
         let unused = Subject(id: Subject.ID(UUID()), meta: EditorEntities.placeholderMeta, timetableID: used.timetableID,
                              name: "Art", color: .white)
         let linked = task("x", subject: used.id)
-        #expect(TaskListModel.filterSubjects(tasks: [linked], subjects: [unused, used]).map(\.name) == ["Maths"])
+        #expect(TaskListModel.filterSubjects(tasks: [linked], subjects: [unused, used], timetableOrder: [used.timetableID],
+                                             locale: Locale(identifier: "en_US")).map(\.name) == ["Maths"])
     }
 }
 

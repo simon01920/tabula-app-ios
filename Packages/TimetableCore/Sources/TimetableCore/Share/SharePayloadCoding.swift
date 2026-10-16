@@ -249,7 +249,7 @@ extension ShareTimeStructure: Codable {
 // MARK: - Subjects and bell schedules
 
 extension ShareSubject: Codable {
-    enum CodingKeys: String, CodingKey { case n, sn, c, ck, cl, se, si, r, bd, te, no }
+    enum CodingKeys: String, CodingKey { case n, sn, c, ck, cl, se, si, r, bd, te, no, o }
 
     public init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -272,6 +272,7 @@ extension ShareSubject: Codable {
         defaultBuilding = try c.decodeIfPresent(String.self, forKey: .bd)
         defaultTeacher = try c.decodeIfPresent(String.self, forKey: .te)
         notes = try c.decodeIfPresent(String.self, forKey: .no)
+        sortIndex = try c.decodeIfPresent(Int.self, forKey: .o)
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -293,6 +294,7 @@ extension ShareSubject: Codable {
         try c.encodeIfPresent(defaultBuilding, forKey: .bd)
         try c.encodeIfPresent(defaultTeacher, forKey: .te)
         try c.encodeIfPresent(notes, forKey: .no)
+        try c.encodeIfPresent(sortIndex, forKey: .o)
     }
 }
 

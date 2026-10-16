@@ -70,12 +70,8 @@ public struct QuickAddTarget: Hashable, Sendable, Identifiable {
 
 /// Subjects offered by the quick-add sheet.
 public enum QuickAddSubjects {
-    /// Live subjects of `timetableID`, by name (locale-aware, case-insensitive), then ID.
+    /// Live subjects of `timetableID` in display order (`SubjectOrder`: manual order, then name, then ID).
     public static func list(_ database: TabulaDatabase, timetableID: Timetable.ID, locale: Locale) -> [Subject] {
-        database.subjects.filter { !$0.isDeleted && $0.timetableID == timetableID }.sorted { lhs, rhs in
-            let order = lhs.name.compare(rhs.name, options: [.caseInsensitive, .diacriticInsensitive], locale: locale)
-            if order != .orderedSame { return order == .orderedAscending }
-            return lhs.id.uuidString < rhs.id.uuidString
-        }
+        SubjectOrder.live(database, timetableID: timetableID, locale: locale)
     }
 }

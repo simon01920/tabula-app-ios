@@ -1,21 +1,50 @@
 # Phase 4 — manual on-device checklist
 
 Device: iPhone 16 Pro Max (iOS 26.x) + Apple Watch Series 7 (watchOS 26.x). Same format as `PHASE3_DEVICE.md`:
-**Steps → Expected**, plus an Observed column and ✔ / ✘ / ? (unclear). Each Phase 4 stage appends its own section.
-Widgets, Lock Screen, StandBy, timeline reloads and widget taps cannot be simulated here (no Mac; the CI simulator
-cannot place widgets): everything below is device-only. The CI `widgets.gallery*` screenshots only prove the views'
-layout at the family sizes (see A0).
+**Steps → Expected**, plus an Observed column and ✔ / ✘ / ? (unclear). Each Phase 4 stage adds its own self-contained
+`##` section (several agents edit this file; keep sections independent).
 
-iOS version: ________ · Build: xtool (free team) / TestFlight · App Group available (Developer → Platform probes):
-yes / no · Tester: ________ · Date: ________
+iOS version: ________ · Build: xtool / TestFlight · Tester: ________ · Date: ________
+
+---
+
+## C1
+
+**Subject order (`Subject.sortIndex`, P3-2, approved 2026-10-16).** Subjects have a manual order; every subject list and
+picker follows it (DOMAIN_MODEL §3.3). Never-ordered timetables stay alphabetical until the first reorder or the first
+new subject. No UI can be previewed locally: everything here is device-only.
+
+Setup: a timetable with at least 5 subjects created **before** installing this build (e.g. the Phase 3 build's sample
+data or a manually built timetable), so the upgrade path is tested. Optional second device / older build for C1.12.
+
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| C1.1 | Install this build over the Phase 3 build (keep data), open Timetable → options → Subjects | All subjects present; order is **alphabetical** (no order stored yet); no error banner; footer "Tap Reorder to change the order. New subjects are added at the end." (with only one subject: "New subjects are added at the end of the list.") | | |
+| C1.2 | Tap **Reorder** (top left) | Drag handles appear on every row; no delete buttons; Reorder becomes **Done** and the sheet's own Done (top right) is hidden, so only one Done is visible; VoiceOver reads it as "Done reordering". With 0–1 subjects, Reorder is disabled | | |
+| C1.3 | Drag the last subject to the top, tap Done. Then drag a row and drop it where it was | The row stays at the top; reopening the Subjects sheet and relaunching the app keep the order. The drop in place changes nothing (Developer screen: last mutation label not "reorder subjects") | | |
+| C1.4 | Open the subject picker in: lesson editor (new lesson), day-change editor (substitute / extra lesson), timetable quick add (tap an empty grid slot), Tasks → quick-add subject menu, task editor, exam editor | Every list shows the **same order** as the Subjects sheet (moved subject first) | | |
+| C1.5 | Tasks tab → options menu → Subject filter (have tasks for ≥ 3 subjects) | Filter subjects follow the manual order; with several timetables, grouped in the timetables-list order | | |
+| C1.6 | Subjects → **+**, create "Aaa test" | New subject appears at the **end** of the list (not alphabetically first), and at the end of every picker in C1.4 | | |
+| C1.7 | Edit an existing subject (rename it), Save | Its position does not change | | |
+| C1.8 | VoiceOver on, Subjects sheet: focus the 2nd row, swipe up/down (rotor Actions) | Actions "Move up" and "Move down" are offered; the first row offers only "Move down", the last only "Move up". Activating one moves the row immediately and VoiceOver announces "Moved to position N of M" | | |
+| C1.9 | Repeat C1.8 in Slovak (or another non-English language) | Action names, the announcement ("Presunuté na pozíciu N z M") and the Reorder button are translated in sk; footer translated | | |
+| C1.10 | Dynamic Type at the largest accessibility size, Edit mode | Rows wrap, reorder handles stay reachable; the footer is readable | | |
+| C1.11 | *(only once the share UI exists — not built yet; core-tested: `SubjectOrderShareBackupTests`)* Share the timetable (link or QR), import it on the same device | The imported timetable's subjects appear in the **same manual order** as the source | | |
+| C1.12 | (optional, two devices or an older build) Reorder differently on two devices offline, then sync / exchange data | Both devices end with the same order (deterministic merge, DOMAIN_MODEL §3.3); a later full reorder on one device wins | | |
+| C1.13 | *(only once the backup UI exists — not built yet; core-tested)* Export a backup, change the order, restore the backup (replace) | The order from the backup is restored | | |
+
+Not testable on device yet: CloudKit sync, the share UI and the backup UI are not built, so C1.11–C1.13 wait for those
+stages (the logic is covered by TimetableCore tests on Linux).
 
 ---
 
 ## A. Widget snapshot + *Now & Next* (Stage A)
 
 ### A0. Setup and what each build can prove
+Build: xtool (free team) / xtool (paid team) / TestFlight · App Group available (Developer → Platform probes): yes / no
+
 - **App Group is required.** The app writes `<App Group>/Widgets/widget-snapshot.json`; the widget only reads it.
-  On a **free-team xtool build the App Group is filtered out** (xtool PR #284, RISKS #47/#56/#62): the widget can only
+  On a **free-team xtool build the App Group is filtered out** (xtool PR #284, RISKS #47/#56/#65): the widget can only
   show "Open Tabula" (rows A1.1–A1.2 still apply). Every other row needs a build with the group: a paid-team xtool
   build or TestFlight (`TABULA_PAID_ACCOUNT=1`). Record which build you used.
 - **Data.** Use the real store (onboarding → Secondary profile, or your own timetable). Seed launches (`-TabulaSeed …`)
@@ -32,7 +61,7 @@ yes / no · Tester: ________ · Date: ________
 | ID | Steps | Expected | Observed | ✔/✘ |
 |---|---|---|---|---|
 | A1.1 | Free-team xtool build: add the small widget | Widget gallery lists "Now & Next" with the localised description; the placed widget shows **"Open Tabula"** + "Open the app once…" — never stale or invented lessons | | |
-| A1.2 | Tap it | Tabula opens on the **Today** tab | | |
+| A1.2 | Precondition: open Tabula, switch to the **Tasks** tab, go Home (app stays in memory). Tap the widget. Repeat after force-quitting Tabula (cold launch) | Tabula opens on the **Today** tab both times (proves the `tabula://open/today` deep link, RISKS #66; without it the app would stay on Tasks) | | |
 | A1.3 | Group build, fresh install, before onboarding finished: add the widget | "Open Tabula" + "Set up your timetable in the app." | | |
 | A1.4 | Finish onboarding with lessons, go Home (≤ 2 s) | Widget switches to real content within seconds (app wrote + `reloadAllTimelines`); Developer read-back shows a snapshot from the last minute | | |
 | A1.5 | Widget gallery preview with no data yet | Preview shows the sample "during a lesson" content, not an empty widget | | |
@@ -53,7 +82,7 @@ yes / no · Tester: ________ · Date: ________
 | A2.11 | Change a lesson's room for today | Upcoming state shows the badge "Room changed" | | |
 | A2.12 | Medium family | Left: as small; right: "Next"/"Later" with up to 3 lessons of that day (badge, name, time · room) | | |
 | A2.13 | Settings → 12/24 h → change | All widget times switch format after the app writes (go Home) | | |
-| A2.14 | iOS Settings → Tabula → Language → another language | Widget strings follow the app's language (snapshot `languageCode`); the gallery name/description follow the system | | |
+| A2.14 | iOS Settings → Tabula → Language → another language | Widget strings follow the app's language (snapshot `languageCode`); the gallery name/description follow the system (RISKS #69) | | |
 | A2.15 | Large text (Settings → Display → Text Size max) | Text scales within the widget without overlapping; long subject names truncate with "…" | | |
 | A2.16 | VoiceOver on the widget | One sentence: "Now, <subject>, 8:00 to 8:45, room 214, ends at 8:45, Next, …" (no raw keys, no timer gibberish) | | |
 
@@ -61,13 +90,13 @@ yes / no · Tester: ________ · Date: ________
 | ID | Steps | Expected | Observed | ✔/✘ |
 |---|---|---|---|---|
 | A3.1 | accessoryRectangular during a lesson | "Subject · room", hourglass + live countdown, "Next: …" — legible in vibrant (grey) rendering | | |
-| A3.2 | accessoryCircular during a lesson | Ring that **empties live** over the lesson with subject label + countdown inside (RISKS #65: if the ring does not render circular / does not move, record what you see) | | |
+| A3.2 | accessoryCircular during a lesson | Ring that **empties live** over the lesson with subject label + countdown inside (RISKS #68: if the ring does not render circular / does not move, record what you see) | | |
 | A3.3 | accessoryCircular in a break / free day | Subject label + start time / status symbol | | |
 | A3.4 | accessoryInline during a lesson | "Math · 12:34" live; in a break "Next: Biology, 9:50" | | |
 | A3.5 | Always-On display (lock the phone) | Lock Screen widgets stay legible; countdown keeps (or freezes per system policy) | | |
 | A3.6 | StandBy (charging, landscape, locked): add Now & Next | Small layout scaled up, background removed, text legible; at night (red tint) still readable | | |
 | A3.7 | Home Screen → Customize → Tinted / Clear icons | Subject badges become outlined marks; timer is the accent group; nothing invisible | | |
-| A3.8 | Tap a Lock Screen widget (unlock) | Opens Tabula on Today | | |
+| A3.8 | Precondition: leave Tabula on the **Tasks** tab, lock the phone. Tap a Lock Screen widget, unlock | Opens Tabula on **Today** (not Tasks), RISKS #66 | | |
 
 ### A4. Refresh triggers, background refresh, low power, time zone
 | ID | Steps | Expected | Observed | ✔/✘ |
@@ -77,7 +106,7 @@ yes / no · Tester: ________ · Date: ________
 | A4.3 | Don't open the app for 2 school days (phone used normally) | Widget keeps advancing lesson by lesson (≤ 29 entries per timeline, reload at the last entry); Background App Refresh may rewrite the snapshot (read-back time) | | |
 | A4.4 | Background App Refresh **off** for Tabula, don't open the app until past the covered days | Widget shows "Open Tabula" + "Open the app to update…" once the snapshot's days are over — never yesterday's lessons | | |
 | A4.5 | Low Power Mode on for a school day | Countdown still ticks; boundaries still switch (timeline entries need no app); reloads may be delayed — note how much | | |
-| A4.6 | Settings → General → Date & Time → time zone to New York (automatic off), app **not** opened | Note what the widget shows (WidgetKit may not reload on a zone change, RISKS #64). Then open the app → widget re-plans: an 08:00 lesson shows at 08:00 New York time ("follow device") | | |
+| A4.6 | Settings → General → Date & Time → time zone to New York (automatic off), app **not** opened | Note what the widget shows (WidgetKit may not reload on a zone change, RISKS #67). Then open the app → widget re-plans: an 08:00 lesson shows at 08:00 New York time ("follow device") | | |
 | A4.7 | Same with a fixed-zone timetable (Settings → Calendar → fixed zone) | Lessons keep the home zone's clock | | |
 | A4.8 | DST night (last Sunday of October / March) with the widget placed | No skipped / duplicated lesson state; Monday's lessons at the right wall-clock time | | |
 

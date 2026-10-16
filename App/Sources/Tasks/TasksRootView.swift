@@ -108,8 +108,7 @@ struct TasksRootView: View {
     /// Subjects the quick-add menu offers: the active timetable's.
     private var quickSubjects: [Subject] {
         guard let timetableID = model.activeTimetable?.id else { return [] }
-        return (model.database?.subjects ?? []).filter { !$0.isDeleted && $0.timetableID == timetableID }
-            .sorted { ($0.name, $0.id) < ($1.name, $1.id) }
+        return model.database.map { SubjectOrder.live($0, timetableID: timetableID, locale: model.formatter.locale) } ?? []
     }
 
     private var deleteDialogBinding: Binding<Bool> {
@@ -218,7 +217,8 @@ struct TasksRootView: View {
     // MARK: Options menu
 
     private var optionsMenu: some View {
-        let subjects = TaskListModel.filterSubjects(tasks: liveTasks, subjects: model.database?.subjects ?? [])
+        let subjects = TaskListModel.filterSubjects(tasks: liveTasks, subjects: model.database?.subjects ?? [],
+                                                    timetableOrder: model.timetables.map(\.id), locale: model.formatter.locale)
         return Menu {
             Picker(selection: $sort) {
                 ForEach(TaskSort.allCases, id: \.self) { option in

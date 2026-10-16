@@ -138,9 +138,9 @@ enum Fixture {
             Subject(id: math, meta: meta(), timetableID: tt, name: "Matematika", shortName: "MAT",
                     color: ColorValue(hex: "#E53935")!, colorName: .key("palette.classic.color.red"),
                     symbol: .emoji("➗"), defaultRoom: "101", defaultBuilding: "A", defaultTeacher: "Novák",
-                    notes: "Calculator"),
+                    notes: "Calculator", sortIndex: 1),
             Subject(id: physics, meta: meta(), timetableID: tt, name: "Fyzika", color: ColorValue(hex: "#1E88E580")!,
-                    colorName: .literal("Blue-ish"), symbol: .systemImage("atom")),
+                    colorName: .literal("Blue-ish"), symbol: .systemImage("atom"), sortIndex: 0),
             Subject(id: lecture, meta: meta(), timetableID: tt2, name: "Algebra", color: .black),
         ]
         let winterTerm = Term(id: winter, meta: meta(), timetableID: tt, name: "Winter",

@@ -119,9 +119,12 @@ private struct TaskFormContent: View {
 
     private var subjects: [Subject] {
         let timetableID = draft.timetableID ?? model.activeTimetable?.id
-        return (model.database?.subjects ?? []).filter { subject in
+        let candidates = (model.database?.subjects ?? []).filter { subject in
             !subject.isDeleted && (subject.timetableID == timetableID || subject.id == draft.subjectID)
-        }.sorted { ($0.name, $0.id) < ($1.name, $1.id) }
+        }
+        // Display order (`SubjectOrder`); a selected subject of another timetable is grouped by the timetables order.
+        return SubjectOrder.sorted(candidates, timetableOrder: [timetableID].compactMap { $0 } + model.timetables.map(\.id),
+                                   locale: model.formatter.locale)
     }
 
     private var kindOptions: [TaskKind] {

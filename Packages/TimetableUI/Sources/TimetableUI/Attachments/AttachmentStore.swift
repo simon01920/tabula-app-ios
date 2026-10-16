@@ -151,9 +151,10 @@ public enum AttachmentReferences {
         }
     }
 
-    /// The `sortIndex` for a ref appended after the live ones.
+    /// The `sortIndex` for a ref appended after the live ones. Overflow-safe: after a stored `Int.max` it stays at
+    /// `Int.max` (the tie is ordered by ID, so the new ref is not guaranteed last, but adding never traps).
     public static func nextSortIndex(_ refs: [AttachmentRef]) -> Int {
-        (refs.filter { !$0.meta.isDeleted }.map(\.sortIndex).max() ?? -1) + 1
+        SubjectOrder.appendedIndex(after: refs.filter { !$0.meta.isDeleted }.map(\.sortIndex)) ?? Int.max
     }
 }
 

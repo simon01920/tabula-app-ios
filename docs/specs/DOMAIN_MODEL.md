@@ -4,6 +4,8 @@ Status: written in Phase 1 Stage 1 (2026-10-06), consolidated in Stage 3 (2026-1
 `createdAt`, instant range, unknown-key guarantee in §7, every Phase 1 localisation key in Appendix A), last
 pre-freeze changes 2026-10-08 (B11–B16: opened vocabularies/unions, `Timetable.rotationWeekStart`, normative rotation
 and override semantics, task repetition, neutral validation messages).
+**Post-freeze change (approved):** `Subject.sortIndex` (§3.3), approved by the human at the Phase 3 gate (**P3-2,
+2026-10-16**), added in Phase 4 Stage C1. Additive and optional; `schemaVersion` stays `1` (decision B18).
 **This is the document the post-Phase-1 schema freeze refers to.**
 After the Phase 1 gate, any change to what is described in §§1–7 needs human approval (CLAUDE.md).
 Source of truth for the code: `Packages/TimetableCore/Sources/TimetableCore/{Calendar,Model,Support,Theme,Sync}`.
@@ -239,6 +241,34 @@ Example:
 | `symbol` | `SubjectSymbol` | opt | `{"kind":"emoji","value":"📐"}` or `{"kind":"systemImage","value":"function"}` |
 | `defaultRoom`, `defaultBuilding`, `defaultTeacher` | String | opt | inherited by lessons whose own value is nil/empty |
 | `notes` | String | opt | |
+| `sortIndex` | Int | opt | manual display order within the timetable, ascending. **Approved post-freeze change P3-2 (2026-10-16), Phase 4 C1.** Absent = never ordered (all data written before P3-2); written dense (`0..<n`) by a reorder |
+
+**Display order** (`SubjectOrder`, every subject list and picker): `sortIndex` ascending, subjects **without** one after every
+indexed subject; then the name, compared case-insensitively with the user's locale; then the ID (UUID order). A total
+order, so every device shows the same sequence for the same data and locale. Never-ordered timetables therefore stay
+alphabetical, exactly as before P3-2.
+
+**Writing the order** (always through `MutationStamper`, so `fieldClocks.sortIndex` and `updatedAt` move):
+- *Reorder* (`SubjectOrder.reordered`): the live subjects of the timetable get the dense indices `0..<n` of the new order;
+  only subjects whose index changes are rewritten (unchanged ones keep their clocks). How many that is: the **first**
+  reorder or addition in a never-ordered timetable (all `nil`) rewrites **every** live subject; afterwards, moving one
+  subject from position *i* to *j* rewrites the |i − j| + 1 subjects between them (a swap of neighbours: 2). IDs not named keep their relative
+  canonical order behind the named ones.
+- *New subject* (`SubjectOrder.insertion`): added at the end. If every live subject has an index it gets `max + 1` (`0`
+  in an empty timetable). If some have none (pre-P3-2 data, an older share link, a subject created by an older app
+  version), the visible order is written down densely in the same change and the new subject gets the count.
+- *Editing* a subject never changes its index (the editor saves the stored value, so a reorder made meanwhile is kept).
+- Sample data numbers its subjects in seed order; share import takes the payload's rank (SHARE_FORMAT §4.3); duplicating
+  a timetable copies the indices.
+
+**Concurrent reorders** (sync): `sortIndex` is an ordinary field, merged last-writer-wins per subject (§2.2). Two
+reorders that each rewrite every index resolve to the later one as a whole. When the later reorder left some subject's
+index unchanged, that subject keeps the earlier device's index, so indices can tie; the display order then decides by
+name and ID — deterministically and identically on every device — and the next reorder writes dense indices again
+(tests: `SubjectReorderSyncTests`, including a 150-seed convergence property). Known edge: a reorder on a device that has not
+seen a delete rewrites every subject whose index changes (all of them on never-ordered data, else the |i − j| + 1 between
+the old and new position), and such a newer write resurrects a deleted subject (tombstone rule, §2.2;
+RISKS #61).
 
 ### 3.4 `BellSchedule` (`bellSchedule`) and `Period`
 
@@ -656,7 +686,7 @@ deletion; `LocalTime` never exceeds 23:59 (no lesson spans midnight).
    `Period`, `reminderOverride`). A newer version that needs one must add a top-level field, a new entity array or
    an open-union kind instead, or bump `schemaVersion`.
    Consequence: adding an **optional top-level field** to an entity/child or a **new entity array** needs no schema
-   bump — older apps keep, re-save and sync it. This includes **`AppSettings`**: a new optional settings field (absent =
+   bump — older apps keep, re-save and sync it (first used by `Subject.sortIndex`, B18). This includes **`AppSettings`**: a new optional settings field (absent =
    the documented default) is **not** a schema change; changing the value of an existing default is (§2.2).
 4. Renaming a key or a raw value, changing a type, or changing the meaning of a value is always a breaking change.
 5. Decoding tolerates: missing root arrays (→ empty), missing `WeekCycleAnchor.offset` (→ 0), missing
@@ -972,3 +1002,16 @@ Pre-freeze decisions (orchestrator, after the Phase 1 gate QA "PASS WITH FIXES",
   are folded by the merge join instead of "first copy wins"; the later-`createdAt` rule and the frozen
   `AppSettings.untouchedDefaults` are documented (§2.2); the university preset's 15-minute lesson reminders are off by
   default (each preset's default plan for a typical week: 8–23 of 60 notifications, `PresetBudgetTests`).
+
+Post-freeze decisions (Phase 4):
+
+- B18 `Subject.sortIndex` (P3-2, approved by the human 2026-10-16; Phase 4 Stage C1, core-domain-engineer). **No
+  `schemaVersion` bump** (stays `1`). Reasoning, checked in code: (a) the field is optional and omitted when `nil`, so
+  data without it decodes unchanged and re-encodes byte for byte (`SubjectSortIndexSchemaTests`, with a literal pre-P3-2
+  database file); (b) an older app (Phase 1–3 build) decodes a newer file without error — `Subject` uses synthesized
+  `Codable`, which ignores unknown keys, and §7.3's `UnknownFields` keeps `sortIndex` as an unknown entity key that it writes
+  back unchanged and merges with the newer app's field clock; nothing in an older build rejects the key. Consequence for
+  an older app: it shows subjects alphabetically and cannot reorder; subjects it creates have no index and appear after the
+  ordered ones on newer devices until the next addition or reorder there writes the order down. A bump would instead make
+  every older app open the file read-only (§7.2) for a purely cosmetic field. Share payload: optional key `o` within
+  `v` = 1 (SHARE_FORMAT D2D-8).

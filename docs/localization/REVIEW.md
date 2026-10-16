@@ -28,12 +28,16 @@ Source of truth: `Resources/Localizable.xcstrings` (797 keys after the follow-up
 ### Store listing
 **Serbian is not an App Store Connect metadata language** (Phase 0, RISKS #25, gate decision D10). The in-app Serbian (Cyrillic and Latin) is fine; the store page needs a fallback language (default proposal: English). Human decides.
 
-## How a reviewer works
-1. Pick a language, open the catalog in Xcode (String Catalog editor, filter "Needs Review") or review `docs/localization/translations/<lang>.json`.
-2. Read each string with its **comment** (context, arguments, where it appears).
-3. Fix wording; keep format specifiers (`%@`, `%lld`, `%1$lld`, ...) identical in type and count; keep plural categories complete.
-4. Mark reviewed units `translated`, record the reviewer and date in the table below.
-5. `bash scripts/validate.sh` must stay green (completeness is a FAIL, not a warning).
+## How a reviewer works (review document, Phase 4 C2, decision P3-3)
+Everything a reviewer needs is generated into `docs/localization/review/` (see its `README.md`); nobody edits the catalog by hand.
+1. Open `docs/localization/review/index.html` (self-contained, offline, phone and desktop, light/dark): one row per string and plural form with key, "where it is used" (the catalog comment), English and the 12 languages. A language picker shows e.g. only English + Slovak; search; filter all / needs_review / translated / changed since last review. Placeholders (`%@`, `%lld`, `%1$@`) are highlighted. A short "How to review" is at the top in English and Slovak.
+2. Fill the **`corrected`** (and optionally `note`) column in the language's CSV (`<lang>.csv`: key, plural_form, context, english, current, corrected, note; UTF-8 with BOM). Empty = skip, `[ok]` = current text is right, any other text = the correction. Keep format specifiers identical in type and count; translate every plural form on its own row. Excel with `;` separators and files without BOM are fine.
+3. The maintainer runs `python3 scripts/l10n-review-import.py --dry-run <lang>.csv`, then without `--dry-run`. Accepted rows become `translated` (reviewed); rows whose placeholders differ from English, or whose key/plural form does not exist, are rejected and listed. Corrected `sr` rows re-derive `sr-Latn`. The catalog stays in canonical form.
+4. `python3 scripts/l10n-review-export.py` regenerates the folder (also run it whenever strings change); commit catalogs and folder together. Record reviewer, date and scope in the table below.
+5. `bash scripts/validate.sh` must stay green (completeness is a FAIL, not a warning). It runs the round-trip test (`scripts/l10n-review-test.py`) and **warns** (does not fail) when the review folder is stale. Staleness is a **hash** check (`docs/localization/review/SOURCE_HASH` = sha256 of both catalogs + `baseline.json`), not a file-time comparison, because git checkouts reset times.
+6. `baseline.json` records what a reviewer last signed off (written only by the import); the "changed since last review" filter compares against it. Without an entry a row counts as changed until it is `translated`.
+
+Row counts (2026-10-16): 1,205 keys (1,200 `Localizable` + 5 `InfoPlist`), 1,391 rows in the HTML; CSV rows per language: sk, cs, pl, uk 1,391; ro 1,329; sr, sr-Latn 1,329; hu, de, fr 1,267; ja, zh-Hans 1,205. All still machine translations until reviewed.
 
 | Language | Reviewer | Date | Scope | Result |
 |---|---|---|---|---|
@@ -119,6 +123,22 @@ New keys `tasks.quickAdd.due.tomorrow`, `tasks.quickAdd.due.nextLesson` (replace
 1 changed English text (`health.notifications.notDetermined`: Tabula now asks once, after the first save of a task or
 exam that has a reminder; old translations dropped, re-authored). Model-authored for 11 languages (`sr-Latn` derived),
 all `needs_review`. Reviewer: "asks once" must not read as a promise to ask again; ro uses "reamintire" as elsewhere.
+
+### Phase 4 Stage C1 additions (2026-10-16, core-domain-engineer)
+2 new keys (`editor.subjects.moveUp`, `editor.subjects.moveDown`: VoiceOver actions on a subjects-list row) and 1 changed
+English text (`editor.subjects.footer`: the list is no longer alphabetical; it now says how to reorder — old translations
+dropped, re-authored). Model-authored for 11 languages (`sr-Latn` derived), all `needs_review`. Reviewer: the footer
+names the system Edit button, so it must match the iOS label in each language (sk "Upraviť", cs "Upravit", pl "Edytuj",
+hu "Szerkesztés", ro "Editează", de "Bearbeiten", fr "Modifier", uk "Редагувати", sr "Уреди", ja 編集, zh 编辑); the move
+actions are short imperative labels read by VoiceOver.
+
+### Phase 4 Stage C1 QA fixes (2026-10-16, core-domain-engineer)
+4 new keys (`editor.subjects.reorder` toolbar button, `editor.subjects.reorder.done` its VoiceOver label in reorder mode,
+`editor.subjects.footer.single`, `editor.subjects.moved` VoiceOver announcement with two numbers) and `editor.subjects.footer`
+re-authored again (it now names the Reorder button, not Edit). Model-authored for 11 languages (`sr-Latn` derived), all
+`needs_review`. Reviewer: the footer must use exactly the wording of `editor.subjects.reorder`; `editor.subjects.moved` is
+phrased without a counted noun after the numbers ("position 3 of 8" / sk "na pozíciu 3 z 8") so no plural forms are needed —
+check that this holds in each language (hu uses "Új pozíció: 3, összesen 8").
 ### Phase 4 Stage A additions (2026-10-16, widgets-watch-engineer)
 13 new keys (`widget.nowNext.*`, `widget.open.*`, `widget.pro.*`), model-authored for 11 languages (`sr-Latn` derived),
 all `needs_review`. The widget otherwise reuses the Today header keys (`today.header.*`, `a11y.lesson.*`). Reviewer: the

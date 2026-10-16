@@ -175,6 +175,8 @@ struct TimetablesManagerView: View {
         guard let database else { return }
         var order = timetables.map(\.id)
         order.move(fromOffsets: source, toOffset: destination)
+        // A row dropped where it was changes nothing: no apply (no save, no change notification).
+        guard !TimetableManagement.reorderIsNoOp(order, in: database) else { return }
         run(TimetableManagement.reorderMutation(order, in: database))
     }
 

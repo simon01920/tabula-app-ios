@@ -77,9 +77,9 @@ private struct DayChangeFormContent: View {
         DayChangeEditorView.lessonEntries(model: model, timetable: timetable, date: draft.date)
     }
 
+    /// The timetable's subjects in display order (manual order, then name; `SubjectOrder`).
     private var subjects: [Subject] {
-        (database?.subjects ?? []).filter { !$0.isDeleted && $0.timetableID == timetable.id }
-            .sorted { ($0.name, $0.id) < ($1.name, $1.id) }
+        database.map { SubjectOrder.live($0, timetableID: timetable.id, locale: model.formatter.locale) } ?? []
     }
 
     private var schedules: [BellSchedule] {
