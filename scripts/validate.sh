@@ -148,6 +148,19 @@ else
 fi
 if python3 -B "$REPO_ROOT/scripts/l10n-add.py" --check; then :; else bad "Localizable.xcstrings not in canonical (Xcode) form: add strings with scripts/l10n-add.py"; fi
 
+if python3 -B "$REPO_ROOT/scripts/l10n-review-test.py" >"$TMP/l10n-review.log" 2>&1; then
+  ok "l10n review round trip ($(grep -c '^OK' "$TMP/l10n-review.log") checks: export, ';' CSV without BOM, plural key, placeholder rejection, sr-Latn, staleness)"
+else
+  cat "$TMP/l10n-review.log"; bad "l10n-review-test"
+fi
+# Staleness of docs/localization/review/ is a WARNING, not a failure: a hash (SOURCE_HASH) of both catalogs + baseline
+# is compared, not file times (git checkouts reset mtimes). Regenerate: python3 scripts/l10n-review-export.py
+if python3 -B "$REPO_ROOT/scripts/l10n-review-export.py" --check >"$TMP/l10n-review-check.log" 2>&1; then
+  ok "translation review export is current (hash matches the catalogs)"
+else
+  printf 'WARN %s\n' "translation review export is STALE: run python3 scripts/l10n-review-export.py and commit docs/localization/review/"
+fi
+
 step "CI helper self-tests (macOS-job path gate, simulator picker)"
 for helper in ci_paths.py sim_pick.py; do
   if python3 -B "$REPO_ROOT/scripts/$helper" --self-test >"$TMP/$helper.log" 2>&1; then
