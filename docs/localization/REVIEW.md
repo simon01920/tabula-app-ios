@@ -119,3 +119,10 @@ New keys `tasks.quickAdd.due.tomorrow`, `tasks.quickAdd.due.nextLesson` (replace
 1 changed English text (`health.notifications.notDetermined`: Tabula now asks once, after the first save of a task or
 exam that has a reminder; old translations dropped, re-authored). Model-authored for 11 languages (`sr-Latn` derived),
 all `needs_review`. Reviewer: "asks once" must not read as a promise to ask again; ro uses "reamintire" as elsewhere.
+### Phase 4 Stage A additions (2026-10-16, widgets-watch-engineer)
+13 new keys (`widget.nowNext.*`, `widget.open.*`, `widget.pro.*`), model-authored for 11 languages (`sr-Latn` derived),
+all `needs_review`. The widget otherwise reuses the Today header keys (`today.header.*`, `a11y.lesson.*`). Reviewer: the
+widget name `widget.nowNext.name` appears in the iOS widget gallery (sk "Teraz a ďalej", de "Jetzt & Als Nächstes");
+`widget.nowNext.nextShort` is one line on the Lock Screen and must stay short; `widget.pro.short` ≤ about 4 characters;
+the brand stays undeclined ("aplikácia Tabula", "aplikace Tabula", "aplikacja Tabula"); `widget.nowNext.inline.current
+%@ %@` is only a separator format (`%1$@ · %2$@`, ja `・`).
