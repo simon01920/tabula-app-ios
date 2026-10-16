@@ -74,4 +74,34 @@ public struct LessonTileStyle: Equatable, Sendable {
 
     /// Whether to outline for the given appearance.
     public func needsOutline(isDark: Bool) -> Bool { isDark ? needsOutlineInDark : needsOutlineInLight }
+
+    /// Minimum contrast of a non-text UI part (progress bar, ring) against the page (WCAG 2.2, 1.4.11).
+    public static let nonTextMinimumRatio = 3.0
+
+    /// The subject colour as an accent drawn directly on the page (e.g. the widget's progress bar): the colour itself
+    /// when it already reaches `minimumRatio` against the light / dark page background, else mixed towards black
+    /// (light page) or white (dark page) in 5 % steps until it does — so a pastel yellow bar stays visible on white
+    /// and a navy one on black. Always terminates (pure black / white reach ≥ 19:1).
+    public static func contrastSafeAccent(_ color: ColorValue, isDark: Bool,
+                                          minimumRatio: Double = nonTextMinimumRatio) -> ColorValue {
+        let page = isDark ? darkPageBackground : lightPageBackground
+        let target: ColorValue = isDark ? .white : .black
+        let opaque = color.composited(over: page)
+        var candidate = opaque
+        var step = 0
+        while candidate.contrastRatio(with: page) < minimumRatio, step < 20 {
+            step += 1
+            candidate = mix(opaque, target, fraction: Double(step) / 20)
+        }
+        return candidate
+    }
+
+    /// `fraction` of the way from `from` to `to` (opaque, per sRGB channel).
+    static func mix(_ from: ColorValue, _ to: ColorValue, fraction: Double) -> ColorValue {
+        func channel(_ a: UInt8, _ b: UInt8) -> UInt8 {
+            UInt8((Double(a) + (Double(b) - Double(a)) * fraction).rounded())
+        }
+        return ColorValue(red: channel(from.red, to.red), green: channel(from.green, to.green),
+                          blue: channel(from.blue, to.blue))
+    }
 }

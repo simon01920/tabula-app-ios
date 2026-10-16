@@ -62,6 +62,7 @@ struct WidgetTimelinePlannerTests {
     /// weekend, a holiday and a cancelled day, for three scenarios.
     @Test(arguments: [
         (SeedKind.secondary, date(2026, 10, 13)), (.secondary, date(2026, 10, 16)), (.secondary, date(2026, 10, 29)),
+        (.secondary, date(2026, 10, 23)),   // Fri → Mon over the DST end (Sun 25 Oct, a 25-hour day)
         (.university, date(2026, 10, 13)), (.elementary, date(2026, 10, 13)),
     ])
     func stateMatchesTheTodayTab(_ seed: SeedKind, _ day: LocalDate) throws {
@@ -108,13 +109,16 @@ struct WidgetTimelinePlannerTests {
         for entry in plan.entries {
             #expect(entry.state == WidgetTimelinePlanner.state(snapshot: snapshot, at: entry.date, context: context))
         }
-        // Three school days have more boundaries than one timeline holds: reload at the last entry.
+        // Three school days have more boundaries than one timeline holds: cut at the last midnight inside the cap,
+        // reload there (or within 6 h, whichever is earlier).
         #expect(future.count > plan.entries.count - 1)
-        #expect(plan.reloadDate == plan.entries.last?.date)
+        let last = try #require(plan.entries.last?.date)
+        #expect(snapshot.days.map { context.startOfDay($0.date.adding(days: 1)) }.contains(last))
+        #expect(plan.reloadDate == min(last, now.addingTimeInterval(WidgetTimelinePlanner.maxReloadInterval)))
         #expect(plan.entries.dropFirst().map(\.date).contains(context.startOfDay(today.adding(days: 1))))
     }
 
-    @Test func shortTimelineReloadsWhenTheCoveredRangeEnds() {
+    @Test func shortTimelineEndsWithTheCoveredRangeAndReloadsWithinSixHours() {
         let day = date(2026, 10, 13)
         let snap = snapshot([school(day, [lesson("a", day, time(8), time(8, 45))]),
                              WidgetSnapshot.Day(date: day.adding(days: 1), kind: .free)])
@@ -122,11 +126,29 @@ struct WidgetTimelinePlannerTests {
         let plan = WidgetTimelinePlanner.plan(snapshot: snap, now: now, deviceTimeZone: bratislava)
         #expect(plan.entries.map(\.date) == [now, instant(day, 8), instant(day, 8, 45), context.startOfDay(day.adding(days: 1)),
                                              context.startOfDay(day.adding(days: 2))])
-        #expect(plan.reloadDate == context.startOfDay(day.adding(days: 2)))
         #expect(plan.entries.last?.state == .unavailable(.outdated))
+        // The range ends in 41 h: the reload is capped at 6 h (a zone change needs a re-plan, RISKS #67).
+        #expect(plan.reloadDate == now.addingTimeInterval(WidgetTimelinePlanner.maxReloadInterval))
+        #expect(WidgetTimelinePlanner.maxReloadInterval == 6 * 3600)
+        // The range ends in 2 h: reload at its end.
+        let late = instant(day.adding(days: 1), 22)
+        #expect(WidgetTimelinePlanner.plan(snapshot: snap, now: late, deviceTimeZone: bratislava).reloadDate
+            == context.startOfDay(day.adding(days: 2)))
     }
 
-    @Test func manyLessonsAreCutAt29Entries() {
+    @Test func everyPlanReloadsWithinSixHours() throws {
+        let database = SampleScenarios.secondary().database
+        for day in [today, date(2026, 10, 16), date(2026, 10, 29)] {
+            for hour in [0, 7, 10, 15, 21] {
+                let now = instant(day, hour)
+                let plan = WidgetTimelinePlanner.plan(snapshot: build(database, at: instant(day, 0)), now: now,
+                                                      deviceTimeZone: bratislava)
+                #expect(plan.reloadDate > now && plan.reloadDate <= now.addingTimeInterval(6 * 3600), "\(day) \(hour):00")
+            }
+        }
+    }
+
+    @Test func manyLessonsAreCutAtTheLastMidnightBeforeTheCap() {
         let first = date(2026, 10, 12)
         let days = (0..<5).map { offset -> WidgetSnapshot.Day in
             let day = first.adding(days: offset)
@@ -134,8 +156,12 @@ struct WidgetTimelinePlannerTests {
         }
         let now = instant(first, 6)
         let plan = WidgetTimelinePlanner.plan(snapshot: snapshot(days), now: now, deviceTimeZone: bratislava)
-        #expect(plan.entries.count == 29)
-        #expect(plan.reloadDate == plan.entries.last?.date)
+        // 17 boundaries a day (16 lesson boundaries + midnight): 28 slots reach into day 2, so the timeline ends at the
+        // first midnight (now + 16 boundaries + midnight = 18 entries) and its last state stays valid overnight.
+        #expect(plan.entries.count == 18)
+        #expect(plan.entries.last?.date == context.startOfDay(first.adding(days: 1)))
+        #expect(plan.entries.last?.state == .upcoming(days[1].lessons[0], isFirstOfDay: true))
+        #expect(plan.reloadDate == now.addingTimeInterval(WidgetTimelinePlanner.maxReloadInterval))
     }
 
     @Test func gapBetweenLessonsAndAfterTheLastLesson() throws {
@@ -400,8 +426,52 @@ struct NowNextPresentationTests {
     }
 }
 
+@Suite("Widget accent contrast")
+struct WidgetAccentContrastTests {
+    @Test func progressTintReachesThreeToOneOnBothPages() {
+        let palette = PalettePack.classic.colors.map(\.value) + [
+            ColorValue(red: 255, green: 255, blue: 255), ColorValue(red: 0, green: 0, blue: 0),
+            ColorValue(red: 240, green: 220, blue: 60), ColorValue(red: 20, green: 30, blue: 80),
+            ColorValue(red: 200, green: 200, blue: 200, alpha: 80),
+        ]
+        for color in palette {
+            for isDark in [false, true] {
+                let page = isDark ? LessonTileStyle.darkPageBackground : LessonTileStyle.lightPageBackground
+                let tint = LessonTileStyle.contrastSafeAccent(color, isDark: isDark)
+                #expect(tint.contrastRatio(with: page) >= 3.0, "\(color) on \(isDark ? "dark" : "light"): \(tint)")
+            }
+        }
+        // A colour that already contrasts is left as it is.
+        let blue = ColorValue(red: 30, green: 90, blue: 200)
+        #expect(LessonTileStyle.contrastSafeAccent(blue, isDark: false) == blue)
+        // Pastel yellow on white is darkened, navy on black is lightened.
+        let yellow = ColorValue(red: 240, green: 220, blue: 60)
+        #expect(LessonTileStyle.contrastSafeAccent(yellow, isDark: false).relativeLuminance < yellow.relativeLuminance)
+        let navy = ColorValue(red: 20, green: 30, blue: 80)
+        #expect(LessonTileStyle.contrastSafeAccent(navy, isDark: true).relativeLuminance > navy.relativeLuminance)
+    }
+}
+
 @Suite("Widget gallery samples")
 struct WidgetGallerySampleTests {
+    @Test func previewSnapshotIsSmallAndRunsALiveLesson() throws {
+        for (hour, minute) in [(10, 20), (0, 5), (23, 50)] {
+            let now = instant(today, hour, minute)
+            let snap = WidgetGallerySamples.previewSnapshot(now: now, timeZone: bratislava, localeID: "en_GB",
+                                                            languageCode: "en", name: EnglishCatalog.lookup)
+            let data = try WidgetSnapshotStore.encode(snap)
+            #expect(data.count < 1_500)
+            let state = WidgetTimelinePlanner.state(snapshot: snap, at: now, context: context)
+            guard case let .current(lesson, next) = state else {
+                Issue.record("expected a current lesson at \(hour):\(minute), got \(state)")
+                continue
+            }
+            #expect(lesson.subject.name == "Mathematics")
+            #expect(lesson.end(in: context) > now)   // the timer runs, never 0:00
+            if hour == 10 { #expect(next?.subject.name == "Biology") }
+        }
+    }
+
     @Test func scenesShowTheirStates() throws {
         let scenes = WidgetGallerySamples.scenes(locale: Locale(identifier: "en_GB"), languageCode: "en")
         #expect(scenes.map(\.id) == ["lesson", "break", "after", "holiday"])

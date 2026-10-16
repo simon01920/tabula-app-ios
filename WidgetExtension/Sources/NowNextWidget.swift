@@ -39,6 +39,8 @@ struct NowNextProvider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping @Sendable (NowNextEntry) -> Void) {
+        // The extension process can outlive a time-zone change: drop Foundation's cached zone first (RISKS #67).
+        NSTimeZone.resetSystemTimeZone()
         let read = WidgetSnapshotReader.read()
         let entries = Self.entries(snapshot: read.snapshot, now: Date())
         // The widget gallery (preview) shows sample content when there is nothing real to show yet.
@@ -50,6 +52,7 @@ struct NowNextProvider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping @Sendable (Timeline<NowNextEntry>) -> Void) {
+        NSTimeZone.resetSystemTimeZone()   // see getSnapshot; the plan's reload is ≤ 6 h away for the same reason
         let read = WidgetSnapshotReader.read()
         let now = Date()
         let plan = WidgetTimelinePlanner.plan(snapshot: read.snapshot, now: now, deviceTimeZone: TimeZone.current)
@@ -76,13 +79,19 @@ struct NowNextProvider: TimelineProvider {
         }
     }
 
-    /// The seeded "during a lesson" scene (placeholder / gallery preview), in the device language.
+    /// A tiny "during a lesson" sample around now (placeholder / gallery preview), in the device language. Built by
+    /// hand (`WidgetGallerySamples.previewSnapshot`), not from the seeded database, to stay within the extension's
+    /// memory limit; its live timers run because the lesson is placed around `Date()`.
     static func sampleEntry() -> NowNextEntry {
-        let scene = WidgetGallerySamples.scenes(locale: Locale.current,
-                                                languageCode: Bundle.main.preferredLocalizations.first)[0]
-        let plan = WidgetTimelinePlanner.plan(snapshot: scene.snapshot, now: scene.date,
-                                              deviceTimeZone: SampleScenarios.timeZone)
-        return entries(snapshot: scene.snapshot, plan: plan)[0]
+        NSTimeZone.resetSystemTimeZone()
+        let now = Date()
+        let language = Bundle.main.preferredLocalizations.first
+        let lookup = WidgetSnapshotReader.lookup(language: language)
+        let snapshot = WidgetGallerySamples.previewSnapshot(now: now, timeZone: TimeZone.current,
+                                                            localeID: Locale.current.identifier, languageCode: language,
+                                                            name: lookup)
+        let plan = WidgetTimelinePlanner.plan(snapshot: snapshot, now: now, deviceTimeZone: TimeZone.current)
+        return entries(snapshot: snapshot, plan: plan)[0]
     }
 }
 

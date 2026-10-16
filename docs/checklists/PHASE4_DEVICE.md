@@ -103,7 +103,7 @@ Build: xtool (free team) / xtool (paid team) / TestFlight · App Group available
 |---|---|---|---|---|
 | A4.1 | Edit a lesson, immediately swipe Home | Widget shows the change (writer flushes when the scene leaves `active`) | | |
 | A4.2 | Open + close the app 10× without changes | Read-back time does **not** change each time (unchanged snapshot is not rewritten → no reload spent) | | |
-| A4.3 | Don't open the app for 2 school days (phone used normally) | Widget keeps advancing lesson by lesson (≤ 29 entries per timeline, reload at the last entry); Background App Refresh may rewrite the snapshot (read-back time) | | |
+| A4.3 | Don't open the app for 2 school days (phone used normally) | Widget keeps advancing lesson by lesson (≤ 29 entries per timeline, cut at a midnight, a reload at least every 6 h: read-back time advances); Background App Refresh may rewrite the snapshot (read-back time) | | |
 | A4.4 | Background App Refresh **off** for Tabula, don't open the app until past the covered days | Widget shows "Open Tabula" + "Open the app to update…" once the snapshot's days are over — never yesterday's lessons | | |
 | A4.5 | Low Power Mode on for a school day | Countdown still ticks; boundaries still switch (timeline entries need no app); reloads may be delayed — note how much | | |
 | A4.6 | Settings → General → Date & Time → time zone to New York (automatic off), app **not** opened | Note what the widget shows (WidgetKit may not reload on a zone change, RISKS #67). Then open the app → widget re-plans: an 08:00 lesson shows at 08:00 New York time ("follow device") | | |

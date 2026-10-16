@@ -8,7 +8,11 @@
 //
 // Entries: `now`, then every start and end of a lesson that takes place, and every midnight of the covered days (the
 // day changes the state: "tomorrow" becomes "today", a holiday begins) — at most `maxEntries` (ARCHITECTURE.md: < 30
-// per timeline, and well above the 5-minute spacing WidgetKit asks for, because lesson times are whole minutes).
+// per timeline). Spacing: entries are whole-minute lesson boundaries, so they are usually a break (often exactly 5
+// minutes) apart, but a 1–4-minute changeover produces entries closer than the "at least about 5 minutes" WidgetKit
+// recommends. They are kept on purpose: merging them would show a finished lesson (timer at 0:00) or a lesson that has
+// not started for those minutes. Boundary entries are at least 1 minute apart (identical instants are merged); only the
+// first entry, at `now`, can be closer to the next one.
 // Live remaining time is NOT an entry: views use `Text(timerInterval:)` / `ProgressView(timerInterval:)`.
 //
 // Instants come from the snapshot's wall-clock values in the zone that applies now (`effectiveTimeZone`): after a
@@ -16,8 +20,10 @@
 // range (the app has not written for days, or the zone change moved "today" before the first covered day) is
 // `.unavailable(.outdated)`: the widget asks to open the app instead of guessing.
 //
-// Reload: after the last entry when the list was cut at `maxEntries`, else at the end of the covered range (where
-// the state becomes outdated); for an unavailable state `unavailableRetry` later (the app also reloads after writing).
+// Reload: when the list was cut at `maxEntries`, at its last midnight (else its last entry); otherwise at the end of
+// the covered range (where the state becomes outdated); for an unavailable state `unavailableRetry` later. Always at
+// most `maxReloadInterval` after now, because WidgetKit does not reload on a time-zone change and the next natural
+// reload can be days away (the app also reloads after every write).
 import Foundation
 import TimetableCore
 
@@ -99,6 +105,8 @@ public enum WidgetTimelinePlanner {
     public static let maxLaterLessons = 3
     /// Reload delay while nothing can be shown.
     public static let unavailableRetry: TimeInterval = 6 * 3600
+    /// The latest reload after `now` (time-zone changes, RISKS #67): ≤ 4 reloads a day, far below the 40–70 budget.
+    public static let maxReloadInterval: TimeInterval = 6 * 3600
 
     /// The calendar context the snapshot is planned in on a device in `deviceTimeZone`.
     public static func context(for snapshot: WidgetSnapshot, deviceTimeZone: TimeZone) -> CalendarContext {
@@ -118,21 +126,32 @@ public enum WidgetTimelinePlanner {
                                        context: context)
         }
         var boundaries: Set<Date> = []
+        var midnights: Set<Date> = []
         for day in snapshot.days {
-            boundaries.insert(context.startOfDay(day.date.adding(days: 1)))
+            midnights.insert(context.startOfDay(day.date.adding(days: 1)))
             for lesson in day.lessons where lesson.takesPlace {
                 boundaries.insert(lesson.start(in: context))
                 boundaries.insert(lesson.end(in: context))
             }
         }
+        boundaries.formUnion(midnights)
         let future = boundaries.filter { $0 > now }.sorted()
-        let kept = future.prefix(maxEntries - 1)
+        var kept = Array(future.prefix(maxEntries - 1))
+        let isCut = kept.count < future.count
+        // Cut at the last midnight inside the kept range: if the reload comes late, the last state (the next day's
+        // "first lesson / starts in") stays valid for hours instead of a mid-day state that is wrong minutes later.
+        if isCut, let lastMidnight = kept.lastIndex(where: { midnights.contains($0) }) {
+            kept = Array(kept[...lastMidnight])
+        }
         var entries = [first]
         for date in kept {
             entries.append(entry(snapshot: snapshot, at: date, context: context))
         }
         let coverageEnd = snapshot.lastDay.map { context.startOfDay($0.adding(days: 1)) } ?? now
-        let reload = kept.count < future.count ? (kept.last ?? now) : max(coverageEnd, now)
+        let natural = isCut ? (kept.last ?? now) : max(coverageEnd, now)
+        // Never later than `maxReloadInterval`: WidgetKit does not reload on a time-zone change (RISKS #67), so a
+        // re-plan in the current zone must come within hours even when the timeline itself would last for days.
+        let reload = min(natural, now.addingTimeInterval(maxReloadInterval))
         return NowNextTimelinePlan(entries: entries, reloadDate: reload, context: context)
     }
 

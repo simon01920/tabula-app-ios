@@ -10,7 +10,9 @@
 // Debounced (`debounce`), built on the main actor from the model's current state (pure `WidgetSnapshotBuilder`),
 // written atomically off the main actor (`WidgetSnapshotStore.write`), then `WidgetCenter.shared.reloadAllTimelines()`.
 // Unchanged content (ignoring `generatedAt`) is neither written nor reloaded, so foregrounding does not spend the
-// widgets' reload budget (reloads while the app is in the foreground do not count anyway: WidgetKit docs).
+// widgets' reload budget (reloads while the app is in the foreground do not count anyway: WidgetKit docs). The
+// comparison starts from the file already in the App Group, so a cold or background launch with unchanged data writes
+// nothing either. Each write runs inside a UIKit background-task assertion (it can start as the scene leaves `active`).
 //
 // No App Group (free team, RISKS #47/#56; `AppEnvironment.widgetContainer == nil`) or seed mode → nothing is written:
 // the widgets keep showing "Open Tabula". Never writes while the store is loading or failed to load.
@@ -19,7 +21,27 @@
 import Foundation
 import TimetableCore
 import TimetableUI
+import UIKit
 import WidgetKit
+
+/// A UIKit background-task assertion (`beginBackgroundTask(withName:expirationHandler:)`: returns `.invalid` when no
+/// background time is granted; every begin needs exactly one `endBackgroundTask(_:)`, also from the expiration handler).
+@MainActor
+final class BackgroundAssertion {
+    private var id: UIBackgroundTaskIdentifier = .invalid
+
+    init(name: String) {
+        id = UIApplication.shared.beginBackgroundTask(withName: name) { [weak self] in
+            self?.end()
+        }
+    }
+
+    func end() {
+        guard id != .invalid else { return }
+        UIApplication.shared.endBackgroundTask(id)
+        id = .invalid
+    }
+}
 
 @MainActor
 final class WidgetSnapshotWriter {
@@ -36,6 +58,9 @@ final class WidgetSnapshotWriter {
         self.model = model
         self.container = container
         self.debounce = debounce
+        // What the widgets already have (a cold or background launch with unchanged data then writes and reloads
+        // nothing). A small file (< 20 KB), read once at launch.
+        lastWritten = container.flatMap { WidgetSnapshotStore.read(container: $0) }
     }
 
     /// Chains the writer onto `model.onChange`. Call once, after every other `onChange` owner attached.
@@ -84,7 +109,12 @@ final class WidgetSnapshotWriter {
         }
         lastWritten = snapshot
         let previous = writeChain
+        // The write may start just as the scene leaves the foreground (`flushNow`): ask for background time so iOS
+        // does not suspend the app mid-write (the atomic rename means a cut write leaves the old file, never half a
+        // file, but the widgets would miss the change). Balanced by exactly one `end()`, also from the expiration.
+        let assertion = BackgroundAssertion(name: "tabula.widget-snapshot")
         writeChain = Task { [weak self] in
+            defer { assertion.end() }
             await previous?.value
             let outcome = await Task.detached(priority: .utility) { () -> String? in
                 do {
