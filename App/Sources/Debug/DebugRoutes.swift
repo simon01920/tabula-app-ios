@@ -1,4 +1,5 @@
 // Debug launch routes (DEBUG builds only). Ids are unchanged from Phase 0 so the CI screenshot list keeps working.
+// Phase 4 A: the widget gallery routes (`widgets.gallery*`, Debug/WidgetGallery.swift).
 #if DEBUG
 import SwiftUI
 
@@ -8,6 +9,9 @@ enum DebugRoutes: RouteProvider {
             AppRoute(area.rawValue, .standalone) { DebugScreen(area: area) }
         } + [
             AppRoute("debug-developer", .standalone) { DeveloperScreen() },
+            AppRoute("widgets.gallery", .standalone) { WidgetGalleryScreen(page: .daytime) },
+            AppRoute("widgets.gallery-evening", .standalone) { WidgetGalleryScreen(page: .evening) },
+            AppRoute("widgets.gallery-pro", .standalone) { WidgetGalleryScreen(page: .pro) },
         ]
     }
 }

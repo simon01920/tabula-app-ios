@@ -139,3 +139,10 @@ re-authored again (it now names the Reorder button, not Edit). Model-authored fo
 `needs_review`. Reviewer: the footer must use exactly the wording of `editor.subjects.reorder`; `editor.subjects.moved` is
 phrased without a counted noun after the numbers ("position 3 of 8" / sk "na pozíciu 3 z 8") so no plural forms are needed —
 check that this holds in each language (hu uses "Új pozíció: 3, összesen 8").
+### Phase 4 Stage A additions (2026-10-16, widgets-watch-engineer)
+13 new keys (`widget.nowNext.*`, `widget.open.*`, `widget.pro.*`), model-authored for 11 languages (`sr-Latn` derived),
+all `needs_review`. The widget otherwise reuses the Today header keys (`today.header.*`, `a11y.lesson.*`). Reviewer: the
+widget name `widget.nowNext.name` appears in the iOS widget gallery (sk "Teraz a ďalej", de "Jetzt & Als Nächstes");
+`widget.nowNext.nextShort` is one line on the Lock Screen and must stay short; `widget.pro.short` ≤ about 4 characters;
+the brand stays undeclined ("aplikácia Tabula", "aplikace Tabula", "aplikacja Tabula"); `widget.nowNext.inline.current
+%@ %@` is only a separator format (`%1$@ · %2$@`, ja `・`).

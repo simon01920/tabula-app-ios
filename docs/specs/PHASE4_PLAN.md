@@ -63,6 +63,13 @@ Status: started 2026-10-16. The human approved Phase 3 and asked for Phase 4 end
     - Simulator screenshots cannot capture the Home Screen widgets.
     - Instead, a DEBUG-only `widgets.gallery` route renders each widget view, at its exact family size, from a seeded snapshot. It covers light and dark, and the accented mode where possible.
     - This requires the widget views to live in code that both the app and the extension compile (decided in Stage A).
+    - **Stage A decision (2026-10-16):** the views live in `Packages/TimetableUI/Sources/TimetableUI/Widgets/`
+      (`#if canImport(SwiftUI) && canImport(WidgetKit)`), next to the pure snapshot / planner / presenter. Both targets
+      already link TimetableUI on both build paths (no build-file change), and the watch type-check compiles them for
+      watchOS. Routes: `widgets.gallery` (lesson, break), `widgets.gallery-evening` (after school, holiday),
+      `widgets.gallery-pro` (Pro placeholders, "Open Tabula"), two scenes per page so each fits one screenshot.
+      Widget taps use `tabula://open/<link>` (`ItemLinkURL`, new `ItemLink.today`) through `onOpenURL` →
+      `AppNavigation.open`.
 11. **Unchanged constraints:**
     - No paid account, so no push notifications and no Time Sensitive.
     - Persisted schema changes need approval: P3-2 has it, and nothing else may change.

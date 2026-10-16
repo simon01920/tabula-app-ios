@@ -10,6 +10,8 @@ public enum ItemLink: Hashable, Sendable {
     case exam(Exam.ID)
     case lesson(OccurrenceID)
     case packTonight(LocalDate)
+    /// The Today tab (widget taps, Phase 4; never produced by a notification).
+    case today
 
     public init(_ source: ReminderSource) {
         switch source {

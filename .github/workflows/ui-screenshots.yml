@@ -30,7 +30,7 @@ on:
       screens:
         description: "Space-separated entries id[@seed[@lang]] — id = -TabulaScreen route, seed = -TabulaSeed (empty|blank|elementary|secondary|university), lang = -AppleLanguages code (e.g. sk, de)"
         type: string
-        default: "today@secondary timetable.grid@secondary timetable.lesson-detail@secondary tasks@secondary tasks.overdue@secondary tasks.editor@secondary tasks.detail@secondary exams@secondary exams.history@secondary exams@university exams.editor@secondary settings.reminders@secondary settings.reminder-rule@secondary settings.reminder-health@secondary reminders.permission@secondary tasks@secondary@sk exams@secondary@de"
+        default: "today@secondary timetable.grid@secondary timetable.lesson-detail@secondary tasks@secondary tasks.overdue@secondary tasks.editor@secondary tasks.detail@secondary exams@secondary exams.history@secondary exams@university exams.editor@secondary settings.reminders@secondary settings.reminder-rule@secondary settings.reminder-health@secondary reminders.permission@secondary tasks@secondary@sk exams@secondary@de widgets.gallery@secondary widgets.gallery-evening@secondary widgets.gallery-pro@secondary widgets.gallery@secondary@sk"
       device:
         description: "Simulator device type name, e.g. 'iPhone 17 Pro Max' (empty = largest available Pro Max)"
         type: string
@@ -51,7 +51,7 @@ env:
   XCODE_APP: /Applications/Xcode_27.app
   XCODEGEN_VERSION: "2.46.0"
   XCODEGEN_SHA256: 4d9e34b62172d645eed6457cac13fc222569974098ef4ee9c3368bedf0196806
-  SCREENS: ${{ inputs.screens || 'today@secondary timetable.grid@secondary timetable.lesson-detail@secondary tasks@secondary tasks.overdue@secondary tasks.editor@secondary tasks.detail@secondary exams@secondary exams.history@secondary exams@university exams.editor@secondary settings.reminders@secondary settings.reminder-rule@secondary settings.reminder-health@secondary reminders.permission@secondary tasks@secondary@sk exams@secondary@de' }}
+  SCREENS: ${{ inputs.screens || 'today@secondary timetable.grid@secondary timetable.lesson-detail@secondary tasks@secondary tasks.overdue@secondary tasks.editor@secondary tasks.detail@secondary exams@secondary exams.history@secondary exams@university exams.editor@secondary settings.reminders@secondary settings.reminder-rule@secondary settings.reminder-health@secondary reminders.permission@secondary tasks@secondary@sk exams@secondary@de widgets.gallery@secondary widgets.gallery-evening@secondary widgets.gallery-pro@secondary widgets.gallery@secondary@sk' }}
   DEVICE_OVERRIDE: ${{ inputs.device || '' }}
   OUT: screenshots
 
@@ -151,6 +151,8 @@ jobs:
             xcrun simctl ui "$SIM_UDID" appearance light; shoot "$screen" light || failed=1
             xcrun simctl ui "$SIM_UDID" appearance dark;  shoot "$screen" dark  || failed=1
             xcrun simctl ui "$SIM_UDID" appearance light
+            # Widget gallery pages (Phase 4): fixed widget point sizes, so the AX variant is skipped (optional per plan).
+            case "$screen" in widgets.*) continue ;; esac
             if xcrun simctl ui "$SIM_UDID" content_size accessibility-extra-extra-extra-large; then
               shoot "$screen" ax-xxxl-text || failed=1
             else

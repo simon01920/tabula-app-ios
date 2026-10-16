@@ -82,6 +82,23 @@ public enum DynamicL10nKeys {
         keys += ReminderRuleDefaults.targets.map { ReminderKindList.titleKey($0, terminology: .classLecture) }
         keys += TaskL10nKeys.allKeys
         keys += AttachmentKind.knownValues.map(attachmentKind) + [attachmentKind(AttachmentKind(rawValue: "future"))]
+        keys += widgetKeys
+        keys += ModificationReason.allCases.map(\.l10nKey)
         return Array(Set(keys)).sorted()
     }
+
+    /// Keys the widget presenter (`NowNextPresenter`) picks at runtime by state; looked up through the widget's
+    /// renderer in the app's language (Phase 4 A).
+    public static let widgetKeys: [String] = [
+        "today.header.now", "today.header.next", "today.header.first", "today.header.nextLesson",
+        "today.header.timeLeft", "today.header.startsIn", "today.header.dayOver", "today.header.free",
+        "today.header.holiday", "today.header.dayCancelled", "today.header.nothingAhead", "today.header.tomorrow",
+        "today.header.dayAndTime", "a11y.separator", "a11y.lesson.time", "a11y.lesson.room", "a11y.lesson.cancelled",
+        "a11y.lesson.added", "a11y.lesson.modified", "a11y.lesson.modifiedReasons", "lesson.status.cancelled",
+        "lesson.status.added", "lesson.status.modified", "widget.nowNext.nextShort", "widget.nowNext.later",
+        "widget.nowNext.a11y.endsAt", "widget.nowNext.a11y.startsAt", "widget.open.title", "widget.open.noTimetable",
+        "widget.open.noSnapshot", "widget.open.outdated", "widget.pro.title", "widget.pro.short",
+        // The interpolated `Text` key of NowNextInlineView (subject + live timer); validate.sh skips interpolated keys.
+        "widget.nowNext.inline.current %@ %@",
+    ]
 }
