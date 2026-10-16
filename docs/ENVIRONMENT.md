@@ -524,3 +524,18 @@ renamed into place. Seed runs (`-TabulaSeed`) use `tmp/TabulaSeedAttachments`.
 - **Observed:** iOS CI run 38600687712 (Linux job, Swift 6.4) failed in `validate.sh`: `swift test Packages/TimetableUI` exited because **`/usr/bin/swift-package` itself segfaulted** (crash frame in `libdispatch.so`). It was not a test failure; no test had reported a failure.
 - **Verified:** the job was rerun on the same commit `b854087` and passed. Local WSL and QA runs of the same tree passed every time. This is classified as a toolchain flake.
 - **Action if it recurs:** add a single retry around the Linux `swift test` step in `ios.yml`, and record it in RISKS.
+
+## 27. Device runbook preflight (Phase 4 C3, 2026-10-16)
+Runbook: `docs/DEVICE_SETUP.md`; preflight: `bash scripts/device-doctor.sh` (read-only, always exits 0, never prints the Apple ID or tokens).
+
+| Item | Status | Evidence |
+|---|---|---|
+| xtool CLI flags | VERIFIED (`xtool --help`, 1.20.1, WSL) | top level: `setup auth sdk new dev ds devices install uninstall launch`. `xtool auth login [-u/--username] [-p/--password] [-m/--mode key\|password]`, `auth status`, `auth logout`. `xtool dev run [-c debug\|release] [-u/--udid] [--usb/--network/--all]`. `xtool devices [--usb/--network/--all] [--wait/--no-wait]`. `xtool launch [--udid] <bundle-id> [<arg>...]`, `xtool uninstall <bundle-id>` |
+| `xtool devices` default waits forever | VERIFIED | with no phone the default `--wait` hung past the 120 s tool timeout; `xtool devices --no-wait` returned at once, empty output, rc 0. Always pass `--no-wait` in scripts |
+| `idevice_id -l` without usbmuxd | VERIFIED | prints `ERROR: Unable to retrieve device list!`, exit 255; `systemctl is-active usbmuxd` = `inactive` (static unit, udev starts it on attach) |
+| WSL tools present | VERIFIED | `/usr/sbin/usbmuxd`, `idevice_id`, `ideviceinfo`, `idevicepair`, `idevicesyslog`, `idevicecrashreport`, `idevicedebug` (libimobiledevice-utils 1.4.0, usbmuxd 1.1.1-7). Missing: `ideviceinstaller`, `lsusb` (optional) |
+| `idevicesyslog` 1.4.0 | VERIFIED (`--help`) | options `-u -n -x -d -o --no-colors --colors --syslog-relay`; **no process filter**, use `grep`; commands `pidlist`, `archive PATH` |
+| WSL kernel USB/IP | VERIFIED | `6.18.33.2-microsoft-standard-WSL2`, `CONFIG_USBIP_VHCI_HCD=m`, `/lib/modules/.../vhci-hcd.ko` present (module not loaded until `usbipd attach`) |
+| Windows side | VERIFIED | `winget` present; `usbipd` not installed yet; no `Apple Mobile Device Service` |
+| `xtool auth status` | VERIFIED | `Logged out` (build works, device install needs login) |
+| usbipd bind/attach, Apple driver coexistence, firewall TCP 3240, Developer Mode query `ideviceinfo -q com.apple.security.mac.amfi -k DeveloperModeStatus`, `idevicecrashreport -e -k` | RESEARCH-ONLY | to be confirmed at first plug-in; update this table |
