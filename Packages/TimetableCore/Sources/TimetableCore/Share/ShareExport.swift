@@ -12,7 +12,8 @@ public struct ShareExportResult: Hashable, Sendable {
 /// timetable plus global breaks, and — with "Include tasks" — open (not completed) live tasks and exams that
 /// belong to the timetable (by `timetableID`, or without one but linked to one of its subjects). Never shared:
 /// IDs and sync metadata, schedule overrides (v1), reminder rules, settings, task/exam completion, attachments
-/// and reminder overrides, the timetable's sort index.
+/// and reminder overrides, the timetable's sort index. Subjects carry their display order as the dense rank of
+/// `sortIndex` (`ShareSubject.sortIndex`, wire key `o`).
 ///
 /// Canonical order (determinism): every collection sorted by its source entity ID; periods by
 /// (start, end, ID); period keys numbered by first appearance in that order; subtasks by (sortIndex, ID).
@@ -73,6 +74,7 @@ public enum ShareExport {
             try limit(.lessons, lessons.count)
 
             let subjectIndex = Self.indexMap(subjects.map(\.id))
+            let subjectRanks = SubjectOrder.denseRanks(subjects)
             let scheduleIndex = Self.indexMap(schedules.map(\.id))
             let termIndex = Self.indexMap(terms.map(\.id))
 
@@ -148,7 +150,11 @@ public enum ShareExport {
                 density: sanitizer.vocabulary(source.density) ?? .comfortable,
                 palettePackID: source.palettePackID.flatMap { sanitizer.vocabulary($0) })
 
-            let sharedSubjects = subjects.map { sanitizer.subject($0) }
+            let sharedSubjects = subjects.map { subject in
+                var shared = sanitizer.subject(subject)
+                shared.sortIndex = subjectRanks[subject.id]
+                return shared
+            }
             let sharedTerms = terms.map { ShareTerm(name: sanitizer.name($0.name), range: $0.range) }
             let sharedBreaks = breaks.map {
                 ShareBreak(name: sanitizer.name($0.name), range: $0.range, kind: sanitizer.vocabulary($0.kind) ?? .holiday)

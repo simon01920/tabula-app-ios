@@ -63,21 +63,23 @@ Decode (input is hostile; every step has a bound and a typed error):
 Route: `compressedByteCount ≤ inlineCompressedBytes` → `.inline`, else `.shortCode`. 2048 compressed bytes → 2731
 base64url chars → an inline link of ≈ 2.76 KB, below the 2953-byte capacity of a QR code (byte mode, level L).
 
-Measured sizes (Linux zlib, `ShareCodecTests.sizeBudgetRoutesSecondaryInlineAndUniversityToShortCode`):
+Measured sizes (Linux zlib, `ShareCodecTests.sizeBudgetRoutesSecondaryInlineAndUniversityToShortCode`; re-measured in Phase 4 C1
+with every fixture subject manually ordered, i.e. including the `o` keys — before: secondary 1405 B / secondary + tasks
+1619 B DEFLATE):
 
 | Fixture | JSON | DEFLATE | envelope | route |
 |---|---|---|---|---|
-| secondary school (14 subjects, 2 bell schedules, 32 lessons, 2 terms, 6 holidays) | 4063 B | 1405 B | 1876 chars | inline (link 1905 chars) |
-| secondary + tasks (3 tasks, 1 exam) | 4535 B | 1619 B | 2161 chars | inline (link 2190 chars) |
-| university (45 courses, 360 lessons, 12 breaks) | 56 387 B | 7642 B | 10 192 chars | short code |
-| university + tasks (150 tasks, 40 exams) | 82 389 B | 11 832 B | 15 778 chars | short code |
+| secondary school (14 subjects, 2 bell schedules, 32 lessons, 2 terms, 6 holidays) | 4151 B | 1438 B | 1920 chars | inline (link 1949 chars) |
+| secondary + tasks (3 tasks, 1 exam) | 4623 B | 1654 B | 2208 chars | inline (link 2237 chars) |
+| university (45 courses, 360 lessons, 12 breaks) | 56 692 B | 7778 B | 10 373 chars | short code |
+| university + tasks (150 tasks, 40 exams) | 82 694 B | 11 965 B | 15 956 chars | short code |
 
 ## 3. What is shared
 
 | Shared | Not shared (v1) |
 |---|---|
 | the live timetable: name, emoji, enabled days, rotation, rotation week start, time structure, field visibility, default view, density, palette pack | IDs and sync metadata (`meta`, `fieldClocks`), the timetable's `sortIndex` |
-| its live subjects, bell schedules, terms, lessons | schedule overrides (one-off, date-specific, usually personal; may come in a later `v`) |
+| its live subjects (with their display order, §4.3), bell schedules, terms, lessons | schedule overrides (one-off, date-specific, usually personal; may come in a later `v`) |
 | live breaks of the timetable **and global breaks** (imported as breaks of the new timetable — never global) | reminder rules, settings |
 | with "Include tasks": live, **open** tasks and exams of the timetable (by `timetableID`, or with none but linked to one of its subjects) | completed tasks/exams, completion state, attachments, reminder overrides |
 
@@ -135,7 +137,18 @@ keyed `"1"`…`"7"`, `w` omitted when empty) or `{"k":"f","m":90}` (free form, d
 
 `n` name · `sn` short name? · `c` colour · colour name: `ck` palette colour key (known keys only; an unknown but
 well-formed key is a warning and dropped on import) **or** `cl` literal text · symbol: `se` emoji **or** `si` SF Symbol
-name (`a–z 0–9 .`) · `r` default room? · `bd` default building? · `te` default teacher? · `no` notes?
+name (`a–z 0–9 .`) · `r` default room? · `bd` default building? · `te` default teacher? · `no` notes? · `o` display order?
+(`ShareSubject.sortIndex`; optional key added within `v` = 1 in Phase 4 C1, P3-2 approved 2026-10-16; D2D-8).
+
+`o` is the **dense rank** of the source subject's `Subject.sortIndex` among the exported subjects that have one: equal
+indices share a rank, gaps are closed, subjects without an index have no `o`. Range `0 ..< maxSubjects` (200), else
+`invalidValue(s[i].o)`; a non-integer is `malformedPayload`; equal values are allowed. Import stores `o` as the new subject's
+`sortIndex` (absent → `nil`), so the recipient sees the sender's order wherever ranks differ. Subjects with equal ranks (or none) are
+ordered by the recipient's own tie-break (DOMAIN_MODEL §3.3: name in the recipient's locale, then the **new** IDs from
+import), which can differ from the sender's for case-insensitively equal names or across locales.
+Payloads written before the key existed import with no order (alphabetical); older apps ignore the key. The ranks are
+locale-independent and do not depend on array order, so the canonical-envelope guarantee (§3) holds. The golden payload
+has no index, so it is unchanged.
 
 ### 4.4 `ShareBellSchedule` (`b[i]`) and `SharePeriod`
 
@@ -277,7 +290,7 @@ accepted payload materializes into a database with no `error`-severity `TabulaDa
 | `malformedPayload(path:)` | JSON syntax, depth, wrong types, missing required keys, unknown kind of a closed union, closed enum value unknown, violated "exactly one of" groups (`w`/`c`, `p`/`a`+`z`, `vt`/`vr`, `ck`/`cl`, `se`/`si`, `dt` without `dd`) |
 | `tooMany(collection, count:)` | §5.2 count limits |
 | `stringTooLong(path:length:)`, `invalidCharacters(path:)` | §5.3 |
-| `invalidValue(path:)` | rotation length/anchor/offset/index/school days, labels > 10, day key vs rotation, cycle weeks out of range, span, period key, free-form minutes, repeat interval, dates outside 1970…2199, malformed emoji/symbol/palette key/vocabulary value, non-canonical weekday keys in `ts.w`, tasks present without `includesTasks` |
+| `invalidValue(path:)` | subject order `o` outside 0..<200, rotation length/anchor/offset/index/school days, labels > 10, day key vs rotation, cycle weeks out of range, span, period key, free-form minutes, repeat interval, dates outside 1970…2199, malformed emoji/symbol/palette key/vocabulary value, non-canonical weekday keys in `ts.w`, tasks present without `includesTasks` |
 | `danglingReference(path:)` | subject/term/bell-schedule/lesson index, period key not in any schedule |
 | `duplicate(path:)` | period key twice in a schedule; repeated element in any set |
 | `invalidTimeRange(path:)` | period, time slot, exam: end ≤ start |
@@ -382,5 +395,12 @@ limit (pre-freeze; the count is not shown, the user sees it in the app). Total: 
   arithmetic). Export normalises offsets modulo the length.
 - D2D-7 (pre-freeze, 2026-10-08) Optional `t.ws` (rotation week start, default Monday) added within `v` = 1, and `t.de`
   is an open vocabulary like the persisted `Density`; neither changes the golden payload.
+- D2D-8 (Phase 4 C1, 2026-10-16, P3-2) Optional `s[i].o` (subject display order, dense rank of `Subject.sortIndex`) added
+  within `v` = 1 — an optional key old apps ignore (§10). Ranks rather than raw indices keep values small (< 200, cheap to
+  validate), close gaps left by deletions and keep ties as ties. Ties are then broken by the recipient (name in the recipient's
+  locale, then the IDs created on import), so for tied subjects the order matches the sender's only when the names differ
+  and both locales collate them the same way; equal names fall back to the new IDs. Accepted: ties only arise after
+  concurrent reorders.
+  Cost: +33 B DEFLATE for the 14-subject secondary fixture (still inline, 1438 of 2048 B).
 - Open: overrides in a later `v`; whether the Worker should re-validate payloads with the same rules (port of §5/§7);
   App Attest for uploads (SHARING.md).

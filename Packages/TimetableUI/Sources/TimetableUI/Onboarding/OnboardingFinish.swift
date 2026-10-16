@@ -42,8 +42,9 @@ extension OnboardingDraft {
         let built = draft.makeDatabase(names: names, localeFirstWeekday: localeFirstWeekday, localize: localize,
                                        ids: &ids, clock: &scratchClock, now: now)
         var timetable = built.timetables[0]
-        timetable.sortIndex = (existing.timetables.filter { !$0.isDeleted }.map(\.sortIndex).max() ?? -1) + 1
-        var steps: [DatabaseMutation] = [.upsert(timetable)]
+        let append = TimetableManagement.appendIndex(in: existing)    // overflow-safe (renumbers on Int.max)
+        timetable.sortIndex = append.sortIndex
+        var steps: [DatabaseMutation] = append.steps + [.upsert(timetable)]
         steps += built.bellSchedules.map { .upsert($0) }
         steps += built.terms.map { .upsert($0) }
         steps += built.subjects.map { .upsert($0) }

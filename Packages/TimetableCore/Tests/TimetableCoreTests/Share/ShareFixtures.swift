@@ -46,12 +46,14 @@ enum ShareFixture {
             ("Umenie a kultúra", "UKL", "orange", "Mgr. Šimko", "Ateliér"),
         ]
         let classic = PalettePack.classic.colors
-        let subjects: [Subject] = names.map { name, short, color, teacher, room in
+        // Manually ordered (P3-2): the list order, so the size budget includes the `o` keys.
+        let subjects: [Subject] = names.enumerated().map { order, entry in
+            let (name, short, color, teacher, room) = entry
             let paletteColor = classic.first { $0.nameKey.hasSuffix(".\(color)") }!
             return Subject(id: ids.next(), meta: meta, timetableID: tt, name: name, shortName: short,
                            color: paletteColor.value, colorName: .key(paletteColor.nameKey),
                            symbol: short == "TSV" ? .emoji("⚽️") : (short == "INF" ? .systemImage("desktopcomputer") : nil),
-                           defaultRoom: room, defaultTeacher: teacher)
+                           defaultRoom: room, defaultTeacher: teacher, sortIndex: order)
         }
         func subject(_ short: String) -> Subject.ID { subjects[names.firstIndex { $0.1 == short }!].id }
 
@@ -160,7 +162,7 @@ enum ShareFixture {
                            defaultRoom: "\(pick(["A", "B", "C", "BC", "M"]))-\(100 + Int(rng.next() % 400))",
                            defaultBuilding: pick(["FMFI UK Mlynská dolina", "Pavilón informatiky", "Pavilón matematiky"]),
                            defaultTeacher: "doc. \(pick(["Novák", "Horváth", "Kováč", "Varga", "Tóth", "Nagy", "Baláž"])), PhD.",
-                           notes: index % 3 == 0 ? "Konzultácie: \(phrase(6))" : nil)
+                           notes: index % 3 == 0 ? "Konzultácie: \(phrase(6))" : nil, sortIndex: index)
         }
         var lessons: [Lesson] = []
         for (index, subject) in subjects.enumerated() {

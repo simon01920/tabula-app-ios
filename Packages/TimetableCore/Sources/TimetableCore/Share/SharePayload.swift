@@ -120,11 +120,15 @@ public struct ShareSubject: Hashable, Sendable {
     public var defaultTeacher: String?
     /// Notes (`no`).
     public var notes: String?
+    /// Display order (`o`): the dense rank of the source subject's `sortIndex` (0 ..< `ShareLimits.maxSubjects`;
+    /// equal ranks allowed); `nil` = never ordered. Optional key added within `v` = 1 (P3-2, 2026-10-16): payloads
+    /// without it import with `nil` (alphabetical), and older apps ignore it.
+    public var sortIndex: Int?
 
     /// Creates a shared subject.
     public init(name: String, shortName: String? = nil, color: ColorValue, colorName: TextValue? = nil,
                 symbol: SubjectSymbol? = nil, defaultRoom: String? = nil, defaultBuilding: String? = nil,
-                defaultTeacher: String? = nil, notes: String? = nil) {
+                defaultTeacher: String? = nil, notes: String? = nil, sortIndex: Int? = nil) {
         self.name = name
         self.shortName = shortName
         self.color = color
@@ -134,6 +138,7 @@ public struct ShareSubject: Hashable, Sendable {
         self.defaultBuilding = defaultBuilding
         self.defaultTeacher = defaultTeacher
         self.notes = notes
+        self.sortIndex = sortIndex
     }
 }
 

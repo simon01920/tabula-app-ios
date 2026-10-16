@@ -429,7 +429,7 @@ enum EditorSeedPicker {
 
     static func firstSubject(in model: AppModel) -> Subject? {
         guard let timetable = model.activeTimetable else { return nil }
-        let subjects = (model.database?.subjects ?? []).filter { !$0.isDeleted && $0.timetableID == timetable.id }
-        return subjects.sorted { ($0.name, $0.id) < ($1.name, $1.id) }.first
+        guard let database = model.database else { return nil }
+        return SubjectOrder.live(database, timetableID: timetable.id, locale: model.formatter.locale).first
     }
 }

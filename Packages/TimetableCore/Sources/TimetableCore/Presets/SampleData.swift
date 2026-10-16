@@ -84,7 +84,7 @@ public enum SampleData {
     /// - Parameters:
     ///   - bellSchedule: the timetable's default bell schedule when it uses one (lessons go into its lesson
     ///     periods); `nil` → explicit times based on the free-form default duration (90 min if unknown).
-    ///   - palette: colours for the subjects, assigned in order.
+    ///   - palette: colours for the subjects, assigned in order. Subjects get `sortIndex` 0, 1, … in seed order.
     ///   - today: the user's current date; the homework is due on the next school day, the exam a week later.
     ///   - localize: resolves a catalog key into user text in the current language.
     public static func make<G: IDGenerator, C: TimestampClock>(
@@ -101,7 +101,7 @@ public enum SampleData {
                 name: localize(LocalizedText(key: subjectKey(seed.name))), color: color.value,
                 colorName: .key(color.nameKey), symbol: .emoji(seed.symbol),
                 defaultRoom: isUniversity ? "\(index % 2 == 0 ? "A" : "B")1.0\(index + 1)" : String(101 + index),
-                defaultBuilding: isUniversity ? (index % 2 == 0 ? "A" : "B") : nil))
+                defaultBuilding: isUniversity ? (index % 2 == 0 ? "A" : "B") : nil, sortIndex: index))
         }
 
         let days: [DayKey]
