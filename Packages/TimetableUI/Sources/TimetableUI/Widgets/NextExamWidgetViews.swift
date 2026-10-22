@@ -77,15 +77,14 @@ struct ExamSmallView: View {
                     .font(.subheadline.weight(.semibold))
                     .lineLimit(2)
                     .minimumScaleFactor(0.85)
-                Text(verbatim: [info.timer == nil ? info.dateText : nil, info.timeText, info.room]
-                    .compactMap { $0 }.joined(separator: " · "))
+                Text(verbatim: info.smallLine)
                     .font(.caption)
                     .monospacedDigit()
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
                 Spacer(minLength: 0)
                 if let timer = info.timer {
-                    Text(verbatim: [info.whenText, info.timerCaption].compactMap { $0 }.joined(separator: " · "))
+                    Text(verbatim: info.whenLine)
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
@@ -169,7 +168,7 @@ struct ExamRectangularView: View {
                 }
                 .font(.body.weight(.semibold))
                 .widgetAccentable()
-                Text(verbatim: [info.dateText, info.timeText, info.room].compactMap { $0 }.joined(separator: " · "))
+                Text(verbatim: info.detailLine)
                     .font(.caption)
                     .monospacedDigit()
                     .lineLimit(1)

@@ -129,7 +129,7 @@ struct WidgetGalleryScreen: View {
     private func todayDisplay(_ scene: WidgetGalleryScene) -> TodayDisplay {
         let plan = WidgetTimelinePlanner.plan(snapshot: scene.snapshot, now: scene.date,
                                               deviceTimeZone: WidgetGallerySamples.context.timeZone,
-                                              includeCancelledBoundaries: true)
+                                              includeCancelledBoundaries: true, includeTaskDueBoundaries: true)
         let context = plan.context ?? WidgetGallerySamples.context
         return TodayPresenter(renderer: renderer(scene, context: context), context: context)
             .display(snapshot: scene.snapshot, entry: plan.entries[0])

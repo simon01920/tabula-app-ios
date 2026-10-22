@@ -89,6 +89,9 @@ private struct TodayLessonsColumn: View {
 /// One lesson of the day.
 struct TodayLessonRow: View {
     let row: TodayDisplay.Row
+    /// Time column and badge scale with Dynamic Type instead of being fixed widths.
+    @ScaledMetric(relativeTo: .caption) private var timeWidth: CGFloat = 42
+    @ScaledMetric(relativeTo: .caption) private var markSize: CGFloat = 16
 
     var body: some View {
         let line = row.line
@@ -99,8 +102,8 @@ struct TodayLessonRow: View {
                     .monospacedDigit()
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
-                    .frame(width: 42, alignment: .leading)
-                WidgetSubjectMark(subject: line.subject, size: 16)
+                    .frame(width: timeWidth, alignment: .leading)
+                WidgetSubjectMark(subject: line.subject, size: markSize)
                 Text(verbatim: line.name)
                     .font(.caption.weight(.semibold))
                     .strikethrough(row.isCancelled)
@@ -124,7 +127,7 @@ struct TodayLessonRow: View {
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
-                    .padding(.leading, 66)
+                    .padding(.leading, timeWidth + markSize + 12)
             }
         }
         .padding(.vertical, 1)
@@ -168,9 +171,11 @@ private struct TodayStatusColumn: View {
             }
             Spacer(minLength: 0)
             if let next {
-                Text(verbatim: nextCaption ?? "")
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(.secondary)
+                if let nextCaption {
+                    Text(verbatim: nextCaption)
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
                 NowNextLessonRow(line: next)
             } else if let nothingAhead {
                 Text(verbatim: nothingAhead)

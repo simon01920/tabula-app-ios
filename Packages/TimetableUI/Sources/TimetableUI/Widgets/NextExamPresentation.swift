@@ -40,6 +40,12 @@ public struct ExamDisplay: Equatable, Sendable {
         public var timer: ClosedRange<Date>?
         /// "Starts in" / "Time left" for `timer`.
         public var timerCaption: String?
+        /// "Tue, Oct 20 · 10:00 – 10:45 · Lab" (rectangular family), joined with the localised separator.
+        public var detailLine: String
+        /// The small family's line: the date is left out on the exam day (the countdown says it).
+        public var smallLine: String
+        /// "Today, 10:00 · Starts in" above the exam-day countdown (small family).
+        public var whenLine: String
     }
 
     public enum Kind: Equatable, Sendable {
@@ -124,32 +130,36 @@ public struct ExamPresenter: Sendable {
             whenText = today(startText)
             timer = min(instant, start)...start
             timerCaption = renderer.string(forKey: "today.header.startsIn")
-            circular = startText ?? "0"
+            circular = startText ?? renderer.string(forKey: "exams.when.today")
             escalation = .today
             symbol = "alarm.fill"
         case .allDay?:
             whenText = today(nil)
-            circular = "0"
+            circular = renderer.string(forKey: "exams.when.today")
             escalation = .today
             symbol = "alarm.fill"
         case let .inProgress(start, end)?:
             whenText = renderer.string(forKey: "widget.exam.inProgress")
             timer = start...max(start, end)
             timerCaption = renderer.string(forKey: "today.header.timeLeft")
-            circular = startText ?? "0"
+            circular = startText ?? renderer.string(forKey: "exams.when.today")
             escalation = .inProgress
             symbol = "pencil"
         case .started?:
             whenText = today(startText)
-            circular = startText ?? "0"
+            circular = startText ?? renderer.string(forKey: "exams.when.today")
             escalation = .inProgress
             symbol = "pencil"
         case .finished?:
             whenText = renderer.string(forKey: "widget.exam.finished")
-            circular = startText ?? "0"
+            circular = startText ?? renderer.string(forKey: "exams.when.today")
             escalation = .finished
             symbol = "checkmark.circle"
         }
+        let dot = renderer.string(forKey: "widget.separator")
+        let detailLine = [dateText, timeText, exam.room].compactMap { $0 }.joined(separator: dot)
+        let smallLine = [timer == nil ? dateText : nil, timeText, exam.room].compactMap { $0 }.joined(separator: dot)
+        let whenLine = [whenText, timerCaption].compactMap { $0 }.joined(separator: dot)
         let subjectName = exam.subject?.name
         // Spoken: exam, subject, when, full date, start time, room.
         var spoken = [renderer.string(forKey: "widget.exam.name"), exam.title]
@@ -160,7 +170,8 @@ public struct ExamPresenter: Sendable {
         if let room = exam.room { spoken.append(renderer.format(key: "exams.a11y.room", arguments: [.text(room)])) }
         let info = ExamDisplay.Info(id: exam.id, subject: exam.subject, title: exam.title, dateText: dateText,
                                     timeText: timeText, room: exam.room, whenText: whenText, circularValue: circular,
-                                    escalation: escalation, symbol: symbol, timer: timer, timerCaption: timerCaption)
+                                    escalation: escalation, symbol: symbol, timer: timer, timerCaption: timerCaption,
+                                    detailLine: detailLine, smallLine: smallLine, whenLine: whenLine)
         return ExamDisplay(date: instant, kind: .exam(info), title: title,
                            accessibilityLabel: formatter.list(spoken), link: .exam(Exam.ID(exam.id)))
     }

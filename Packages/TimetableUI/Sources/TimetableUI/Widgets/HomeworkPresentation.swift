@@ -6,8 +6,8 @@
 // (the Tasks tab's phrases, `tasks.due.*`, with the weekday instead of "In 3 days" as the widget has little room);
 // overdue by days → "2 days overdue" (`tasks.due.overdueDays`), overdue today (the time has passed) → "Overdue". An
 // overdue row also carries a warning icon and a spoken "overdue", so the mark is never colour alone.
-// Count: only tasks the snapshot knows (overdue + due within a week) are counted ("3 tasks to do"); undated tasks and
-// tasks due later are not in the snapshot.
+// Count: the snapshot's `openTaskCount` (every open task, undated and later ones included; B1 QA M3), at least the tasks it
+// lists. Rows: overdue + due within a week.
 import Foundation
 import TimetableCore
 
@@ -52,8 +52,13 @@ public struct HomeworkDisplay: Equatable, Sendable {
     public var unlistedOverdue: Int
     /// Overdue tasks (listed or not).
     public var overdueCount: Int
+    /// Open tasks in total (the count shown), listed or not.
+    public var totalCount: Int
     /// One VoiceOver sentence for the whole widget in the small family (rows have their own in larger ones).
     public var accessibilityLabel: String
+    /// The list header's VoiceOver sentence: "Homework, 3 tasks to do".
+    public var listHeaderLabel: String { [title, countText].joined(separator: separator) }
+    var separator: String
     /// "+3 more" for `hidden` items (plural variations).
     var moreFormat: @Sendable (Int) -> String
 
@@ -69,7 +74,7 @@ public struct HomeworkDisplay: Equatable, Sendable {
     /// The lines `family` shows and how many tasks it leaves out (including the unlisted overdue ones).
     public func visible(for family: WidgetFamilyKind) -> (lines: [TaskLine], hidden: Int) {
         let shown = Array(lines.prefix(Self.capacity(for: family)))
-        return (shown, lines.count - shown.count + unlistedOverdue)
+        return (shown, max(0, totalCount - shown.count))
     }
 
     /// "+3 more".
@@ -81,7 +86,7 @@ public struct HomeworkDisplay: Equatable, Sendable {
     public static func == (lhs: HomeworkDisplay, rhs: HomeworkDisplay) -> Bool {
         lhs.date == rhs.date && lhs.kind == rhs.kind && lhs.title == rhs.title && lhs.countText == rhs.countText
             && lhs.lines == rhs.lines && lhs.unlistedOverdue == rhs.unlistedOverdue
-            && lhs.overdueCount == rhs.overdueCount && lhs.accessibilityLabel == rhs.accessibilityLabel
+            && lhs.overdueCount == rhs.overdueCount && lhs.totalCount == rhs.totalCount && lhs.accessibilityLabel == rhs.accessibilityLabel
     }
 }
 
@@ -111,25 +116,25 @@ public struct HomeworkPresenter: Sendable {
         case .unavailable(let reason):
             let (heading, detail) = WidgetUnavailableText.texts(for: reason, renderer: renderer)
             return HomeworkDisplay(date: entry.date, kind: .unavailable(title: heading, detail: detail), title: title,
-                                   countText: "", lines: [], unlistedOverdue: 0, overdueCount: 0,
-                                   accessibilityLabel: [heading, detail].joined(separator: separator), moreFormat: more)
+                                   countText: "", lines: [], unlistedOverdue: 0, overdueCount: 0, totalCount: 0,
+                                   accessibilityLabel: [heading, detail].joined(separator: separator), separator: separator, moreFormat: more)
         case .list(let list):
             let today = context.localDate(of: entry.date)
             let lines = list.rows.map { taskLine($0.task, isOverdue: $0.isOverdue, today: today) }
-            guard list.knownTotal > 0 else {
+            guard list.total > 0 else {
                 let heading = renderer.string(forKey: "widget.homework.allDone.title")
                 let detail = renderer.string(forKey: "widget.homework.allDone.detail")
                 return HomeworkDisplay(date: entry.date, kind: .allDone(title: heading, detail: detail), title: title,
-                                       countText: "", lines: [], unlistedOverdue: 0, overdueCount: 0,
+                                       countText: "", lines: [], unlistedOverdue: 0, overdueCount: 0, totalCount: 0,
                                        accessibilityLabel: [title, heading, detail].joined(separator: separator),
-                                       moreFormat: more)
+                                       separator: separator, moreFormat: more)
             }
-            let count = renderer.format(key: "widget.homework.count", arguments: [.integer(Int64(list.knownTotal))])
+            let count = renderer.format(key: "widget.homework.count", arguments: [.integer(Int64(list.total))])
             var spoken = [title, count]
             if let top = lines.first { spoken.append(top.accessibilityLabel) }
             return HomeworkDisplay(date: entry.date, kind: .tasks, title: title, countText: count, lines: lines,
-                                   unlistedOverdue: list.unlistedOverdue, overdueCount: list.overdueTotal,
-                                   accessibilityLabel: spoken.joined(separator: separator), moreFormat: more)
+                                   unlistedOverdue: list.unlistedOverdue, overdueCount: list.overdueTotal, totalCount: list.total,
+                                   accessibilityLabel: spoken.joined(separator: separator), separator: separator, moreFormat: more)
         }
     }
 

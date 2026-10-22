@@ -104,7 +104,7 @@ public enum DynamicL10nKeys {
         "widget.homework.name", "widget.homework.count", "widget.homework.allDone.title",
         "widget.homework.allDone.detail", "widget.homework.overdue", "widget.more", "widget.exam.name",
         "widget.exam.inProgress", "widget.exam.finished", "widget.exam.empty.detail", "exams.empty.upcoming.title",
-        "exams.a11y.room", "a11y.task.overdue", "a11y.task.due",
+        "exams.a11y.room", "a11y.task.overdue", "a11y.task.due", "widget.separator",
         // The interpolated `Text` key of NowNextInlineView (subject + live timer); validate.sh skips interpolated keys.
         "widget.nowNext.inline.current %@ %@",
     ]

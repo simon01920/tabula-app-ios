@@ -49,24 +49,33 @@ public struct WidgetSnapshot: Codable, Equatable, Sendable {
     public var tasks: [DueTask]
     /// Open tasks whose due date / time has passed (all of them, also those not listed in `overdueItems`).
     public var overdueTaskCount: Int
-    /// The next upcoming exam, if any.
+    /// The first exam that has not ended yet at build time, if any (always `exams.first` when `exams` is present).
     public var nextExam: UpcomingExam?
     /// The most overdue open tasks, oldest due date first, at most `WidgetSnapshotBuilder.maxOverdueTasks` (Phase 4 B1,
     /// for the Homework widget). Additive: an optional key, so v1 files written before B1 decode with `nil` (the widget
     /// then shows the overdue count only) and an older reader ignores the key; hence no version bump.
     public var overdueItems: [DueTask]?
+    /// The next upcoming exams in date / start order, at most `WidgetSnapshotBuilder.maxExams` (B1 QA M1): the exam
+    /// widget moves to the next one when one ends, and over midnight, without the app. Additive and optional like
+    /// `overdueItems`; absent in files written before, where `nextExam` alone is the list.
+    public var exams: [UpcomingExam]?
+    /// The number of open tasks (the Tasks tab's Today + Upcoming + Overdue, undated ones included), for the Homework
+    /// count (B1 QA M3). Additive and optional; absent in older files.
+    public var openTaskCount: Int?
 
     enum CodingKeys: String, CodingKey {
         case version = "v", generatedAt = "at", timeZoneID = "tz", followsDeviceTimeZone = "ftz", localeID = "loc"
         case languageCode = "lang", hourCycle = "hc", tier, hasTimetable = "tt", days, followingLesson = "after"
         case tasks, overdueTaskCount = "overdue", nextExam = "exam", overdueItems = "od"
+        case exams = "exs", openTaskCount = "open"
     }
 
     /// Creates a snapshot.
     public init(version: Int = WidgetSnapshot.currentVersion, generatedAt: Date, timeZoneID: String,
                 followsDeviceTimeZone: Bool, localeID: String, languageCode: String?, hourCycle: HourCycle, tier: Tier,
                 hasTimetable: Bool, days: [Day], followingLesson: Lesson?, tasks: [DueTask], overdueTaskCount: Int,
-                nextExam: UpcomingExam?, overdueItems: [DueTask]? = nil) {
+                nextExam: UpcomingExam?, overdueItems: [DueTask]? = nil, exams: [UpcomingExam]? = nil,
+                openTaskCount: Int? = nil) {
         self.version = version
         self.generatedAt = generatedAt
         self.timeZoneID = timeZoneID
@@ -82,10 +91,15 @@ public struct WidgetSnapshot: Codable, Equatable, Sendable {
         self.overdueTaskCount = overdueTaskCount
         self.nextExam = nextExam
         self.overdueItems = overdueItems
+        self.exams = exams
+        self.openTaskCount = openTaskCount
     }
 
     /// The listed overdue tasks (empty for snapshots written before B1).
     public var overdueTasks: [DueTask] { overdueItems ?? [] }
+
+    /// The exams the exam widget walks through: `exams`, else just `nextExam` (older files).
+    public var upcomingExams: [UpcomingExam] { exams ?? nextExam.map { [$0] } ?? [] }
 
     /// First covered day.
     public var firstDay: LocalDate? { days.first?.date }

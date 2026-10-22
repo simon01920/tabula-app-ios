@@ -1299,6 +1299,7 @@ widget.open.outdated,,Widget detail when the data the app shared is too old to s
 widget.open.title,,Widget title when it has no timetable data to show; tapping opens the app. 'Tabula' is the app name.,Open Tabula,Tabula megnyitása,,
 widget.pro.short,,Very short label in a round Lock Screen widget that needs the paid Pro version. Keep to about 4 characters.,Pro,Pro,,
 widget.pro.title,,Shown in a widget size that needs the paid Pro version (e.g. Lock Screen widgets). 'Tabula Pro' is the product name.,Available in Tabula Pro,A Tabula Pro része,,
+widget.separator,,"Separator between facts on one visible line of a widget, for example date, time and room: 'Tue 20 Oct · 10:00 · Lab'. Keep the surrounding spaces if the language uses them; Japanese uses the middle dot without spaces.", · , · ,,
 widget.today.description,,Description of the Today widget in the widget gallery.,"Today's lessons, or tomorrow's once school is out, and what is due.","A mai órák, tanítás után a holnapiak, és a közelgő határidők.",,
 widget.today.dueTomorrow,,Heading above the tasks due tomorrow in the large Today widget (shown after school instead of 'Due today').,Due tomorrow,Holnapra esedékes,,
 widget.today.name,,Name of the Today widget in the widget gallery (lessons of the day).,Today,Ma,,

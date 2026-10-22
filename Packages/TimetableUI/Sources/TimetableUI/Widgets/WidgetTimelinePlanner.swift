@@ -115,8 +115,11 @@ public enum WidgetTimelinePlanner {
 
     /// The timeline from `now`. `includeCancelledBoundaries` also puts entries at the start / end of cancelled lessons
     /// (the Today widget lists them struck through and drops them when over); the Now & Next state ignores them.
+    /// `includeTaskDueBoundaries` adds an entry one minute after each due time of a listed task (the large Today
+    /// widget's "Due today" list flips a task to overdue then).
     public static func plan(snapshot: WidgetSnapshot?, now: Date, deviceTimeZone: TimeZone,
-                            includeCancelledBoundaries: Bool = false) -> NowNextTimelinePlan {
+                            includeCancelledBoundaries: Bool = false,
+                            includeTaskDueBoundaries: Bool = false) -> NowNextTimelinePlan {
         guard let snapshot else {
             return NowNextTimelinePlan(entries: [NowNextTimelineEntry(date: now, state: .unavailable(.noSnapshot))],
                                        reloadDate: now.addingTimeInterval(unavailableRetry), context: nil)
@@ -134,6 +137,12 @@ public enum WidgetTimelinePlanner {
             for lesson in day.lessons where lesson.takesPlace || includeCancelledBoundaries {
                 boundaries.insert(lesson.start(in: context))
                 boundaries.insert(lesson.end(in: context))
+            }
+        }
+        if includeTaskDueBoundaries, let last = snapshot.lastDay {
+            for task in snapshot.tasks {
+                guard let time = task.dueTime, task.dueDate >= context.localDate(of: now), task.dueDate <= last else { continue }
+                boundaries.insert(context.date(task.dueDate, time).addingTimeInterval(60))
             }
         }
         boundaries.formUnion(midnights)

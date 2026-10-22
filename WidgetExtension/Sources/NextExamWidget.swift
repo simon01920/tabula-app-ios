@@ -81,7 +81,6 @@ struct NextExamWidget: Widget {
         StaticConfiguration(kind: Self.kind, provider: NextExamProvider()) { entry in
             NextExamEntryView(entry: entry)
                 .containerBackground(.background, for: .widget)
-                .widgetURL(ItemLinkURL.url(for: entry.display.link))
         }
         .configurationDisplayName("widget.exam.name")
         .description("widget.exam.description")
@@ -98,8 +97,11 @@ struct NextExamEntryView: View {
         let decision = entry.tier.map { WidgetProGate.decision(for: family, tier: $0) } ?? .allowed
         if decision == .allowed {
             NextExamWidgetView(display: entry.display, family: family)
+                .widgetURL(ItemLinkURL.url(for: entry.display.link))
         } else {
+            // A gated placeholder taps to the Today tab (as Homework), not to an exam the user cannot see here.
             WidgetProPlaceholderView(family: family, title: entry.proTitle, short: entry.proShort)
+                .widgetURL(ItemLinkURL.url(for: .today))
         }
     }
 }

@@ -88,6 +88,9 @@ public struct HomeworkList: Equatable, Sendable {
 
     /// Open tasks known to the widget (overdue + due within a week), listed or not.
     public var knownTotal: Int { rows.count + unlistedOverdue }
+    /// The true number of open tasks (the snapshot's `openTaskCount`, at least `knownTotal`).
+    public var total: Int
+
 }
 
 /// The Homework widget's state.
@@ -140,8 +143,9 @@ public enum HomeworkPlanner {
         let rows = (listedOverdue + snapshot.tasks).map { HomeworkList.Row(task: $0, isOverdue: overdue($0)) }
             .sorted(by: ordered)
         let newlyOverdue = snapshot.tasks.filter(overdue).count
-        return .list(HomeworkList(rows: rows, overdueTotal: snapshot.overdueTaskCount + newlyOverdue,
-                                  unlistedOverdue: max(0, snapshot.overdueTaskCount - listedOverdue.count)))
+        let unlisted = max(0, snapshot.overdueTaskCount - listedOverdue.count)
+        return .list(HomeworkList(rows: rows, overdueTotal: snapshot.overdueTaskCount + newlyOverdue, unlistedOverdue: unlisted,
+                                  total: max(snapshot.openTaskCount ?? 0, rows.count + unlisted)))
     }
 
     /// Overdue before open; then due date, due time (a task without a time after those with one), priority (highest
@@ -204,7 +208,8 @@ public enum ExamPlanner {
                                    reloadDate: now.addingTimeInterval(WidgetTimelinePlanner.unavailableRetry), context: context)
         }
         let today = context.localDate(of: now)
-        let lastDay = snapshot.nextExam.map { max($0.date, today) } ?? WidgetTimelinePlanner.coverageLastDay(snapshot, context: context)
+        let exams = snapshot.upcomingExams.filter { $0.date >= today }
+        let lastDay = exams.last.map { max($0.date, today) } ?? WidgetTimelinePlanner.coverageLastDay(snapshot, context: context)
         var midnights: Set<Date> = []
         var date = today
         // At most `maxEntries` midnights matter; do not walk months for a far exam.
@@ -213,7 +218,8 @@ public enum ExamPlanner {
             date = date.adding(days: 1)
         }
         var boundaries: Set<Date> = []
-        if let exam = snapshot.nextExam, let startTime = exam.start {
+        for exam in exams {
+            guard let startTime = exam.start else { continue }
             boundaries.insert(context.date(exam.date, startTime))
             if let endTime = exam.end, endTime > startTime { boundaries.insert(context.date(exam.date, endTime)) }
         }
@@ -223,20 +229,29 @@ public enum ExamPlanner {
         }
     }
 
-    /// The state at `instant`.
+    /// The state at `instant`: the first listed exam that has not ended (an exam without a valid end lasts until
+    /// midnight); a day's earlier exam hands over to the later one when it ends.
     public static func state(snapshot: WidgetSnapshot, at instant: Date, context: CalendarContext) -> ExamState {
         let today = context.localDate(of: instant)
-        guard let exam = snapshot.nextExam else {
+        let list = snapshot.upcomingExams
+        func isOver(_ exam: WidgetSnapshot.UpcomingExam) -> Bool {
+            if exam.date != today { return exam.date < today }
+            guard let start = exam.start, let end = exam.end, end > start else { return false }
+            return instant >= context.date(exam.date, end)
+        }
+        guard let exam = list.first(where: { !isOver($0) }) else {
+            // Everything listed is over: the last one finished today, else nothing is known (a full list may hide
+            // later exams; so may a snapshot older than its covered days).
+            if let last = list.last, last.date == today { return .today(last, .finished) }
+            if list.count >= WidgetSnapshotBuilder.maxExams { return .unavailable(.outdated) }
             return today > WidgetTimelinePlanner.coverageLastDay(snapshot, context: context) ? .unavailable(.outdated) : .none
         }
         let delta = today.days(to: exam.date)
-        if delta < 0 { return .unavailable(.outdated) }
         if delta > 0 { return .upcoming(exam, daysUntil: delta) }
         guard let startTime = exam.start else { return .today(exam, .allDay) }
         let start = context.date(exam.date, startTime)
         if instant < start { return .today(exam, .beforeStart(start: start)) }
         guard let endTime = exam.end, endTime > startTime else { return .today(exam, .started(start: start)) }
-        let end = context.date(exam.date, endTime)
-        return .today(exam, instant < end ? .inProgress(start: start, end: end) : .finished)
+        return .today(exam, .inProgress(start: start, end: context.date(exam.date, endTime)))
     }
 }

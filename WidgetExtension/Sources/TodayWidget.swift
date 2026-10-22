@@ -50,7 +50,7 @@ struct TodayProvider: TimelineProvider {
 
     static func plan(snapshot: WidgetSnapshot?, now: Date) -> NowNextTimelinePlan {
         WidgetTimelinePlanner.plan(snapshot: snapshot, now: now, deviceTimeZone: TimeZone.current,
-                                   includeCancelledBoundaries: true)
+                                   includeCancelledBoundaries: true, includeTaskDueBoundaries: true)
     }
 
     static func entries(snapshot: WidgetSnapshot?, now: Date) -> [TodayEntry] {

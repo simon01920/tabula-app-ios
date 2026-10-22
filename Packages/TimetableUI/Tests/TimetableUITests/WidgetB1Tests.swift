@@ -47,12 +47,13 @@ private func school(_ day: LocalDate, _ lessons: [WidgetSnapshot.Lesson] = []) -
 /// Covers today … today + 2 unless `days` is given; written at 08:00 today.
 private func snapshot(days: [WidgetSnapshot.Day]? = nil, tasks: [WidgetSnapshot.DueTask] = [],
                       overdue: [WidgetSnapshot.DueTask]? = nil, overdueCount: Int = 0,
-                      exam: WidgetSnapshot.UpcomingExam? = nil, tier: Tier = .pro) -> WidgetSnapshot {
+                      exam: WidgetSnapshot.UpcomingExam? = nil, exams: [WidgetSnapshot.UpcomingExam]? = nil,
+                      openTaskCount: Int? = nil, tier: Tier = .pro) -> WidgetSnapshot {
     WidgetSnapshot(generatedAt: instant(today, 8), timeZoneID: zone.identifier, followsDeviceTimeZone: false,
                    localeID: "en_GB", languageCode: "en", hourCycle: .h24, tier: tier, hasTimetable: true,
                    days: days ?? [school(today), school(today.adding(days: 1)), school(today.adding(days: 2))],
                    followingLesson: nil, tasks: tasks, overdueTaskCount: overdueCount, nextExam: exam,
-                   overdueItems: overdue)
+                   overdueItems: overdue, exams: exams, openTaskCount: openTaskCount)
 }
 
 private func homeworkRows(_ snap: WidgetSnapshot, at now: Date) -> HomeworkList? {
@@ -390,6 +391,10 @@ struct ExamPresentationTests {
         #expect(after.whenText == "Finished" && after.escalation == .finished && after.timer == nil)
         let allDay = try info(examDisplay(snapshot(exam: exam(on: day, start: nil, end: nil)), at: instant(day, 9)))
         #expect(allDay.whenText == "Today" && allDay.timer == nil && allDay.timeText == nil)
+        #expect(allDay.circularValue == "Today")   // a word, never "0"
+        let dot = try #require(EnglishCatalog.values["widget.separator"])
+        #expect(dot == " · " && before.smallLine == "\(formatter.timeRange(time(10), time(10, 45)))\(dot)Lab")
+        #expect(before.detailLine.hasPrefix(formatter.date(day, style: .weekdayDayMonth) + dot))
         // The spoken sentence names the start, never the ticking timer.
         #expect(examDisplay(snap, at: instant(day, 8, 30)).accessibilityLabel.contains("Today, \(formatter.time(time(10)))"))
     }
@@ -398,7 +403,7 @@ struct ExamPresentationTests {
         let none = examDisplay(snapshot(), at: instant(today, 9))
         #expect(none.kind == .empty(title: "No Upcoming Exams", detail: "Add an exam in the app to see its countdown here."))
         #expect(none.link == .today)
-        let stale = examDisplay(snapshot(exam: exam(on: date(2026, 10, 10))), at: instant(today, 9))
+        let stale = examDisplay(snapshot(exam: exam(on: date(2026, 10, 10))), at: instant(today.adding(days: 3), 9))
         #expect(stale.kind == .unavailable(title: "Open Tabula", detail: "Open the app to update your timetable."))
     }
 
@@ -596,5 +601,172 @@ struct WidgetB1GateTests {
         #expect(WidgetProGate.decision(for: .accessoryRectangular, snapshot: snapshot(tier: .free)) == .requiresPro(.lockScreenWidgets))
         // The "Open Tabula" state carries no Pro content: never gated.
         #expect(WidgetProGate.decision(for: .systemLarge, snapshot: nil) == .allowed)
+    }
+}
+
+
+// MARK: - QA fixes (B1)
+
+private func database(withExtraExams extra: [(LocalDate, LocalTime?, LocalTime?)]) throws -> TabulaDatabase {
+    var db = SampleScenarios.secondary().database
+    let template = try #require(db.exams.first)
+    for (day, start, end) in extra {
+        var copy = template
+        copy.id = Exam.ID(UUID())
+        copy.date = day
+        copy.start = start
+        copy.end = end
+        copy.title = "Extra \(day.isoString) \(start.map { "\($0.minuteOfDay)" } ?? "-")"
+        db.exams.append(copy)
+    }
+    return db
+}
+
+private func build(_ db: TabulaDatabase, at now: Date) -> WidgetSnapshot {
+    WidgetSnapshotBuilder.make(database: db, now: now, context: context, tier: .pro, locale: Locale(identifier: "en_GB"),
+                               languageCode: "en")
+}
+
+@Suite("B1 QA: exams list, size budget, open count, planners")
+struct WidgetB1QATests {
+    @Test func builderSkipsEndedExamsAndListsTheNextFew() throws {
+        let db = try database(withExtraExams: [(today, time(9), time(9, 45)), (today, time(11), nil)])
+        let early = build(db, at: instant(today, 8))
+        #expect(early.nextExam == early.exams?.first && early.exams?.first?.start == time(9))
+        let later = build(db, at: instant(today, 10))   // the 09:00 exam has ended
+        #expect(later.exams?.first?.start == time(11) && later.nextExam?.start == time(11))
+        #expect((later.exams?.count ?? 0) <= WidgetSnapshotBuilder.maxExams && later.exams?.count ?? 0 >= 2)
+        let tomorrow = build(db, at: instant(today.adding(days: 1), 8))
+        #expect(tomorrow.exams?.allSatisfy { $0.date >= today.adding(days: 1) } == true)
+    }
+
+    @Test func twoExamsInADayHandOverAtTheEndAndOverMidnight() throws {
+        let first = exam(on: today, start: time(9), end: time(9, 45))
+        let second = exam(on: today, start: time(11), end: time(11, 45), room: nil)
+        let next = exam(on: today.adding(days: 1), start: time(8), end: nil)
+        let snap = snapshot(exam: first, exams: [first, second, next])
+        func state(_ day: LocalDate, _ h: Int, _ m: Int = 0) -> ExamState {
+            ExamPlanner.state(snapshot: snap, at: instant(day, h, m), context: context)
+        }
+        guard case .today(let a, .inProgress) = state(today, 9, 10), a.id == first.id else { Issue.record("first"); return }
+        guard case .today(let b, .beforeStart(let start)) = state(today, 9, 50), b.id == second.id else { Issue.record("second"); return }
+        #expect(start == instant(today, 11))
+        guard case .upcoming(let c, 1) = state(today, 12), c.id == next.id else { Issue.record("after both"); return }
+        guard case .today(let d, .beforeStart) = state(today.adding(days: 1), 0, 1), d.id == next.id else { Issue.record("midnight"); return }
+        let plan = ExamPlanner.plan(snapshot: snap, now: instant(today, 8), deviceTimeZone: zone)
+        let dates = plan.entries.map(\.date)
+        for expected in [instant(today, 9), instant(today, 9, 45), instant(today, 11), instant(today, 11, 45), instant(today.adding(days: 1), 8)] {
+            #expect(dates.contains(expected))
+        }
+    }
+
+    @Test func aFullListThatIsOverIsOutdatedNotEmpty() {
+        let list = (0..<WidgetSnapshotBuilder.maxExams).map { _ in exam(on: date(2026, 10, 10)) }
+        let snap = snapshot(exam: list[0], exams: list)
+        #expect(ExamPlanner.state(snapshot: snap, at: instant(today, 9), context: context) == .unavailable(.outdated))
+        let short = snapshot(exam: list[0], exams: [list[0]])
+        #expect(ExamPlanner.state(snapshot: short, at: instant(today, 9), context: context) == .none)
+    }
+
+    @Test func worstCaseSnapshotStaysUnderTheBudget() throws {
+        var db = SampleScenarios.secondary().database
+        let long = String(repeating: "Ř", count: 79)
+        for index in db.subjects.indices { db.subjects[index].name = long }
+        let template = try #require(db.tasks.first)
+        for index in 0..<40 {
+            var copy = template
+            copy.id = TaskItem.ID(UUID())
+            copy.title = String(repeating: "Úloha ", count: 20) + "\(index)"
+            copy.due = .date(index < 20 ? today.adding(days: index % 7) : date(2026, 10, 1).adding(days: index % 10))
+            copy.completedAt = nil
+            db.tasks.append(copy)
+        }
+        let exams = try database(withExtraExams: (0..<6).map { (today.adding(days: $0 + 1), time(8), time(9)) })
+        db.exams = exams.exams
+        let snap = build(db, at: SampleScenarios.referenceNow)
+        let data = try WidgetSnapshotStore.encode(snap)
+        #expect(data.count < 20_000, "\(data.count) bytes")
+        #expect(snap.exams?.isEmpty == false && snap.exams?.first?.date == today.adding(days: 1))   // the next exam always survives
+        #expect(snap.tasks.allSatisfy { $0.title.count <= WidgetSnapshotBuilder.maxTextLength })
+        #expect((snap.openTaskCount ?? 0) >= 40)   // the count stays true after trimming
+    }
+
+    @Test func overdueDueTodayIsAlwaysListed() throws {
+        var db = SampleScenarios.secondary().database
+        let template = try #require(db.tasks.first)
+        for index in 0..<10 {
+            var copy = template
+            copy.id = TaskItem.ID(UUID())
+            copy.title = "Old \(index)"
+            copy.due = .date(date(2026, 9, 1).adding(days: index))
+            copy.completedAt = nil
+            db.tasks.append(copy)
+        }
+        var late = template
+        late.id = TaskItem.ID(UUID())
+        late.title = "Due this morning"
+        late.due = .dateTime(today, time(8))
+        late.completedAt = nil
+        db.tasks.append(late)
+        let snap = build(db, at: SampleScenarios.referenceNow)
+        #expect(snap.overdueTasks.count == WidgetSnapshotBuilder.maxOverdueTasks)
+        #expect(snap.overdueTasks.contains { $0.title == "Due this morning" })
+        let dates = snap.overdueTasks.map(\.dueDate)
+        #expect(dates == dates.sorted())
+    }
+
+    @Test func homeworkCountIsTheTrueOpenCount() throws {
+        let snap = snapshot(tasks: [task("a", today.adding(days: 1)), task("b", today.adding(days: 2))], openTaskCount: 14)
+        let shown = homeworkDisplay(snap, at: instant(today, 9))
+        #expect(shown.countText == "14 tasks to do" && shown.totalCount == 14)
+        #expect(shown.visible(for: .systemMedium).hidden == 12)
+        // Only far-away tasks open: no rows, but not "All done".
+        let far = homeworkDisplay(snapshot(openTaskCount: 3), at: instant(today, 9))
+        #expect(far.kind == .tasks && far.lines.isEmpty && far.countText == "3 tasks to do")
+        let db = SampleScenarios.secondary().database
+        let built = build(db, at: SampleScenarios.referenceNow)
+        let counts = TaskListModel.counts(of: db.tasks.filter { !$0.isDeleted }, now: context.local(from: SampleScenarios.referenceNow))
+        #expect(built.openTaskCount == counts.today + counts.upcoming + counts.overdue)
+    }
+
+    @Test func plannersFollowTheDeviceZoneForFollowDeviceTimetables() throws {
+        let ny = TimeZone(identifier: "America/New_York")!
+        let nyContext = CalendarContext(timeZone: ny, firstWeekday: .monday)
+        var snap = snapshot(tasks: [task("due", today, time(16))], exam: exam(on: today.adding(days: 1)))
+        snap.followsDeviceTimeZone = true
+        let now = nyContext.date(today, time(9))
+        let homeworkDates = HomeworkPlanner.plan(snapshot: snap, now: now, deviceTimeZone: ny).entries.map(\.date)
+        #expect(homeworkDates.contains(nyContext.date(today, time(16, 1))))
+        guard case .upcoming(_, 1) = ExamPlanner.state(snapshot: snap, at: now, context: WidgetTimelinePlanner.context(for: snap, deviceTimeZone: ny))
+        else { Issue.record("exam tomorrow in the device zone"); return }
+        let examNow = nyContext.date(today.adding(days: 1), time(8))
+        guard case .today(_, .beforeStart(let start)) = ExamPlanner.plan(snapshot: snap, now: examNow, deviceTimeZone: ny).entries[0].state
+        else { Issue.record("exam day in the device zone"); return }
+        #expect(start == nyContext.date(today.adding(days: 1), time(10)))
+        // A fixed-zone timetable keeps its own zone.
+        snap.followsDeviceTimeZone = false
+        let fixedDates = HomeworkPlanner.plan(snapshot: snap, now: now, deviceTimeZone: ny).entries.map(\.date)
+        #expect(fixedDates.contains(instant(today, 16, 1)) && !fixedDates.contains(nyContext.date(today, time(16, 1))))
+    }
+
+    @Test func dueTimeBoundaryAcrossTheAutumnDSTChange() throws {
+        let dst = date(2026, 10, 25)   // 25-hour day in Europe/Bratislava
+        let days = [school(date(2026, 10, 24)), school(dst), school(date(2026, 10, 26))]
+        let snap = snapshot(days: days, tasks: [task("early", dst, time(8))])
+        let midnight = instant(dst, 0)
+        let plan = HomeworkPlanner.plan(snapshot: snap, now: midnight, deviceTimeZone: zone)
+        let boundary = instant(dst, 8, 1)
+        #expect(plan.entries.map(\.date).contains(boundary) && boundary.timeIntervalSince(midnight) == 9 * 3600 + 60)
+        #expect(homeworkRows(snap, at: instant(dst, 8))?.rows.first?.isOverdue == false)
+        #expect(homeworkRows(snap, at: boundary)?.rows.first?.isOverdue == true)
+    }
+
+    @Test func todayPlanAddsTaskDueEntriesOnlyOnRequest() {
+        let snap = snapshot(tasks: [task("due", today, time(16))])
+        let now = instant(today, 9)
+        let plain = WidgetTimelinePlanner.plan(snapshot: snap, now: now, deviceTimeZone: zone).entries.map(\.date)
+        let withDue = WidgetTimelinePlanner.plan(snapshot: snap, now: now, deviceTimeZone: zone,
+                                                 includeTaskDueBoundaries: true).entries.map(\.date)
+        #expect(!plain.contains(instant(today, 16, 1)) && withDue.contains(instant(today, 16, 1)))
     }
 }

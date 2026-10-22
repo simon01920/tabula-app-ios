@@ -146,3 +146,6 @@ pages for comparison: `widgets.gallery-today`, `widgets.gallery-homework`, `widg
 | B1.14 | Tinted Home Screen / Lock Screen (accented, vibrant) | Subject colours become outlined marks; text stays legible; overdue still has icon + word | | |
 | B1.15 | VoiceOver on each widget | One sentence per widget (Today, small Homework, exam); Homework rows one sentence each | | |
 | B1.16 | Largest Dynamic Type; non-English app language | No clipped essential text; strings translated | | |
+| B1.17 | Two exams on one day; the day after an exam | After the first exam ends the widget switches to the second one with its countdown; the day after the last exam it shows "No Upcoming Exams" (or the next exam), not "Open Tabula" | | |
+
+Known difference (accepted, QA minor): on a Friday evening the Today widget (lessons over, nothing tomorrow) shows the Stage A status "No more lessons today" with the Monday lesson, while the Today tab words it slightly differently. Not a bug; no code change.

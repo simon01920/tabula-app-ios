@@ -81,13 +81,13 @@ struct HomeworkDueText: View {
 
     var body: some View {
         if line.isOverdue {
+            // Primary text (contrast) with a red icon; the word carries the meaning, the icon the shape.
             Label {
-                Text(verbatim: line.dueText)
+                Text(verbatim: line.dueText).foregroundStyle(.primary)
             } icon: {
-                Image(systemName: "exclamationmark.triangle.fill")
+                Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.red)
             }
             .font(.caption2.weight(.bold))
-            .foregroundStyle(.red)
             .lineLimit(1)
         } else {
             Text(verbatim: line.dueText)
@@ -229,7 +229,7 @@ struct HomeworkListColumn<Leading: View>: View {
                         .minimumScaleFactor(0.7)
                 }
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel(Text(verbatim: [display.title, display.countText].joined(separator: ", ")))
+                .accessibilityLabel(Text(verbatim: display.listHeaderLabel))
                 ForEach(shown.lines) { line in
                     HStack(alignment: .center, spacing: 6) {
                         leading(line)
