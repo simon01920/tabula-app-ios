@@ -1,6 +1,6 @@
 // Decides what the app does with its Live Activities right now (Stage B2): start, schedule, update or end each one.
 // Pure, Linux-tested; the app (App/Sources/Widgets/LiveActivityController.swift) only reads ActivityKit's current
-// activities into `LiveActivityExisting` values, runs `plan`, and executes the steps.
+// activities into `LiveActivityExisting` values, runs `plan`, executes the steps and applies `ledgerChanges`.
 //
 // Apple's rules this is built on (ENVIRONMENT §31): an app starts a Live Activity only while it is in the FOREGROUND
 // (`canStart`; background requests fail with `.visibility`); it updates and ends them from the foreground or a
@@ -8,22 +8,31 @@
 // the user, and the pending activity counts toward the system limit); an activity lives ≤ 8 h, then stays on the Lock
 // Screen ≤ 4 h; content + attributes ≤ 4 KB; the highest `relevanceScore` wins the Dynamic Island.
 //
+// Ledger: every start / schedule is recorded; the planner forgets the key again when it ends that activity itself
+// without a replacement. So only activities the USER swiped away (or the system ended, 8 h) block a new start that
+// day; a day cancelled and then restored, an exam moved to another day, a setting switched off and on all start again.
+//
 // (a) Lesson activity — one per school day (`LessonActivityAttributes.day`):
 //   start     when a lesson runs or the first lesson starts within `lessonLead` (15 min), the lesson setting is on, the
-//             feature is entitled, the system allows Live Activities, the app is in the foreground and no lesson
-//             activity was started for today yet (the ledger also remembers activities the user swiped away);
+//             feature is entitled, the system allows Live Activities, the app is in the foreground and no activity
+//             for today is running or was dismissed;
 //   schedule  with "Start automatically" on, from the foreground: today's window if it opens later, else the next
 //             lesson day within `scheduleHorizonDays` once today's lessons are over (at most one pending);
 //   update    on every run (data change, foreground, time-zone change, background refresh, in-app timer) when the
 //             content differs: the day's lessons, the current/next index, the stale date (the next lesson boundary);
 //   end       after the last lesson with the final "No more lessons today" content, dismissed `endStateDuration`
 //             after it; immediately on a day change, a holiday / cancelled day / no lessons, the setting off, the
-//             entitlement or system permission gone, and for duplicates. A changed pending (scheduled) activity is
-//             ended and scheduled again, because a scheduled start date cannot be changed.
-// (b) Exam-day activity — one per exam with a start time (`ExamActivityAttributes.examID`):
-//   window    from max(start of the exam day, start − `examLead` (6 h)) to the end (else start + `examAssumedDuration`);
-//   start / schedule / update / end as above; a scheduled start alerts the user, so it is moved to no earlier than
-//             `earliestScheduledStart` (06:00) unless that is less than `examScheduledLead` before the exam;
+//             entitlement or system permission gone, and for duplicates; every PENDING one as soon as "Start
+//             automatically" is off. A changed pending activity is ended and scheduled again from the foreground (a
+//             scheduled start date cannot be changed); in the background, where nothing could replace it, it is kept.
+// (b) Exam-day activity — one per exam with a start time (`ExamActivityAttributes.examID`), one running at a time:
+//   window    from the latest of the start of the exam day, start − `examLead` (6 h) and close − `maxDuration` (8 h) to
+//             the end (else start + `examAssumedDuration`);
+//   start     the first exam of today whose window is open and that was not dismissed (a second exam that day starts
+//             when its window opens if the first was swiped away, or once the first ended);
+//   schedule  the earliest exam whose window opens later (an earlier exam added later replaces the pending one); the
+//             alert is moved to no earlier than `earliestScheduledStart` (06:00) unless that is less than
+//             `examScheduledLead` before the exam;
 //   ends      after the exam with "Exam finished", or at once when the exam is deleted, completed or moved.
 // Relevance: exam 100, lesson 50 → the exam wins the Dynamic Island when both run; the Lock Screen orders them so.
 import Foundation
@@ -45,6 +54,8 @@ public enum LiveActivityPolicy {
     public static let earliestScheduledStart = LocalTime(hour: 6, minute: 0)!
     /// …unless the exam starts less than this after it; then it starts this long before the exam.
     public static let examScheduledLead: TimeInterval = 15 * 60
+    /// Apple: "A Live Activity can be active for up to eight hours" (exam windows are capped to it, RISKS #75).
+    public static let maxDuration: TimeInterval = 8 * 3600
     /// A schedule closer than this to now is not worth it (the next run starts it directly).
     public static let minimumScheduleDelay: TimeInterval = 60
     /// Relevance scores ("the system shows the Live Activity with the highest relevance score in the Dynamic Island").
@@ -64,7 +75,7 @@ public struct LiveActivityPreferences: Codable, Equatable, Sendable {
     enum CodingKeys: String, CodingKey { case lessonEnabled = "lesson", examEnabled = "exam", autoStart = "auto" }
 
     /// Defaults: both activities on (PHASE4_PLAN §0.5 "default on"); automatic start off, because every scheduled
-    /// start alerts the user (decision needed, gate report).
+    /// start alerts the user (P4-B2-1: human decision pending).
     public init(lessonEnabled: Bool = true, examEnabled: Bool = true, autoStart: Bool = false) {
         self.lessonEnabled = lessonEnabled
         self.examEnabled = examEnabled
@@ -80,39 +91,101 @@ public struct LiveActivityPreferences: Codable, Equatable, Sendable {
     }
 }
 
-/// Which days / exams already had an activity started or scheduled (so one the user swiped away is not started again
-/// the same day). Device-local; pruned to the last `keptDays` days and `keptExams` exams.
+/// Which days / exams had an activity started or scheduled that the planner did not end itself — i.e. one the user
+/// swiped away or the system ended (8-hour limit) — so it is not started again that day. The planner records every
+/// start / schedule and forgets the key again whenever it ends that activity itself without a replacement (holiday,
+/// setting off, exam deleted…), so a planner-initiated end never blocks a later start. Exams are keyed by (exam, day),
+/// so a moved exam can start on its new day. Device-local; pruned to the last `keptDays` days and `keptExams` exams.
 public struct LiveActivityLedger: Codable, Equatable, Sendable {
     public static let keptDays = 14
     public static let keptExams = 32
 
+    /// One exam on one day.
+    public struct ExamKey: Codable, Hashable, Sendable {
+        public var id: UUID
+        public var day: LocalDate
+
+        enum CodingKeys: String, CodingKey { case id, day = "d" }
+
+        public init(id: UUID, day: LocalDate) {
+            self.id = id
+            self.day = day
+        }
+    }
+
     public var lessonDays: [LocalDate]
-    public var examIDs: [UUID]
+    public var exams: [ExamKey]
 
-    enum CodingKeys: String, CodingKey { case lessonDays = "days", examIDs = "exams" }
+    // "examDays": the pre-QA format ("exams": [UUID]) is ignored on purpose (it never shipped).
+    enum CodingKeys: String, CodingKey { case lessonDays = "days", exams = "examDays" }
 
-    public init(lessonDays: [LocalDate] = [], examIDs: [UUID] = []) {
+    public init(lessonDays: [LocalDate] = [], exams: [ExamKey] = []) {
         self.lessonDays = lessonDays
-        self.examIDs = examIDs
+        self.exams = exams
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        lessonDays = try container.decodeIfPresent([LocalDate].self, forKey: .lessonDays) ?? []
+        exams = try container.decodeIfPresent([ExamKey].self, forKey: .exams) ?? []
     }
 
     public func hasLesson(_ day: LocalDate) -> Bool { lessonDays.contains(day) }
-    public func hasExam(_ id: UUID) -> Bool { examIDs.contains(id) }
+    public func hasExam(_ id: UUID, day: LocalDate) -> Bool { exams.contains(ExamKey(id: id, day: day)) }
 
     public mutating func recordLesson(_ day: LocalDate) {
         guard !hasLesson(day) else { return }
         lessonDays = Array((lessonDays + [day]).sorted().suffix(Self.keptDays))
     }
 
-    public mutating func recordExam(_ id: UUID) {
-        guard !hasExam(id) else { return }
-        examIDs = Array((examIDs + [id]).suffix(Self.keptExams))
+    public mutating func forgetLesson(_ day: LocalDate) { lessonDays.removeAll { $0 == day } }
+
+    public mutating func recordExam(_ id: UUID, day: LocalDate) {
+        guard !hasExam(id, day: day) else { return }
+        exams = Array((exams + [ExamKey(id: id, day: day)]).suffix(Self.keptExams))
     }
 
-    /// The user switched the lesson activity on: today and later may start again.
+    /// Every day of exam `id`.
+    public mutating func forgetExam(_ id: UUID) { exams.removeAll { $0.id == id } }
+
+    /// Today and later lesson days may start again.
     public mutating func forgetLessons(from day: LocalDate) { lessonDays.removeAll { $0 >= day } }
-    /// The user switched the exam activity on.
-    public mutating func forgetExams() { examIDs.removeAll() }
+    /// Every exam may start again.
+    public mutating func forgetExams() { exams.removeAll() }
+
+    /// Applies one planning run's changes. The app reloads the ledger after the run's ActivityKit awaits and applies
+    /// only these, so writes made meanwhile (Settings switches, the system switch) are kept.
+    public mutating func apply(_ changes: [LiveActivityLedgerChange]) {
+        for change in changes {
+            switch change {
+            case .recordLesson(let day): recordLesson(day)
+            case .forgetLesson(let day): forgetLesson(day)
+            case let .recordExam(id, day): recordExam(id, day: day)
+            case .forgetExam(let id): forgetExam(id)
+            }
+        }
+    }
+
+    /// The Settings switches changed: an activity switched on again may start again from today.
+    public mutating func applyPreferenceChange(from old: LiveActivityPreferences, to new: LiveActivityPreferences,
+                                               today: LocalDate) {
+        if new.lessonEnabled, !old.lessonEnabled { forgetLessons(from: today) }
+        if new.examEnabled, !old.examEnabled { forgetExams() }
+    }
+
+    /// Live Activities were turned on again in the Settings app: the activities the system ended may start again.
+    public mutating func systemReenabled(today: LocalDate) {
+        forgetLessons(from: today)
+        forgetExams()
+    }
+}
+
+/// One ledger change of a planning run.
+public enum LiveActivityLedgerChange: Hashable, Sendable {
+    case recordLesson(LocalDate)
+    case forgetLesson(LocalDate)
+    case recordExam(UUID, LocalDate)
+    case forgetExam(UUID)
 }
 
 /// ActivityKit's `ActivityState`, without ActivityKit.
@@ -222,11 +295,16 @@ public struct LiveActivityPlanInput: Sendable {
 public struct LiveActivityPlan: Equatable, Sendable {
     public var lessonSteps: [LessonActivityStep]
     public var examSteps: [ExamActivityStep]
-    /// The ledger after the steps (save it).
+    /// This run's ledger changes (the app applies them to a freshly loaded ledger after executing the steps).
+    public var ledgerChanges: [LiveActivityLedgerChange]
+    /// The input ledger with `ledgerChanges` applied (tests, diagnostics).
     public var ledger: LiveActivityLedger
     /// The next instant at which the plan changes (lesson boundary, window opening, exam start / end), if any. The app
     /// re-plans then while it runs and asks for a background refresh around it.
     public var nextEvaluation: Date?
+    /// After the steps at least one lesson / exam activity is pending or running (known before the steps execute, so
+    /// the background-refresh hint never waits for ActivityKit).
+    public var keepsActivity: Bool
 
     /// Nothing to do.
     public var isEmpty: Bool { lessonSteps.isEmpty && examSteps.isEmpty }
@@ -241,21 +319,26 @@ public struct LiveActivityPlanner: Sendable {
     }
 
     public func plan(_ input: LiveActivityPlanInput) -> LiveActivityPlan {
-        var ledger = input.ledger
+        var changes: [LiveActivityLedgerChange] = []
         var events: [Date] = []
-        let lessonSteps = planLessons(input, ledger: &ledger, events: &events)
-        let examSteps = planExams(input, ledger: &ledger, events: &events)
+        var keeps = false
+        let lessonSteps = planLessons(input, changes: &changes, events: &events, keeps: &keeps)
+        let examSteps = planExams(input, changes: &changes, events: &events, keeps: &keeps)
+        var ledger = input.ledger
+        ledger.apply(changes)
         let next = events.filter { $0 > input.now }.min()
-        return LiveActivityPlan(lessonSteps: lessonSteps, examSteps: examSteps, ledger: ledger, nextEvaluation: next)
+        return LiveActivityPlan(lessonSteps: lessonSteps, examSteps: examSteps, ledgerChanges: changes, ledger: ledger,
+                                nextEvaluation: next, keepsActivity: keeps)
     }
 
     // MARK: (a) Lessons
 
-    func planLessons(_ input: LiveActivityPlanInput, ledger: inout LiveActivityLedger,
-                     events: inout [Date]) -> [LessonActivityStep] {
+    func planLessons(_ input: LiveActivityPlanInput, changes: inout [LiveActivityLedgerChange], events: inout [Date],
+                     keeps: inout Bool) -> [LessonActivityStep] {
         let now = input.now
         let running = input.lessons.filter(\.status.isRunning).sorted { $0.id < $1.id }
         guard input.preferences.lessonEnabled, input.entitled, input.systemEnabled else {
+            changes += Set(running.map(\.attributes.day)).sorted().map { .forgetLesson($0) }
             return running.map { .end(id: $0.id, nil, .immediate) }
         }
         let style = input.sources.style
@@ -263,38 +346,52 @@ public struct LiveActivityPlanner: Sendable {
         let todayDay = input.sources.lessonDay(today)
         let horizon = today.adding(days: LiveActivityPolicy.scheduleHorizonDays)
         let nextDay = input.sources.lessonDays.first { $0.day > today && $0.day <= horizon }
+        let autoStart = input.preferences.autoStart
         var steps: [LessonActivityStep] = []
         var keptToday: LessonActivityExisting?
         var keptPending: LessonActivityExisting?
-        var replan = Set<LocalDate>()
+        var ended = Set<LocalDate>()     // days whose activity the planner ended itself (forgotten unless replaced)
+        var started = Set<LocalDate>()   // days started or scheduled in this run
 
         for activity in running {
             let day = activity.attributes.day
+            let pending = activity.status == .pending
+            func end(_ content: LiveActivityContent<LessonActivityAttributes.ContentState>?,
+                     _ dismissal: LiveActivityDismissal = .immediate) {
+                steps.append(.end(id: activity.id, content, dismissal))
+                ended.insert(day)
+            }
             if day < today {
-                steps.append(.end(id: activity.id, Self.finalLessonContent(activity.content.state.style), .immediate))
+                end(Self.finalLessonContent(activity.content.state.style))
+            } else if pending, !autoStart {
+                end(nil)   // "Start automatically" was switched off: cancel what it scheduled
             } else if day == today {
-                guard let todayDay, keptToday == nil else {
-                    steps.append(.end(id: activity.id, nil, .immediate))   // no lessons (any more) today, or a duplicate
+                guard let todayDay else {
+                    end(nil)   // no lessons (any more) today: holiday, cancelled day, all lessons moved
                     continue
                 }
-                if now >= todayDay.lastEnd {
-                    steps.append(.end(id: activity.id, Self.finalLessonContent(style),
-                                      Self.dismissal(endedAt: todayDay.lastEnd, now: now)))
-                } else if activity.status == .pending, activity.content != Self.scheduledLessonContent(todayDay, style) {
-                    steps.append(.end(id: activity.id, nil, .immediate))
-                    replan.insert(today)
+                if keptToday != nil {
+                    steps.append(.end(id: activity.id, nil, .immediate))   // a duplicate; the kept one keeps the key
+                } else if now >= todayDay.lastEnd {
+                    end(Self.finalLessonContent(style), Self.dismissal(endedAt: todayDay.lastEnd, now: now))
+                } else if pending, input.canStart, activity.content != Self.scheduledLessonContent(todayDay, style) {
+                    end(nil)   // changed: a scheduled start date cannot be changed, so it is replaced below
                 } else {
+                    // Running, an unchanged pending one, or a changed pending one in the background: nothing could
+                    // replace it there, so it keeps its start and the first run after it started updates it.
                     keptToday = activity
                 }
-            } else if activity.status == .pending, keptPending == nil, let nextDay, nextDay.day == day,
-                      activity.content == Self.scheduledLessonContent(nextDay, style) {
-                keptPending = activity
+            } else if pending, keptPending == nil, let nextDay, nextDay.day == day,
+                      !input.canStart || activity.content == Self.scheduledLessonContent(nextDay, style) {
+                keptPending = activity   // the next lesson day's schedule (a changed one is kept in the background)
+            } else if pending, keptPending == nil, !input.canStart, input.sources.lessonDay(day) != nil {
+                keptPending = activity   // still a lesson day; re-planned at the next foreground
             } else {
-                steps.append(.end(id: activity.id, nil, .immediate))
-                if activity.status == .pending { replan.insert(day) }
+                end(nil)
             }
         }
 
+        func blocked(_ day: LocalDate) -> Bool { input.ledger.hasLesson(day) && !ended.contains(day) }
         var todayBusy = false
         if let todayDay, now < todayDay.lastEnd {
             todayBusy = true
@@ -305,28 +402,31 @@ public struct LiveActivityPlanner: Sendable {
                     let desired = Self.runningLessonContent(todayDay, style, now: now)
                     if kept.content != desired { steps.append(.update(id: kept.id, desired)) }
                 }
-            } else if input.canStart, !ledger.hasLesson(today) || replan.contains(today) {
+            } else if input.canStart, !blocked(today) {
                 if now >= open {
                     steps.append(.start(LessonActivityAttributes(day: today),
                                         Self.runningLessonContent(todayDay, style, now: now)))
-                    ledger.recordLesson(today)
-                } else if input.preferences.autoStart, open.timeIntervalSince(now) >= LiveActivityPolicy.minimumScheduleDelay {
+                    started.insert(today)
+                } else if autoStart, open.timeIntervalSince(now) >= LiveActivityPolicy.minimumScheduleDelay {
                     steps.append(.schedule(LessonActivityAttributes(day: today), Self.scheduledLessonContent(todayDay, style),
                                            at: open, alert: lessonAlert(todayDay)))
-                    ledger.recordLesson(today)
+                    started.insert(today)
                 }
             }
         }
 
-        if !todayBusy, keptPending == nil, input.canStart, input.preferences.autoStart, let nextDay,
-           !ledger.hasLesson(nextDay.day) || replan.contains(nextDay.day) {
+        if !todayBusy, keptPending == nil, input.canStart, autoStart, let nextDay, !blocked(nextDay.day) {
             let open = nextDay.firstStart.addingTimeInterval(-LiveActivityPolicy.lessonLead)
             if open.timeIntervalSince(now) >= LiveActivityPolicy.minimumScheduleDelay {
                 steps.append(.schedule(LessonActivityAttributes(day: nextDay.day), Self.scheduledLessonContent(nextDay, style),
                                        at: open, alert: lessonAlert(nextDay)))
-                ledger.recordLesson(nextDay.day)
+                started.insert(nextDay.day)
             }
         }
+        let kept = Set([keptToday, keptPending].compactMap { $0?.attributes.day })
+        changes += started.sorted().map { .recordLesson($0) }
+        changes += ended.subtracting(started).subtracting(kept).sorted().map { .forgetLesson($0) }
+        if !kept.isEmpty || !started.isEmpty { keeps = true }
         return steps
     }
 
@@ -367,40 +467,57 @@ public struct LiveActivityPlanner: Sendable {
 
     // MARK: (b) Exams
 
-    func planExams(_ input: LiveActivityPlanInput, ledger: inout LiveActivityLedger,
-                   events: inout [Date]) -> [ExamActivityStep] {
+    func planExams(_ input: LiveActivityPlanInput, changes: inout [LiveActivityLedgerChange], events: inout [Date],
+                   keeps: inout Bool) -> [ExamActivityStep] {
         let now = input.now
         let running = input.exams.filter(\.status.isRunning).sorted { $0.id < $1.id }
         guard input.preferences.examEnabled, input.entitled, input.systemEnabled else {
+            changes += Set(running.map(\.attributes.examID)).sorted { $0.uuidString < $1.uuidString }.map { .forgetExam($0) }
             return running.map { .end(id: $0.id, nil, .immediate) }
         }
         let style = input.sources.style
         let context = input.sources.context
         let today = context.localDate(of: now)
+        let autoStart = input.preferences.autoStart
         let exams = input.sources.exams.filter { $0.close > now }
+        let pendingIDs = Set(running.filter { $0.status == .pending }.map(\.attributes.examID))
+        func recorded(_ exam: LiveActivityExam) -> Bool { input.ledger.hasExam(exam.id, day: exam.day) }
+        // The exam a scheduled start is for: the earliest whose window opens later and that the user did not dismiss
+        // (an exam added before the pending one replaces it).
+        let upcoming = autoStart
+            ? exams.first { Self.window($0, context).lowerBound > now && (!recorded($0) || pendingIDs.contains($0.id)) }
+            : nil
         var steps: [ExamActivityStep] = []
         var kept: [UUID: ExamActivityExisting] = [:]
-        var replan = Set<UUID>()
+        var ended = Set<UUID>()             // exams whose activity the planner ended itself (forgotten unless replaced)
+        var started: [UUID: LocalDate] = [:]
 
         for activity in running {
             let id = activity.attributes.examID
-            guard let exam = input.sources.exams.first(where: { $0.id == id }), kept[id] == nil else {
-                steps.append(.end(id: activity.id, nil, .immediate))   // deleted, completed, moved away, or a duplicate
+            let pending = activity.status == .pending
+            func end(_ content: LiveActivityContent<ExamActivityAttributes.ContentState>?,
+                     _ dismissal: LiveActivityDismissal = .immediate) {
+                steps.append(.end(id: activity.id, content, dismissal))
+                ended.insert(id)
+            }
+            guard let exam = input.sources.exams.first(where: { $0.id == id }) else {
+                end(nil)   // deleted, completed, or moved beyond the horizon
                 continue
             }
-            if now >= exam.close {
-                steps.append(.end(id: activity.id, Self.finalExamContent(exam, style),
-                                  Self.dismissal(endedAt: exam.close, now: now)))
-            } else if activity.status == .pending {
-                if activity.content == Self.scheduledExamContent(exam, style) {
-                    kept[id] = activity
+            if pending, !autoStart {
+                end(nil)   // "Start automatically" was switched off
+            } else if kept[id] != nil {
+                steps.append(.end(id: activity.id, nil, .immediate))   // a duplicate
+            } else if now >= exam.close {
+                end(Self.finalExamContent(exam, style), Self.dismissal(endedAt: exam.close, now: now))
+            } else if pending {
+                if !input.canStart || (upcoming?.id == id && activity.content == Self.scheduledExamContent(exam, style)) {
+                    kept[id] = activity   // unchanged, or nothing could replace it in the background
                 } else {
-                    steps.append(.end(id: activity.id, nil, .immediate))
-                    replan.insert(id)
+                    end(nil)   // changed or no longer the earliest: replaced below
                 }
             } else if exam.day != today {
-                steps.append(.end(id: activity.id, nil, .immediate))   // moved to a later day
-                replan.insert(id)
+                end(nil)   // moved to a later day while it ran
             } else {
                 kept[id] = activity
                 let desired = Self.runningExamContent(exam, style, now: now)
@@ -411,32 +528,39 @@ public struct LiveActivityPlanner: Sendable {
         for exam in exams {
             events += [Self.window(exam, context).lowerBound, exam.start, exam.close]
         }
-        // Started now: the first exam of today whose window is open.
-        if let current = exams.first(where: { $0.day == today && Self.window($0, context).contains(now) }),
-           kept[current.id] == nil, input.canStart, !ledger.hasExam(current.id) || replan.contains(current.id) {
+        func blocked(_ exam: LiveActivityExam) -> Bool { recorded(exam) && !ended.contains(exam.id) }
+        // Started now: the first exam of today whose window is open and that was not dismissed, while no exam
+        // activity runs (one at a time; the next one starts when the previous one ended).
+        let examRunning = kept.values.contains { $0.status != .pending }
+        if !examRunning, input.canStart,
+           let current = exams.first(where: { $0.day == today && Self.window($0, context).contains(now)
+                                              && kept[$0.id] == nil && !blocked($0) }) {
             steps.append(.start(ExamActivityAttributes(examID: current.id), Self.runningExamContent(current, style, now: now)))
-            ledger.recordExam(current.id)
-            kept[current.id] = ExamActivityExisting(id: "", attributes: .init(examID: current.id), status: .active,
-                                                    content: Self.runningExamContent(current, style, now: now))
+            started[current.id] = current.day
         }
-        // Scheduled: the first exam whose window opens later, if none is pending yet.
+        // Scheduled: the upcoming exam, if no exam activity is pending yet.
         let hasPending = kept.values.contains { $0.status == .pending }
-        if !hasPending, input.canStart, input.preferences.autoStart,
-           let upcoming = exams.first(where: { Self.window($0, context).lowerBound > now }), kept[upcoming.id] == nil,
-           !ledger.hasExam(upcoming.id) || replan.contains(upcoming.id) {
+        if !hasPending, input.canStart, let upcoming, kept[upcoming.id] == nil, started[upcoming.id] == nil,
+           !blocked(upcoming) {
             let at = Self.scheduledStart(upcoming, context)
             if at.timeIntervalSince(now) >= LiveActivityPolicy.minimumScheduleDelay {
                 steps.append(.schedule(ExamActivityAttributes(examID: upcoming.id), Self.scheduledExamContent(upcoming, style),
                                        at: at, alert: examAlert(upcoming)))
-                ledger.recordExam(upcoming.id)
+                started[upcoming.id] = upcoming.day
             }
         }
+        changes += started.sorted { $0.key.uuidString < $1.key.uuidString }.map { .recordExam($0.key, $0.value) }
+        changes += ended.subtracting(started.keys).subtracting(kept.keys).sorted { $0.uuidString < $1.uuidString }
+            .map { .forgetExam($0) }
+        if !kept.isEmpty || !started.isEmpty { keeps = true }
         return steps
     }
 
-    /// The exam's window: from max(start of its day, start − `examLead`) to its close.
+    /// The exam's window: from the latest of the start of its day, start − `examLead` and close − `maxDuration` (an
+    /// activity lives ≤ 8 h) to its close.
     public static func window(_ exam: LiveActivityExam, _ context: CalendarContext) -> Range<Date> {
-        let open = max(context.startOfDay(exam.day), exam.start.addingTimeInterval(-LiveActivityPolicy.examLead))
+        let open = max(context.startOfDay(exam.day), exam.start.addingTimeInterval(-LiveActivityPolicy.examLead),
+                       exam.close.addingTimeInterval(-LiveActivityPolicy.maxDuration))
         return open..<max(open, exam.close)
     }
 

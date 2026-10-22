@@ -193,7 +193,7 @@ ENVIRONMENT §31; risks: RISKS #73–#79.
 | ID | Steps | Expected | Observed | ✔/✘ |
 |---|---|---|---|---|
 | B2.12 | With a lesson activity running, force-quit Tabula, relaunch | The same activity continues; **no duplicate**; Developer: `0 lesson …` steps or one update | | |
-| B2.13 | Swipe the activity away on the Lock Screen, open Tabula again the same day | It does **not** come back today (ledger); the next school day it starts again | | |
+| B2.13 | Swipe the activity away on the Lock Screen, open Tabula again the same day | It does **not** come back today (ledger); the next school day it starts again. An activity Tabula ended itself (holiday, setting off) does come back when the reason goes away (B2.42) | | |
 | B2.14 | Settings → Live Activities → "Current lesson" off | The running lesson activity disappears at once; switching it on again during lessons starts a new one at once | | |
 | B2.15 | iOS Settings → Tabula → Live Activities off, back to Tabula → Settings → Live Activities | Running activities end; the page shows "Live Activities are turned off for Tabula…" + "Open Settings" (opens Tabula's page in the Settings app); turning them on again removes the note and (during lessons) the lesson activity starts again | | |
 | B2.16 | Holiday / cancelled day / move all of today's lessons to tomorrow while the activity runs | The activity ends at once | | |
@@ -225,11 +225,16 @@ ENVIRONMENT §31; risks: RISKS #73–#79.
 | B2.30 | Always-On (dimmed Lock Screen) with a lesson running | Readable; progress bar grey (reduced luminance); the timer keeps counting (Always-On may update it less often) | | |
 | B2.31 | StandBy (charging, landscape) | Minimal presentation at the top; tapping shows the Lock Screen layout scaled up; readable in Night Mode (red tint) | | |
 | B2.32 | Low Power Mode on during lessons, app closed | Timers keep counting; background refresh is reduced, so updates come at the next foreground — record whether the boundary re-renders (B2.3) still happen | | |
-| B2.33 | App closed for a whole school day, Background App Refresh on | Developer "Last run" shows background runs (record the times) and compares them with the lesson boundaries (the refresh request asks for the next boundary while an activity runs) | | |
+| B2.33 | App closed for a whole school day, Background App Refresh on | Developer "Last run" shows background runs (record the times); compare them with the lesson boundaries (the refresh request asks for the next boundary while an activity runs; each background refresh runs the reminders first, so reminders keep working even if ActivityKit is slow) | | |
 | B2.34 | A day longer than 8 h (15 min before the first lesson to the end of the last) | The system ends the activity after 8 h (Apple limit); it is not restarted that day (documented, RISKS #75) | | |
 | B2.35 | Apple Watch paired, activity running | The Smart Stack shows it (system layout from the compact presentation: badge + timer); a tap offers to open Tabula on the iPhone (no watch app until Phase 5); record readability | | |
 | B2.36 | VoiceOver on the Lock Screen activity and on the compact island | Lock Screen: one sentence ("Now, Mathematics, 8:00 to 8:45, room 214, ends at 8:45, Next, 8:55, Biology"); compact timer: "Mathematics, ends at 8:45" | | |
 | B2.37 | Largest Dynamic Type | Lock Screen text scales within the 160 pt limit without overlaps (the system may truncate); record clipping | | |
 | B2.38 | A loud AlarmKit alarm with snooze (existing) while a lesson activity runs | The alarm's countdown activity still works; both coexist | | |
+| B2.39 | With a lesson and an exam start scheduled (auto-start on, in the evening), switch "Start automatically" off | Nothing starts the next morning (both pending activities were cancelled at once); switched on again, the next foreground schedules them again | | |
+| B2.40 | Swipe an exam activity away, then move the exam to tomorrow | Tomorrow the exam activity starts again (the ledger is per exam and day) | | |
+| B2.41 | Two exams today (e.g. 8:00 and 13:00); swipe the first away, open Tabula after 7:00 | The second exam's activity starts (its window opened at 7:00); without the swipe it starts once the first ended | | |
+| B2.42 | While the lesson activity runs, cancel today (day change), then undo it | The activity ends, then starts again after the undo (a planner end does not block a restart) | | |
+| B2.43 | With a start scheduled for tomorrow, change tomorrow's first lesson on another device (sync) without opening Tabula | The pending activity is kept and starts at its old time, then the next run updates it; opening Tabula before then replaces it with one at the new time | | |
 
 Watch complication refresh: not part of B2 (no complications yet; Phase 5).

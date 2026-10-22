@@ -10,12 +10,15 @@
 //   timer         while the app runs: at the plan's next lesson boundary / window opening / exam start or end
 //   enablement    `ActivityAuthorizationInfo().activityEnablementUpdates` (the user switched them off / on in Settings)
 //   preferences   the Settings toggles
-//   background    `backgroundRefresh()` from the BGAppRefreshTask (TabulaApp): updates / ends only (starting needs the
-//                 foreground); `backgroundRefreshHint` lets the reminder coordinator ask for a refresh near the next
+//   background    `backgroundRefresh()` from the BGAppRefreshTask (TabulaApp, after the reminders, which submit the
+//                 next request): updates / ends only (starting needs the foreground); `backgroundRefreshHint` (set from
+//                 the plan before any ActivityKit await) lets the reminder coordinator ask for a refresh near the next
 //                 boundary while an activity runs.
 // Starting / scheduling only happens while the scene is active (`UIApplication.applicationState == .active`); the
-// planner records each start in a ledger (UserDefaults) so an activity the user swiped away is not started again the
-// same day. A failed request is taken out of the ledger again (the next foreground retries).
+// planner records each start in a ledger (UserDefaults) and forgets it when it ends the activity itself, so only an
+// activity the user swiped away (or the system ended) is not started again that day. A failed request is taken out of
+// the ledger again (the next foreground retries). The run applies only its own ledger changes to a ledger reloaded
+// after the ActivityKit awaits (QA M3), so a Settings switch flipped meanwhile is not overwritten.
 //
 // Seed / screenshot runs (`AppEnvironment.liveActivities.isLive == false`) never touch ActivityKit: seed data must not
 // reach the real Lock Screen.
@@ -109,10 +112,11 @@ final class LiveActivityController {
     /// so it can start right away.
     func setPreferences(_ new: LiveActivityPreferences) {
         guard new != preferences else { return }
-        var ledger = store.loadLedger()
-        if new.lessonEnabled, !preferences.lessonEnabled, let today = model?.today { ledger.forgetLessons(from: today) }
-        if new.examEnabled, !preferences.examEnabled { ledger.forgetExams() }
-        store.saveLedger(ledger)
+        if let today = model?.today {
+            var ledger = store.loadLedger()
+            ledger.applyPreferenceChange(from: preferences, to: new, today: today)
+            store.saveLedger(ledger)
+        }
         store.savePreferences(new)
         preferences = new
         requestRefresh(debounce: .zero)
@@ -161,10 +165,11 @@ final class LiveActivityController {
     /// again today (they were not swiped away by the user).
     private func applySystemEnabled(_ enabled: Bool) {
         if enabled, !systemEnabled {
-            var ledger = store.loadLedger()
-            if let today = model?.today { ledger.forgetLessons(from: today) }
-            ledger.forgetExams()
-            store.saveLedger(ledger)
+            if let today = model?.today {
+                var ledger = store.loadLedger()
+                ledger.systemReenabled(today: today)
+                store.saveLedger(ledger)
+            }
         }
         systemEnabled = enabled
     }
@@ -200,26 +205,33 @@ final class LiveActivityController {
             systemEnabled: systemEnabled, entitled: isEntitled, preferences: preferences, ledger: store.loadLedger(),
             lessons: Self.existing(LessonActivityAttributes.self), exams: Self.existing(ExamActivityAttributes.self))
         let plan = LiveActivityPlanner(renderer: model.renderer).plan(input)
-        var ledger = plan.ledger
+        // Known before any ActivityKit await, so the background-refresh hint is current even if the run is cut short.
+        nextEvaluation = plan.nextEvaluation
+        hasRunningActivity = plan.keepsActivity
+        var changes = plan.ledgerChanges
         var failures: [String] = []
         for step in plan.lessonSteps {
             if let failure = await Self.execute(step) {
                 failures.append(failure)
-                if case .start(let attributes, _) = step { ledger.lessonDays.removeAll { $0 == attributes.day } }
-                if case .schedule(let attributes, _, _, _) = step { ledger.lessonDays.removeAll { $0 == attributes.day } }
+                switch step {   // a failed start / schedule may be retried at the next foreground
+                case .start(let attributes, _), .schedule(let attributes, _, _, _): changes.append(.forgetLesson(attributes.day))
+                case .update, .end: break
+                }
             }
         }
         for step in plan.examSteps {
             if let failure = await Self.execute(step) {
                 failures.append(failure)
-                if case .start(let attributes, _) = step { ledger.examIDs.removeAll { $0 == attributes.examID } }
-                if case .schedule(let attributes, _, _, _) = step { ledger.examIDs.removeAll { $0 == attributes.examID } }
+                switch step {
+                case .start(let attributes, _), .schedule(let attributes, _, _, _): changes.append(.forgetExam(attributes.examID))
+                case .update, .end: break
+                }
             }
         }
+        // Reload, then apply only this run's changes: Settings / system-switch writes made during the awaits survive.
+        var ledger = store.loadLedger()
+        ledger.apply(changes)
         store.saveLedger(ledger)
-        nextEvaluation = plan.nextEvaluation
-        hasRunningActivity = Self.existing(LessonActivityAttributes.self).contains { $0.status.isRunning }
-            || Self.existing(ExamActivityAttributes.self).contains { $0.status.isRunning }
         let summary = "\(plan.lessonSteps.count) lesson + \(plan.examSteps.count) exam steps"
         lastRun = "\(Date().ISO8601Format()): \(summary)" + (failures.isEmpty ? "" : "; failed: \(failures.joined(separator: "; "))")
         scheduleTimer(at: plan.nextEvaluation, now: now)

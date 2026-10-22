@@ -199,7 +199,7 @@ struct LessonActivityPlannerTests {
 struct ExamActivityPlannerTests {
     @Test func windowOpensSixHoursBeforeButNotBeforeTheExamDay() {
         #expect(LiveActivityPlanner.window(exam(wed, 10), context).lowerBound == at(wed, 4))
-        #expect(LiveActivityPlanner.window(exam(wed, 3), context).lowerBound == context.startOfDay(wed))
+        #expect(LiveActivityPlanner.window(exam(wed, 3, end: (4, 0)), context).lowerBound == context.startOfDay(wed))
         #expect(LiveActivityPlanner.window(exam(wed, 10), context).upperBound == at(wed, 11, 30))
         // Without an end: one hour of "in progress".
         #expect(LiveActivityPlanner.window(exam(wed, 10, end: nil), context).upperBound == at(wed, 11))
@@ -224,7 +224,7 @@ struct ExamActivityPlannerTests {
         #expect(content.relevanceScore == LiveActivityPolicy.examRelevance)
         #expect(content.relevanceScore > LiveActivityPolicy.lessonRelevance)
         #expect(content.staleDate == at(tue, 10))
-        #expect(plan.ledger.hasExam(examID))
+        #expect(plan.ledger.hasExam(examID, day: tue))
         let shown = presenter.exam(content.state, examID: examID, now: at(tue, 8))
         #expect(shown.phase == .upcoming && shown.caption == "Exam today" && shown.timerCaption == "Starts in")
         #expect(shown.timer == at(tue, 8)...at(tue, 10))
@@ -236,7 +236,7 @@ struct ExamActivityPlannerTests {
         let started = ExamActivityExisting(id: "X", attributes: .init(examID: examID), status: .active,
                                            content: LiveActivityPlanner.runningExamContent(original, style, now: at(tue, 8)))
         // The exam start passed: new stale date (the end) → update.
-        let during = planner.plan(input(sources(exams: [original]), now: at(tue, 10, 5), ledger: .init(examIDs: [examID]),
+        let during = planner.plan(input(sources(exams: [original]), now: at(tue, 10, 5), ledger: .init(exams: [.init(id: examID, day: tue)]),
                                         exams: [started]))
         guard case let .update(_, content)? = during.examSteps.first else {
             Issue.record("expected an update")
@@ -248,7 +248,7 @@ struct ExamActivityPlannerTests {
         // The room was edited: update.
         var edited = original
         edited.room = "B2"
-        let edit = planner.plan(input(sources(exams: [edited]), now: at(tue, 8), ledger: .init(examIDs: [examID]),
+        let edit = planner.plan(input(sources(exams: [edited]), now: at(tue, 8), ledger: .init(exams: [.init(id: examID, day: tue)]),
                                       exams: [started]))
         #expect(edit.examSteps.count == 1)
         // After the end: final content, kept 15 minutes.
@@ -380,9 +380,10 @@ struct LiveActivityDataTests {
         #expect(ledger.lessonDays.count == LiveActivityLedger.keptDays && ledger.hasLesson(tue.adding(days: 19)))
         ledger.forgetLessons(from: tue.adding(days: 10))
         #expect(!ledger.hasLesson(tue.adding(days: 10)) && ledger.hasLesson(tue.adding(days: 9)))
-        ledger.recordExam(examID)
+        ledger.recordExam(examID, day: tue)
+        #expect(ledger.hasExam(examID, day: tue) && !ledger.hasExam(examID, day: wed))
         ledger.forgetExams()
-        #expect(!ledger.hasExam(examID))
+        #expect(!ledger.hasExam(examID, day: tue))
     }
 
     @Test func userDefaultsStoreRoundTrips() throws {
@@ -392,9 +393,9 @@ struct LiveActivityDataTests {
         let store = UserDefaultsLiveActivityPreferenceStore(defaults: defaults)
         #expect(store.loadPreferences() == LiveActivityPreferences())
         store.savePreferences(auto)
-        store.saveLedger(LiveActivityLedger(lessonDays: [tue], examIDs: [examID]))
+        store.saveLedger(LiveActivityLedger(lessonDays: [tue], exams: [.init(id: examID, day: tue)]))
         #expect(store.loadPreferences() == auto)
-        #expect(store.loadLedger().hasLesson(tue) && store.loadLedger().hasExam(examID))
+        #expect(store.loadLedger().hasLesson(tue) && store.loadLedger().hasExam(examID, day: tue))
     }
 
     @Test func sourcesFollowTheTodayTabAndTheExamsTab() throws {
@@ -439,5 +440,273 @@ struct LiveActivityDataTests {
         // Never sooner than 15 minutes from now.
         #expect(BackgroundRefreshPolicy.earliestBeginDate(nextReplanDate: at(tue, 20), now: now,
                                                           additional: at(tue, 9, 5)) == at(tue, 9, 15))
+    }
+}
+
+// MARK: - QA fixes (B1, M1–M3, m2–m5, m7)
+
+private let thu = day(2026, 10, 15)
+private let secondExamID = UUID(uuidString: "E8A30000-0000-4000-8000-000000000002")!
+
+private func pendingLesson(_ date: LocalDate, _ lessons: LiveActivityLessonDay? = nil, id: String = "P") -> LessonActivityExisting {
+    LessonActivityExisting(id: id, attributes: .init(day: date), status: .pending,
+                           content: LiveActivityPlanner.scheduledLessonContent(lessons ?? lessonDay(date), style))
+}
+
+private func examActivity(_ exam: LiveActivityExam, id: String = "E", status: LiveActivityStatus,
+                          now: Date) -> ExamActivityExisting {
+    let content = status == .pending ? LiveActivityPlanner.scheduledExamContent(exam, style)
+        : LiveActivityPlanner.runningExamContent(exam, style, now: now)
+    return ExamActivityExisting(id: id, attributes: .init(examID: exam.id), status: status, content: content)
+}
+
+@Suite("Live Activity planner — QA fixes")
+struct LiveActivityPlannerQAFixTests {
+    // B1
+    @Test func switchingStartAutomaticallyOffCancelsEveryPendingActivity() {
+        let examWed = exam(wed, 10)
+        let plan = planner.plan(input(sources(exams: [examWed]), now: at(tue, 19),
+                                      ledger: .init(lessonDays: [wed], exams: [.init(id: examID, day: wed)]),
+                                      lessons: [pendingLesson(wed)],
+                                      exams: [examActivity(examWed, status: .pending, now: at(tue, 19))]))
+        #expect(plan.lessonSteps == [.end(id: "P", nil, .immediate)])
+        #expect(plan.examSteps == [.end(id: "E", nil, .immediate)])
+        #expect(!plan.ledger.hasLesson(wed) && !plan.ledger.hasExam(examID, day: wed))
+        #expect(plan.ledgerChanges.contains(.forgetLesson(wed)) && plan.ledgerChanges.contains(.forgetExam(examID)))
+        #expect(!plan.keepsActivity)
+        // Also in the background (cancelling needs no foreground).
+        let background = planner.plan(input(sources(), now: at(tue, 19), canStart: false, ledger: .init(lessonDays: [wed]),
+                                            lessons: [pendingLesson(wed)]))
+        #expect(background.lessonSteps == [.end(id: "P", nil, .immediate)])
+    }
+
+    @Test func aCancelledPendingTodayStartsDirectlyWhenItsWindowIsOpen() {
+        let plan = planner.plan(input(sources(), now: at(tue, 7, 50), ledger: .init(lessonDays: [tue]),
+                                      lessons: [pendingLesson(tue)]))
+        #expect(plan.lessonSteps.count == 2)
+        #expect(plan.lessonSteps.first == .end(id: "P", nil, .immediate))
+        if case .start(let attributes, _)? = plan.lessonSteps.last { #expect(attributes.day == tue) } else {
+            Issue.record("expected a start, got \(plan.lessonSteps)")
+        }
+        #expect(plan.ledger.hasLesson(tue))
+    }
+
+    // M1
+    @Test func aMovedExamStartsOnItsNewDay() {
+        let moved = exam(wed, 10)
+        // Swiped away on Tuesday, then moved to Wednesday: starts on Wednesday.
+        let plan = planner.plan(input(sources(exams: [moved]), now: at(wed, 8), ledger: .init(exams: [.init(id: examID, day: tue)])))
+        guard case .start(let attributes, _)? = plan.examSteps.first else {
+            Issue.record("expected a start, got \(plan.examSteps)")
+            return
+        }
+        #expect(attributes.examID == examID && plan.ledger.hasExam(examID, day: wed))
+        // Swiped away on Wednesday itself: not again that day.
+        let swiped = planner.plan(input(sources(exams: [moved]), now: at(wed, 8), ledger: .init(exams: [.init(id: examID, day: wed)])))
+        #expect(swiped.examSteps.isEmpty)
+        // Running on Tuesday while it is moved to Thursday: ended and forgotten, so Thursday can start it.
+        let running = examActivity(exam(tue, 10), status: .active, now: at(tue, 8))
+        let away = planner.plan(input(sources(exams: [exam(thu, 10)]), now: at(tue, 8, 30),
+                                      ledger: .init(exams: [.init(id: examID, day: tue)]), exams: [running]))
+        #expect(away.examSteps == [.end(id: "E", nil, .immediate)])
+        #expect(away.ledger.exams.isEmpty)
+    }
+
+    // M2
+    @Test func aChangedPendingActivityIsKeptInTheBackground() {
+        var moved = lessonDay(wed)
+        moved.lessons[0].start = at(wed, 7, 30)
+        let lesson = planner.plan(input(sources(days: [lessonDay(tue), moved]), now: at(tue, 19), canStart: false,
+                                        preferences: auto, ledger: .init(lessonDays: [wed]), lessons: [pendingLesson(wed)]))
+        #expect(lesson.lessonSteps.isEmpty && lesson.ledger.hasLesson(wed) && lesson.keepsActivity)
+        // Today's changed pending activity too.
+        var today = lessonDay(tue)
+        today.lessons[0].start = at(tue, 7, 40)
+        let todayPlan = planner.plan(input(sources(days: [today]), now: at(tue, 6), canStart: false, preferences: auto,
+                                           ledger: .init(lessonDays: [tue]), lessons: [pendingLesson(tue)]))
+        #expect(todayPlan.lessonSteps.isEmpty && todayPlan.ledger.hasLesson(tue))
+        // A pending exam whose room changed: kept in the background, replaced in the foreground.
+        var edited = exam(wed, 10)
+        edited.room = "B2"
+        let pending = examActivity(exam(wed, 10), status: .pending, now: at(tue, 19))
+        let background = planner.plan(input(sources(days: [], exams: [edited]), now: at(tue, 19), canStart: false,
+                                            preferences: auto, ledger: .init(exams: [.init(id: examID, day: wed)]),
+                                            exams: [pending]))
+        #expect(background.examSteps.isEmpty && background.ledger.hasExam(examID, day: wed))
+        let foreground = planner.plan(input(sources(days: [], exams: [edited]), now: at(tue, 19), preferences: auto,
+                                            ledger: .init(exams: [.init(id: examID, day: wed)]), exams: [pending]))
+        #expect(foreground.examSteps.count == 2 && foreground.examSteps.first == .end(id: "E", nil, .immediate))
+        #expect(foreground.ledger.hasExam(examID, day: wed))
+    }
+
+    // m2
+    @Test func theSecondExamOfADayStartsWhenTheFirstWasSwipedAway() {
+        let first = exam(tue, 8, end: (9, 30))
+        let second = exam(tue, 13, end: (14, 30), id: secondExamID)
+        let src = sources(days: [], exams: [first, second])
+        let swiped = LiveActivityLedger(exams: [.init(id: examID, day: tue)])
+        #expect(planner.plan(input(src, now: at(tue, 6, 30), ledger: swiped)).examSteps.isEmpty)   // second not open yet
+        let plan = planner.plan(input(src, now: at(tue, 7, 30), ledger: swiped))
+        guard case .start(let attributes, _)? = plan.examSteps.first else {
+            Issue.record("expected the second exam to start, got \(plan.examSteps)")
+            return
+        }
+        #expect(attributes.examID == secondExamID)
+        // One exam activity at a time: while the first runs, the second waits; it starts once the first ended.
+        let firstRunning = examActivity(first, status: .active, now: at(tue, 7))
+        let during = planner.plan(input(src, now: at(tue, 7, 30), ledger: .init(exams: [.init(id: examID, day: tue)]),
+                                        exams: [firstRunning]))
+        #expect(during.examSteps.allSatisfy { if case .start = $0 { false } else { true } })
+        let after = planner.plan(input(src, now: at(tue, 9, 31), ledger: .init(exams: [.init(id: examID, day: tue)]),
+                                       exams: [firstRunning]))
+        #expect(after.examSteps.count == 2)
+        if case .start(let next, _)? = after.examSteps.last { #expect(next.examID == secondExamID) } else {
+            Issue.record("expected the second exam to start after the first, got \(after.examSteps)")
+        }
+        // The first one ended by the planner (not swiped) is forgotten; the second is recorded.
+        #expect(after.ledger.hasExam(secondExamID, day: tue) && !after.ledger.hasExam(examID, day: tue))
+    }
+
+    // m3
+    @Test func anEarlierExamAddedLaterReplacesThePendingOne() {
+        let later = exam(thu, 10, id: secondExamID)
+        let earlier = exam(wed, 10)
+        let pending = examActivity(later, id: "X", status: .pending, now: at(tue, 20))
+        let plan = planner.plan(input(sources(days: [], exams: [earlier, later]), now: at(tue, 20), preferences: auto,
+                                      ledger: .init(exams: [.init(id: secondExamID, day: thu)]), exams: [pending]))
+        #expect(plan.examSteps.first == .end(id: "X", nil, .immediate))
+        guard case let .schedule(attributes, _, date, _)? = plan.examSteps.last else {
+            Issue.record("expected a schedule, got \(plan.examSteps)")
+            return
+        }
+        #expect(attributes.examID == examID && date == at(wed, 6))
+        #expect(plan.ledger.hasExam(examID, day: wed) && !plan.ledger.hasExam(secondExamID, day: thu))
+        // Without a new earlier exam the pending one is kept.
+        let kept = planner.plan(input(sources(days: [], exams: [later]), now: at(tue, 20), preferences: auto,
+                                      ledger: .init(exams: [.init(id: secondExamID, day: thu)]), exams: [pending]))
+        #expect(kept.examSteps.isEmpty)
+    }
+
+    // m4
+    @Test func aLongExamWindowIsCappedAtEightHours() {
+        let long = exam(wed, 10, end: (17, 0))
+        #expect(LiveActivityPlanner.window(long, context) == at(wed, 9)..<at(wed, 17))
+        #expect(LiveActivityPlanner.window(exam(wed, 10), context).lowerBound == at(wed, 4))   // short exam: 6 h lead
+    }
+
+    // m5 + a system-ended activity
+    @Test func onlyDismissedOrSystemEndedActivitiesBlockARestart() {
+        // Today cleared by a data change (holiday), then restored: the planner's own end forgot the day.
+        let active = running(tue, now: at(tue, 9))
+        let cleared = planner.plan(input(sources(days: [lessonDay(wed)]), now: at(tue, 9), ledger: .init(lessonDays: [tue]),
+                                         lessons: [active]))
+        #expect(cleared.lessonSteps == [.end(id: "L1", nil, .immediate)] && !cleared.ledger.hasLesson(tue))
+        let restored = planner.plan(input(sources(), now: at(tue, 9, 5), ledger: cleared.ledger))
+        if case .start? = restored.lessonSteps.first {} else { Issue.record("expected a restart, got \(restored.lessonSteps)") }
+        // Ended by the system after 8 h (or swiped away): still in Activity.activities as ended / dismissed, recorded →
+        // not restarted that day (RISKS #75).
+        for status in [LiveActivityStatus.ended, .dismissed] {
+            let ended = running(tue, now: at(tue, 9), status: status)
+            let plan = planner.plan(input(sources(), now: at(tue, 10), ledger: .init(lessonDays: [tue]), lessons: [ended]))
+            #expect(plan.lessonSteps.isEmpty, "\(status)")
+        }
+        // A duplicate end keeps the key (the kept activity still covers the day).
+        let a = running(tue, now: at(tue, 9), id: "A")
+        let b = running(tue, now: at(tue, 9), id: "B")
+        let dup = planner.plan(input(sources(), now: at(tue, 9), ledger: .init(lessonDays: [tue]), lessons: [a, b]))
+        #expect(dup.ledger.hasLesson(tue) && dup.keepsActivity)
+    }
+
+    @Test func switchingAnActivityOffEndsItAndForgetsItsDay() {
+        let plan = planner.plan(input(sources(), now: at(tue, 9), preferences: .init(lessonEnabled: false),
+                                      ledger: .init(lessonDays: [tue]), lessons: [running(tue, now: at(tue, 9))]))
+        #expect(plan.ledgerChanges == [.forgetLesson(tue)] && !plan.keepsActivity)
+    }
+
+    // DST (Europe/Bratislava, CEST → CET on Sun 2026-10-25 at 03:00)
+    @Test func dstChangeKeepsWallClockWindowsAndBoundaries() {
+        let sunday = day(2026, 10, 25)
+        let src = sources(days: [lessonDay(sunday)])
+        #expect(at(sunday, 8).timeIntervalSince(at(day(2026, 10, 24), 8)) == 25 * 3600)
+        #expect(planner.plan(input(src, now: at(sunday, 7, 44))).lessonSteps.isEmpty)
+        let plan = planner.plan(input(src, now: at(sunday, 7, 45)))
+        guard case .start(_, let content)? = plan.lessonSteps.first else {
+            Issue.record("expected a start")
+            return
+        }
+        #expect(content.staleDate == at(sunday, 8))
+        let shown = presenter.lesson(content.state, now: at(sunday, 8, 10))
+        #expect(shown.timer == at(sunday, 8)...at(sunday, 8, 45))
+    }
+
+    @Test func sourcesUseWallClockTimesAcrossDSTAndAfterAZoneChange() throws {
+        let scenario = SampleScenarios.secondary()
+        let locale = Locale(identifier: "en_GB")
+        let friday = at(day(2026, 10, 23), 9)
+        let src = LiveActivitySourceBuilder.make(database: scenario.database, now: friday, context: context, locale: locale,
+                                                 languageCode: "en")
+        let snapshot = WidgetSnapshotBuilder.make(database: scenario.database, now: friday, context: context, tier: .pro,
+                                                  locale: locale, languageCode: "en")
+        #expect(src.lessonDays.contains { $0.day > day(2026, 10, 25) }, "no lesson day after the DST change")
+        for lessonDay in src.lessonDays {
+            let widgetDay = try #require(snapshot.day(lessonDay.day))
+            let wallClock = WidgetTimelinePlanner.active(widgetDay, context).map(\.startTime)
+            #expect(lessonDay.lessons.map { context.local(from: $0.start).time } == Array(wallClock.prefix(lessonDay.lessons.count)))
+            #expect(lessonDay.lessons.allSatisfy { context.localDate(of: $0.start) == lessonDay.day })
+        }
+        // After moving to New York ("follow device" timetable): the same wall-clock times, in the new zone.
+        let newYork = CalendarContext(timeZone: TimeZone(identifier: "America/New_York")!, firstWeekday: .monday)
+        let nyNow = newYork.date(day(2026, 10, 23), LocalTime(hour: 7, minute: 0)!)
+        let ny = LiveActivitySourceBuilder.make(database: scenario.database, now: nyNow, context: newYork, locale: locale,
+                                                languageCode: "en")
+        #expect(ny.style.timeZoneID == "America/New_York")
+        let nyFirst = try #require(ny.lessonDays.first)
+        let homeFirst = try #require(src.lessonDays.first { $0.day == nyFirst.day })
+        #expect(newYork.local(from: nyFirst.lessons[0].start).time == context.local(from: homeFirst.lessons[0].start).time)
+        #expect(nyFirst.lessons[0].start != homeFirst.lessons[0].start)
+    }
+}
+
+@Suite("Live Activity ledger — QA fixes")
+struct LiveActivityLedgerQAFixTests {
+    @Test func preferenceTogglesAndTheSystemSwitchClearTheLedger() {
+        var ledger = LiveActivityLedger(lessonDays: [tue.adding(days: -1), tue, wed], exams: [.init(id: examID, day: tue)])
+        let off = LiveActivityPreferences(lessonEnabled: false, examEnabled: false)
+        let on = LiveActivityPreferences()
+        ledger.applyPreferenceChange(from: on, to: off, today: tue)   // switching off changes nothing here
+        #expect(ledger.lessonDays.count == 3 && ledger.exams.count == 1)
+        ledger.applyPreferenceChange(from: off, to: LiveActivityPreferences(lessonEnabled: true, examEnabled: false), today: tue)
+        #expect(ledger.lessonDays == [tue.adding(days: -1)] && ledger.exams.count == 1)
+        ledger.applyPreferenceChange(from: LiveActivityPreferences(examEnabled: false), to: on, today: tue)
+        #expect(ledger.exams.isEmpty)
+        var system = LiveActivityLedger(lessonDays: [tue], exams: [.init(id: examID, day: tue)])
+        system.systemReenabled(today: tue)
+        #expect(system.lessonDays.isEmpty && system.exams.isEmpty)
+    }
+
+    @Test func runChangesApplyOnTopOfConcurrentWrites() {
+        // M3: the run planned with an old ledger; meanwhile Settings cleared today. Applying only the run's changes
+        // keeps that write (a stale full save would bring `tue` back).
+        let plan = planner.plan(input(sources(), now: at(tue, 19), preferences: auto, ledger: .init(lessonDays: [tue])))
+        #expect(plan.ledgerChanges == [.recordLesson(wed)])
+        var current = LiveActivityLedger()   // what Settings left in the store during the run
+        current.apply(plan.ledgerChanges)
+        #expect(current.lessonDays == [wed])
+    }
+
+    @Test func ledgerDecodesTheOldFormatWithoutExams() throws {
+        let data = Data(#"{"days":["2026-10-13"],"exams":["E8A30000-0000-4000-8000-000000000001"]}"#.utf8)
+        let ledger = try JSONDecoder().decode(LiveActivityLedger.self, from: data)
+        #expect(ledger.lessonDays == [tue] && ledger.exams.isEmpty)
+        let round = try JSONDecoder().decode(LiveActivityLedger.self, from: JSONEncoder().encode(
+            LiveActivityLedger(lessonDays: [tue], exams: [.init(id: examID, day: wed)])))
+        #expect(round.hasExam(examID, day: wed))
+    }
+
+    @Test func keepsActivityIsKnownBeforeTheSteps() {
+        #expect(planner.plan(input(sources(), now: at(tue, 9))).keepsActivity)          // a start
+        #expect(!planner.plan(input(sources(), now: at(tue, 6))).keepsActivity)         // nothing yet
+        #expect(planner.plan(input(sources(), now: at(tue, 9), canStart: false,
+                                   lessons: [running(tue, now: at(tue, 9))])).keepsActivity)
     }
 }
