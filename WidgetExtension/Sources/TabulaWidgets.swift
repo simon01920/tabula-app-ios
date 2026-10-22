@@ -10,6 +10,9 @@ import WidgetKit
 struct TabulaWidgetBundle: WidgetBundle {
     var body: some Widget {
         NowNextWidget()
+        TodayWidget()
+        HomeworkWidget()
+        NextExamWidget()
         // Owned by the notifications agent (WidgetExtension/Sources/AlarmLiveActivity.swift).
         AlarmLiveActivity()
         // Phase 4 B2: lesson + exam-day Live Activities (WidgetExtension/Sources/TabulaLiveActivities.swift).

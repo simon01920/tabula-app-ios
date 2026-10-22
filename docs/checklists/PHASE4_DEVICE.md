@@ -120,11 +120,41 @@ Watch pairing, WatchConnectivity snapshot transfer, complication refresh and wat
 Stage A only guarantees the snapshot format they will reuse: < 20 KB for the seeded scenarios (Linux test
 `encodedSnapshotStaysSmall`).
 
+---
+
+## B1
+
+**Today, Homework and Next exam widgets** (StaticConfiguration, no App Intents yet). Same build caveats as A0: a free-team
+xtool build has no App Group, so every widget shows "Open Tabula" (row B1.1); the rest needs a group build. CI gallery
+pages for comparison: `widgets.gallery-today`, `widgets.gallery-homework`, `widgets.gallery-exam`.
+
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| B1.1 | Add Today (medium), Homework (small) and Next Exam (small) on a free-team build | Each shows "Open Tabula" + the hint; gallery names/descriptions localised | | |
+| B1.2 | Today medium during a lesson | Header "Today" + date; rows from the current lesson on (3-4); current row on a plate with a bar; cancelled lessons struck through with "Cancelled"; changed ones carry an icon + text line | | |
+| B1.3 | Today large | Whole day, ended lessons dimmed; "Due today" with up to 3 tasks (overdue-today ones with a warning icon) | | |
+| B1.4 | After the last lesson; then past midnight | "Tomorrow" header with tomorrow's lessons and "Due tomorrow"; after 00:00 it reads "Today" | | |
+| B1.5 | Holiday / free day / cancelled day | Same wording as Now & Next with the next lesson | | |
+| B1.6 | Homework small / medium / large | Small: count + top task; medium 3 rows, large 9, "+N more"; overdue first with a warning icon AND text ("2 days overdue"); due texts Today / Tomorrow / Fri | | |
+| B1.7 | Tap a Homework row (medium), then the small widget | Opens that task's detail (`tabula://open/task/<id>`, RISKS #66); small opens the top task | | |
+| B1.8 | Complete the last open task in the app | Widget turns to "All done" within seconds | | |
+| B1.9 | Task with a due time: wait until a minute after it | Row turns overdue without opening the app | | |
+| B1.10 | Next Exam small, exam 2+ days away | Subject, title, date, time, room; "in N days" with a calendar icon | | |
+| B1.11 | Exam tomorrow; exam day before the start | "Tomorrow" (alert icon); "Today, 10:00" + live "Starts in" countdown ticking without the app | | |
+| B1.12 | During / after the exam | "In progress" with a "Time left" countdown; later "Finished" | | |
+| B1.13 | Lock Screen: rectangular + circular Next Exam | Rectangular: subject, icon + countdown/timer, date; circular: icon + days number; tap opens the exam | | |
+| B1.14 | Tinted Home Screen / Lock Screen (accented, vibrant) | Subject colours become outlined marks; text stays legible; overdue still has icon + word | | |
+| B1.15 | VoiceOver on each widget | One sentence per widget (Today, small Homework, exam); Homework rows one sentence each | | |
+| B1.16 | Largest Dynamic Type; non-English app language | No clipped essential text; strings translated | | |
+| B1.17 | Two exams on one day; the day after an exam | After the first exam ends the widget switches to the second one with its countdown; the day after the last exam it shows "No Upcoming Exams" (or the next exam), not "Open Tabula" | | |
+
+Known difference (accepted, QA minor): on a Friday evening the Today widget (lessons over, nothing tomorrow) shows the Stage A status "No more lessons today" with the Monday lesson, while the Today tab words it slightly differently. Not a bug; no code change.
+
 ## B2
 
 Live Activities for (a) the current lesson and (b) exam day (Phase 4 Stage B2, PHASE4_PLAN §0.5, decision P3-6). Rules
 and constants: `Packages/TimetableUI/Sources/TimetableUI/Widgets/LiveActivityPlanner.swift` (header); facts:
-ENVIRONMENT §29; risks: RISKS #70–#76 (numbers may be renumbered at merge, B1 appends in parallel).
+ENVIRONMENT §31; risks: RISKS #73–#79.
 
 ### B2.0 Setup and what each build can prove
 - **Any build works**, including a free-team xtool build: ActivityKit needs no entitlement and no App Group (the content
@@ -149,8 +179,8 @@ ENVIRONMENT §29; risks: RISKS #70–#76 (numbers may be renumbered at merge, B1
 |---|---|---|---|---|
 | B2.1 | Open Tabula **more than 15 min** before the first lesson, lock | No Live Activity yet (the window opens 15 min before) | | |
 | B2.2 | Open Tabula **≤ 15 min** before the first lesson, lock | Lock Screen: "First Lesson", subject, room · time, "Starts in" + live countdown; Dynamic Island compact: badge + countdown | | |
-| B2.3 | Wait until the lesson starts **without opening the app** | At the start the activity switches to "Now", the lesson's "Time left" countdown and progress bar (stale-date re-render, RISKS #70). Record whether it switched on time | | |
-| B2.4 | Wait until the lesson ends, still without opening the app | Record what the Lock Screen shows in the break. Expected "Next" + the next lesson counting down (needs a second re-render, which only an update gives: if it shows 0:00 for the old lesson, RISKS #70 materialised) | | |
+| B2.3 | Wait until the lesson starts **without opening the app** | At the start the activity switches to "Now", the lesson's "Time left" countdown and progress bar (stale-date re-render, RISKS #73). Record whether it switched on time | | |
+| B2.4 | Wait until the lesson ends, still without opening the app | Record what the Lock Screen shows in the break. Expected "Next" + the next lesson counting down (needs a second re-render, which only an update gives: if it shows 0:00 for the old lesson, RISKS #73 materialised) | | |
 | B2.5 | Open Tabula in the break, go back to the Lock Screen | Updated at once: "Next" + next lesson countdown; Developer shows `1 lesson + 0 exam steps` (one update) | | |
 | B2.6 | Keep Tabula open in the foreground across a lesson boundary | The in-app timer updates the activity within ~1 s of the boundary | | |
 | B2.7 | Edit the current lesson's room in Tabula | Lock Screen shows the new room within ~1 s; no second activity appears | | |
@@ -196,7 +226,7 @@ ENVIRONMENT §29; risks: RISKS #70–#76 (numbers may be renumbered at merge, B1
 | B2.31 | StandBy (charging, landscape) | Minimal presentation at the top; tapping shows the Lock Screen layout scaled up; readable in Night Mode (red tint) | | |
 | B2.32 | Low Power Mode on during lessons, app closed | Timers keep counting; background refresh is reduced, so updates come at the next foreground — record whether the boundary re-renders (B2.3) still happen | | |
 | B2.33 | App closed for a whole school day, Background App Refresh on | Developer "Last run" shows background runs (record the times) and compares them with the lesson boundaries (the refresh request asks for the next boundary while an activity runs) | | |
-| B2.34 | A day longer than 8 h (15 min before the first lesson to the end of the last) | The system ends the activity after 8 h (Apple limit); it is not restarted that day (documented, RISKS #72) | | |
+| B2.34 | A day longer than 8 h (15 min before the first lesson to the end of the last) | The system ends the activity after 8 h (Apple limit); it is not restarted that day (documented, RISKS #75) | | |
 | B2.35 | Apple Watch paired, activity running | The Smart Stack shows it (system layout from the compact presentation: badge + timer); a tap offers to open Tabula on the iPhone (no watch app until Phase 5); record readability | | |
 | B2.36 | VoiceOver on the Lock Screen activity and on the compact island | Lock Screen: one sentence ("Now, Mathematics, 8:00 to 8:45, room 214, ends at 8:45, Next, 8:55, Biology"); compact timer: "Mathematics, ends at 8:45" | | |
 | B2.37 | Largest Dynamic Type | Lock Screen text scales within the 160 pt limit without overlaps (the system may truncate); record clipping | | |

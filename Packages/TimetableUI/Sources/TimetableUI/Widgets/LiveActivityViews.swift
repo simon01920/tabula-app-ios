@@ -21,7 +21,7 @@
 // VoiceOver: the Lock Screen view and the expanded presentation are one element each with the presenter's sentence;
 // the compact / minimal timers speak `timerAccessibilityLabel` ("Mathematics, ends at 9:40").
 //
-// APIs (Apple docs JSON, checked 2026-10-16, ENVIRONMENT §29): Text(timerInterval:pauseTime:countsDown:showsHours:)
+// APIs (Apple docs JSON, checked 2026-10-16, ENVIRONMENT §31): Text(timerInterval:pauseTime:countsDown:showsHours:)
 //   iOS 16 / watchOS 9; ProgressView(timerInterval:countsDown:label:currentValueLabel:) iOS 16 / watchOS 9;
 //   EnvironmentValues.isLuminanceReduced iOS 16 / watchOS 8; HIG Live Activities: Lock Screen margin 14 pt,
 //   408 × 84…160 pt (430 × 932 screen), compact 62.33 × 36.67, minimal 36.67…45 × 36.67, limited width 28 pt circle.

@@ -20,7 +20,7 @@
 // Seed / screenshot runs (`AppEnvironment.liveActivities.isLive == false`) never touch ActivityKit: seed data must not
 // reach the real Lock Screen.
 //
-// APIs (Apple docs JSON, checked 2026-10-16, ENVIRONMENT §29): Activity.request(attributes:content:pushType:) (iOS 16.2,
+// APIs (Apple docs JSON, checked 2026-10-16, ENVIRONMENT §31): Activity.request(attributes:content:pushType:) (iOS 16.2,
 //   foreground only, throws ActivityAuthorizationError e.g. .visibility in the background),
 //   Activity.request(attributes:content:pushType:style:alertConfiguration:start:) (iOS 26: "Requests and schedules a
 //   Live Activity for a specific date"; the system starts it even if the app is in the background; must alert),

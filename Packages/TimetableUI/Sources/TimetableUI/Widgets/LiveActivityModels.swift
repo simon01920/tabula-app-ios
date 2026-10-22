@@ -12,7 +12,7 @@
 // (AppModel `.environment`), so the instants follow "follow device" timetables while the app runs; a zone change
 // while the app is not running keeps the old instants until the next foreground / background refresh (RISKS).
 //
-// Size: "Static and dynamic data for a Live Activity … can't exceed a combined size of 4 KB" (Apple, ENVIRONMENT §29).
+// Size: "Static and dynamic data for a Live Activity … can't exceed a combined size of 4 KB" (Apple, ENVIRONMENT §31).
 // User text is cut (`LiveActivityLimits`) and a lesson day carries at most `maxLessons` lessons; tests assert the
 // worst case (every field at its maximum, 4-byte characters) stays under `LiveActivityLimits.maxEncodedBytes`.
 //

@@ -2,7 +2,7 @@
 // Pure, Linux-tested; the app (App/Sources/Widgets/LiveActivityController.swift) only reads ActivityKit's current
 // activities into `LiveActivityExisting` values, runs `plan`, and executes the steps.
 //
-// Apple's rules this is built on (ENVIRONMENT §29): an app starts a Live Activity only while it is in the FOREGROUND
+// Apple's rules this is built on (ENVIRONMENT §31): an app starts a Live Activity only while it is in the FOREGROUND
 // (`canStart`; background requests fail with `.visibility`); it updates and ends them from the foreground or a
 // background task; iOS 26 can SCHEDULE a start for a date (`request(…, alertConfiguration:start:)`, which must alert
 // the user, and the pending activity counts toward the system limit); an activity lives ≤ 8 h, then stays on the Lock

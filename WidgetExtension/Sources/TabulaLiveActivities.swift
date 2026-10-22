@@ -11,7 +11,7 @@
 // The Lock Screen keeps the system background (no `activityBackgroundTint`): it follows light / dark and Always-On,
 // and the text colours are the system's (contrast-safe); the subject colour shows in the badge and progress only.
 //
-// APIs (Apple docs JSON, checked 2026-10-16, ENVIRONMENT §29): ActivityConfiguration(for:content:dynamicIsland:)
+// APIs (Apple docs JSON, checked 2026-10-16, ENVIRONMENT §31): ActivityConfiguration(for:content:dynamicIsland:)
 //   (iOS 16.1), ActivityViewContext (.attributes, .state, .isStale iOS 16.2), DynamicIsland(expanded:compactLeading:
 //   compactTrailing:minimal:), DynamicIslandExpandedRegion(_:priority:content:) with .leading / .trailing / .center /
 //   .bottom, DynamicIsland.keylineTint(_:), DynamicIsland.widgetURL(_:), View.widgetURL(_:).
