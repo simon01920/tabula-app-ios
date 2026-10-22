@@ -146,3 +146,11 @@ widget name `widget.nowNext.name` appears in the iOS widget gallery (sk "Teraz a
 `widget.nowNext.nextShort` is one line on the Lock Screen and must stay short; `widget.pro.short` ≤ about 4 characters;
 the brand stays undeclined ("aplikácia Tabula", "aplikace Tabula", "aplikacja Tabula"); `widget.nowNext.inline.current
 %@ %@` is only a separator format (`%1$@ · %2$@`, ja `・`).
+### Phase 4 Stage B2 additions (2026-10-22, widgets-watch-engineer)
+12 new keys (`liveActivity.exam.*`, `liveActivity.alert.at`, `settings.liveActivities.*`), model-authored for 11 languages
+(`sr-Latn` derived), all `needs_review`. The Live Activities otherwise reuse the Today header / widget keys. Reviewer: use
+Apple's official names for "Live Activities", "Lock Screen" and "Dynamic Island" in each language (de "Live-Aktivitäten",
+fr "Activités en direct", sk/cs "Živé aktivity", ja "ライブアクティビティ", zh-Hans "实时活动" / "灵动岛");
+`liveActivity.exam.*` are one-line captions on the Lock Screen and must stay short; `liveActivity.alert.at` is the body of
+the alert iOS shows when a scheduled activity starts ("Mathematics at 8:00"; hu "%1$@ – kezdés: %2$@" avoids the time
+suffix, ja/zh put "start" after the time); the brand stays undeclined ("aplikácia Tabula").

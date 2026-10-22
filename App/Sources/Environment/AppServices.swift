@@ -18,6 +18,8 @@ final class AppServices {
     let notificationDelegate: NotificationResponseDelegate
     /// Widget snapshot writer (Phase 4 A): App Group snapshot + WidgetKit reload after every change.
     let widgets: WidgetSnapshotWriter
+    /// Lesson + exam-day Live Activities (Phase 4 B2): start / schedule / update / end after every change.
+    let liveActivities: LiveActivityController
 
     init(environment: AppEnvironment) {
         let model = AppModel(environment: environment)
@@ -37,6 +39,10 @@ final class AppServices {
         reminders.attach()
         AttachmentMaintenance.install(on: model)   // orphan attachment cleanup after load + changes (B3); chains onChange
         widgets = WidgetSnapshotWriter.install(on: model)   // widget snapshot after load + changes (Phase 4 A); chains onChange
+        let liveActivities = LiveActivityController.install(on: model)   // Live Activities (Phase 4 B2); chains onChange
+        self.liveActivities = liveActivities
+        // A background refresh near the next lesson boundary / exam start while an activity runs.
+        reminders.additionalRefreshDate = { [weak liveActivities] in liveActivities?.backgroundRefreshHint }
     }
 }
 

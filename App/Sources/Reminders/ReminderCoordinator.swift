@@ -78,6 +78,9 @@ final class ReminderCoordinator {
     @ObservationIgnored private let offerStore: any ReminderPermissionOfferStore
     /// A user save happened since the last run started (consumed by the next run).
     @ObservationIgnored private var offerArmed = false
+    /// Another feature's wish for an earlier background refresh (Phase 4 B2: the next lesson boundary / exam start
+    /// while a Live Activity runs); merged into the request by `BackgroundRefreshPolicy`.
+    @ObservationIgnored var additionalRefreshDate: (@MainActor () -> Date?)?
 
     init(engine: ReminderEngine, model: AppModel, navigation: AppNavigation,
          backgroundScheduler: any BackgroundRefreshScheduling, deviceState: @escaping @MainActor () -> DeviceReminderState,
@@ -203,7 +206,8 @@ final class ReminderCoordinator {
         lastResult = result
         lastReasons = reasons
         lastRunAt = model.now
-        let earliest = BackgroundRefreshPolicy.earliestBeginDate(nextReplanDate: result.replanDate, now: model.now)
+        let earliest = BackgroundRefreshPolicy.earliestBeginDate(nextReplanDate: result.replanDate, now: model.now,
+                                                                 additional: additionalRefreshDate?())
         if let error = await backgroundScheduler.submit(earliestBeginDate: earliest) {
             lastBackgroundRequest = "failed: \(error)"
         } else {

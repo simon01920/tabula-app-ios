@@ -1,5 +1,5 @@
 // Settings root (stage B4): one grouped Form; sub-pages are SettingsCalendarView, SettingsAppearanceView,
-// SettingsRemindersView, SettingsAboutView. Every write goes through `model.apply(.settings { … })`.
+// SettingsRemindersView, SettingsLiveActivitiesView (Phase 4 B2), SettingsAboutView. Every write goes through `model.apply(.settings { … })`.
 // Keep the type name `SettingsRootView` and its no-argument init (the app shell uses it) and keep
 //     #if DEBUG
 //     DeveloperSettingsLink()
@@ -44,6 +44,13 @@ struct SettingsRootView: View {
                     }
                 } header: {
                     Text("settings.reminders.title")
+                }
+                Section {
+                    NavigationLink { SettingsLiveActivitiesView() } label: {
+                        Label { Text("settings.liveActivities.row") } icon: { Image(systemName: "timer") }
+                    }
+                } header: {
+                    Text("settings.liveActivities.title")
                 }
                 languageSection
                 proSection

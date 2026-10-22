@@ -15,5 +15,8 @@ struct TabulaWidgetBundle: WidgetBundle {
         NextExamWidget()
         // Owned by the notifications agent (WidgetExtension/Sources/AlarmLiveActivity.swift).
         AlarmLiveActivity()
+        // Phase 4 B2: lesson + exam-day Live Activities (WidgetExtension/Sources/TabulaLiveActivities.swift).
+        LessonLiveActivity()
+        ExamLiveActivity()
     }
 }

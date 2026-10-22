@@ -39,11 +39,13 @@ struct TabulaRootApp: App {
 
     var body: some Scene {
         let reminders = services.reminders
+        let liveActivities = services.liveActivities
         WindowGroup {
             AppRootView(launchRoute: launchRoute)
                 .environment(services.model)
                 .environment(services.navigation)
                 .environment(services.reminders)
+                .environment(services.liveActivities)
                 .task { await services.model.load() }
                 // Widget taps (Phase 4 A): `tabula://open/…` (ItemLinkURL) → the same path as a notification tap.
                 // Anything else is ignored (any app or web page can send the app a URL).
@@ -59,10 +61,13 @@ struct TabulaRootApp: App {
                 services.widgets.flushNow()           // a change made just before leaving reaches the widgets
             }
         }
-        // The BGAppRefreshTask handler: loads the store if the app was launched for it, re-plans, submits the next
-        // request. Returning completes the task (SwiftUI cancels it when the time is up).
+        // The BGAppRefreshTask handler: loads the store if the app was launched for it, re-plans the reminders and
+        // submits the next request (first, so a slow ActivityKit call can never cut the refresh chain; the request uses
+        // the Live Activity hint of the previous run), then updates / ends the Live Activities (Phase 4 B2).
+        // Returning completes the task (SwiftUI cancels it when the time is up).
         .backgroundTask(.appRefresh(BackgroundRefreshPolicy.taskIdentifier)) {
             await reminders.backgroundRefresh()
+            await liveActivities.backgroundRefresh()
         }
     }
 }
