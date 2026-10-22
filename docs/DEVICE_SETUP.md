@@ -12,6 +12,18 @@ Repo path in WSL: `/mnt/c/Users/simon/Documents/Claude Code/school_timetable`.
 
 Never type or paste an Apple ID password, 2FA code or app-specific password into the chat (CLAUDE.md rule 7).
 
+> **VERIFIED 2026-10-16 (ENVIRONMENT §29): install through the relay route, not USB/IP.**
+> - USB/IP (sections 1–2) pairs and provisions, but the app upload hangs at `[Connecting] 100%` (usbmuxd reports "message was too large"; xtool #341).
+> - **Working route (phone: iPhone 16 Pro, iOS 27.0.1):**
+>   1. Detach the phone from WSL: `usbipd detach --busid <BUSID>`.
+>   2. Open the **Apple Devices** app on Windows, with the phone plugged in and trusted.
+>   3. On Windows (no admin): `py -3 scripts/win-usbmuxd-relay.py 172.19.96.1`. Use the IP of the `vEthernet (WSL…)` adapter.
+>   4. In WSL: `export USBMUXD_SOCKET_ADDRESS=172.19.96.1:27015 && cd /root/.cache/tabula/work && xtool dev run`.
+>
+>   Run `bash scripts/xtool-dev.sh build` first, so the work dir is current.
+> - Use xtool **1.22.2+**; 1.20.1 cannot log in (error -80045).
+> - The human opens a root shell without the first-run prompt using `wsl -d Ubuntu -u root --exec bash -l`.
+
 ## 0. Preflight (before the phone is plugged in)
 
 **[Orch]** run the doctor; it is read-only and always exits 0:
