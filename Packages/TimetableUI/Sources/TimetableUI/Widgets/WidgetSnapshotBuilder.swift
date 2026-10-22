@@ -20,8 +20,15 @@ public enum WidgetSnapshotBuilder {
     public static let taskHorizonDays = 7
     /// At most this many tasks.
     public static let maxTasks = 20
+    /// At most this many overdue tasks are listed (the count is always complete).
+    public static let maxOverdueTasks = 8
     /// User text longer than this is cut (characters).
-    public static let maxTextLength = 80
+    public static let maxTextLength = 60
+    /// At most this many upcoming exams are listed (B1 QA M1).
+    public static let maxExams = 4
+    /// The encoded snapshot is trimmed (far-future tasks first) until it is at most this many bytes: the Watch
+    /// reuses it and ARCHITECTURE.md budgets < 20 KB (B1 QA M2).
+    public static let maxEncodedBytes = 19_000
     /// Days covered after today when no school day follows tomorrow within the horizon.
     public static let fallbackCoveredDays = 7
     /// Horizon of the next-school-day and following-lesson searches.
@@ -69,24 +76,65 @@ public enum WidgetSnapshotBuilder {
         let horizon = today.adding(days: taskHorizonDays)
         let due = TaskListModel.tasks(in: .today, from: liveTasks, now: nowLocal, sort: .due)
             + TaskListModel.tasks(in: .upcoming, from: liveTasks, now: nowLocal, sort: .due)
-        snapshot.tasks = due.compactMap { task -> WidgetSnapshot.DueTask? in
-            guard let dueDate = task.due?.date, dueDate <= horizon else { return nil }
+        func dueTask(_ task: TaskItem) -> WidgetSnapshot.DueTask? {
+            guard let dueDate = task.due?.date else { return nil }
             return WidgetSnapshot.DueTask(id: task.id.uuid, title: shortened(task.title),
                                           subject: task.subjectID.flatMap { subjects[$0] }.map(shortened),
                                           dueDate: dueDate, dueTime: task.due?.time, priority: task.priority)
         }
-        .prefix(maxTasks).map { $0 }
+        snapshot.tasks = due.compactMap { task in dueTask(task).flatMap { $0.dueDate <= horizon ? $0 : nil } }
+            .prefix(maxTasks).map { $0 }
+        // Open tasks (the Tasks tab's Today + Upcoming + Overdue; undated ones included) for the Homework count.
+        let counts = TaskListModel.counts(of: liveTasks, now: nowLocal)
+        snapshot.openTaskCount = counts.today + counts.upcoming + counts.overdue
+        // Overdue tasks: those due today (time passed) first, then the oldest; listed oldest first.
+        let overdueAll = TaskListModel.tasks(in: .overdue, from: liveTasks, now: nowLocal, sort: .due).compactMap(dueTask)
+        let overdueToday = overdueAll.filter { $0.dueDate == today }
+        let overdueOlder = overdueAll.filter { $0.dueDate != today }
+        let overdue = (overdueToday + overdueOlder).prefix(maxOverdueTasks)
+            .sorted { ($0.dueDate, $0.dueTime ?? .midnight) < ($1.dueDate, $1.dueTime ?? .midnight) }
+        snapshot.overdueItems = overdue.isEmpty ? nil : overdue
 
-        if let row = ExamListModel.make(database: database, today: today, context: context).next {
-            let facts = ExamFacts(exam: row.exam, visibility: ExamFacts.visibility(for: row.exam, in: database))
-            snapshot.nextExam = WidgetSnapshot.UpcomingExam(
-                id: row.exam.id.uuid, title: shortened(row.exam.title), subject: row.subject.map(shortened),
-                date: row.exam.date, start: row.exam.start, end: row.exam.end, room: facts.room.map(shortened))
+        // Upcoming exams: not completed, and not ended yet (no end: the whole exam day), soonest first.
+        let subjectsByID = subjects
+        let upcoming = database.exams.filter { !$0.isDeleted && !$0.isCompleted && $0.date >= today }
+            .filter { exam in
+                guard exam.date == today, let end = exam.end, end > (exam.start ?? .midnight) else { return true }
+                return context.date(exam.date, end) > now
+            }
+            .sorted { ($0.date, $0.start ?? LocalTime.midnight, $0.title) < ($1.date, $1.start ?? LocalTime.midnight, $1.title) }
+            .prefix(maxExams)
+        let exams = upcoming.map { exam -> WidgetSnapshot.UpcomingExam in
+            let facts = ExamFacts(exam: exam, visibility: ExamFacts.visibility(for: exam, in: database))
+            return WidgetSnapshot.UpcomingExam(
+                id: exam.id.uuid, title: shortened(exam.title), subject: exam.subjectID.flatMap { subjectsByID[$0] }.map(shortened),
+                date: exam.date, start: exam.start, end: exam.end, room: facts.room.map(shortened))
         }
+        snapshot.nextExam = exams.first
+        snapshot.exams = exams.isEmpty ? nil : exams
+        enforceBudget(&snapshot)
         return snapshot
     }
 
     // MARK: Internals
+
+    /// Trims the lowest-priority lists until the encoded snapshot fits `maxEncodedBytes`: tasks beyond the first 8,
+    /// overdue beyond the first 3, exams beyond 2, tasks beyond 4, exams beyond 1, overdue beyond 1.
+    static func enforceBudget(_ snapshot: inout WidgetSnapshot) {
+        func size() -> Int { (try? WidgetSnapshotStore.encode(snapshot).count) ?? 0 }
+        let steps: [(inout WidgetSnapshot) -> Void] = [
+            { $0.tasks = Array($0.tasks.prefix(8)) },
+            { $0.overdueItems = $0.overdueItems.map { Array($0.prefix(3)) } },
+            { $0.exams = $0.exams.map { Array($0.prefix(2)) } },
+            { $0.tasks = Array($0.tasks.prefix(4)) },
+            { $0.exams = $0.exams.map { Array($0.prefix(1)) } },
+            { $0.overdueItems = $0.overdueItems.map { Array($0.prefix(1)) } },
+        ]
+        for step in steps {
+            guard size() > maxEncodedBytes else { return }
+            step(&snapshot)
+        }
+    }
 
     static func day(_ date: LocalDate, resolver: ScheduleResolver, database: TabulaDatabase,
                     visibility: FieldVisibility) -> WidgetSnapshot.Day {

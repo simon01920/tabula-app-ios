@@ -98,6 +98,13 @@ public enum DynamicL10nKeys {
         "lesson.status.added", "lesson.status.modified", "widget.nowNext.nextShort", "widget.nowNext.later",
         "widget.nowNext.a11y.endsAt", "widget.nowNext.a11y.startsAt", "widget.open.title", "widget.open.noTimetable",
         "widget.open.noSnapshot", "widget.open.outdated", "widget.pro.title", "widget.pro.short",
+        // Phase 4 B1 (Today / Homework / Next exam presenters; the due phrases `tasks.due.*`, `exams.when.*` and the
+        // priority sentences are in their own families above).
+        "shell.tab.today", "today.section.tomorrow", "today.section.dueToday", "widget.today.dueTomorrow",
+        "widget.homework.name", "widget.homework.count", "widget.homework.allDone.title",
+        "widget.homework.allDone.detail", "widget.homework.overdue", "widget.more", "widget.exam.name",
+        "widget.exam.inProgress", "widget.exam.finished", "widget.exam.empty.detail", "exams.empty.upcoming.title",
+        "exams.a11y.room", "a11y.task.overdue", "a11y.task.due", "widget.separator",
         // The interpolated `Text` key of NowNextInlineView (subject + live timer); validate.sh skips interpolated keys.
         "widget.nowNext.inline.current %@ %@",
     ]
