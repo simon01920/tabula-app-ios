@@ -6,6 +6,11 @@
 //   widgets.gallery          during a lesson + in a break
 //   widgets.gallery-evening  after school + a holiday
 //   widgets.gallery-pro      Pro placeholders (free tier, Lock Screen families) + the "Open Tabula" states
+// Phase 4 B1 (one page each, one screenshot each):
+//   widgets.gallery-today     Today: medium during a lesson, medium after school ("Tomorrow"), large
+//   widgets.gallery-homework  Homework: small (top task) + small (all done), medium, large
+//   widgets.gallery-exam      Next exam: small (in 9 days) + small (exam day, countdown), rectangular + circular,
+//                             free-tier gate, empty and "Open Tabula" states
 // Two scenes per route so each fits one screenshot (simctl cannot scroll). Timers are paused at the scene's instant.
 // Accessory families are drawn on a dark rounded rectangle like the Lock Screen; the system's accented / vibrant
 // rendering cannot be produced inside an app (`widgetRenderingMode` is read-only), so it stays a device check.
@@ -30,7 +35,7 @@ enum WidgetGallerySize {
 }
 
 struct WidgetGalleryScreen: View {
-    enum Page: Sendable { case daytime, evening, pro }
+    enum Page: Sendable { case daytime, evening, pro, today, homework, exam }
 
     let page: Page
     @Environment(AppModel.self) private var model
@@ -45,6 +50,12 @@ struct WidgetGalleryScreen: View {
                     ForEach(scenes.filter { ["after", "holiday"].contains($0.id) }) { scene($0) }
                 case .pro:
                     proPage
+                case .today:
+                    todayPage
+                case .homework:
+                    homeworkPage
+                case .exam:
+                    examPage
                 }
             }
             .padding(.horizontal, 16)
@@ -94,6 +105,127 @@ struct WidgetGalleryScreen: View {
             home(.systemMedium) { NowNextWidgetView(display: shown, family: .systemMedium, pauseTime: scene.date) }
             lock(.accessoryInline) {
                 NowNextWidgetView(display: shown, family: .accessoryInline, pauseTime: scene.date)
+            }
+        }
+    }
+
+    // MARK: Stage B1 pages
+
+    private var languageCode: String? { Bundle.main.preferredLocalizations.first }
+
+    /// Every scene (built once per page: each snapshot comes from a seeded database).
+    private var allScenes: [WidgetGalleryScene] {
+        scenes + WidgetGallerySamples.extraScenes(locale: model.formatter.locale, languageCode: languageCode)
+    }
+
+    private func pick(_ id: String, _ all: [WidgetGalleryScene]) -> WidgetGalleryScene {
+        all.first { $0.id == id } ?? all[0]
+    }
+
+    private func renderer(_ scene: WidgetGalleryScene, context: CalendarContext) -> LocalizedTextRenderer {
+        NowNextPresenter.renderer(for: scene.snapshot, context: context, lookup: model.environment.catalogLookup)
+    }
+
+    private func todayDisplay(_ scene: WidgetGalleryScene) -> TodayDisplay {
+        let plan = WidgetTimelinePlanner.plan(snapshot: scene.snapshot, now: scene.date,
+                                              deviceTimeZone: WidgetGallerySamples.context.timeZone,
+                                              includeCancelledBoundaries: true)
+        let context = plan.context ?? WidgetGallerySamples.context
+        return TodayPresenter(renderer: renderer(scene, context: context), context: context)
+            .display(snapshot: scene.snapshot, entry: plan.entries[0])
+    }
+
+    private func homeworkDisplay(_ scene: WidgetGalleryScene) -> HomeworkDisplay {
+        let plan = HomeworkPlanner.plan(snapshot: scene.snapshot, now: scene.date,
+                                        deviceTimeZone: WidgetGallerySamples.context.timeZone)
+        let context = plan.context ?? WidgetGallerySamples.context
+        return HomeworkPresenter(renderer: renderer(scene, context: context), context: context).display(plan.entries[0])
+    }
+
+    private func examPresenter(_ scene: WidgetGalleryScene) -> ExamPresenter {
+        let context = WidgetGallerySamples.context
+        return ExamPresenter(renderer: renderer(scene, context: context), context: context)
+    }
+
+    private func examDisplay(_ scene: WidgetGalleryScene) -> ExamDisplay {
+        let plan = ExamPlanner.plan(snapshot: scene.snapshot, now: scene.date,
+                                    deviceTimeZone: WidgetGallerySamples.context.timeZone)
+        return examPresenter(scene).display(plan.entries[0])
+    }
+
+    private func caption(_ text: String) -> some View {
+        Text(verbatim: text).font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+    }
+
+    private var todayPage: some View {
+        let all = allScenes
+        let during = todayDisplay(pick("lesson", all))
+        let evening = todayDisplay(pick("after", all))
+        return VStack(alignment: .leading, spacing: 6) {
+            caption("Medium · during a lesson")
+            home(.systemMedium) { TodayWidgetView(display: during, family: .systemMedium) }
+            caption("Medium · after school (tomorrow)")
+            home(.systemMedium) { TodayWidgetView(display: evening, family: .systemMedium) }
+            caption("Large · during a lesson")
+            home(.systemLarge) { TodayWidgetView(display: during, family: .systemLarge) }
+        }
+    }
+
+    private var homeworkPage: some View {
+        let all = allScenes
+        let open = homeworkDisplay(pick("lesson", all))
+        let done = homeworkDisplay(pick("empty", all))
+        return VStack(alignment: .leading, spacing: 6) {
+            caption("Small · top task (overdue) · all done")
+            HStack(alignment: .top, spacing: 16) {
+                home(.systemSmall) { HomeworkWidgetView(display: open, family: .systemSmall) }
+                home(.systemSmall) { HomeworkWidgetView(display: done, family: .systemSmall) }
+            }
+            caption("Medium")
+            home(.systemMedium) { HomeworkWidgetView(display: open, family: .systemMedium) }
+            caption("Large")
+            home(.systemLarge) { HomeworkWidgetView(display: open, family: .systemLarge) }
+        }
+    }
+
+    private var examPage: some View {
+        let all = allScenes
+        let upcoming = pick("lesson", all), day = pick("exam-day", all), empty = pick("empty", all)
+        let freeScene = WidgetGallerySamples.scenes(locale: model.formatter.locale, languageCode: languageCode,
+                                                    tier: .free)[0]
+        let soon = examDisplay(upcoming), today = examDisplay(day), none = examDisplay(empty)
+        let free = examDisplay(freeScene)
+        let texts = examPresenter(upcoming).proTexts()
+        let outdated = examPresenter(upcoming).display(WidgetStateEntry(date: upcoming.date, state: .unavailable(.outdated)))
+        return VStack(alignment: .leading, spacing: 6) {
+            caption("Small · in 9 days · exam day (countdown)")
+            HStack(alignment: .top, spacing: 16) {
+                home(.systemSmall) { NextExamWidgetView(display: soon, family: .systemSmall, pauseTime: upcoming.date) }
+                home(.systemSmall) { NextExamWidgetView(display: today, family: .systemSmall, pauseTime: day.date) }
+            }
+            caption("Lock Screen · rectangular")
+            HStack(alignment: .top, spacing: 16) {
+                lock(.accessoryRectangular) {
+                    NextExamWidgetView(display: soon, family: .accessoryRectangular, pauseTime: upcoming.date)
+                }
+                lock(.accessoryRectangular) {
+                    NextExamWidgetView(display: today, family: .accessoryRectangular, pauseTime: day.date)
+                }
+            }
+            caption("Lock Screen · circular · free-tier gate")
+            HStack(alignment: .top, spacing: 16) {
+                lock(.accessoryCircular) { NextExamWidgetView(display: soon, family: .accessoryCircular) }
+                lock(.accessoryCircular) { NextExamWidgetView(display: today, family: .accessoryCircular) }
+                lock(.accessoryRectangular) {
+                    gated(.accessoryRectangular, tier: freeScene.snapshot.tier, texts: texts) {
+                        NextExamWidgetView(display: free, family: .accessoryRectangular, pauseTime: freeScene.date)
+                    }
+                }
+            }
+            caption("Small · no exam · Open Tabula")
+            HStack(alignment: .top, spacing: 16) {
+                home(.systemSmall) { NextExamWidgetView(display: none, family: .systemSmall) }
+                home(.systemSmall) { NextExamWidgetView(display: outdated, family: .systemSmall) }
             }
         }
     }

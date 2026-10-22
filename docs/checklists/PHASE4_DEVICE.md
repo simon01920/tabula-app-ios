@@ -119,3 +119,30 @@ Build: xtool (free team) / xtool (paid team) / TestFlight · App Group available
 Watch pairing, WatchConnectivity snapshot transfer, complication refresh and watch low-power rows are added in Phase 5.
 Stage A only guarantees the snapshot format they will reuse: < 20 KB for the seeded scenarios (Linux test
 `encodedSnapshotStaysSmall`).
+
+---
+
+## B1
+
+**Today, Homework and Next exam widgets** (StaticConfiguration, no App Intents yet). Same build caveats as A0: a free-team
+xtool build has no App Group, so every widget shows "Open Tabula" (row B1.1); the rest needs a group build. CI gallery
+pages for comparison: `widgets.gallery-today`, `widgets.gallery-homework`, `widgets.gallery-exam`.
+
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| B1.1 | Add Today (medium), Homework (small) and Next Exam (small) on a free-team build | Each shows "Open Tabula" + the hint; gallery names/descriptions localised | | |
+| B1.2 | Today medium during a lesson | Header "Today" + date; rows from the current lesson on (3-4); current row on a plate with a bar; cancelled lessons struck through with "Cancelled"; changed ones carry an icon + text line | | |
+| B1.3 | Today large | Whole day, ended lessons dimmed; "Due today" with up to 3 tasks (overdue-today ones with a warning icon) | | |
+| B1.4 | After the last lesson; then past midnight | "Tomorrow" header with tomorrow's lessons and "Due tomorrow"; after 00:00 it reads "Today" | | |
+| B1.5 | Holiday / free day / cancelled day | Same wording as Now & Next with the next lesson | | |
+| B1.6 | Homework small / medium / large | Small: count + top task; medium 3 rows, large 9, "+N more"; overdue first with a warning icon AND text ("2 days overdue"); due texts Today / Tomorrow / Fri | | |
+| B1.7 | Tap a Homework row (medium), then the small widget | Opens that task's detail (`tabula://open/task/<id>`, RISKS #66); small opens the top task | | |
+| B1.8 | Complete the last open task in the app | Widget turns to "All done" within seconds | | |
+| B1.9 | Task with a due time: wait until a minute after it | Row turns overdue without opening the app | | |
+| B1.10 | Next Exam small, exam 2+ days away | Subject, title, date, time, room; "in N days" with a calendar icon | | |
+| B1.11 | Exam tomorrow; exam day before the start | "Tomorrow" (alert icon); "Today, 10:00" + live "Starts in" countdown ticking without the app | | |
+| B1.12 | During / after the exam | "In progress" with a "Time left" countdown; later "Finished" | | |
+| B1.13 | Lock Screen: rectangular + circular Next Exam | Rectangular: subject, icon + countdown/timer, date; circular: icon + days number; tap opens the exam | | |
+| B1.14 | Tinted Home Screen / Lock Screen (accented, vibrant) | Subject colours become outlined marks; text stays legible; overdue still has icon + word | | |
+| B1.15 | VoiceOver on each widget | One sentence per widget (Today, small Homework, exam); Homework rows one sentence each | | |
+| B1.16 | Largest Dynamic Type; non-English app language | No clipped essential text; strings translated | | |

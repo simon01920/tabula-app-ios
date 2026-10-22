@@ -560,3 +560,10 @@ Runbook: `docs/DEVICE_SETUP.md`; preflight: `bash scripts/device-doctor.sh` (rea
 | Git inside WSL still cannot use this worktree (`fatal: not a git repository … C:/…/.git/worktrees/…`); validate.sh does not need git | FACT (observed, again) | this stage |
 | QA M1: WidgetKit does not reload on a time-zone change and a natural reload can be 1.5–8 days away → every plan's `reloadDate` ≤ now + 6 h; the extension calls `NSTimeZone.resetSystemTimeZone()` before `TimeZone.current` (a long-lived extension process caches the zone) | FIXED (code + Linux tests) | `WidgetTimelinePlanner.maxReloadInterval`; RISKS #67 |
 | QA minors: a cut timeline ends at its last midnight (the last state stays valid overnight); the gallery preview / placeholder uses a hand-made 2-lesson snapshot around `Date()` (`WidgetGallerySamples.previewSnapshot`, `sample.subject.*` names) instead of the seeded database (extension memory limit, no dead 0:00 timer); the writer seeds its "unchanged" check from the App Group file and wraps each write in `beginBackgroundTask`; the progress bar tint is `LessonTileStyle.contrastSafeAccent` (≥ 3:1 against the light / dark page) | FIXED (code + Linux tests) | Phase 4 A QA fixes commit |
+
+## 29. Phase 4 Stage B1 — Today / Homework / Next exam (widgets-watch-engineer-sonnet)
+| Fact / assumption | Status | Source / evidence |
+|---|---|---|
+| `WidgetSnapshot.overdueItems` (key `od`, optional) lists up to 8 overdue tasks; additive, so `currentVersion` stays 1 and old files decode | VERIFIED (Linux test) | `WidgetOverdueSnapshotTests` |
+| Homework/Exam state planners and the three presenters are pure and Linux-tested; the views compile on xtool (0 warnings) and in the watchOS type-check | VERIFIED | validate.sh, xtool-dev.sh build |
+| Gallery routes `widgets.gallery-today`, `-homework`, `-exam` added to ui-screenshots.yml | UNRUN in CI | .github/workflows/ui-screenshots.yml |

@@ -20,6 +20,8 @@ public enum WidgetSnapshotBuilder {
     public static let taskHorizonDays = 7
     /// At most this many tasks.
     public static let maxTasks = 20
+    /// At most this many overdue tasks are listed (the count is always complete).
+    public static let maxOverdueTasks = 8
     /// User text longer than this is cut (characters).
     public static let maxTextLength = 80
     /// Days covered after today when no school day follows tomorrow within the horizon.
@@ -69,13 +71,18 @@ public enum WidgetSnapshotBuilder {
         let horizon = today.adding(days: taskHorizonDays)
         let due = TaskListModel.tasks(in: .today, from: liveTasks, now: nowLocal, sort: .due)
             + TaskListModel.tasks(in: .upcoming, from: liveTasks, now: nowLocal, sort: .due)
-        snapshot.tasks = due.compactMap { task -> WidgetSnapshot.DueTask? in
-            guard let dueDate = task.due?.date, dueDate <= horizon else { return nil }
+        func dueTask(_ task: TaskItem) -> WidgetSnapshot.DueTask? {
+            guard let dueDate = task.due?.date else { return nil }
             return WidgetSnapshot.DueTask(id: task.id.uuid, title: shortened(task.title),
                                           subject: task.subjectID.flatMap { subjects[$0] }.map(shortened),
                                           dueDate: dueDate, dueTime: task.due?.time, priority: task.priority)
         }
-        .prefix(maxTasks).map { $0 }
+        snapshot.tasks = due.compactMap { task in dueTask(task).flatMap { $0.dueDate <= horizon ? $0 : nil } }
+            .prefix(maxTasks).map { $0 }
+        // Overdue tasks, oldest first (the Homework widget lists them before the upcoming ones).
+        let overdue = TaskListModel.tasks(in: .overdue, from: liveTasks, now: nowLocal, sort: .due)
+            .compactMap(dueTask).prefix(maxOverdueTasks).map { $0 }
+        snapshot.overdueItems = overdue.isEmpty ? nil : overdue
 
         if let row = ExamListModel.make(database: database, today: today, context: context).next {
             let facts = ExamFacts(exam: row.exam, visibility: ExamFacts.visibility(for: row.exam, in: database))

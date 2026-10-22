@@ -12,6 +12,9 @@ enum DebugRoutes: RouteProvider {
             AppRoute("widgets.gallery", .standalone) { WidgetGalleryScreen(page: .daytime) },
             AppRoute("widgets.gallery-evening", .standalone) { WidgetGalleryScreen(page: .evening) },
             AppRoute("widgets.gallery-pro", .standalone) { WidgetGalleryScreen(page: .pro) },
+            AppRoute("widgets.gallery-today", .standalone) { WidgetGalleryScreen(page: .today) },
+            AppRoute("widgets.gallery-homework", .standalone) { WidgetGalleryScreen(page: .homework) },
+            AppRoute("widgets.gallery-exam", .standalone) { WidgetGalleryScreen(page: .exam) },
         ]
     }
 }

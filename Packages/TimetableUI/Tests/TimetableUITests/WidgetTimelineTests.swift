@@ -460,7 +460,7 @@ struct WidgetGallerySampleTests {
             let snap = WidgetGallerySamples.previewSnapshot(now: now, timeZone: bratislava, localeID: "en_GB",
                                                             languageCode: "en", name: EnglishCatalog.lookup)
             let data = try WidgetSnapshotStore.encode(snap)
-            #expect(data.count < 1_500)
+            #expect(data.count < 2_500)
             let state = WidgetTimelinePlanner.state(snapshot: snap, at: now, context: context)
             guard case let .current(lesson, next) = state else {
                 Issue.record("expected a current lesson at \(hour):\(minute), got \(state)")

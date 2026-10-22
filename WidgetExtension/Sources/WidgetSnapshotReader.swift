@@ -27,10 +27,10 @@ enum WidgetSnapshotReader {
     }
 
     /// Writes what this timeline saw for the developer screen.
-    static func recordRead(_ result: Result, now: Date, entries: Int) {
+    static func recordRead(_ result: Result, now: Date, entries: Int, widget: String = "Now & Next") {
         guard result.containerAvailable, let defaults = UserDefaults(suiteName: result.groupID) else { return }
         let seen = result.snapshot.map { "snapshot v\($0.version) from \($0.generatedAt.ISO8601Format())" } ?? "no snapshot"
-        defaults.set("Now & Next: \(seen), \(entries) entries, read \(now.ISO8601Format())", forKey: Phase0ProbeKeys.widgetSaw)
+        defaults.set("\(widget): \(seen), \(entries) entries, read \(now.ISO8601Format())", forKey: Phase0ProbeKeys.widgetSaw)
     }
 
     /// Catalog lookup in the app's UI language (`languageCode` = an .lproj of this bundle), else the system's.

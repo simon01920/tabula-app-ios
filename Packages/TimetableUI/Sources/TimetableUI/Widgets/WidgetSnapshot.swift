@@ -47,22 +47,26 @@ public struct WidgetSnapshot: Codable, Equatable, Sendable {
     public var followingLesson: Lesson?
     /// Open tasks due within `WidgetSnapshotBuilder.taskHorizonDays` (overdue ones excluded), by due date.
     public var tasks: [DueTask]
-    /// Open tasks whose due date / time has passed.
+    /// Open tasks whose due date / time has passed (all of them, also those not listed in `overdueItems`).
     public var overdueTaskCount: Int
     /// The next upcoming exam, if any.
     public var nextExam: UpcomingExam?
+    /// The most overdue open tasks, oldest due date first, at most `WidgetSnapshotBuilder.maxOverdueTasks` (Phase 4 B1,
+    /// for the Homework widget). Additive: an optional key, so v1 files written before B1 decode with `nil` (the widget
+    /// then shows the overdue count only) and an older reader ignores the key; hence no version bump.
+    public var overdueItems: [DueTask]?
 
     enum CodingKeys: String, CodingKey {
         case version = "v", generatedAt = "at", timeZoneID = "tz", followsDeviceTimeZone = "ftz", localeID = "loc"
         case languageCode = "lang", hourCycle = "hc", tier, hasTimetable = "tt", days, followingLesson = "after"
-        case tasks, overdueTaskCount = "overdue", nextExam = "exam"
+        case tasks, overdueTaskCount = "overdue", nextExam = "exam", overdueItems = "od"
     }
 
     /// Creates a snapshot.
     public init(version: Int = WidgetSnapshot.currentVersion, generatedAt: Date, timeZoneID: String,
                 followsDeviceTimeZone: Bool, localeID: String, languageCode: String?, hourCycle: HourCycle, tier: Tier,
                 hasTimetable: Bool, days: [Day], followingLesson: Lesson?, tasks: [DueTask], overdueTaskCount: Int,
-                nextExam: UpcomingExam?) {
+                nextExam: UpcomingExam?, overdueItems: [DueTask]? = nil) {
         self.version = version
         self.generatedAt = generatedAt
         self.timeZoneID = timeZoneID
@@ -77,7 +81,11 @@ public struct WidgetSnapshot: Codable, Equatable, Sendable {
         self.tasks = tasks
         self.overdueTaskCount = overdueTaskCount
         self.nextExam = nextExam
+        self.overdueItems = overdueItems
     }
+
+    /// The listed overdue tasks (empty for snapshots written before B1).
+    public var overdueTasks: [DueTask] { overdueItems ?? [] }
 
     /// First covered day.
     public var firstDay: LocalDate? { days.first?.date }

@@ -6,6 +6,9 @@
 //   break    Tue 2026-10-13, two minutes before the end of the day's first gap between lessons
 //   after    Tue 2026-10-13 17:00 (lessons over, tomorrow's first lesson next)
 //   holiday  Thu 2026-10-29 09:00 (autumn holidays, next lesson after the break)
+// Stage B1 adds (`extraScenes`):
+//   exam-day Thu 2026-10-22 08:30 (the chemistry test starts at 10:00: live countdown)
+//   empty    Tue 2026-10-13 10:20 on the blank profile (no tasks, no exam: "All done", "No upcoming exams")
 import Foundation
 import TimetableCore
 
@@ -50,10 +53,28 @@ public enum WidgetGallerySamples {
         ]
     }
 
+    /// The Stage B1 scenes (see the header), built for `locale` / `languageCode` with `tier`.
+    public static func extraScenes(locale: Locale, languageCode: String?, tier: Tier = .pro) -> [WidgetGalleryScene] {
+        let context = context
+        func snapshot(_ database: TabulaDatabase, at date: Date) -> WidgetSnapshot {
+            WidgetSnapshotBuilder.make(database: database, now: date, context: context, tier: tier, locale: locale,
+                                       languageCode: languageCode)
+        }
+        let examDay = context.date(LocalDate(year: 2026, month: 10, day: 22)!, LocalTime(hour: 8, minute: 30)!)
+        let reference = SampleScenarios.referenceNow
+        return [
+            WidgetGalleryScene(id: "exam-day", title: "Exam day", snapshot: snapshot(SampleScenarios.secondary().database, at: examDay),
+                               date: examDay),
+            WidgetGalleryScene(id: "empty", title: "Nothing open", snapshot: snapshot(SampleScenarios.blank(), at: reference),
+                               date: reference),
+        ]
+    }
+
     /// A tiny snapshot for the system widget gallery preview / placeholder (the extension must not build the seeded
     /// database: widget extensions have a small memory limit). Around `now` in `timeZone`: a lesson that started
     /// 15 minutes ago (45 minutes long) and the next one 10 minutes after it, so live timers run instead of showing 0:00.
-    /// Subject names come from `name` (the catalog's `sample.subject.*` keys in the app's language).
+    /// Subject names come from `name` (the catalog's `sample.subject.*` keys in the app's language); the two sample tasks
+    /// (due today and tomorrow) and the exam in five days use `sample.task.homework` / `sample.exam.title`.
     public static func previewSnapshot(now: Date, timeZone: TimeZone, localeID: String, languageCode: String?,
                                        name: (String) -> String) -> WidgetSnapshot {
         let context = CalendarContext(timeZone: timeZone, firstWeekday: .monday)
@@ -72,12 +93,24 @@ public enum WidgetGallerySamples {
             lessons.append(WidgetSnapshot.Lesson(id: "preview:2", subject: biology, date: local.date,
                                                  startTime: time(minute + 40), endTime: time(minute + 85), room: "7"))
         }
+        let tasks = [
+            WidgetSnapshot.DueTask(id: UUID(uuidString: "7AB0D000-0000-4000-8000-000000000011")!,
+                                   title: name("sample.task.homework"), subject: math, dueDate: local.date,
+                                   dueTime: nil, priority: .normal),
+            WidgetSnapshot.DueTask(id: UUID(uuidString: "7AB0D000-0000-4000-8000-000000000012")!,
+                                   title: name("sample.task.homework"), subject: biology, dueDate: local.date.adding(days: 1),
+                                   dueTime: nil, priority: .normal),
+        ]
+        let exam = WidgetSnapshot.UpcomingExam(
+            id: UUID(uuidString: "7AB0D000-0000-4000-8000-000000000021")!, title: name("sample.exam.title"),
+            subject: biology, date: local.date.adding(days: 5), start: LocalTime(hour: 9, minute: 0),
+            end: LocalTime(hour: 9, minute: 45), room: "7")
         return WidgetSnapshot(generatedAt: now, timeZoneID: timeZone.identifier, followsDeviceTimeZone: true,
                               localeID: localeID, languageCode: languageCode, hourCycle: .auto, tier: .pro,
                               hasTimetable: true,
                               days: [WidgetSnapshot.Day(date: local.date, kind: .school, lessons: lessons),
                                      WidgetSnapshot.Day(date: local.date.adding(days: 1), kind: .free)],
-                              followingLesson: nil, tasks: [], overdueTaskCount: 0, nextExam: nil)
+                              followingLesson: nil, tasks: tasks, overdueTaskCount: 0, nextExam: exam)
     }
 
     /// End of the first gap between two lessons that take place on `date` (start of the lesson after it).
