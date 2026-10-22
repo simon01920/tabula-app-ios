@@ -49393,6 +49393,342 @@
         }
       }
     },
+    "liveActivity.alert.at" : {
+      "comment" : "Body of the alert iOS shows when a scheduled Live Activity starts. %1$@ = subject name or exam title, %2$@ = start time (e.g. 'Mathematics at 8:00').",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@ v %2$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@ um %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ at %2$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@ à %2$@"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@ – kezdés: %2$@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@・%2$@開始"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@ o %2$@"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@ la %2$@"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@ o %2$@"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@ у %2$@"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@ u %2$@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@ о %2$@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@ · %2$@开始"
+          }
+        }
+      }
+    },
+    "liveActivity.exam.finished" : {
+      "comment" : "Live Activity caption after the exam's end time (final state, shown briefly on the Lock Screen). Short.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zkouška skončila"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Prüfung vorbei"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exam finished"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Examen terminé"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A vizsga véget ért"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "試験終了"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Egzamin zakończony"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Examen încheiat"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Skúška skončila"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Испит је завршен"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ispit je završen"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Іспит завершено"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "考试结束"
+          }
+        }
+      }
+    },
+    "liveActivity.exam.inProgress" : {
+      "comment" : "Live Activity caption while the exam is being written (between its start and end time). Short.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Probíhá"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Läuft"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In progress"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "En cours"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Folyamatban"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "実施中"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "W toku"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "În desfășurare"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Prebieha"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "У току"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "U toku"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Триває"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "进行中"
+          }
+        }
+      }
+    },
+    "liveActivity.exam.today" : {
+      "comment" : "Live Activity (Lock Screen / Dynamic Island) caption before an exam that takes place today; also the title of the alert when a scheduled exam Live Activity starts. Short.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dnes zkouška"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Prüfung heute"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exam today"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Examen aujourd’hui"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ma vizsga"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "今日は試験"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dziś egzamin"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Examen azi"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dnes skúška"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Данас испит"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Danas ispit"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Сьогодні іспит"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "今天考试"
+          }
+        }
+      }
+    },
     "onboarding.action.back" : {
       "comment" : "Onboarding: button to go to the previous step.",
       "extractionState" : "manual",
@@ -83115,6 +83451,678 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "语言"
+          }
+        }
+      }
+    },
+    "settings.liveActivities.autoStart" : {
+      "comment" : "Settings switch: let Tabula schedule the next Live Activity so it starts on its own.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Spouštět automaticky"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Automatisch starten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start automatically"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Démarrer automatiquement"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Automatikus indítás"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "自動で開始"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Uruchamiaj automatycznie"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pornește automat"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Spúšťať automaticky"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Покрећи аутоматски"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pokreći automatski"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Запускати автоматично"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "自动开始"
+          }
+        }
+      }
+    },
+    "settings.liveActivities.autoStart.footer" : {
+      "comment" : "Footer explaining the 'Start automatically' switch for Live Activities, including that iOS shows an alert when a scheduled Live Activity starts.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dokud je aplikace Tabula otevřená, naplánuje další živou aktivitu, aby se spustila sama 15 minut před první hodinou nebo ráno v den zkoušky. iOS každé spuštění oznámí jako upozornění."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Solange Tabula geöffnet ist, plant die App die nächste Live-Aktivität, damit sie 15 Minuten vor deiner ersten Stunde oder am Morgen einer Prüfung von selbst startet. iOS kündigt jeden Start wie eine Mitteilung an."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "While Tabula is open, it schedules the next Live Activity so it starts on its own 15 minutes before your first lesson or on the morning of an exam. iOS announces each start like a notification."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tant que Tabula est ouverte, elle programme la prochaine activité en direct pour qu’elle démarre d’elle-même 15 minutes avant ton premier cours ou le matin d’un examen. iOS annonce chaque démarrage comme une notification."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Amíg a Tabula nyitva van, beütemezi a következő élő tevékenységet, hogy magától induljon 15 perccel az első óra előtt vagy a vizsga reggelén. Az iOS minden indítást értesítésként jelez."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabulaを開いている間に次のライブアクティビティを予約し、最初の授業の15分前や試験日の朝に自動で開始します。開始のたびにiOSが通知のようにお知らせします。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Gdy aplikacja Tabula jest otwarta, planuje następną aktywność na żywo, aby uruchomiła się sama 15 minut przed pierwszą lekcją lub rano w dniu egzaminu. iOS ogłasza każde uruchomienie jak powiadomienie."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Cât timp aplicația Tabula este deschisă, programează următoarea activitate live, ca să pornească singură cu 15 minute înainte de prima oră sau în dimineața unui examen. iOS anunță fiecare pornire ca pe o notificare."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kým je aplikácia Tabula otvorená, naplánuje ďalšiu živú aktivitu, aby sa spustila sama 15 minút pred prvou hodinou alebo ráno v deň skúšky. iOS každé spustenie ohlási ako upozornenie."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Док је Tabula отворена, заказује следећу активност уживо да се сама покрене 15 минута пре првог часа или ујутру на дан испита. iOS најављује свако покретање као обавештење."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dok je Tabula otvorena, zakazuje sledeću aktivnost uživo da se sama pokrene 15 minuta pre prvog časa ili ujutru na dan ispita. iOS najavljuje svako pokretanje kao obaveštenje."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Поки Tabula відкрита, вона планує наступну активність наживо, щоб та запускалася сама за 15 хвилин до першого уроку або вранці в день іспиту. iOS повідомляє про кожен запуск як про сповіщення."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula 打开时会预约下一个实时活动，使其在第一节课前 15 分钟或考试当天早上自动开始。每次开始时，iOS 都会像通知一样提醒你。"
+          }
+        }
+      }
+    },
+    "settings.liveActivities.disabled" : {
+      "comment" : "Shown in Settings → Live Activities when the user has turned Live Activities off for the app in the iOS Settings app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Živé aktivity jsou pro aplikaci Tabula vypnuté. Zapnout je můžeš v aplikaci Nastavení."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Live-Aktivitäten sind für Tabula ausgeschaltet. Du kannst sie in der App „Einstellungen“ einschalten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live Activities are turned off for Tabula. You can turn them on in the Settings app."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Les activités en direct sont désactivées pour Tabula. Tu peux les activer dans l’app Réglages."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Az élő tevékenységek ki vannak kapcsolva a Tabula számára. A Beállítások appban kapcsolhatod be őket."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabulaのライブアクティビティはオフになっています。設定アプリでオンにできます。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Aktywności na żywo są wyłączone dla aplikacji Tabula. Możesz je włączyć w aplikacji Ustawienia."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Activitățile live sunt dezactivate pentru Tabula. Le poți activa în aplicația Setări."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Živé aktivity sú pre aplikáciu Tabula vypnuté. Zapnúť ich môžeš v aplikácii Nastavenia."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Активности уживо су искључене за Tabula. Можеш да их укључиш у апликацији Подешавања."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Aktivnosti uživo su isključene za Tabula. Možeš da ih uključiš u aplikaciji Podešavanja."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Активності наживо для Tabula вимкнено. Увімкнути їх можна в програмі «Параметри»."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula 的实时活动已关闭。你可以在“设置”App 中打开。"
+          }
+        }
+      }
+    },
+    "settings.liveActivities.exam" : {
+      "comment" : "Settings switch: show a countdown to the exam as a Live Activity on the day of an exam.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Den zkoušky"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Prüfungstag"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exam day"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Jour d’examen"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vizsganap"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "試験日"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dzień egzaminu"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ziua examenului"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Deň skúšky"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Дан испита"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dan ispita"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "День іспиту"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "考试日"
+          }
+        }
+      }
+    },
+    "settings.liveActivities.footer" : {
+      "comment" : "Footer under the Live Activities switches explaining what they show and when they start.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Na zamčené obrazovce a v Dynamic Island zobrazují aktuální hodinu se zbývajícím časem a v den zkoušky odpočet do jejího začátku. Spustí se, když otevřeš aplikaci Tabula krátce před hodinami nebo během nich."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zeigen auf dem Sperrbildschirm und in der Dynamic Island die aktuelle Stunde mit der Restzeit und am Tag einer Prüfung einen Countdown bis zum Beginn. Sie starten, wenn du Tabula kurz vor oder während deiner Stunden öffnest."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows the current lesson with the time left, and on the day of an exam a countdown to it, on the Lock Screen and in the Dynamic Island. They start when you open Tabula shortly before or during your lessons."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Affichent sur l’écran verrouillé et dans la Dynamic Island le cours actuel avec le temps restant et, le jour d’un examen, un compte à rebours jusqu’à son début. Elles démarrent quand tu ouvres Tabula peu avant ou pendant tes cours."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A zárolási képernyőn és a Dynamic Islandben mutatják az aktuális órát a hátralévő idővel, a vizsga napján pedig a visszaszámlálást a kezdetéig. Akkor indulnak, ha röviddel az órák előtt vagy alatt megnyitod a Tabula appot."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ロック画面とダイナミックアイランドに、現在の授業と残り時間、試験日には試験開始までのカウントダウンを表示します。授業の少し前か授業中にTabulaを開くと開始します。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Na ekranie blokady i w Dynamic Island pokazują bieżącą lekcję z pozostałym czasem, a w dniu egzaminu odliczanie do jego rozpoczęcia. Uruchamiają się, gdy otworzysz aplikację Tabula tuż przed lekcjami lub w ich trakcie."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pe ecranul de blocare și în Dynamic Island afișează ora curentă cu timpul rămas, iar în ziua unui examen o numărătoare inversă până la începerea lui. Pornesc când deschizi aplicația Tabula cu puțin înainte de ore sau în timpul lor."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Na zamknutej obrazovke a v Dynamic Island zobrazujú aktuálnu hodinu so zostávajúcim časom a v deň skúšky odpočítavanie do jej začiatku. Spustia sa, keď otvoríš aplikáciu Tabula krátko pred hodinami alebo počas nich."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "На закључаном екрану и у Dynamic Island приказују тренутни час са преосталим временом, а на дан испита одбројавање до његовог почетка. Покрећу се када отвориш Tabula мало пре часова или током њих."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Na zaključanom ekranu i u Dynamic Island prikazuju trenutni čas sa preostalim vremenom, a na dan ispita odbrojavanje do njegovog početka. Pokreću se kada otvoriš Tabula malo pre časova ili tokom njih."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Показують на замкненому екрані та в Dynamic Island поточний урок із залишком часу, а в день іспиту — зворотний відлік до його початку. Запускаються, коли ти відкриваєш Tabula незадовго до уроків або під час них."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "在锁定屏幕和灵动岛上显示当前课程及剩余时间，考试当天显示距考试开始的倒计时。在上课前不久或上课期间打开 Tabula 时开始。"
+          }
+        }
+      }
+    },
+    "settings.liveActivities.lesson" : {
+      "comment" : "Settings switch: show the current lesson with its remaining time as a Live Activity.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Aktuální hodina"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Aktuelle Stunde"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current lesson"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Cours actuel"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Aktuális óra"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "現在の授業"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Bieżąca lekcja"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ora curentă"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Aktuálna hodina"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Тренутни час"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Trenutni čas"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Поточний урок"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "当前课程"
+          }
+        }
+      }
+    },
+    "settings.liveActivities.row" : {
+      "comment" : "Settings row that opens the Live Activities page (Apple's terms 'Lock Screen' and 'Dynamic Island': use the official translations).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zamčená obrazovka a Dynamic Island"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sperrbildschirm und Dynamic Island"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lock Screen and Dynamic Island"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Écran verrouillé et Dynamic Island"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zárolási képernyő és Dynamic Island"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ロック画面とダイナミックアイランド"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ekran blokady i Dynamic Island"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ecranul de blocare și Dynamic Island"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zamknutá obrazovka a Dynamic Island"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Закључани екран и Dynamic Island"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zaključani ekran i Dynamic Island"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Замкнений екран і Dynamic Island"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "锁定屏幕和灵动岛"
+          }
+        }
+      }
+    },
+    "settings.liveActivities.title" : {
+      "comment" : "Settings section header and page title for Live Activities (Apple's feature name: use the official translation of 'Live Activities' in your language).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Živé aktivity"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Live-Aktivitäten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live Activities"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Activités en direct"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Élő tevékenységek"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ライブアクティビティ"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Aktywności na żywo"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Activități live"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Živé aktivity"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Активности уживо"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Aktivnosti uživo"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Активності наживо"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "实时活动"
           }
         }
       }

@@ -338,6 +338,12 @@ check(policy_id is not None and app_plist.get("BGTaskSchedulerPermittedIdentifie
       f"({policy_id.group(1) if policy_id else '?'}) and UIBackgroundModes contains fetch",
       f"App-Info.plist background refresh keys wrong: permitted={app_plist.get('BGTaskSchedulerPermittedIdentifiers')}, "
       f"modes={app_plist.get('UIBackgroundModes')}, policy id={policy_id.group(1) if policy_id else None}")
+
+# Phase 4 B2: ActivityKit needs NSSupportsLiveActivities = YES in the APP's Info.plist ("Displaying live data with Live
+# Activities"); the plist is shared by both build paths, so one check covers xtool and XcodeGen.
+check(app_plist.get("NSSupportsLiveActivities") is True,
+      "App-Info.plist: NSSupportsLiveActivities = true (lesson + exam-day Live Activities, both build paths)",
+      f"App-Info.plist: NSSupportsLiveActivities must be true, is {app_plist.get('NSSupportsLiveActivities')!r}")
 check(pj["targets"]["TabulaApp"]["settings"]["base"].get("INFOPLIST_FILE") == "Config/App-Info.plist"
       and xt.get("infoPath") == "Config/App-Info.plist",
       "both build paths use Config/App-Info.plist (background refresh keys apply to xtool and XcodeGen builds)",

@@ -56,6 +56,8 @@ struct AppEnvironment: Sendable {
     /// The App Group container the widget snapshot is written to (Phase 4 A); `nil` without an App Group (free team:
     /// the widgets show "Open Tabula") and in seed mode (seed data must never reach the real widgets).
     let widgetContainer: URL?
+    /// Live Activity preferences / ledger store; seed runs never touch ActivityKit (Phase 4 B2).
+    let liveActivities: LiveActivityDependencies
 
     /// The environment for this process.
     static func make(launchOptions: LaunchOptions) -> AppEnvironment {
@@ -82,7 +84,7 @@ struct AppEnvironment: Sendable {
                     : .inMemory(),
                 attachments: FileAttachmentStore(root: FileManager.default.temporaryDirectory
                     .appendingPathComponent("TabulaSeedAttachments", isDirectory: true)),
-                widgetContainer: nil)
+                widgetContainer: nil, liveActivities: .inMemory())
         }
         #endif
         // The real store always uses the real clock and the system zone: -TabulaNow/-TabulaTimeZone are honoured only
@@ -97,7 +99,7 @@ struct AppEnvironment: Sendable {
             launchOptions: launchOptions, saveDebounce: .milliseconds(400),
             reminders: .live(defaults: location.defaults),
             attachments: FileAttachmentStore(root: FileAttachmentStore.root(forStoreDirectory: location.directory)),
-            widgetContainer: location.groupContainer)
+            widgetContainer: location.groupContainer, liveActivities: .live(defaults: location.defaults))
     }
 }
 

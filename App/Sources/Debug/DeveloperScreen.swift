@@ -132,6 +132,8 @@ struct DeveloperScreen: View {
 
             ReminderDebugSection()
 
+            LiveActivityDebugSection()
+
             Section {
                 NavigationLink { DebugScreen(area: .all) } label: { Text(verbatim: "Phase 0 probes") }
             }
@@ -155,4 +157,21 @@ struct DeveloperScreen: View {
         ProbeRow(title, value: value)
     }
 }
+/// Phase 4 B2: the Live Activity controller's diagnostics (device checklist B2).
+struct LiveActivityDebugSection: View {
+    @Environment(LiveActivityController.self) private var liveActivities
+
+    var body: some View {
+        Section {
+            ProbeRow("System enabled", value: "\(liveActivities.systemEnabled)")
+            ProbeRow("Last run", value: liveActivities.lastRun)
+            ProbeRow("Next evaluation", value: liveActivities.nextEvaluation?.ISO8601Format() ?? "–")
+            ProbeRow("Activity running", value: "\(liveActivities.hasRunningActivity)")
+            Button {
+                Task { await liveActivities.refreshNow() }
+            } label: { Text(verbatim: "Run the Live Activity planner now") }
+        } header: { Text(verbatim: "Live Activities") }
+    }
+}
 #endif // DEBUG
+

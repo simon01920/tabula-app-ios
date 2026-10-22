@@ -46,6 +46,12 @@ Status: started 2026-10-16. The human approved Phase 3 and asked for Phase 4 end
      - There is no server: push updates are out of scope.
    - **(b) Exam day:** when an exam is today, a countdown Live Activity to its start, then "in progress" until its end (P3-6).
    - Lock Screen and Dynamic Island compact, minimal and expanded layouts. Accessibility: the timers have spoken labels.
+   - **Stage B2 result (2026-10-22):** iOS 26 offers a scheduled start without a server
+     (`Activity.request(…, alertConfiguration:start:)`, ENVIRONMENT §29), but it must alert the user. It is used behind
+     a separate "Start automatically" switch, **default off (decision needed)**; otherwise activities start in the
+     foreground only. Rules: `LiveActivityPlanner` header (TimetableUI); relevance exam 100 > lesson 50; preferences
+     are device-local (UserDefaults), not schema; views in `TimetableUI/Widgets/LiveActivityViews.swift`; gallery routes
+     `widgets.gallery-live`, `widgets.gallery-live-exam`; device rows PHASE4_DEVICE §B2; RISKS #70–#76.
 6. **Deep links:** widget taps open the right screen through the existing `AppNavigation` / `RootPresentationPolicy`, without new routing.
 7. **`Subject.sortIndex` (P3-2, approved).**
    - The new field is optional (`Int?`). Decoding v1 data without it is unchanged. Subjects sort by `sortIndex`, then by name.

@@ -119,3 +119,87 @@ Build: xtool (free team) / xtool (paid team) / TestFlight · App Group available
 Watch pairing, WatchConnectivity snapshot transfer, complication refresh and watch low-power rows are added in Phase 5.
 Stage A only guarantees the snapshot format they will reuse: < 20 KB for the seeded scenarios (Linux test
 `encodedSnapshotStaysSmall`).
+
+## B2
+
+Live Activities for (a) the current lesson and (b) exam day (Phase 4 Stage B2, PHASE4_PLAN §0.5, decision P3-6). Rules
+and constants: `Packages/TimetableUI/Sources/TimetableUI/Widgets/LiveActivityPlanner.swift` (header); facts:
+ENVIRONMENT §29; risks: RISKS #70–#76 (numbers may be renumbered at merge, B1 appends in parallel).
+
+### B2.0 Setup and what each build can prove
+- **Any build works**, including a free-team xtool build: ActivityKit needs no entitlement and no App Group (the content
+  travels inside the activity). `NSSupportsLiveActivities = YES` is in `Config/App-Info.plist` (both paths; checked by
+  `validate_config.py`).
+- **Data.** Real store only. Seed launches (`-TabulaSeed …`) never start Live Activities (seed data must not reach the
+  real Lock Screen).
+- **Diagnostics.** Settings → Developer → *Live Activities*: system enabled, last run (`<time>: n lesson + m exam steps`,
+  plus failures such as `start: …visibility` or `schedule: …`), next evaluation, whether one runs, and "Run the Live
+  Activity planner now".
+- **Settings.** Settings → *Live Activities* → "Current lesson" (on), "Exam day" (on), "Start automatically" (**off** by
+  default; decision needed, see the B2 report).
+- **CI gallery** (`ui-screenshots.yml`, light + dark): `widgets.gallery-live` (lesson in progress: Lock Screen, expanded,
+  compact + minimal; in a break), `widgets.gallery-live-exam` (exam countdown, exam in progress, the final lesson
+  state), `settings.live-activities`. Compare the device with them.
+- Test timetable: a day with ≥ 3 lessons and a 5–10 min break, the first one 20–30 min from now (edit a lesson's time
+  or add a one-off override), and an exam today with a start and an end time a few hours ahead.
+- Devices: iPhone 16 Pro Max (Dynamic Island, Always-On); Apple Watch Series 7 paired (Smart Stack, B2.35).
+
+### B2.1 Start, update, end — lesson
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| B2.1 | Open Tabula **more than 15 min** before the first lesson, lock | No Live Activity yet (the window opens 15 min before) | | |
+| B2.2 | Open Tabula **≤ 15 min** before the first lesson, lock | Lock Screen: "First Lesson", subject, room · time, "Starts in" + live countdown; Dynamic Island compact: badge + countdown | | |
+| B2.3 | Wait until the lesson starts **without opening the app** | At the start the activity switches to "Now", the lesson's "Time left" countdown and progress bar (stale-date re-render, RISKS #70). Record whether it switched on time | | |
+| B2.4 | Wait until the lesson ends, still without opening the app | Record what the Lock Screen shows in the break. Expected "Next" + the next lesson counting down (needs a second re-render, which only an update gives: if it shows 0:00 for the old lesson, RISKS #70 materialised) | | |
+| B2.5 | Open Tabula in the break, go back to the Lock Screen | Updated at once: "Next" + next lesson countdown; Developer shows `1 lesson + 0 exam steps` (one update) | | |
+| B2.6 | Keep Tabula open in the foreground across a lesson boundary | The in-app timer updates the activity within ~1 s of the boundary | | |
+| B2.7 | Edit the current lesson's room in Tabula | Lock Screen shows the new room within ~1 s; no second activity appears | | |
+| B2.8 | After the last lesson (app open, or opened later) | "No more lessons today" with a check mark; removed from the Lock Screen ≈ 15 min after the last lesson; gone from the Dynamic Island at once | | |
+| B2.9 | Long-press the compact Dynamic Island | Expanded: badge + caption (leading), timer (trailing), subject (center), room · time, "Time left", progress, "Next: …" (bottom); compare with `widgets.gallery-live` (the gallery only approximates the region placement) | | |
+| B2.10 | Start another app's Live Activity (e.g. a Clock timer) | Tabula shows the minimal presentation (subject badge); tapping it opens Tabula on **Today** | | |
+| B2.11 | Tap the Lock Screen activity / the compact island | Tabula opens on Today | | |
+
+### B2.2 Relaunch adoption, settings, permission
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| B2.12 | With a lesson activity running, force-quit Tabula, relaunch | The same activity continues; **no duplicate**; Developer: `0 lesson …` steps or one update | | |
+| B2.13 | Swipe the activity away on the Lock Screen, open Tabula again the same day | It does **not** come back today (ledger); the next school day it starts again | | |
+| B2.14 | Settings → Live Activities → "Current lesson" off | The running lesson activity disappears at once; switching it on again during lessons starts a new one at once | | |
+| B2.15 | iOS Settings → Tabula → Live Activities off, back to Tabula → Settings → Live Activities | Running activities end; the page shows "Live Activities are turned off for Tabula…" + "Open Settings" (opens Tabula's page in the Settings app); turning them on again removes the note and (during lessons) the lesson activity starts again | | |
+| B2.16 | Holiday / cancelled day / move all of today's lessons to tomorrow while the activity runs | The activity ends at once | | |
+| B2.17 | Let the day change with an activity still shown, open Tabula next morning | Yesterday's activity is gone | | |
+| B2.18 | Change the time zone (Settings → General → Date & Time) with an activity running, open Tabula | Times follow the timetable rule ("follow device": same wall-clock times); one update | | |
+
+### B2.3 Exam day
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| B2.19 | Exam today at T (with an end time); open Tabula after T − 6 h | Lock Screen: "Exam today", title (+ subject badge), room · time, "Starts in" + live countdown (hours shown) | | |
+| B2.20 | A lesson and the exam activity run together | The **exam** is in the Dynamic Island (relevance 100 vs 50) and first on the Lock Screen | | |
+| B2.21 | At T, without opening the app | Switches to "In progress" with "Time left" to the end + progress (stale-date re-render) | | |
+| B2.22 | After the end | "Exam finished", removed ≈ 15 min later | | |
+| B2.23 | Edit the exam's time / mark it done / delete it while it runs | Time: updated at once; done or deleted: the activity ends at once | | |
+| B2.24 | Exam without a start time | No exam Live Activity (documented) | | |
+| B2.25 | Tap the exam activity | Tabula opens the exam's detail | | |
+
+### B2.4 Start automatically (scheduled starts, iOS 26)
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| B2.26 | Turn "Start automatically" on in the evening after school, close Tabula, don't open it until the next lessons | 15 min before the first lesson the activity starts **on its own** with an alert ("First Lesson", "Mathematics at 8:00"): screen lights up, expanded island, notification sound; the Watch shows the alert | | |
+| B2.27 | Exam tomorrow at 10:00 with auto-start on; open Tabula the evening before | The exam activity starts at **06:00** with "Exam today" / "<title> at 10:00" | | |
+| B2.28 | With a scheduled start pending, move tomorrow's first lesson earlier and open Tabula | The pending activity is replaced; it starts 15 min before the new time (one alert only) | | |
+| B2.29 | Record how loud / intrusive the scheduled-start alert is with Focus and the silent switch | Input for the default on/off decision | | |
+
+### B2.5 Always-On, StandBy, Low Power Mode, background refresh, Watch, accessibility
+| ID | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|
+| B2.30 | Always-On (dimmed Lock Screen) with a lesson running | Readable; progress bar grey (reduced luminance); the timer keeps counting (Always-On may update it less often) | | |
+| B2.31 | StandBy (charging, landscape) | Minimal presentation at the top; tapping shows the Lock Screen layout scaled up; readable in Night Mode (red tint) | | |
+| B2.32 | Low Power Mode on during lessons, app closed | Timers keep counting; background refresh is reduced, so updates come at the next foreground — record whether the boundary re-renders (B2.3) still happen | | |
+| B2.33 | App closed for a whole school day, Background App Refresh on | Developer "Last run" shows background runs (record the times) and compares them with the lesson boundaries (the refresh request asks for the next boundary while an activity runs) | | |
+| B2.34 | A day longer than 8 h (15 min before the first lesson to the end of the last) | The system ends the activity after 8 h (Apple limit); it is not restarted that day (documented, RISKS #72) | | |
+| B2.35 | Apple Watch paired, activity running | The Smart Stack shows it (system layout from the compact presentation: badge + timer); a tap offers to open Tabula on the iPhone (no watch app until Phase 5); record readability | | |
+| B2.36 | VoiceOver on the Lock Screen activity and on the compact island | Lock Screen: one sentence ("Now, Mathematics, 8:00 to 8:45, room 214, ends at 8:45, Next, 8:55, Biology"); compact timer: "Mathematics, ends at 8:45" | | |
+| B2.37 | Largest Dynamic Type | Lock Screen text scales within the 160 pt limit without overlaps (the system may truncate); record clipping | | |
+| B2.38 | A loud AlarmKit alarm with snooze (existing) while a lesson activity runs | The alarm's countdown activity still works; both coexist | | |
+
+Watch complication refresh: not part of B2 (no complications yet; Phase 5).

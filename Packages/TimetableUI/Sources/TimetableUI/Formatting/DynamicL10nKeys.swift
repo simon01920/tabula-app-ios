@@ -83,6 +83,7 @@ public enum DynamicL10nKeys {
         keys += TaskL10nKeys.allKeys
         keys += AttachmentKind.knownValues.map(attachmentKind) + [attachmentKind(AttachmentKind(rawValue: "future"))]
         keys += widgetKeys
+        keys += liveActivityKeys
         keys += ModificationReason.allCases.map(\.l10nKey)
         return Array(Set(keys)).sorted()
     }
@@ -100,5 +101,14 @@ public enum DynamicL10nKeys {
         "widget.open.noSnapshot", "widget.open.outdated", "widget.pro.title", "widget.pro.short",
         // The interpolated `Text` key of NowNextInlineView (subject + live timer); validate.sh skips interpolated keys.
         "widget.nowNext.inline.current %@ %@",
+    ]
+
+    /// Keys the Live Activity presenter and planner (`LiveActivityPresenter`, `LiveActivityPlanner` alerts) pick at
+    /// runtime, looked up in the app's language (Phase 4 B2). The Today header / widget keys they share are listed in
+    /// `widgetKeys`.
+    public static let liveActivityKeys: [String] = [
+        "liveActivity.exam.today", "liveActivity.exam.inProgress", "liveActivity.exam.finished", "liveActivity.alert.at",
+        "today.header.first", "today.header.dayOver", "widget.nowNext.nextShort", "widget.nowNext.a11y.endsAt",
+        "widget.nowNext.a11y.startsAt",
     ]
 }

@@ -1,6 +1,6 @@
 // Launch routes of Settings (stage B4): `settings` (root), `settings.calendar`, `settings.appearance`,
 // `settings.reminders`, `settings.reminder-rule`, `settings.reminder-health`, `reminders.permission` (sheet),
-// `settings.about`. Sub-pages are wrapped in their own NavigationStack so they can be opened
+// `settings.about`, `settings.live-activities` (Phase 4 B2). Sub-pages are wrapped in their own NavigationStack so they can be opened
 // directly (`-TabulaScreen settings.appearance`); data comes from the `-TabulaSeed` settings.
 // Add entries here only; see Routing/RouteRegistry.swift.
 import SwiftUI
@@ -18,6 +18,7 @@ enum SettingsRoutes: RouteProvider {
             AppRoute("settings.reminder-health", .tabRoot(.settings)) { NavigationStack { RemindersHealthView() } },
             AppRoute("reminders.permission", .sheet(over: .settings)) { ReminderPermissionSheet() },
             AppRoute("settings.about", .tabRoot(.settings)) { NavigationStack { SettingsAboutView() } },
+            AppRoute("settings.live-activities", .tabRoot(.settings)) { NavigationStack { SettingsLiveActivitiesView() } },
         ]
     }
 }

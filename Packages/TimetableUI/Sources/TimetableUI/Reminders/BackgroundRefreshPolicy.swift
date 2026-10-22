@@ -43,4 +43,13 @@ public enum BackgroundRefreshPolicy {
         let upper = now.addingTimeInterval(maximumDelay)
         return min(max(wanted, lower), upper)
     }
+
+    /// `earliestBeginDate(nextReplanDate:now:)`, moved earlier to `additional` (no lead, never sooner than
+    /// `minimumDelay` from now) when another feature needs a refresh then — Phase 4 B2: the next lesson boundary or
+    /// exam start / end while a Live Activity runs, so a background refresh can update it.
+    public static func earliestBeginDate(nextReplanDate: Date?, now: Date, additional: Date?) -> Date {
+        let base = earliestBeginDate(nextReplanDate: nextReplanDate, now: now)
+        guard let additional else { return base }
+        return min(base, max(additional, now.addingTimeInterval(minimumDelay)))
+    }
 }
