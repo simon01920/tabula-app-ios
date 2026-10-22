@@ -33,6 +33,8 @@ import UIKit
 enum ReplanReason: String, Sendable, CaseIterable {
     case launch, environment, dataChange, notificationAction, alarmAuthorization, backgroundRefresh, timer, manual,
          permission
+    /// An App Intent completed an item (Phase 4 B3: widget checkbox, loud-alarm "Done").
+    case intentAction
 }
 
 @MainActor

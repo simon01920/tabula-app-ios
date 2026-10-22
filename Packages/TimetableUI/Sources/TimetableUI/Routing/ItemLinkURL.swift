@@ -8,6 +8,7 @@
 //   tabula://open/task/<UUID>                → Tasks tab + task detail
 //   tabula://open/exam/<UUID>                → Exams tab + exam detail
 //   tabula://open/pack/<yyyy-MM-dd>          → Today tab ("pack tonight")
+//   tabula://open/new-task                   → Tasks tab + the new-task editor (Phase 4 B3, "Add homework")
 //
 // Parsing is strict (scheme, host, component count, UUID / date / occurrence-ID shape, length): any URL can be sent
 // to the app by other apps or web pages, so a malformed one is ignored. Opening a link only navigates; it never
@@ -28,6 +29,7 @@ public enum ItemLinkURL {
         let path: String
         switch link {
         case .today: path = "today"
+        case .newTask: path = "new-task"
         case .lesson(let id): path = "lesson/" + id.rawValue
         case .task(let id): path = "task/" + id.uuidString
         case .exam(let id): path = "exam/" + id.uuidString
@@ -46,6 +48,8 @@ public enum ItemLinkURL {
         switch parts.count {
         case 1 where parts[0] == "today":
             return .today
+        case 1 where parts[0] == "new-task":
+            return .newTask
         case 2:
             let value = parts[1]
             switch parts[0] {

@@ -3,12 +3,14 @@
 // (a Pro family). Each medium / large row is a `Link` to `tabula://open/task/<id>`; the small family and the empty /
 // "Open Tabula" states use `widgetURL`. A `StaticConfiguration` (no App Intents in this stage; RISKS #19).
 //
-// CHECKBOX SEAM (Stage B3): `HomeworkEntryView.checkbox(for:)` returns the view placed before each medium / large row,
-// outside the row's `Link`. It is empty here; B3 returns `Button(intent: MarkDoneIntent(taskID: line.id)) { … }` (and
-// keeps the empty view on builds without App Intent metadata, where the row's link stays the fallback).
+// CHECKBOX (Stage B3, done): `HomeworkEntryView.checkbox(for:)` returns the view placed before each medium / large row,
+// outside the row's `Link`: `Button(intent: MarkTaskDoneIntent(taskID:))` when compiled with `TABULA_APP_INTENTS`
+// (project.yml, the Xcode / TestFlight path that generates App Intents metadata), else nothing: on builds without the
+// metadata (xtool) the row's `Link` is the only control, so a tap can never land on a button that does nothing.
 //
 // Data flow as Now & Next: `WidgetSnapshotReader` → `HomeworkPlanner.plan` (entries at midnights and one minute after
 // each due time, ≤ 29, reload ≤ 6 h) → `HomeworkPresenter` → `HomeworkWidgetView` (TimetableUI).
+import AppIntents
 import Foundation
 import SwiftUI
 import TimetableCore
@@ -114,9 +116,27 @@ struct HomeworkEntryView: View {
         }
     }
 
-    /// The checkbox seam (see the file header): nothing until Stage B3.
-    @ViewBuilder
+    #if TABULA_APP_INTENTS
+    /// The checkbox (Stage B3): `Button(intent:)` with `MarkTaskDoneIntent`, a `LiveActivityIntent`, so the app process
+    /// completes the task (never this extension); WidgetKit reloads the timeline when `perform()` returns, and the
+    /// completed task leaves the list. Sits beside the row's `Link`, so a tap on the row still opens the task. A 44 pt
+    /// tall target; VoiceOver: "Mark “Essay” as done", button.
+    static func checkbox(for line: HomeworkDisplay.TaskLine) -> some View {
+        Button(intent: MarkTaskDoneIntent(taskID: line.id.uuidString)) {
+            Image(systemName: "circle")
+                .font(.body.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .frame(width: 26, height: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .widgetAccentable()
+        .accessibilityLabel(Text(verbatim: line.markDoneLabel))
+    }
+    #else
+    /// No App Intents metadata on this build path (xtool, RISKS #19): no checkbox, the row's `Link` is the control.
     static func checkbox(for line: HomeworkDisplay.TaskLine) -> some View {
         EmptyView()
     }
+    #endif
 }

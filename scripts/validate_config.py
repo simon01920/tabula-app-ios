@@ -142,6 +142,22 @@ check("TABULA_MACRO_PROBES" in str(base("TabulaApp").get("SWIFT_ACTIVE_COMPILATI
       "project.yml: CI builds the macro variant (SWIFT_ACTIVE_COMPILATION_CONDITIONS)",
       "project.yml TabulaApp must define TABULA_MACRO_PROBES")
 
+# --- App Intents (Phase 4 B3; RISKS #19: only Xcode writes Metadata.appintents) ------------------------------
+# The intent-driven controls compile only where the metadata exists: project.yml defines TABULA_APP_INTENTS for the
+# app and the widget; the xtool manifest does not (only `xtool-dev.sh --app-intents`, an on-device experiment).
+check(all("TABULA_APP_INTENTS" not in defines(d, t) for d in (dump_default, dump_macro) for t in ("TabulaApp", "TabulaWidgets")),
+      "Package.swift (xtool): no TABULA_APP_INTENTS by default (no App Intents metadata on that path)",
+      "Package.swift defines TABULA_APP_INTENTS by default: xtool builds would show intent controls without metadata")
+check(all("TABULA_APP_INTENTS" in str(base(t).get("SWIFT_ACTIVE_COMPILATION_CONDITIONS", "")) for t in ("TabulaApp", "TabulaWidgets")),
+      "project.yml: TabulaApp + TabulaWidgets define TABULA_APP_INTENTS (checkbox, alarm Done, timetable choice)",
+      "project.yml: TABULA_APP_INTENTS missing from TabulaApp or TabulaWidgets")
+# The Mark done intents exist in both targets (Apple: add the intent to the widget extension AND the app target);
+# the two copies must stay identical, or the widget's button and the app's metadata would describe different intents.
+intent_copies = [ROOT / "App/Sources/Intents/CompletionIntents.swift", ROOT / "WidgetExtension/Sources/Intents/CompletionIntents.swift"]
+check(all(p.is_file() for p in intent_copies) and intent_copies[0].read_bytes() == intent_copies[1].read_bytes(),
+      "CompletionIntents.swift identical in App/Sources/Intents and WidgetExtension/Sources/Intents",
+      "CompletionIntents.swift copies differ (or one is missing): copy App/Sources/Intents/CompletionIntents.swift over the widget's")
+
 # Macro policy (PHASE2_PLAN §0.1, 2026-10-09). @Observable/@State/@Entry/@Environment are allowed in real app code
 # (App/Sources outside Debug, WidgetExtension, WatchApp): VERIFIED to compile on both paths in Phase 0.
 # Still guarded (macro outside `#if TABULA_MACRO_PROBES` = FAIL):
@@ -278,6 +294,29 @@ ip_sources = [s.get("path") for s in pj["targets"]["TabulaApp"]["sources"]]
 check("Resources/InfoPlist.xcstrings" in ip_sources,
       "project.yml: TabulaApp target includes Resources/InfoPlist.xcstrings (Xcode compiles it to InfoPlist.strings)",
       "project.yml: TabulaApp sources lack Resources/InfoPlist.xcstrings")
+# App Shortcut phrases (Phase 4 B3): Resources/AppShortcuts.xcstrings, app target only (Xcode metadata step; there is no
+# xtool equivalent, shortcuts are TestFlight-only). Every key is a phrase of TabulaAppShortcuts with
+# `\(.applicationName)` -> `${applicationName}`; every translation keeps the placeholder exactly once (Xcode rejects
+# an utterance without it), and all 12 languages are complete.
+sc_catalog = json.loads((ROOT / "Resources/AppShortcuts.xcstrings").read_text(encoding="utf-8"))["strings"]
+sc_code = (ROOT / "App/Sources/Intents/AppShortcuts.swift").read_text(encoding="utf-8")
+sc_phrases = {p.replace("\\(.applicationName)", "${applicationName}")
+              for p in re.findall(r'^\s*"((?:[^"\\]|\\.)*\\\(\.applicationName\)(?:[^"\\]|\\.)*)",?\s*$', sc_code, re.M)}
+check(sc_phrases and sc_phrases == set(sc_catalog),
+      f"AppShortcuts.xcstrings: keys == the {len(sc_phrases)} phrases of TabulaAppShortcuts",
+      f"AppShortcuts.xcstrings keys differ from the code's phrases: {sorted(sc_phrases ^ set(sc_catalog))}")
+sc_bad = [f"{k} [{lang}]" for k, v in sc_catalog.items() for lang, loc in v.get("localizations", {}).items()
+          if loc.get("stringUnit", {}).get("value", "").count("${applicationName}") != 1]
+sc_gaps = L10N.all_problems({"strings": sc_catalog})
+check(not sc_bad and not sc_gaps and all(str(v.get("comment", "")).strip() for v in sc_catalog.values())
+      and {lang for v in sc_catalog.values() for lang in v.get("localizations", {})} == set(L10N.LANGS),
+      f"AppShortcuts.xcstrings: {len(sc_catalog)} phrases complete in all {len(L10N.TARGETS)} translations, "
+      "${applicationName} exactly once in each, with comments",
+      f"AppShortcuts.xcstrings problems: placeholder {sc_bad[:10]}, gaps {sc_gaps[:10]}")
+check("Resources/AppShortcuts.xcstrings" in ip_sources
+      and "Resources/AppShortcuts.xcstrings" not in [s.get("path") for s in pj["targets"]["TabulaWidgets"]["sources"]],
+      "project.yml: Resources/AppShortcuts.xcstrings is a TabulaApp resource (not the widget's)",
+      "project.yml: Resources/AppShortcuts.xcstrings must be in TabulaApp's sources only")
 # The widget must not get the app's InfoPlist.strings (CFBundleDisplayName "Tabula" would override "Tabula Widgets",
 # plus the microphone/camera texts). XcodeGen: InfoPlist.xcstrings is an app-only resource. xtool: the widget's
 # .lproj come from a separate Localizable-only compile into .build-l10n/widget/ (Phase 3 polish).
@@ -467,7 +506,7 @@ check(not xc_res, "no Package.swift target declares a .xcstrings resource (would
 # .env.example documents every variable the scripts/CI read (names only, never values).
 ENV_NAMES = ("TABULA_PAID_ACCOUNT", "TABULA_DEVELOPMENT_TEAM", "APPLE_TEAM_ID", "ASC_KEY_ID", "ASC_ISSUER_ID",
              "ASC_KEY_P8_BASE64", "TABULA_MACRO_PROBES", "TABULA_WORKDIR", "TABULA_SCRATCH", "TABULA_SWIFTLY_ENV",
-             "TABULA_DARWIN_SDK", "TABULA_WATCH_TARGET", "XCODEGEN")
+             "TABULA_DARWIN_SDK", "TABULA_WATCH_TARGET", "XCODEGEN", "TABULA_APP_INTENTS")
 env_example = ROOT / ".env.example"
 if env_example.is_file():
     lines = [ln.strip() for ln in env_example.read_text().splitlines() if ln.strip() and not ln.lstrip().startswith("#")]

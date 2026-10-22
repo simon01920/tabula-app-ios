@@ -12,6 +12,9 @@ public enum ItemLink: Hashable, Sendable {
     case packTonight(LocalDate)
     /// The Today tab (widget taps, Phase 4; never produced by a notification).
     case today
+    /// The Tasks tab with the editor for a new task ("Add homework" App Shortcut, Phase 4 B3; never produced by a
+    /// notification).
+    case newTask
 
     public init(_ source: ReminderSource) {
         switch source {

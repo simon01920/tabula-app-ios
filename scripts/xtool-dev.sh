@@ -20,6 +20,9 @@
 #   bash scripts/xtool-dev.sh --macro-probes       # macro variant: build + install + launch
 #   bash scripts/xtool-dev.sh --macro-probes build --ipa
 #   bash scripts/xtool-dev.sh --simulator          # base variant, iOS Simulator .app (build only)
+#   bash scripts/xtool-dev.sh --app-intents        # Phase 4 B3 experiment: compile the intent-driven controls
+#                                                  # (TABULA_APP_INTENTS=1) although xtool writes no App Intents
+#                                                  # metadata; own work dir (-intents). Checklist row B3.X1 only.
 # Env: TABULA_WORKDIR (default ~/.cache/tabula/work; variants append -macro / -sim)
 set -euo pipefail
 
@@ -31,11 +34,12 @@ WORK="${TABULA_WORKDIR:-$HOME/.cache/tabula/work}"
 
 VARIANT="base"
 SIMULATOR=0
-unset TABULA_MACRO_PROBES
+unset TABULA_MACRO_PROBES TABULA_APP_INTENTS
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --macro-probes) VARIANT="macro-probes"; WORK="$WORK-macro"; export TABULA_MACRO_PROBES=1; shift ;;
     --simulator) SIMULATOR=1; WORK="$WORK-sim"; shift ;;
+    --app-intents) WORK="$WORK-intents"; export TABULA_APP_INTENTS=1; shift ;;
     *) break ;;
   esac
 done
@@ -69,7 +73,7 @@ if [ "$SIMULATOR" -eq 1 ]; then
 elif [ "$#" -eq 0 ]; then
   set -- run
 fi
-echo "+ variant: $VARIANT (TABULA_MACRO_PROBES=${TABULA_MACRO_PROBES:-unset})$([ "$SIMULATOR" -eq 1 ] && echo ', iOS Simulator')"
+echo "+ variant: $VARIANT (TABULA_MACRO_PROBES=${TABULA_MACRO_PROBES:-unset}, TABULA_APP_INTENTS=${TABULA_APP_INTENTS:-unset})$([ "$SIMULATOR" -eq 1 ] && echo ', iOS Simulator')"
 echo "+ (cd $WORK && xtool dev $*)"
 xtool dev "$@"
 

@@ -6,6 +6,7 @@
 //   exam  → Exams tab, then `exams.detail` (stage B2)
 //   lesson → Timetable tab; pack tonight → Today tab (no detail sheet)
 //   today  → Today tab (widget taps, Phase 4 A: `tabula://open/…` URLs from `ItemLinkURL`, handled by `onOpenURL`)
+//   newTask → Tasks tab + `tasks.editor-new` (the "Add homework" App Shortcut, Phase 4 B3)
 // Contract for B1/B2: register `AppRoute("tasks.detail", .sheet(over: .tasks)) { TaskDetailRouteView() }` (resp.
 // `exams.detail`) in your *Routes.swift. The route's view reads `navigation.presentedItem` (`.task(id)` / `.exam(id)`)
 // and shows that item; when it is `nil` (launched with `-TabulaScreen tasks.detail` for screenshots) it picks a
@@ -184,7 +185,7 @@ final class AppNavigation {
     /// The tab that shows `link`.
     static func tab(for link: ItemLink) -> AppTab {
         switch link {
-        case .task: return .tasks
+        case .task, .newTask: return .tasks
         case .exam: return .exams
         case .lesson: return .timetable
         case .packTonight, .today: return .today
@@ -195,6 +196,7 @@ final class AppNavigation {
     static func detailRouteID(for link: ItemLink) -> String? {
         switch link {
         case .task: return "tasks.detail"
+        case .newTask: return "tasks.editor-new"   // "Add homework" App Shortcut (Phase 4 B3)
         case .exam: return "exams.detail"
         case .lesson, .packTonight, .today: return nil
         }

@@ -93,6 +93,15 @@ final class WidgetSnapshotWriter {
         writeIfChanged()
     }
 
+    /// Writes now if anything changed and waits until the file is on disk (Phase 4 B3: an App Intent's `perform()`
+    /// returns only after this, because WidgetKit reloads the widget timeline right after it).
+    func flushAndWait() async {
+        pending?.cancel()
+        pending = nil
+        writeIfChanged()
+        await writeChain?.value
+    }
+
     private func writeIfChanged() {
         pending = nil
         guard let model, let container, !model.isLoading, model.problem == nil else { return }

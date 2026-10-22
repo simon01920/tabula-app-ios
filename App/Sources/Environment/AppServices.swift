@@ -20,6 +20,8 @@ final class AppServices {
     let widgets: WidgetSnapshotWriter
     /// Lesson + exam-day Live Activities (Phase 4 B2): start / schedule / update / end after every change.
     let liveActivities: LiveActivityController
+    /// What App Intents run in this process (Phase 4 B3): Mark done, "What's next?", "Add homework".
+    let intents: AppIntentHost
 
     init(environment: AppEnvironment) {
         let model = AppModel(environment: environment)
@@ -43,6 +45,10 @@ final class AppServices {
         self.liveActivities = liveActivities
         // A background refresh near the next lesson boundary / exam start while an activity runs.
         reminders.additionalRefreshDate = { [weak liveActivities] in liveActivities?.backgroundRefreshHint }
+        // App Intents (Phase 4 B3): registered here, before launch finishes, so an intent that launched the app in the
+        // background (widget checkbox, alarm "Done") finds the services; the widget extension never registers any.
+        intents = AppIntentHost(model: model, reminders: reminders, navigation: navigation, widgets: widgets)
+        IntentHost.register(intents)
     }
 }
 

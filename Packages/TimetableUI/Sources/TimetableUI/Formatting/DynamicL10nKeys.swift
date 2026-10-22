@@ -80,6 +80,7 @@ public enum DynamicL10nKeys {
                  "timetable.cycle.numberedDay"]
         keys += ReminderUIKeys.allKeys
         keys += ReminderRuleDefaults.targets.map { ReminderKindList.titleKey($0, terminology: .classLecture) }
+        keys += IntentL10nKeys.allKeys   // Phase 4 B3: App Intent titles / parameters, checkbox + alarm "Done"
         keys += TaskL10nKeys.allKeys
         keys += AttachmentKind.knownValues.map(attachmentKind) + [attachmentKind(AttachmentKind(rawValue: "future"))]
         keys += widgetKeys

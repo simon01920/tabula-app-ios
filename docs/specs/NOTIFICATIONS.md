@@ -76,6 +76,11 @@ Silent switch on/off · each Focus (DND, Sleep, custom) · Low Power Mode · app
   from a notification (or another screen) while its editor is open, Save writes the edits onto the completed original
   (it stays completed); the successor was generated at completion time from the old values and keeps them (e.g. the
   old title). Device note in `docs/checklists/PHASE3_DEVICE.md` Q5.4.
+- **Phase 4 B3 (App Intents):** on builds with App Intents metadata (Xcode/TestFlight, `TABULA_APP_INTENTS`) a loud
+  alarm for a task or exam shows Stop + **Done** (`MarkTaskDoneIntent` / `MarkExamDoneIntent`, same mutation and
+  successor rule as the notification "Mark as Done", run in the app process) instead of Snooze; lesson, pack-tonight and
+  test alarms, and every alarm on xtool builds, keep the 9-minute Snooze. Pending human decision: RISKS #82
+  (`AlarmSecondaryAction.doneReplacesSnooze`). The Homework widget's checkbox uses the same intent.
 - **Health check model:** `ReminderHealthCheck` (rows for notifications, Time Sensitive, loud alarms, Focus, Silent mode,
   Low Power, Background App Refresh, pending vs 64, saturation, alarm overflow, hidden/locked app). UI in B4.
 - **Device matrix:** `docs/checklists/PHASE3_DEVICE.md` §A.

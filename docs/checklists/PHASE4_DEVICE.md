@@ -238,3 +238,63 @@ ENVIRONMENT §31; risks: RISKS #73–#79.
 | B2.43 | With a start scheduled for tomorrow, change tomorrow's first lesson on another device (sync) without opening Tabula | The pending activity is kept and starts at its old time, then the next run updates it; opening Tabula before then replaces it with one at the new time | | |
 
 Watch complication refresh: not part of B2 (no complications yet; Phase 5).
+
+## B3
+
+App Intents (Phase 4 Stage B3): Homework widget checkbox, loud-alarm "Done", timetable choice for Now & Next / Today,
+App Shortcuts "What's next?" and "Add homework". Design and facts: ENVIRONMENT §32; risks: RISKS #19, #51, #80–#84.
+
+### B3.0 Setup and what each build can prove
+- **TF** = needs the **TestFlight (Xcode) build**: only Xcode writes `Metadata.appintents`, and only project.yml defines
+  `TABULA_APP_INTENTS`, which compiles the intent controls. TestFlight also implies the paid account, so the App Group
+  exists and the widgets have data. **xtool** = the local dev build (no metadata, by design no intent controls).
+- Test data: two timetables (Settings → Timetables → duplicate, rename "B", change one lesson so the two differ), three
+  open tasks due this week (one **repeating weekly**), one exam with a user Loud-alarm rule (Settings → Reminders, rule
+  for exams, tier Loud alarm, at a time 3–4 min from now) and one homework task with a Loud-alarm rule likewise.
+- Diagnostics: Settings → Developer → Reminders (last re-plan reasons include `intentAction` after a Mark done);
+  Developer → Platform probes → "Widget read-back" (the snapshot the extension saw).
+
+### B3.1 Homework checkbox (widget)
+| ID | Build | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|---|
+| B3.1 | TF | Add Homework medium + large; look at the rows | Each row starts with a circle; the row text still opens the task when tapped (B1 row 7) | | |
+| B3.2 | TF | Unlock, tap the circle of a one-off task (do not open the app) | Within a few seconds the task disappears from the widget; open Tabula → Tasks: the task is in Completed; its pending reminders are gone (Developer → Reminders) | | |
+| B3.3 | TF | Tap the circle of the **weekly** task | It disappears; Tasks shows it completed AND a new open copy due one week later (exactly one) | | |
+| B3.4 | TF | Force-quit Tabula (app switcher), then tap a circle | Same as B3.2 (the intent cold-launches the app in the background; RISKS #81). Record the delay | | |
+| B3.5 | TF | Complete a task in the app, then (before the widget refreshes) tap its circle on the widget | Nothing else changes (no second successor, no error); the row disappears after the reload | | |
+| B3.5a | TF | Lock the phone and tap a circle on a Lock Screen-adjacent surface / StandBy | iOS asks to unlock first ("buttons … are inactive" while locked); after unlocking, as B3.2 | | |
+| B3.5b | TF | VoiceOver on: swipe to a circle | Reads "Mark “<title>” as done, button"; double-tap completes the task; the row link reads its own sentence | | |
+| B3.5c | xtool | Homework medium/large | **No** circle; each row opens its task (fallback). Never a control that does nothing | | |
+
+### B3.2 Loud alarm "Done" (RISKS #51)
+| ID | Build | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|---|
+| B3.6 | TF | Let the homework task's loud alarm ring (phone locked) | Full-screen alarm with Stop and **Done** (no Snooze: RISKS #82) | | |
+| B3.7 | TF | Tap **Done** | Alarm stops; open Tabula: the task is completed (a repeating one has its successor); its other reminders are gone | | |
+| B3.8 | TF | Same with the exam's loud alarm | Stop + Done; Done completes the exam (Exams → Past / completed) | | |
+| B3.9 | TF | Force-quit Tabula before the alarm rings, then tap Done | As B3.7 (cold launch in the background) | | |
+| B3.10 | TF | A lesson or pack-tonight loud alarm, and the health check's test alarm | Stop + **Snooze** (unchanged; Snooze still counts down 9 min in the Live Activity) | | |
+| B3.10a | xtool | Task / exam loud alarm | Stop + Snooze (Phase 3 behaviour); Mark done only through the notification action | | |
+
+### B3.3 Timetable choice (Now & Next, Today)
+| ID | Build | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|---|
+| B3.11 | TF | Add Now & Next small and Today medium; long-press → Edit Widget | A "Choose Timetable" sheet with a "Timetable" row, empty by default; the widget shows the active timetable | | |
+| B3.12 | TF | Pick "B" | The list shows both timetables, the active one subtitled "Active in Tabula"; after picking, the widget shows B's lessons (the changed lesson proves it); a second widget left on default still shows the active one | | |
+| B3.13 | TF | In the app, switch the active timetable to B, then back; delete B | Widgets on default follow the active timetable; the widget configured for B shows the active timetable after B is deleted (never stale B data) | | |
+| B3.13a | xtool | Long-press Now & Next / Today | No Edit Widget option (static widgets), active timetable shown — same as before B3 | | |
+
+### B3.4 App Shortcuts (Shortcuts app, Siri, Spotlight)
+| ID | Build | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|---|
+| B3.14 | TF | Shortcuts app → Tabula (App Shortcuts) | "What's Next" and "Add Homework" tiles; the DEBUG probe tile is gone | | |
+| B3.15 | TF | "Hey Siri, what's next in Tabula?" during a lesson, in a break, after school | Spoken + shown: the Now & Next sentence (e.g. "Now, Maths, 8:00 to 8:45, room 12, ends at 8:45, Next, …"); after school: the Today header's day-over title, then "Next Lesson, Tomorrow, 8:00, …". Same words as the Now & Next widget's VoiceOver label at that moment. The app does not open | | |
+| B3.16 | TF | "Add homework in Tabula" (Siri) or the tile | Tabula opens on the Tasks tab with the new-task editor | | |
+| B3.17 | TF | Switch the phone to Slovak (and German), repeat B3.15/B3.16 with "Čo je ďalej v Tabula?" / "Was kommt als Nächstes in Tabula?" | Recognised; answer in that language. Note any phrase Siri does not recognise (reviewer input, docs/localization/REVIEW.md) | | |
+| B3.18 | TF | Spotlight: type "What's next" | The shortcut is offered and runs | | |
+| B3.18a | xtool | Shortcuts app → search Tabula | No Tabula App Shortcuts (expected: no metadata, RISKS #19) | | |
+
+### B3.X Optional experiment (xtool, evidence for RISKS #19)
+| ID | Build | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|---|
+| B3.X1 | xtool `--app-intents` | `TABULA_WORKDIR=… bash scripts/xtool-dev.sh --app-intents` (compiles the intent controls WITHOUT metadata), install, tap a Homework circle, look at Edit Widget, let a task loud alarm ring and tap Done | Unknown by design — record exactly what happens (nothing / crash / works / widget missing from the gallery). Never ship this variant | | |

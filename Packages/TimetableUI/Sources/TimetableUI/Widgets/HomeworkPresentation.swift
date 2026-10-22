@@ -25,6 +25,8 @@ public struct HomeworkDisplay: Equatable, Sendable {
         public var isHighPriority: Bool
         /// One VoiceOver sentence: title, subject, overdue, due, priority.
         public var accessibilityLabel: String
+        /// VoiceOver label of the Mark done checkbox (Phase 4 B3): "Mark “Essay” as done".
+        public var markDoneLabel: String = ""
 
         /// Where a tap goes (`tabula://open/task/<id>`).
         public var link: ItemLink { .task(TaskItem.ID(id)) }
@@ -154,7 +156,9 @@ public struct HomeworkPresenter: Sendable {
         if task.priority >= .high { parts.append(renderer.string(forKey: TaskL10nKeys.priorityAccessibility(task.priority))) }
         return HomeworkDisplay.TaskLine(id: task.id, title: task.title, subject: task.subject, dueText: visible,
                                         isOverdue: isOverdue, isHighPriority: task.priority >= .high,
-                                        accessibilityLabel: parts.joined(separator: separator))
+                                        accessibilityLabel: parts.joined(separator: separator),
+                                        markDoneLabel: renderer.format(key: "widget.homework.markDone",
+                                                                       arguments: [.text(task.title)]))
     }
 
     func dueText(_ task: WidgetSnapshot.DueTask, isOverdue: Bool, today: LocalDate, spoken: Bool) -> String {

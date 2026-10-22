@@ -12,6 +12,8 @@
 //     overdue = the Tasks tab's overdue count.
 //   - Next exam: the Exams tab's featured exam (`ExamListModel.next`).
 //   - User text is shortened to `maxTextLength` characters (bounded size; a widget cannot show more anyway).
+//   - Timetable sections (Phase 4 B3, widget timetable choice): with ≥ 2 live timetables, one section each; the other
+//     timetables' days only while the whole snapshot fits `maxEncodedBytes` (`addTimetableSections`).
 import Foundation
 import TimetableCore
 
@@ -48,24 +50,11 @@ public enum WidgetSnapshotBuilder {
         guard let database else { return snapshot }
 
         let today = context.localDate(of: now)
-        if let timetable = ActiveTimetable.resolve(database),
-           let resolver = ScheduleResolver(database: database, timetableID: timetable.id, context: context) {
+        let active = ActiveTimetable.resolve(database)
+        if let timetable = active, let covered = coverage(timetable, database: database, today: today, context: context) {
             snapshot.hasTimetable = true
-            let tomorrow = today.adding(days: 1)
-            let last = resolver.nextSchoolDay(after: tomorrow, horizonDays: searchHorizonDays)?.date
-                ?? today.adding(days: fallbackCoveredDays)
-            var days: [WidgetSnapshot.Day] = []
-            var date = today
-            while date <= last {
-                days.append(day(date, resolver: resolver, database: database, visibility: timetable.fieldVisibility))
-                date = date.adding(days: 1)
-            }
-            snapshot.days = days
-            // One second before the day after `last` starts: `nowAndNext` then looks at `last` (nothing starts later
-            // that day) and the following days.
-            let probe = context.startOfDay(last.adding(days: 1)).addingTimeInterval(-1)
-            snapshot.followingLesson = resolver.nowAndNext(at: probe, horizonDays: searchHorizonDays).next
-                .map { lesson($0, reasons: [], visibility: timetable.fieldVisibility) }
+            snapshot.days = covered.days
+            snapshot.followingLesson = covered.following
         }
 
         let nowLocal = context.local(from: now)
@@ -113,7 +102,50 @@ public enum WidgetSnapshotBuilder {
         snapshot.nextExam = exams.first
         snapshot.exams = exams.isEmpty ? nil : exams
         enforceBudget(&snapshot)
+        if let active { addTimetableSections(&snapshot, active: active, database: database, today: today, context: context) }
         return snapshot
+    }
+
+    /// The days of `timetable` from `today` through the next school day after tomorrow (every day in between), and the
+    /// first lesson after them; `nil` when the timetable cannot be resolved.
+    static func coverage(_ timetable: Timetable, database: TabulaDatabase, today: LocalDate,
+                         context: CalendarContext) -> (days: [WidgetSnapshot.Day], following: WidgetSnapshot.Lesson?)? {
+        guard let resolver = ScheduleResolver(database: database, timetableID: timetable.id, context: context) else { return nil }
+        let tomorrow = today.adding(days: 1)
+        let last = resolver.nextSchoolDay(after: tomorrow, horizonDays: searchHorizonDays)?.date
+            ?? today.adding(days: fallbackCoveredDays)
+        var days: [WidgetSnapshot.Day] = []
+        var date = today
+        while date <= last {
+            days.append(day(date, resolver: resolver, database: database, visibility: timetable.fieldVisibility))
+            date = date.adding(days: 1)
+        }
+        // One second before the day after `last` starts: `nowAndNext` then looks at `last` (nothing starts later
+        // that day) and the following days.
+        let probe = context.startOfDay(last.adding(days: 1)).addingTimeInterval(-1)
+        let following = resolver.nowAndNext(at: probe, horizonDays: searchHorizonDays).next
+            .map { lesson($0, reasons: [], visibility: timetable.fieldVisibility) }
+        return (days, following)
+    }
+
+    /// Phase 4 B3 (widget timetable choice): one section per live timetable, display order. Added AFTER the B1 trim, so
+    /// the active timetable, tasks and exams keep everything they had; another timetable's days are kept only while
+    /// the encoded snapshot stays within `maxEncodedBytes` (else that section has no days and a widget configured for it
+    /// shows "Open Tabula"). Nothing is added with a single timetable (no choice to make).
+    static func addTimetableSections(_ snapshot: inout WidgetSnapshot, active: Timetable, database: TabulaDatabase,
+                                     today: LocalDate, context: CalendarContext) {
+        let ordered = ActiveTimetable.ordered(database)
+        guard ordered.count > 1 else { return }
+        snapshot.timetables = ordered.map {
+            TimetableSection(id: $0.id.uuid, name: shortened($0.name), isActive: $0.id == active.id)
+        }
+        for (index, timetable) in ordered.enumerated() where timetable.id != active.id {
+            guard let covered = coverage(timetable, database: database, today: today, context: context) else { continue }
+            var candidate = snapshot
+            candidate.timetables?[index].days = covered.days
+            candidate.timetables?[index].followingLesson = covered.following
+            if let size = try? WidgetSnapshotStore.encode(candidate).count, size <= maxEncodedBytes { snapshot = candidate }
+        }
     }
 
     // MARK: Internals

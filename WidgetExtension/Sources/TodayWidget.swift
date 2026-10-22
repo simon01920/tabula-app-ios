@@ -1,13 +1,15 @@
 // *Today* widget (PHASE4_PLAN §0.3, Stage B1): the day's lessons with times, subject badge, room, cancelled lessons
 // struck through, changes badged and the current lesson highlighted; large adds the tasks due that day. After school it
 // shows tomorrow under a "Tomorrow" header; holiday / free day / "Open Tabula" states reuse the Now & Next semantics.
-// A `StaticConfiguration` (no App Intents in this stage; RISKS #19), systemMedium + systemLarge (large = `.largeWidgets`,
-// a Pro family gated by `WidgetProGate` on the snapshot's tier).
+// A `StaticConfiguration` on the xtool path, an `AppIntentConfiguration` (timetable choice, Phase 4 B3) on builds with
+// `TABULA_APP_INTENTS` (RISKS #19); systemMedium + systemLarge (large = `.largeWidgets`, a Pro family gated by
+// `WidgetProGate` on the snapshot's tier).
 //
 // Data flow as Now & Next (NowNextWidget.swift): `WidgetSnapshotReader` → `WidgetTimelinePlanner.plan` (entries at lesson
 // boundaries, cancelled ones included, and midnights, ≤ 29, reload ≤ 6 h) → `TodayPresenter` (pure, Linux-tested) →
 // `TodayWidgetView` (TimetableUI, shared with the DEBUG gallery). Tap: `widgetURL(tabula://open/today)`.
 // APIs: as NowNextWidget.swift (StaticConfiguration, TimelineProvider, containerBackground, widgetURL, widgetFamily).
+import AppIntents
 import Foundation
 import SwiftUI
 import TimetableCore
@@ -29,23 +31,31 @@ struct TodayProvider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping @Sendable (TodayEntry) -> Void) {
-        NSTimeZone.resetSystemTimeZone()   // RISKS #67
-        let read = WidgetSnapshotReader.read()
-        let entries = Self.entries(snapshot: read.snapshot, now: Date())
-        if context.isPreview, case .unavailable = entries[0].display.kind {
-            completion(Self.sampleEntry())
-        } else {
-            completion(entries[0])
-        }
+        completion(Self.snapshotEntry(isPreview: context.isPreview, timetableID: nil))
     }
 
     func getTimeline(in context: Context, completion: @escaping @Sendable (Timeline<TodayEntry>) -> Void) {
+        completion(Self.timeline(timetableID: nil))
+    }
+
+    /// The gallery / transient entry for `timetableID` (`nil` = the active timetable).
+    static func snapshotEntry(isPreview: Bool, timetableID: String?) -> TodayEntry {
+        NSTimeZone.resetSystemTimeZone()   // RISKS #67
+        let snapshot = WidgetSnapshotReader.read().snapshot?.selecting(timetableID: timetableID)
+        let entries = Self.entries(snapshot: snapshot, now: Date())
+        if isPreview, case .unavailable = entries[0].display.kind { return Self.sampleEntry() }
+        return entries[0]
+    }
+
+    /// The timeline for `timetableID` (`nil` = the active timetable; B3 `selecting(timetableID:)`).
+    static func timeline(timetableID: String?) -> Timeline<TodayEntry> {
         NSTimeZone.resetSystemTimeZone()
         let read = WidgetSnapshotReader.read()
+        let snapshot = read.snapshot?.selecting(timetableID: timetableID)
         let now = Date()
-        let plan = Self.plan(snapshot: read.snapshot, now: now)
+        let plan = Self.plan(snapshot: snapshot, now: now)
         WidgetSnapshotReader.recordRead(read, now: now, entries: plan.entries.count, widget: "Today")
-        completion(Timeline(entries: Self.entries(snapshot: read.snapshot, plan: plan), policy: .after(plan.reloadDate)))
+        return Timeline(entries: Self.entries(snapshot: snapshot, plan: plan), policy: .after(plan.reloadDate))
     }
 
     static func plan(snapshot: WidgetSnapshot?, now: Date) -> NowNextTimelinePlan {
@@ -81,10 +91,36 @@ struct TodayProvider: TimelineProvider {
     }
 }
 
+/// Phase 4 B3: the same provider for a widget configured with `SelectTimetableIntent` (Xcode / TestFlight builds).
+struct TodayIntentProvider: AppIntentTimelineProvider {
+    func placeholder(in context: Context) -> TodayEntry {
+        TodayProvider.sampleEntry()
+    }
+
+    func snapshot(for configuration: SelectTimetableIntent, in context: Context) async -> TodayEntry {
+        TodayProvider.snapshotEntry(isPreview: context.isPreview, timetableID: configuration.timetable?.id)
+    }
+
+    func timeline(for configuration: SelectTimetableIntent, in context: Context) async -> Timeline<TodayEntry> {
+        TodayProvider.timeline(timetableID: configuration.timetable?.id)
+    }
+}
+
 struct TodayWidget: Widget {
     static let kind = "sk.simondev.tabula.widget.today"
 
     var body: some WidgetConfiguration {
+        // As NowNextWidget: configurable with App Intents metadata (TABULA_APP_INTENTS), static otherwise; same kind.
+        #if TABULA_APP_INTENTS
+        AppIntentConfiguration(kind: Self.kind, intent: SelectTimetableIntent.self, provider: TodayIntentProvider()) { entry in
+            TodayEntryView(entry: entry)
+                .containerBackground(.background, for: .widget)
+                .widgetURL(ItemLinkURL.url(for: entry.display.link))
+        }
+        .configurationDisplayName("widget.today.name")
+        .description("widget.today.description")
+        .supportedFamilies([.systemMedium, .systemLarge])
+        #else
         StaticConfiguration(kind: Self.kind, provider: TodayProvider()) { entry in
             TodayEntryView(entry: entry)
                 .containerBackground(.background, for: .widget)
@@ -93,6 +129,7 @@ struct TodayWidget: Widget {
         .configurationDisplayName("widget.today.name")
         .description("widget.today.description")
         .supportedFamilies([.systemMedium, .systemLarge])
+        #endif
     }
 }
 
