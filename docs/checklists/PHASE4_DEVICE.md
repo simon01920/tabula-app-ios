@@ -257,7 +257,7 @@ App Shortcuts "What's next?" and "Add homework". Design and facts: ENVIRONMENT �
 ### B3.1 Homework checkbox (widget)
 | ID | Build | Steps | Expected | Observed | ✔/✘ |
 |---|---|---|---|---|---|
-| B3.1 | TF | Add Homework medium + large; look at the rows | Each row starts with a circle; the row text still opens the task when tapped (B1 row 7) | | |
+| B3.1 | TF | Add Homework medium + large; look at the rows | Each row starts with a circle in a 44 × 44 pt target; medium shows 2 rows, large 7 (then "+N more"); nothing clipped at the largest Dynamic Type; the row text still opens the task when tapped (B1 row 7) | | |
 | B3.2 | TF | Unlock, tap the circle of a one-off task (do not open the app) | Within a few seconds the task disappears from the widget; open Tabula → Tasks: the task is in Completed; its pending reminders are gone (Developer → Reminders) | | |
 | B3.3 | TF | Tap the circle of the **weekly** task | It disappears; Tasks shows it completed AND a new open copy due one week later (exactly one) | | |
 | B3.4 | TF | Force-quit Tabula (app switcher), then tap a circle | Same as B3.2 (the intent cold-launches the app in the background; RISKS #81). Record the delay | | |
@@ -273,6 +273,10 @@ App Shortcuts "What's next?" and "Add homework". Design and facts: ENVIRONMENT �
 | B3.7 | TF | Tap **Done** | Alarm stops; open Tabula: the task is completed (a repeating one has its successor); its other reminders are gone | | |
 | B3.8 | TF | Same with the exam's loud alarm | Stop + Done; Done completes the exam (Exams → Past / completed) | | |
 | B3.9 | TF | Force-quit Tabula before the alarm rings, then tap Done | As B3.7 (cold launch in the background) | | |
+| B3.9a | TF | Exam day with the exam-day Live Activity running: force-quit Tabula, let the exam's loud alarm ring, tap **Done** | The exam is completed AND the exam-day Live Activity ends within a few seconds, without opening the app (final QA M1) | | |
+| B3.9b | TF | Same, but complete the exam from its **notification**'s "Mark as Done" (app force-quit) | The exam-day Live Activity ends as in B3.9a; the widgets drop the exam | | |
+| B3.9c | TF | Make "Done" fail: delete the task on another device / in the app just before its alarm rings (the alarm is already ringing), tap **Done** | The alarm stops anyway (it is stopped first, whatever the outcome; final QA m1); nothing else changes | | |
+| B3.9d | TF | Install a TestFlight build over a build whose task alarms had Snooze (or flip `doneReplacesSnooze`), open the app once | Already scheduled task/exam alarms are re-scheduled with the new buttons (the render signature includes the button policy, so one re-plan cancels and schedules them again; Developer → Reminders shows the alarms as scheduled again in the last run's counts). Let one ring to confirm Stop + Done | | |
 | B3.10 | TF | A lesson or pack-tonight loud alarm, and the health check's test alarm | Stop + **Snooze** (unchanged; Snooze still counts down 9 min in the Live Activity) | | |
 | B3.10a | xtool | Task / exam loud alarm | Stop + Snooze (Phase 3 behaviour); Mark done only through the notification action | | |
 

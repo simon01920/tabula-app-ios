@@ -47,8 +47,16 @@ final class AppServices {
         reminders.additionalRefreshDate = { [weak liveActivities] in liveActivities?.backgroundRefreshHint }
         // App Intents (Phase 4 B3): registered here, before launch finishes, so an intent that launched the app in the
         // background (widget checkbox, alarm "Done") finds the services; the widget extension never registers any.
-        intents = AppIntentHost(model: model, reminders: reminders, navigation: navigation, widgets: widgets)
+        intents = AppIntentHost(model: model, reminders: reminders, navigation: navigation, widgets: widgets,
+                                liveActivities: liveActivities)
         IntentHost.register(intents)
+        // Final QA M1: the notification "Mark done" also ends an exam's Live Activity and writes the widget snapshot
+        // before the delegate calls its completion handler.
+        let widgets = self.widgets
+        reminders.afterCompletion = { [weak liveActivities] in
+            await liveActivities?.refreshNow()
+            await widgets.flushAndWait()
+        }
     }
 }
 

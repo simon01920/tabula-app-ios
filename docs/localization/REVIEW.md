@@ -164,4 +164,5 @@ button on the full-screen alarm and must stay one short word; `widget.homework.m
 translation must keep `${applicationName}` exactly once (validate_config.py checks it) and read naturally with the app
 name inserted (hu uses "a(z) ${applicationName}" because the article depends on the name; ja/zh put the name first).
 The AppShortcuts catalog is not part of the review export (the export covers Localizable + InfoPlist); review its 4 keys
-in the file itself. The brand stays undeclined ("aplikácia Tabula", "Отвара Tabula").
+in the file itself. The brand stays undeclined ("aplikácia Tabula", "Отвара Tabula"). Final QA: + `intent.param.alarm`
+(an internal parameter title, rarely visible); `probe.intent.shortTitle` removed (the probe's App Shortcut is gone).

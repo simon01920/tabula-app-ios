@@ -361,7 +361,7 @@ struct PlatformProbesSection: View {
         } header: {
             Text(verbatim: "Macros & App Intents")
         } footer: {
-            Text(verbatim: "Manual: open Shortcuts, search \"Tabula\"; is \"Run Tabula probe\" listed? Run it, then tap Refresh read-backs.")
+            Text(verbatim: "Manual: open Shortcuts, search \"Tabula\"; are the App Shortcuts \"What's Next\" and \"Add Homework\" listed (TestFlight only, PHASE4_DEVICE B3.14)? The probe action is in the Shortcuts action library (DEBUG builds); run it, then tap Refresh read-backs.")
         }
         .onAppear { model.refreshReadBacks() }
     }

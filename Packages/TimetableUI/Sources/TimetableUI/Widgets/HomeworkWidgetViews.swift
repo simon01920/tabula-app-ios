@@ -6,6 +6,8 @@
 // family); medium (3) and large (9) = one `Link` per row to `tabula://open/task/<id>` (`ItemLinkURL`), so a tap opens
 // that task. The overdue mark is an icon + the word ("2 days overdue" / "Overdue"), never colour alone.
 //
+// B3 final QA: with the 44 × 44 pt checkbox (`withCheckbox: true`) rows are 44 pt tall with no extra spacing and the
+// medium / large families show 2 / 7 rows (`HomeworkDisplay.capacity(for:withCheckbox:)`).
 // SEAM FOR THE CHECKBOX (Stage B3, App Intents): `leading` is placed before every medium / large row, outside the row's
 // `Link`. Stage B3 passes `{ line in Button(intent: MarkDoneIntent(taskID: line.id)) { Image(systemName: "circle") } }`;
 // without it (`init(display:family:)`) rows start with the subject badge and the whole row is the link. A `Button`
@@ -24,12 +26,16 @@ public struct HomeworkWidgetView<Leading: View>: View {
     private let display: HomeworkDisplay
     private let family: WidgetFamilyKind
     private let leading: (HomeworkDisplay.TaskLine) -> Leading
+    private let withCheckbox: Bool
 
     /// `leading` is the checkbox seam (see the file header); it is shown in the medium and large families only.
-    public init(display: HomeworkDisplay, family: WidgetFamilyKind,
+    /// `withCheckbox`: `leading` is the 44 pt Mark done checkbox (B3 final QA m3), so rows are 44 pt tall and fewer fit
+    /// (`HomeworkDisplay.capacity(for:withCheckbox:)`).
+    public init(display: HomeworkDisplay, family: WidgetFamilyKind, withCheckbox: Bool = false,
                 @ViewBuilder leading: @escaping (HomeworkDisplay.TaskLine) -> Leading) {
         self.display = display
         self.family = family
+        self.withCheckbox = withCheckbox
         self.leading = leading
     }
 
@@ -37,7 +43,7 @@ public struct HomeworkWidgetView<Leading: View>: View {
         Group {
             switch family {
             case .systemMedium, .systemLarge, .systemExtraLarge:
-                HomeworkListColumn(display: display, family: family, leading: leading)
+                HomeworkListColumn(display: display, family: family, withCheckbox: withCheckbox, leading: leading)
             default:
                 HomeworkSmallColumn(display: display)
             }
@@ -210,13 +216,14 @@ struct HomeworkSmallColumn: View {
 struct HomeworkListColumn<Leading: View>: View {
     let display: HomeworkDisplay
     let family: WidgetFamilyKind
+    var withCheckbox = false
     let leading: (HomeworkDisplay.TaskLine) -> Leading
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 5) {
+        VStack(alignment: .leading, spacing: withCheckbox ? 0 : 5) {
             switch display.kind {
             case .tasks:
-                let shown = display.visible(for: family)
+                let shown = display.visible(for: family, withCheckbox: withCheckbox)
                 HStack(alignment: .firstTextBaseline) {
                     Text(verbatim: display.title)
                         .font(.caption.weight(.bold))

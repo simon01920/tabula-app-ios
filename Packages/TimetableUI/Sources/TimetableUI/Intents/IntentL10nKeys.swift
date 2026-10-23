@@ -6,7 +6,8 @@
 public enum IntentL10nKeys {
     public static let allKeys: [String] = [
         "intent.markTaskDone.title", "intent.markTaskDone.description", "intent.markExamDone.title",
-        "intent.markExamDone.description", "intent.param.task", "intent.param.exam", "intent.whatsNext.title",
+        "intent.markExamDone.description", "intent.param.task", "intent.param.exam", "intent.param.alarm",
+        "intent.whatsNext.title",
         "intent.whatsNext.description", "intent.whatsNext.shortTitle", "intent.addHomework.title",
         "intent.addHomework.description", "intent.addHomework.shortTitle", "intent.selectTimetable.title",
         "intent.selectTimetable.description", "intent.param.timetable", "intent.timetable.typeName",

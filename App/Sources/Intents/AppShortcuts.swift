@@ -35,7 +35,8 @@ struct WhatsNextIntent: AppIntent {
 
     @MainActor
     private static func answer() async -> String {
-        guard let services = await IntentHost.services() else { return "" }
+        // No services (should not happen in the app process): say "Open Tabula" rather than nothing (final QA m4).
+        guard let services = await IntentHost.services() else { return String(localized: "widget.open.title") }
         return await services.whatsNextAnswer()
     }
 }

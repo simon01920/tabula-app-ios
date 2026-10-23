@@ -310,6 +310,90 @@ struct TimetableChoiceTests {
     }
 }
 
+@Suite("Phase 4 B3 final QA — snapshot size is a hard limit")
+struct SnapshotHardBudgetTests {
+    /// 12+ extra lessons every covered day with maximal multibyte text (3 bytes per character in UTF-8), long rooms,
+    /// 40 tasks, 10 overdue, 6 exams, and 3 timetables (2 full copies): still ≤ 19 000 B, today complete.
+    @Test func trueWorstCaseFits() throws {
+        var database = SampleScenarios.secondary().database
+        let wide = String(repeating: "語", count: 80)          // cut to 60 characters = 180 bytes by the builder
+        for index in database.subjects.indices {
+            database.subjects[index].name = wide
+            database.subjects[index].shortName = wide
+        }
+        let timetable = try #require(ActiveTimetable.resolve(database))
+        let subjectIDs = database.subjects.filter { !$0.isDeleted && $0.timetableID == timetable.id }.map(\.id)
+        #expect(!subjectIDs.isEmpty)
+        var serial = 1
+        for dayOffset in 0..<8 {
+            for slot in 0..<12 {
+                let start = LocalTime(hour: 7 + slot, minute: 5)!, end = LocalTime(hour: 7 + slot, minute: 50)!
+                let lesson = OneOffLesson(subjectID: subjectIDs[slot % subjectIDs.count], slot: .time(start: start, end: end),
+                                          room: String(repeating: "室", count: 80))
+                database.overrides.append(ScheduleOverride(id: ScheduleOverride.ID(Fixture.uuid(5000 + serial)),
+                                                           meta: .created(at: .zero), timetableID: timetable.id,
+                                                           date: Fixture.today.adding(days: dayOffset), change: .addLesson(lesson)))
+                serial += 1
+            }
+        }
+        let template = try #require(database.tasks.first)
+        for index in 0..<50 {
+            var copy = template
+            copy.id = TaskItem.ID(Fixture.uuid(7000 + index))
+            copy.title = String(repeating: "課題", count: 50) + "\(index)"
+            copy.due = .date(index < 40 ? Fixture.today.adding(days: index % 7) : Fixture.today.adding(days: -(index - 39)))
+            copy.completedAt = nil
+            database.tasks.append(copy)
+        }
+        database.exams = (0..<6).map { index in
+            Exam(id: Exam.ID(Fixture.uuid(8000 + index)), meta: Fixture.meta, title: String(repeating: "試験", count: 50),
+                 date: Fixture.today.adding(days: index + 1), start: LocalTime(hour: 8, minute: 0)!,
+                 room: String(repeating: "講堂", count: 50))
+        }
+        var ids = SequentialIDGenerator(namespace: 0xB3B4)
+        for copyIndex in 0..<2 {
+            let (mutation, _) = try #require(TimetableManagement.duplicateMutation(
+                timetable.id, name: String(repeating: "時間割", count: 30) + "\(copyIndex)", in: database, ids: &ids))
+            var clock = hlc(database)
+            database = try mutation.apply(to: database, clock: &clock, now: now)
+        }
+        let built = snapshot(database)
+        let size = try WidgetSnapshotStore.encode(built).count
+        #expect(size <= WidgetSnapshotBuilder.maxEncodedBytes, "\(size) B")
+        // Today is never dropped and keeps all its lessons; the active timetable's data comes first.
+        #expect(built.days.first?.date == Fixture.today)
+        let resolver = try #require(ScheduleResolver(database: database, timetableID: timetable.id, context: context))
+        #expect(built.days.first?.lessons.count == resolver.resolution(for: Fixture.today).schedule.entries.count)
+        #expect((built.days.first?.lessons.count ?? 0) >= 12)
+        // When days were dropped, the following lesson is the first lesson after the last covered day.
+        if let last = built.lastDay, let following = built.followingLesson {
+            #expect(following.date > last)
+        }
+        print("B3 QA worst case: \(size) B, \(built.days.count) day(s), sections \(built.timetables?.count ?? 0)")
+    }
+
+    @Test func droppingDaysMovesTheFollowingLessonAndKeepsToday() throws {
+        let full = snapshot(SampleScenarios.secondary().database)
+        #expect(full.days.count == 3)
+        var dayOnlyToday = full
+        dayOnlyToday.days = [full.days[0]]
+        // A limit that fits today plus the lists but not the other days: the far days go, today stays.
+        let limit = try WidgetSnapshotStore.encode(dayOnlyToday).count + 200
+        var trimmed = full
+        WidgetSnapshotBuilder.enforceBudget(&trimmed, limit: limit)
+        #expect(try WidgetSnapshotStore.encode(trimmed).count <= limit)
+        #expect(trimmed.days.map(\.date) == [full.days[0].date])
+        #expect(trimmed.days[0] == full.days[0])
+        // "Next lesson" after today is tomorrow's first lesson, not the one after the original range.
+        #expect(trimmed.followingLesson == full.days[1].lessons.first { $0.takesPlace })
+        // An impossible limit still ends within it (hard guarantee), today's date kept.
+        var tiny = full
+        WidgetSnapshotBuilder.enforceBudget(&tiny, limit: 1_000)
+        #expect(try WidgetSnapshotStore.encode(tiny).count <= 1_000)
+        #expect(tiny.days.first?.date == full.days[0].date)
+    }
+}
+
 @Suite("Phase 4 B3 — new-task link")
 struct NewTaskLinkTests {
     @Test func roundTrips() {
@@ -317,5 +401,24 @@ struct NewTaskLinkTests {
         #expect(url.absoluteString == "tabula://open/new-task")
         #expect(ItemLinkURL.link(from: url) == .newTask)
         #expect(ItemLinkURL.link(from: URL(string: "tabula://open/new-task/x")!) == nil)
+    }
+
+    /// Final QA m3/m8: 44 pt checkbox rows fit 2 / 7 rows; the alarm button policy id follows intents + the switch.
+    @Test func checkboxCapacitiesAndAlarmPolicyID() {
+        #expect(HomeworkDisplay.capacity(for: .systemMedium, withCheckbox: true) == 2)
+        #expect(HomeworkDisplay.capacity(for: .systemLarge, withCheckbox: true) == 7)
+        #expect(HomeworkDisplay.capacity(for: .systemMedium, withCheckbox: false) == 3)
+        #expect(HomeworkDisplay.capacity(for: .systemSmall, withCheckbox: true) == 1)
+        // 2 rows × 44 + header + "+N more" must fit the medium content height (170 − 2 × 16 = 138 pt); 7 rows the large one (350 pt).
+        #expect(2 * HomeworkDisplay.checkboxRowHeight + 16 + 13 <= 138)
+        #expect(7 * HomeworkDisplay.checkboxRowHeight + 16 + 13 <= 350)
+        #expect(AlarmSecondaryAction.policyID(intentsAvailable: true) != AlarmSecondaryAction.policyID(intentsAvailable: false))
+        #expect(AlarmSecondaryAction.policyID(intentsAvailable: true, doneReplacesSnooze: false)
+            == AlarmSecondaryAction.policyID(intentsAvailable: false))
+        // A state saved before B3 (no button policy) differs from any current signature → alarms re-scheduled once.
+        let old = ReminderRenderSignature(language: "en", localeIdentifier: "en_US", hourCycle: "auto", timeZoneIdentifier: "Europe/Bratislava")
+        var new = old
+        new.alarmButtons = AlarmSecondaryAction.policyID(intentsAvailable: true)
+        #expect(old != new)
     }
 }

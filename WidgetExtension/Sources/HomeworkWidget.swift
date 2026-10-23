@@ -109,24 +109,31 @@ struct HomeworkEntryView: View {
             WidgetProPlaceholderView(family: family, title: entry.proTitle, short: entry.proShort)
                 .widgetURL(ItemLinkURL.url(for: .today))
         } else if rowsAreLinks {
-            HomeworkWidgetView(display: entry.display, family: family) { line in Self.checkbox(for: line) }
+            HomeworkWidgetView(display: entry.display, family: family, withCheckbox: Self.hasCheckbox) { line in
+                Self.checkbox(for: line)
+            }
         } else {
-            HomeworkWidgetView(display: entry.display, family: family) { line in Self.checkbox(for: line) }
+            HomeworkWidgetView(display: entry.display, family: family, withCheckbox: Self.hasCheckbox) { line in
+                Self.checkbox(for: line)
+            }
                 .widgetURL(ItemLinkURL.url(for: entry.display.link))
         }
     }
 
     #if TABULA_APP_INTENTS
+    /// Rows carry the 44 pt checkbox (medium 2 / large 7 rows, `HomeworkDisplay.capacity(for:withCheckbox:)`).
+    static let hasCheckbox = true
+
     /// The checkbox (Stage B3): `Button(intent:)` with `MarkTaskDoneIntent`, a `LiveActivityIntent`, so the app process
     /// completes the task (never this extension); WidgetKit reloads the timeline when `perform()` returns, and the
-    /// completed task leaves the list. Sits beside the row's `Link`, so a tap on the row still opens the task. A 44 pt
-    /// tall target; VoiceOver: "Mark “Essay” as done", button.
+    /// completed task leaves the list. Sits beside the row's `Link`, so a tap on the row still opens the task. A 44 × 44 pt
+    /// target (HIG minimum; final QA m3) whose circle sits at the leading edge; VoiceOver: "Mark “Essay” as done", button.
     static func checkbox(for line: HomeworkDisplay.TaskLine) -> some View {
         Button(intent: MarkTaskDoneIntent(taskID: line.id.uuidString)) {
             Image(systemName: "circle")
                 .font(.body.weight(.semibold))
                 .foregroundStyle(.secondary)
-                .frame(width: 26, height: 44)
+                .frame(width: 44, height: 44, alignment: .leading)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -134,6 +141,9 @@ struct HomeworkEntryView: View {
         .accessibilityLabel(Text(verbatim: line.markDoneLabel))
     }
     #else
+    /// B1 rows (medium 3 / large 9).
+    static let hasCheckbox = false
+
     /// No App Intents metadata on this build path (xtool, RISKS #19): no checkbox, the row's `Link` is the control.
     static func checkbox(for line: HomeworkDisplay.TaskLine) -> some View {
         EmptyView()

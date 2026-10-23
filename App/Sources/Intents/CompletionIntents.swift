@@ -15,8 +15,13 @@
 // nothing is registered and nothing is written. Unknown, deleted or already completed items are a no-op.
 // Builds without App Intents metadata (xtool, RISKS #19) compile these types but never show an intent-driven control
 // (`TABULA_APP_INTENTS` is defined only in project.yml): the widget row's `Link` and the alarm's Snooze stay.
-// APIs (iOS 26 SDK interface + docs, checked 2026-10-22): AppIntent (title, description, isDiscoverable iOS 17,
-//   perform()), LiveActivityIntent (iOS 17), IntentParameter / @Parameter(title:), IntentDescription, IntentResult.
+// Final QA m1: the alarm "Done" passes its alarm id; the alarm is stopped (`AlarmManager.stop(id:)`) whatever the
+// outcome, so a failed or impossible completion never leaves it ringing (the next re-plan re-creates nothing for a
+// completed item; for an item that could not be completed the reminder stays in the plan).
+// APIs (iOS 26/27 SDK interface + docs, checked 2026-10-23): AppIntent (title, description, isDiscoverable iOS 17,
+//   perform()), LiveActivityIntent (iOS 17), IntentParameter / @Parameter(title:), IntentDescription, IntentResult,
+//   AlarmKit AlarmManager.shared.stop(id:) throws (AlarmKit.swiftinterface: "public func stop(id: Alarm.ID) throws").
+import AlarmKit
 import AppIntents
 import Foundation
 import TimetableUI
@@ -32,13 +37,19 @@ struct MarkTaskDoneIntent: LiveActivityIntent {
     @Parameter(title: "intent.param.task")
     var taskID: String
 
+    /// The ringing alarm's `Alarm.ID.uuidString` (alarm "Done" only; `nil` from the widget).
+    @Parameter(title: "intent.param.alarm")
+    var alarmID: String?
+
     init() {}
 
-    init(taskID: String) {
+    init(taskID: String, alarmID: String? = nil) {
         self.taskID = taskID
+        self.alarmID = alarmID
     }
 
     func perform() async throws -> some IntentResult {
+        RingingAlarm.stop(alarmID)
         _ = await IntentHost.perform(IntentAction(taskID: taskID))
         return .result()
     }
@@ -54,14 +65,28 @@ struct MarkExamDoneIntent: LiveActivityIntent {
     @Parameter(title: "intent.param.exam")
     var examID: String
 
+    /// The ringing alarm's `Alarm.ID.uuidString`.
+    @Parameter(title: "intent.param.alarm")
+    var alarmID: String?
+
     init() {}
 
-    init(examID: String) {
+    init(examID: String, alarmID: String? = nil) {
         self.examID = examID
+        self.alarmID = alarmID
     }
 
     func perform() async throws -> some IntentResult {
+        RingingAlarm.stop(alarmID)
         _ = await IntentHost.perform(IntentAction(examID: examID))
         return .result()
+    }
+}
+
+/// Stops the alarm whose "Done" ran the intent, first and regardless of the completion's outcome.
+private enum RingingAlarm {
+    static func stop(_ alarmID: String?) {
+        guard let alarmID, let id = UUID(uuidString: alarmID) else { return }
+        try? AlarmManager.shared.stop(id: id)   // throws when it no longer rings: nothing to do then
     }
 }

@@ -182,10 +182,26 @@ struct WidgetGalleryScreen: View {
                 home(.systemSmall) { HomeworkWidgetView(display: done, family: .systemSmall) }
             }
             caption("Medium")
-            home(.systemMedium) { HomeworkWidgetView(display: open, family: .systemMedium) }
+            home(.systemMedium) { homeworkList(open, .systemMedium) }
             caption("Large")
-            home(.systemLarge) { HomeworkWidgetView(display: open, family: .systemLarge) }
+            home(.systemLarge) { homeworkList(open, .systemLarge) }
         }
+    }
+
+    /// Medium / large Homework. With App Intents (TABULA_APP_INTENTS, the CI/TestFlight build) the rows carry the B3
+    /// checkbox layout (44 pt rows, a static circle here: tapping the gallery must not complete seed tasks).
+    @ViewBuilder
+    private func homeworkList(_ display: HomeworkDisplay, _ family: WidgetFamilyKind) -> some View {
+        #if TABULA_APP_INTENTS
+        HomeworkWidgetView(display: display, family: family, withCheckbox: true) { _ in
+            Image(systemName: "circle")
+                .font(.body.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .frame(width: 44, height: 44, alignment: .leading)
+        }
+        #else
+        HomeworkWidgetView(display: display, family: family)
+        #endif
     }
 
     private var examPage: some View {

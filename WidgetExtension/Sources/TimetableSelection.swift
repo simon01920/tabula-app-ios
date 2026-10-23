@@ -51,6 +51,8 @@ struct TimetableEntityQuery: EntityQuery {
 struct SelectTimetableIntent: WidgetConfigurationIntent {
     static var title: LocalizedStringResource { "intent.selectTimetable.title" }
     static var description: IntentDescription? { IntentDescription("intent.selectTimetable.description") }
+    /// Widget configuration only, never a Shortcuts action (final QA m5; the SDK interface does not show the default).
+    static var isDiscoverable: Bool { false }
 
     /// `nil` = follow the active timetable.
     @Parameter(title: "intent.param.timetable")

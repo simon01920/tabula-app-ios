@@ -73,9 +73,24 @@ public struct HomeworkDisplay: Equatable, Sendable {
         }
     }
 
+    /// Row height of a row with the Mark done checkbox (Phase 4 B3 final QA m3): the HIG's 44 × 44 pt minimum target.
+    public static let checkboxRowHeight: Double = 44
+
+    /// Rows per family when every row carries the 44 pt checkbox (B3, builds with App Intents metadata): medium 2,
+    /// large 7. Content height (HIG 430 × 932 sizes minus the 16 pt widget margins): medium 138 pt, large 350 pt; the
+    /// header (~16) and the "+N more" line (~13) take the rest. Without the checkbox the B1 capacities apply.
+    public static func capacity(for family: WidgetFamilyKind, withCheckbox: Bool) -> Int {
+        guard withCheckbox else { return capacity(for: family) }
+        switch family {
+        case .systemMedium: return 2
+        case .systemLarge, .systemExtraLarge: return 7
+        default: return capacity(for: family)
+        }
+    }
+
     /// The lines `family` shows and how many tasks it leaves out (including the unlisted overdue ones).
-    public func visible(for family: WidgetFamilyKind) -> (lines: [TaskLine], hidden: Int) {
-        let shown = Array(lines.prefix(Self.capacity(for: family)))
+    public func visible(for family: WidgetFamilyKind, withCheckbox: Bool = false) -> (lines: [TaskLine], hidden: Int) {
+        let shown = Array(lines.prefix(Self.capacity(for: family, withCheckbox: withCheckbox)))
         return (shown, max(0, totalCount - shown.count))
     }
 

@@ -136,9 +136,13 @@ public enum WidgetSnapshotBuilder {
                                      today: LocalDate, context: CalendarContext) {
         let ordered = ActiveTimetable.ordered(database)
         guard ordered.count > 1 else { return }
-        snapshot.timetables = ordered.map {
+        var named = snapshot
+        named.timetables = ordered.map {
             TimetableSection(id: $0.id.uuid, name: shortened($0.name), isActive: $0.id == active.id)
         }
+        // Not even the names fit (final QA m2): no sections, the widgets follow the active timetable.
+        guard let namedSize = try? WidgetSnapshotStore.encode(named).count, namedSize <= maxEncodedBytes else { return }
+        snapshot = named
         for (index, timetable) in ordered.enumerated() where timetable.id != active.id {
             guard let covered = coverage(timetable, database: database, today: today, context: context) else { continue }
             var candidate = snapshot
@@ -151,9 +155,11 @@ public enum WidgetSnapshotBuilder {
     // MARK: Internals
 
     /// Trims the lowest-priority lists until the encoded snapshot fits `maxEncodedBytes`: tasks beyond the first 8,
-    /// overdue beyond the first 3, exams beyond 2, tasks beyond 4, exams beyond 1, overdue beyond 1.
-    static func enforceBudget(_ snapshot: inout WidgetSnapshot) {
+    /// overdue beyond the first 3, exams beyond 2, tasks beyond 4, exams beyond 1, overdue beyond 1; then (B3 final QA)
+    /// covered days from the far end, never today. `limit` is a parameter for tests only.
+    static func enforceBudget(_ snapshot: inout WidgetSnapshot, limit: Int = maxEncodedBytes) {
         func size() -> Int { (try? WidgetSnapshotStore.encode(snapshot).count) ?? 0 }
+        let maxEncodedBytes = limit
         let steps: [(inout WidgetSnapshot) -> Void] = [
             { $0.tasks = Array($0.tasks.prefix(8)) },
             { $0.overdueItems = $0.overdueItems.map { Array($0.prefix(3)) } },
@@ -165,6 +171,29 @@ public enum WidgetSnapshotBuilder {
         for step in steps {
             guard size() > maxEncodedBytes else { return }
             step(&snapshot)
+        }
+        // Phase 4 B3 final QA m2 (a hard guarantee; the Phase 5 Watch reuses the snapshot): drop covered days from the
+        // far end, never today. The first lesson that takes place on a dropped day becomes `followingLesson` (it IS the
+        // first lesson after the new last covered day), so "Next lesson" stays right; days past the covered range show
+        // "Open Tabula" (outdated), never invented data.
+        while size() > maxEncodedBytes, snapshot.days.count > 1 {
+            let dropped = snapshot.days.removeLast()
+            if let first = dropped.lessons.first(where: { $0.takesPlace }) { snapshot.followingLesson = first }
+        }
+        // Pathological input only (dozens of lessons today with maximal text): the lists go, then today's last
+        // lessons, then the remaining optional items, until the snapshot fits.
+        if size() > maxEncodedBytes {
+            snapshot.tasks = []
+            snapshot.overdueItems = nil
+            snapshot.exams = snapshot.nextExam.map { [$0] }
+        }
+        while size() > maxEncodedBytes, let today = snapshot.days.indices.first, !snapshot.days[today].lessons.isEmpty {
+            snapshot.days[today].lessons.removeLast()
+        }
+        if size() > maxEncodedBytes {
+            snapshot.followingLesson = nil
+            snapshot.exams = nil
+            snapshot.nextExam = nil
         }
     }
 

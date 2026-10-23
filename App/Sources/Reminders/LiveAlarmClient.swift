@@ -74,7 +74,7 @@ struct LiveAlarmClient: AlarmClient {
                                                                       tintColor: Color.orange)
                 let configuration = AlarmManager.AlarmConfiguration<TabulaAlarmMetadata>.alarm(
                     schedule: .fixed(spec.fireDate), attributes: attributes, stopIntent: nil,
-                    secondaryIntent: Self.doneIntent(for: action))
+                    secondaryIntent: Self.doneIntent(for: action, alarmID: spec.id))
                 _ = try await AlarmManager.shared.schedule(id: spec.id, configuration: configuration)
             } else if secondary == .snooze, let snooze = spec.snoozeSeconds {
                 let presentation = AlarmPresentation(
@@ -132,11 +132,11 @@ struct LiveAlarmClient: AlarmClient {
     static let intentsAvailable = false
     #endif
 
-    /// The Mark done intent of a task / exam alarm (CompletionIntents.swift).
-    static func doneIntent(for action: IntentAction) -> any LiveActivityIntent {
+    /// The Mark done intent of a task / exam alarm (CompletionIntents.swift); it stops `alarmID` whatever the outcome.
+    static func doneIntent(for action: IntentAction, alarmID: UUID) -> any LiveActivityIntent {
         switch action {
-        case .completeTask(let id): return MarkTaskDoneIntent(taskID: id.uuidString)
-        case .completeExam(let id): return MarkExamDoneIntent(examID: id.uuidString)
+        case .completeTask(let id): return MarkTaskDoneIntent(taskID: id.uuidString, alarmID: alarmID.uuidString)
+        case .completeExam(let id): return MarkExamDoneIntent(examID: id.uuidString, alarmID: alarmID.uuidString)
         }
     }
 

@@ -6,10 +6,12 @@
 // (`ReminderCoordinator.handle(.markDone)`):
 //   load the store (the intent may have launched the app) → `IntentActionPlanner.decide` (no-op for completed / deleted
 //   / unknown items: idempotent, never a second successor) → `AppModel.apply` with the notification action's mutation
-//   (stamping, validation, debounced save, `onChange` → re-plan + widget snapshot + Live Activities) → remove the item's
-//   delivered notifications → flush the save → re-plan now (cancels the item's remaining reminders and its alarm) →
-//   write the widget snapshot and wait for it, because WidgetKit reloads the widget's timeline as soon as `perform()`
-//   returns ("Make sure any code that's necessary for the timeline update runs before you return").
+//   (stamping, validation, debounced save, `onChange` → re-plan + widget snapshot + Live Activities) → flush the save →
+//   remove the item's delivered notifications → re-plan now (cancels the item's remaining reminders and its alarm) →
+//   refresh the Live Activities now (an exam marked done ends its exam-day activity; final QA M1: the controller's
+//   600 ms debounce could be cut by a suspension after a cold background launch) → write the widget snapshot and wait
+//   for it, because WidgetKit reloads the widget's timeline as soon as `perform()` returns ("Make sure any code that's
+//   necessary for the timeline update runs before you return").
 // "What's next?": `WhatsNextAnswer` over the snapshot the widgets would get now (Today header logic).
 // "Add homework": `AppNavigation.open(.newTask)` → Tasks tab + `tasks.editor-new` (the shell shows it when it can).
 import Foundation
@@ -22,14 +24,17 @@ final class AppIntentHost: IntentHostServices {
     private let reminders: ReminderCoordinator
     private let navigation: AppNavigation
     private let widgets: WidgetSnapshotWriter
+    private let liveActivities: LiveActivityController
     /// Developer diagnostics: the last intent action and its outcome.
     private(set) var lastAction: String = "none yet"
 
-    init(model: AppModel, reminders: ReminderCoordinator, navigation: AppNavigation, widgets: WidgetSnapshotWriter) {
+    init(model: AppModel, reminders: ReminderCoordinator, navigation: AppNavigation, widgets: WidgetSnapshotWriter,
+         liveActivities: LiveActivityController) {
         self.model = model
         self.reminders = reminders
         self.navigation = navigation
         self.widgets = widgets
+        self.liveActivities = liveActivities
     }
 
     func perform(_ action: IntentAction) async -> IntentActionOutcome {
@@ -40,18 +45,16 @@ final class AppIntentHost: IntentHostServices {
             outcome = skipped
         case .apply(let mutation):
             switch model.apply(mutation) {
-            case .applied:
-                outcome = .completed
-                await reminders.engine.removeDelivered(for: action.source)
-            case .readOnly:
-                outcome = .unavailable
-            case .rejected, .failed:
-                outcome = .failed
+            case .applied: outcome = .completed
+            case .readOnly: outcome = .unavailable
+            case .rejected, .failed: outcome = .failed
             }
         }
         if outcome == .completed {
             await model.flush()                         // persist first: the system may suspend us any moment
+            await reminders.engine.removeDelivered(for: action.source)
             await reminders.replanNow(.intentAction)
+            await liveActivities.refreshNow()           // final QA M1: an exam marked done ends its exam-day activity now
         }
         await widgets.flushAndWait()                    // the timeline reload after perform() must see the change
         lastAction = "\(action.source.rawValue): \(outcome.rawValue) at \(Date().ISO8601Format())"

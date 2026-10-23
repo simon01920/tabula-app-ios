@@ -166,6 +166,12 @@ public enum AlarmSecondaryAction: Hashable, Sendable {
     /// Done replaces Snooze on task / exam alarms when intents work (the B3 default).
     public static let doneReplacesSnooze = true
 
+    /// The button policy in force, part of `ReminderRenderSignature` (final QA m8): when it changes, every scheduled
+    /// alarm is re-scheduled once, so alarms made by an older build or under the other policy get the current buttons.
+    public static func policyID(intentsAvailable: Bool, doneReplacesSnooze: Bool = doneReplacesSnooze) -> String {
+        intentsAvailable && doneReplacesSnooze ? "done-tasks-exams.v1" : "snooze.v1"
+    }
+
     /// The button for an alarm whose metadata `source` is `sourceRawValue` (`ReminderSource.rawValue`; empty for test
     /// alarms). `snoozeAvailable`: the alarm has a snooze length. `intentsAvailable`: this build ships App Intents
     /// metadata (compile-time `TABULA_APP_INTENTS`).

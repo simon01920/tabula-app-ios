@@ -39,12 +39,19 @@ public struct ReminderRenderSignature: Hashable, Sendable, Codable {
     public var hourCycle: String
     /// The plan's zone identifier.
     public var timeZoneIdentifier: String
+    /// The loud alarms' button policy (`AlarmSecondaryAction.policyID`, Phase 4 B3 final QA m8): the alarm diff compares
+    /// planned values only, not buttons, so a policy change (a build with App Intents metadata, `doneReplacesSnooze`)
+    /// changes the signature and every scheduled alarm is cancelled and scheduled again once with the new buttons.
+    /// Optional: a state saved before B3 decodes as `nil`, which differs from every policy → one re-schedule.
+    public var alarmButtons: String?
 
-    public init(language: String, localeIdentifier: String, hourCycle: String, timeZoneIdentifier: String) {
+    public init(language: String, localeIdentifier: String, hourCycle: String, timeZoneIdentifier: String,
+                alarmButtons: String? = nil) {
         self.language = language
         self.localeIdentifier = localeIdentifier
         self.hourCycle = hourCycle
         self.timeZoneIdentifier = timeZoneIdentifier
+        self.alarmButtons = alarmButtons
     }
 }
 

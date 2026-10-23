@@ -17,6 +17,7 @@ Usage:
   python3 scripts/l10n-add.py --from strings.json      # {"key": {"en": "...", "comment": "..."} |
                                                          #         {"one": "...", "other": "...", "comment": "..."}}
   python3 scripts/l10n-add.py --check                  # verify the file is in canonical form (exit 1 if not)
+  python3 scripts/l10n-add.py --remove KEY [KEY ...]   # delete keys that are no longer used (all languages)
 Options: --catalog PATH (default Resources/Localizable.xcstrings), --replace [--drop-translations]
 """
 import argparse
@@ -71,6 +72,7 @@ def main() -> int:
     parser.add_argument("--replace", action="store_true")
     parser.add_argument("--drop-translations", action="store_true")
     parser.add_argument("--check", action="store_true")
+    parser.add_argument("--remove", nargs="+", metavar="KEY", help="delete unused keys (every language)")
     args = parser.parse_args()
 
     path = pathlib.Path(args.catalog)
@@ -81,6 +83,15 @@ def main() -> int:
             print(f"FAIL {path}: not in canonical form (run any l10n-add.py command to rewrite it)")
             return 1
         print(f"OK   {path}: canonical form, {len(data['strings'])} keys")
+        return 0
+    if args.remove:
+        missing = [k for k in args.remove if k not in data.get("strings", {})]
+        if missing:
+            raise SystemExit(f"error: not in the catalog: {missing}")
+        for key in args.remove:
+            del data["strings"][key]
+            print(f"removed {key} (all languages)")
+        path.write_text(dump(data), encoding="utf-8")
         return 0
 
     specs: dict[str, dict] = {}

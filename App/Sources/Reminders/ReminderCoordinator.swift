@@ -83,6 +83,9 @@ final class ReminderCoordinator {
     /// Another feature's wish for an earlier background refresh (Phase 4 B2: the next lesson boundary / exam start
     /// while a Live Activity runs); merged into the request by `BackgroundRefreshPolicy`.
     @ObservationIgnored var additionalRefreshDate: (@MainActor () -> Date?)?
+    /// Run (awaited) after a notification "Mark done" was saved and re-planned (Phase 4 B3 final QA M1): Live Activities
+    /// refresh now and the widget snapshot is written, so neither waits for a debounce the system may never let run.
+    @ObservationIgnored var afterCompletion: (@MainActor () async -> Void)?
 
     init(engine: ReminderEngine, model: AppModel, navigation: AppNavigation,
          backgroundScheduler: any BackgroundRefreshScheduling, deviceState: @escaping @MainActor () -> DeviceReminderState,
@@ -199,7 +202,9 @@ final class ReminderCoordinator {
         let signature = ReminderRenderSignature(language: Bundle.main.preferredLocalizations.first ?? "",
                                                 localeIdentifier: model.formatter.locale.identifier,
                                                 hourCycle: model.settings.hourCycle.rawValue,
-                                                timeZoneIdentifier: model.calendarContext.timeZone.identifier)
+                                                timeZoneIdentifier: model.calendarContext.timeZone.identifier,
+                                                alarmButtons: AlarmSecondaryAction.policyID(
+                                                    intentsAvailable: LiveAlarmClient.intentsAvailable))
         let input = ReminderRunInput(database: database, resolvers: resolvers, context: model.calendarContext,
                                      renderer: model.renderer, now: model.now,
                                      loudAlarmsEntitled: model.entitlements.isAllowed(.loudAlarms),
@@ -291,11 +296,16 @@ final class ReminderCoordinator {
         switch ReminderResponseInterpreter.command(for: action, delivered: delivered) {
         case .markDone(let source):
             guard let mutation = ReminderResponseInterpreter.mutation(for: source, now: model.now) else { return }
-            if case .applied = model.apply(mutation) {
+            let applied: Bool
+            if case .applied = model.apply(mutation) { applied = true } else { applied = false }
+            await model.flush()                              // persist first: the system may suspend us any moment
+            if applied {
                 await engine.removeDelivered(for: source)   // the item's other reminders in Notification Center
             }
-            await model.flush()                              // persist first: the system may suspend us any moment
             await replanNow(.notificationAction)
+            // Phase 4 B3 final QA M1: end an exam-day Live Activity and write the widget snapshot before returning
+            // (the debounced paths could be cut by a suspension after the completion handler).
+            await afterCompletion?()
         case .snooze(let delivered, let reminderAction):
             _ = await engine.snooze(delivered, action: reminderAction, context: model.calendarContext,
                                     renderer: model.renderer, now: model.now)
