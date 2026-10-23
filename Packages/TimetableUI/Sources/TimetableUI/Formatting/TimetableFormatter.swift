@@ -22,6 +22,8 @@ public struct TimetableFormatter: Sendable {
         case full
         /// "ut 13. 10." / "Tue, Oct 13": weekday + day + month, no year.
         case weekdayDayMonth
+        /// "Thu 22" / "cs 22.": abbreviated weekday + day of month (narrow Lock Screen lines).
+        case weekdayDay
         /// "13. 10." / "Oct 13": day + month.
         case dayMonth
     }
@@ -105,6 +107,7 @@ public struct TimetableFormatter: Sendable {
         case .abbreviated: return instant.formatted(base.year().month(.abbreviated).day())
         case .full: return instant.formatted(base.year().month(.wide).day().weekday(.wide))
         case .weekdayDayMonth: return instant.formatted(base.month(.abbreviated).day().weekday(.abbreviated))
+        case .weekdayDay: return instant.formatted(base.day().weekday(.abbreviated))
         case .dayMonth: return instant.formatted(base.month(.abbreviated).day())
         }
     }

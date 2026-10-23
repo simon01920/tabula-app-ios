@@ -168,10 +168,11 @@ struct ExamRectangularView: View {
                 }
                 .font(.body.weight(.semibold))
                 .widgetAccentable()
-                Text(verbatim: info.detailLine)
+                Text(verbatim: info.rectangularLine)
                     .font(.caption)
                     .monospacedDigit()
                     .lineLimit(1)
+                    .truncationMode(.tail)
             case let .empty(title, detail), let .unavailable(title, detail):
                 Text(verbatim: title).font(.headline).lineLimit(1).widgetAccentable()
                 Text(verbatim: detail).font(.caption).lineLimit(2)

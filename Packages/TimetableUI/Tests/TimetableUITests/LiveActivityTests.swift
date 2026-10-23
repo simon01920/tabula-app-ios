@@ -346,7 +346,9 @@ struct LiveActivityDataTests {
         let subject = LiveActivitySubject(SubjectSummary(id: Subject.ID(UUID()), name: long, shortName: long,
                                                          color: ColorValue(red: 1, green: 2, blue: 3),
                                                          symbol: .systemImage(String(repeating: "a", count: LiveActivityLimits.maxSymbolLength))))
-        #expect(subject.name.count == LiveActivityLimits.maxTitleLength)
+        #expect(subject.name.count <= LiveActivityLimits.maxTitleLength)
+        #expect(subject.name.utf8.count <= LiveActivityLimits.maxTitleBytes)
+        #expect(subject.name.hasSuffix("\u{2026}"))
         let lessons = (0..<LiveActivityLimits.maxLessons).map { index in
             LiveActivityLesson(subject: subject, room: LiveActivityLimits.cut(long, LiveActivityLimits.maxRoomLength),
                                start: Date(timeIntervalSince1970: 1_800_000_000 + Double(index) * 3_123.456),
@@ -359,11 +361,29 @@ struct LiveActivityDataTests {
                                                                            style: longStyle))
         #expect(lesson < LiveActivityLimits.maxEncodedBytes, "lesson activity \(lesson) B")
         let examState = ExamActivityAttributes.ContentState(
-            title: LiveActivityLimits.cut(long, LiveActivityLimits.maxTitleLength)!, subject: subject,
+            title: LiveActivityLimits.cut(long, LiveActivityLimits.maxTitleLength, maxBytes: LiveActivityLimits.maxTitleBytes)!, subject: subject,
             room: LiveActivityLimits.cut(long, LiveActivityLimits.maxRoomLength), start: Date(), end: Date(),
             isFinal: false, style: longStyle)
         let exam = try encodedSize(ExamActivityAttributes(examID: UUID()), examState)
         #expect(exam < LiveActivityLimits.maxEncodedBytes, "exam activity \(exam) B")
+    }
+
+    @Test func galleryCaptionsUseTheSceneTimeZoneNotUTC() throws {
+        let locale = Locale(identifier: "en_GB")
+        let lesson = try #require(LiveActivityGallerySamples.scenes(locale: locale, languageCode: "en").first { $0.id == "lesson" })
+        #expect(lesson.timeZone.identifier == WidgetGallerySamples.context.timeZone.identifier)
+        #expect(lesson.caption(locale: locale).contains("10:20"), "\(lesson.caption(locale: locale))")
+        let widget = try #require(WidgetGallerySamples.scenes(locale: locale, languageCode: "en").first { $0.id == "lesson" })
+        #expect(widget.caption(locale: locale).contains("10:20"), "\(widget.caption(locale: locale))")
+    }
+
+    @Test func normalSubjectNamesAreNotCutAndCutNamesEndWithAnEllipsis() {
+        let slovak = "Slovensk\u{FD} jazyk a literat\u{FA}ra"
+        #expect(LiveActivityLimits.cut(slovak, LiveActivityLimits.maxTitleLength, maxBytes: LiveActivityLimits.maxTitleBytes) == slovak)
+        let cut = LiveActivityLimits.cut(String(repeating: "abcdefghi ", count: 10), LiveActivityLimits.maxTitleLength)!
+        #expect(cut.count == LiveActivityLimits.maxTitleLength && cut.hasSuffix("\u{2026}"))
+        #expect(LiveActivityLimits.cut("  ", 5) == nil)
+        #expect(LiveActivityLimits.cut("12345", 5) == "12345")
     }
 
     @Test func contentStateRoundTripsAndPreferencesDecodeOldData() throws {

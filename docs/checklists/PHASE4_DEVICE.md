@@ -302,3 +302,11 @@ App Shortcuts "What's next?" and "Add homework". Design and facts: ENVIRONMENT �
 | ID | Build | Steps | Expected | Observed | ✔/✘ |
 |---|---|---|---|---|---|
 | B3.X1 | xtool `--app-intents` | `TABULA_WORKDIR=… bash scripts/xtool-dev.sh --app-intents` (compiles the intent controls WITHOUT metadata), install, tap a Homework circle, look at Edit Widget, let a task loud alarm ring and tap Done | Unknown by design — record exactly what happens (nothing / crash / works / widget missing from the gallery). Never ship this variant | | |
+
+## Screenshot fixes (Phase 4)
+| ID | Build | Steps | Expected | Observed | ✔/✘ |
+|---|---|---|---|---|---|
+| SF.1 | TF | Start the lesson Live Activity for a lesson named "Slovenský jazyk a literatúra"; look at the Lock Screen banner and the expanded Dynamic Island | The full name is shown; a name longer than the width ends with "…" (never cut mid-word without it); a 48+ character name is stored ending in "…" | | |
+| SF.2 | TF | Add the Homework widget (medium and large) with tasks due today and tomorrow plus one overdue | Task titles are primary (black/white), due texts secondary grey (not blue), overdue keeps the red icon with primary text; check Light, Dark, Clear/Tinted (accented) and StandBy-style vibrant rendering | | |
+| SF.3 | TF | Add the Next exam Lock Screen rectangular widget with an exam in 9 days; again on the exam day | Third line reads like "Thu 22 · 10:00" (date short, start time only, never "10:00–10:4…"); on the exam day the date is dropped. Try Slovak/German | | |
+| SF.4 | CI | Open the widget and Live Activity galleries in the CI simulator run (UTC device zone) | Captions show Bratislava time (e.g. "During a lesson · … 10:20"), not UTC (8:20) | | |
