@@ -57,6 +57,7 @@ public struct LiveActivityLockScreenView: View {
                     Text(verbatim: display.title)
                         .font(.headline)
                         .lineLimit(2)
+                        .truncationMode(.tail)
                         .minimumScaleFactor(0.8)
                     if let detail = display.detail, !detail.isEmpty {
                         Text(verbatim: detail)
@@ -172,6 +173,7 @@ public struct LiveActivityExpandedCenter: View {
         Text(verbatim: display.title)
             .font(.headline)
             .lineLimit(1)
+            .truncationMode(.tail)
             .minimumScaleFactor(0.7)
             .accessibilityLabel(Text(verbatim: display.accessibilityLabel))
     }

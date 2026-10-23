@@ -88,7 +88,7 @@ struct WidgetGalleryScreen: View {
     private func scene(_ scene: WidgetGalleryScene) -> some View {
         let shown = display(scene)
         return VStack(alignment: .leading, spacing: 6) {
-            Text(verbatim: "\(scene.title) · \(scene.date.formatted(date: .abbreviated, time: .shortened))")
+            Text(verbatim: scene.caption(locale: model.formatter.locale))
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
             HStack(alignment: .top, spacing: 16) {

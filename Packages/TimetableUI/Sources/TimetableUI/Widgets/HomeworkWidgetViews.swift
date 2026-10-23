@@ -89,16 +89,18 @@ struct HomeworkDueText: View {
         if line.isOverdue {
             // Primary text (contrast) with a red icon; the word carries the meaning, the icon the shape.
             Label {
-                Text(verbatim: line.dueText).foregroundStyle(.primary)
+                Text(verbatim: line.dueText).foregroundStyle(Color.primary)
             } icon: {
                 Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.red)
             }
             .font(.caption2.weight(.bold))
             .lineLimit(1)
         } else {
+            // `Color.secondary`, not the hierarchical `.secondary`: inside a `Link` the hierarchical styles derive from
+            // the link tint (pale blue, poor contrast).
             Text(verbatim: line.dueText)
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.secondary)
                 .lineLimit(1)
         }
     }
@@ -133,6 +135,7 @@ struct HomeworkRowContent: View {
             VStack(alignment: .leading, spacing: 0) {
                 Text(verbatim: line.title)
                     .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.primary)   // explicit: the row is a `Link` and would take the tint
                     .lineLimit(1)
                 HomeworkDueText(line: line)
             }
@@ -140,6 +143,7 @@ struct HomeworkRowContent: View {
             if line.isHighPriority {
                 Image(systemName: "exclamationmark.2")
                     .font(.caption2.weight(.bold))
+                    .foregroundStyle(Color.primary)
                     .accessibilityHidden(true)
             }
         }

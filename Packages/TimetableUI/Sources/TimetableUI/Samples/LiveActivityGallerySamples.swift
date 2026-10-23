@@ -24,6 +24,19 @@ public struct LiveActivityGalleryScene: Sendable, Identifiable {
     /// The fixed "now".
     public let date: Date
     public let content: Content
+
+    /// The zone of the content's style (what the activity shows its times in).
+    public var timeZone: TimeZone {
+        switch content {
+        case .lesson(let state): return state.style.timeZone
+        case .exam(_, let state): return state.style.timeZone
+        }
+    }
+
+    /// The gallery caption, in the scene's zone (not UTC).
+    public func caption(locale: Locale) -> String {
+        WidgetGallerySamples.caption(title: title, date: date, timeZone: timeZone, locale: locale)
+    }
 }
 
 public enum LiveActivityGallerySamples {

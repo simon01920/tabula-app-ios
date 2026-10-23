@@ -370,6 +370,11 @@ struct ExamPresentationTests {
         #expect(details.title == "Organic chemistry" && details.subject?.name == "Biology" && details.room == "Lab")
         #expect(details.dateText == formatter.date(date(2026, 10, 22), style: .weekdayDayMonth))
         #expect(details.timeText == formatter.timeRange(time(10), time(10, 45)))
+        // Rectangular: short date + start time only (never the end time that truncated); no date on the exam day.
+        let dot = try #require(EnglishCatalog.values["widget.separator"])
+        let shortDate = formatter.date(date(2026, 10, 22), style: .weekdayDay)
+        #expect(details.rectangularLine == "\(shortDate)\(dot)\(formatter.time(time(10)))\(dot)Lab")
+        #expect(!details.rectangularLine.contains(formatter.time(time(10, 45))))
         #expect(shown.link == .exam(Exam.ID(details.id)) && shown.title == "Next Exam")
         for part in ["Next Exam", "Organic chemistry", "Biology", "in 9 days", "Room Lab"] {
             #expect(shown.accessibilityLabel.contains(part), "\(part) missing from \(shown.accessibilityLabel)")
@@ -393,6 +398,7 @@ struct ExamPresentationTests {
         #expect(allDay.whenText == "Today" && allDay.timer == nil && allDay.timeText == nil)
         #expect(allDay.circularValue == "Today")   // a word, never "0"
         let dot = try #require(EnglishCatalog.values["widget.separator"])
+        #expect(before.rectangularLine == "\(formatter.time(time(10)))\(dot)Lab")
         #expect(dot == " · " && before.smallLine == "\(formatter.timeRange(time(10), time(10, 45)))\(dot)Lab")
         #expect(before.detailLine.hasPrefix(formatter.date(day, style: .weekdayDayMonth) + dot))
         // The spoken sentence names the start, never the ticking timer.

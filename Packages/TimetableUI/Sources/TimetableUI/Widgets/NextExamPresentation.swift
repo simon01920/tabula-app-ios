@@ -40,8 +40,11 @@ public struct ExamDisplay: Equatable, Sendable {
         public var timer: ClosedRange<Date>?
         /// "Starts in" / "Time left" for `timer`.
         public var timerCaption: String?
-        /// "Tue, Oct 20 · 10:00 – 10:45 · Lab" (rectangular family), joined with the localised separator.
+        /// "Tue, Oct 20 · 10:00 – 10:45 · Lab", joined with the localised separator.
         public var detailLine: String
+        /// The Lock Screen rectangular line (one short line): "Thu 22 · 10:00 · Lab" (short date and start time only);
+        /// the date is left out on the exam day.
+        public var rectangularLine: String
         /// The small family's line: the date is left out on the exam day (the countdown says it).
         public var smallLine: String
         /// "Today, 10:00 · Starts in" above the exam-day countdown (small family).
@@ -159,6 +162,8 @@ public struct ExamPresenter: Sendable {
         let dot = renderer.string(forKey: "widget.separator")
         let detailLine = [dateText, timeText, exam.room].compactMap { $0 }.joined(separator: dot)
         let smallLine = [timer == nil ? dateText : nil, timeText, exam.room].compactMap { $0 }.joined(separator: dot)
+        let rectangularLine = [timer == nil ? formatter.date(exam.date, style: .weekdayDay) : nil, startText, exam.room]
+            .compactMap { $0 }.joined(separator: dot)
         let whenLine = [whenText, timerCaption].compactMap { $0 }.joined(separator: dot)
         let subjectName = exam.subject?.name
         // Spoken: exam, subject, when, full date, start time, room.
@@ -171,7 +176,8 @@ public struct ExamPresenter: Sendable {
         let info = ExamDisplay.Info(id: exam.id, subject: exam.subject, title: exam.title, dateText: dateText,
                                     timeText: timeText, room: exam.room, whenText: whenText, circularValue: circular,
                                     escalation: escalation, symbol: symbol, timer: timer, timerCaption: timerCaption,
-                                    detailLine: detailLine, smallLine: smallLine, whenLine: whenLine)
+                                    detailLine: detailLine, rectangularLine: rectangularLine, smallLine: smallLine,
+                                    whenLine: whenLine)
         return ExamDisplay(date: instant, kind: .exam(info), title: title,
                            accessibilityLabel: formatter.list(spoken), link: .exam(Exam.ID(exam.id)))
     }

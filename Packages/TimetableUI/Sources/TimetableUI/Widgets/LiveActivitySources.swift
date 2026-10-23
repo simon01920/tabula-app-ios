@@ -121,7 +121,8 @@ public enum LiveActivitySourceBuilder {
                 let end = exam.end.map { context.date(exam.date, $0) }.flatMap { $0 > start ? $0 : nil }
                 let facts = ExamFacts(exam: exam, visibility: ExamFacts.visibility(for: exam, in: database))
                 let subject = exam.subjectID.flatMap { subjects[$0] }.map(LiveActivitySubject.init)
-                let title = LiveActivityLimits.cut(exam.title, LiveActivityLimits.maxTitleLength) ?? subject?.name ?? ""
+                let title = LiveActivityLimits.cut(exam.title, LiveActivityLimits.maxTitleLength,
+                                                 maxBytes: LiveActivityLimits.maxTitleBytes) ?? subject?.name ?? ""
                 return LiveActivityExam(id: exam.id.uuid, day: exam.date, title: title, subject: subject,
                                         room: LiveActivityLimits.cut(facts.room, LiveActivityLimits.maxRoomLength),
                                         start: start, end: end)

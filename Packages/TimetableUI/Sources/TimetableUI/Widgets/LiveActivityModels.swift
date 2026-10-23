@@ -26,20 +26,36 @@ public enum LiveActivityLimits {
     /// Lessons carried by one lesson state (the first ones of the day; a school day rarely has more).
     public static let maxLessons = 10
     /// Subject name / exam title (characters).
-    public static let maxTitleLength = 24
+    public static let maxTitleLength = 48
     /// Subject short name (characters).
     public static let maxShortNameLength = 4
     /// Room (characters).
     public static let maxRoomLength = 10
+    /// UTF-8 byte cap of a title (keeps ten names of 4-byte characters inside the 4 KB budget; Latin-script names of
+    /// 48 characters are well below it).
+    public static let maxTitleBytes = 112
     /// Emoji / SF Symbol name of a subject (characters; longer symbols are dropped).
     public static let maxSymbolLength = 30
     /// Our own budget for attributes + state (JSON); ActivityKit's limit is 4 096 bytes.
     public static let maxEncodedBytes = 3_600
 
-    /// `text` cut to `limit` characters (whole grapheme clusters), `nil` when blank.
-    public static func cut(_ text: String?, _ limit: Int) -> String? {
+    /// `text` cut to `limit` characters (whole grapheme clusters, the ellipsis included) and, if given, `maxBytes`
+    /// UTF-8 bytes. A cut value ends with "\u{2026}" so it reads as shortened. `nil` when blank.
+    public static func cut(_ text: String?, _ limit: Int, maxBytes: Int? = nil) -> String? {
         guard let text = text?.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty else { return nil }
-        return text.count > limit ? String(text.prefix(limit)) : text
+        let ellipsis = "\u{2026}"
+        if text.count <= limit, maxBytes.map({ text.utf8.count <= $0 }) ?? true { return text }
+        guard limit > 1 else { return String(text.prefix(limit)) }
+        var result = ""
+        var bytes = 0
+        let byteBudget = (maxBytes ?? Int.max) - ellipsis.utf8.count
+        for character in text.prefix(limit - 1) {
+            let size = String(character).utf8.count
+            if bytes + size > byteBudget { break }
+            result.append(character)
+            bytes += size
+        }
+        return result.trimmingCharacters(in: .whitespaces) + ellipsis
     }
 }
 
@@ -82,7 +98,8 @@ public struct LiveActivitySubject: Codable, Hashable, Sendable {
 
     /// The summary cut to the Live Activity limits.
     public init(_ summary: SubjectSummary) {
-        name = LiveActivityLimits.cut(summary.name, LiveActivityLimits.maxTitleLength) ?? ""
+        name = LiveActivityLimits.cut(summary.name, LiveActivityLimits.maxTitleLength,
+                                      maxBytes: LiveActivityLimits.maxTitleBytes) ?? ""
         shortName = LiveActivityLimits.cut(summary.shortName, LiveActivityLimits.maxShortNameLength)
         color = summary.color
         switch summary.symbol {

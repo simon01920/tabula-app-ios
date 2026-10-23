@@ -22,9 +22,23 @@ public struct WidgetGalleryScene: Sendable, Identifiable {
     public let snapshot: WidgetSnapshot
     /// The fixed "now".
     public let date: Date
+
+    /// The zone the scene's times are meant in (the snapshot's zone; the seeded scenarios' zone if unknown).
+    public var timeZone: TimeZone { TimeZone(identifier: snapshot.timeZoneID) ?? SampleScenarios.timeZone }
+
+    /// "During a lesson · Oct 13, 2026 at 10:20 AM": the gallery caption, in the scene's zone (not UTC).
+    public func caption(locale: Locale) -> String {
+        WidgetGallerySamples.caption(title: title, date: date, timeZone: timeZone, locale: locale)
+    }
 }
 
 public enum WidgetGallerySamples {
+    /// A gallery caption: `title` + the instant formatted in `timeZone` (the device zone of a CI run is UTC).
+    public static func caption(title: String, date: Date, timeZone: TimeZone, locale: Locale) -> String {
+        let style = Date.FormatStyle(date: .abbreviated, time: .shortened, locale: locale, timeZone: timeZone)
+        return "\(title) \u{B7} \(date.formatted(style))"
+    }
+
     /// The calendar context of the seeded scenarios.
     public static var context: CalendarContext {
         CalendarContext(timeZone: SampleScenarios.timeZone, firstWeekday: .monday)

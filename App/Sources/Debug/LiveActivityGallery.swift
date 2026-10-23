@@ -67,7 +67,7 @@ struct LiveActivityGalleryScreen: View {
     }
 
     private func label(_ scene: LiveActivityGalleryScene) -> some View {
-        Text(verbatim: "\(scene.title) · \(scene.date.formatted(date: .abbreviated, time: .shortened))")
+        Text(verbatim: scene.caption(locale: model.formatter.locale))
             .font(.caption.weight(.semibold))
             .foregroundStyle(.secondary)
     }
