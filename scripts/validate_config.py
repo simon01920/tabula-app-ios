@@ -526,8 +526,8 @@ check(set(ui_on) == {"push", "workflow_dispatch"} and ui_on["push"].get("branche
       and set(ui_on["push"].get("paths", [])) == UI_PATHS,
       "ui-screenshots.yml: manual + push to main only for on-screen paths (no PRs, no TimetableCore, no Config/**)",
       f"ui-screenshots.yml triggers differ from the cost decision: {ui_on}")
-check(ui["concurrency"].get("cancel-in-progress") is True and uj.get("timeout-minutes", 99) <= 15,
-      "ui-screenshots.yml: cancel-in-progress + timeout <= 15 min", "ui-screenshots.yml lacks cost guards")
+check(ui["concurrency"].get("cancel-in-progress") is True and uj.get("timeout-minutes", 99) <= 45,  # 45 since the repo went public (2026-10-22, free minutes; 29+ screens x 3 variants exceed 15)
+      "ui-screenshots.yml: cancel-in-progress + timeout <= 45 min", "ui-screenshots.yml lacks cost guards")
 ui_txt = (ROOT / ".github/workflows/ui-screenshots.yml").read_text()
 check("secrets." not in ui_txt and "CODE_SIGNING_ALLOWED=NO" in ui_txt,
       "ui-screenshots.yml uses no secrets and builds unsigned", "ui-screenshots.yml must not need secrets/signing")
