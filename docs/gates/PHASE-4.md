@@ -1,6 +1,6 @@
 # Phase 4 gate report — Widgets, Live Activities, App Intents (+ Phase 3 carry-overs)
 
-Status: **DRAFT — B3 final fixes and the screenshot run pending** · Plan: `docs/specs/PHASE4_PLAN.md` · Device checklist: `docs/checklists/PHASE4_DEVICE.md`
+Status: **DRAFT — final screenshot review and the UX package pending** · Plan: `docs/specs/PHASE4_PLAN.md` · Device checklist: `docs/checklists/PHASE4_DEVICE.md`
 
 ## Stages and model tier
 | Stage | Agent / tier | Result | Evidence |
@@ -19,7 +19,9 @@ Status: **DRAFT — B3 final fixes and the screenshot run pending** · Plan: `do
 | B2 QA → fixes | qa-reviewer · **Opus** → Opus | Not ready. **Blocking:** turning off auto-start did not cancel scheduled starts. **Majors:** a moved exam was never shown again; a pending activity changed in the background was lost; a ledger race. All fixed, with 15 new tests | `869b3e8`, `c192a0f`; merged `0274dc6` |
 | B3 App Intents (P3-5) | notifications-engineer · **Opus high** | `MarkTaskDone`/`MarkExamDone` as `LiveActivityIntent`s running in the app process, through the same mutation as notification Mark done (idempotent, one successor); widget checkbox; loud-alarm **Done**; timetable choice for Now & Next and Today; App Shortcuts "What's next?" and "Add homework". **The xtool dev build has no intent metadata**, so a compile-time flag gives it the old links and Snooze | `9bb4672`; 17 tests (484 UI) |
 | QA final | qa-reviewer · **Opus high** | **Gate-ready** (no blocking). **Majors:** marking an exam done didn't await the Live Activity end; the Xcode build with App Intents was unproven until CI ran. Confirmed the B1 and B2 fixes, snapshot compatibility, the frozen schema and the docs numbering | 540 core + 484 UI tests; clean xtool builds (base + `--app-intents`) |
-| B3 final fixes | notifications-engineer · **Opus high** | _running_ | |
+| B3 final fixes | notifications-engineer · **Opus high** | Exam/task Done awaits the Live Activity end and the widget flush (intent and notification paths); a failed Done still stops the alarm; **hard snapshot budget** (true worst case 16,383 B ≤ 19,000); 44×44 pt checkbox (on TestFlight builds medium shows 2 rows, large 7; RISKS #85); "Open Tabula" Siri fallback; timetable picker not discoverable; flush before removing notifications; the alarm button policy is part of the render signature | `8376f9a`; merged `c47e808`; 487 UI tests; clean builds with 0 warnings (base + `--app-intents`) |
+| Xcode path with App Intents | CI | **iOS CI green on `c47e808`**: the XcodeGen iOS + watchOS build with `TABULA_APP_INTENTS` (App Intents metadata, `AppShortcuts.xcstrings`), the Linux tests and the xtool path. This settles final-QA major M2 | run 39877356548 |
+| Widget visual fixes (orchestrator screenshot review) | widgets-watch-engineer-sonnet · **Sonnet medium** | Live Activity titles cut with "…" at 48 chars / 112 B (not mid-word at 24); Homework rows primary/secondary instead of link blue; exam Lock Screen line "Thu 22 · 10:00 · room" (no truncated end time); gallery captions in the scene's zone | `ccb5873`; merged `d894f1b`; 489 UI tests |
 | ECC agents/skills (human request) | orchestrator | Installed a vetted subset of everything-claude-code (Swift reviewers, a11y, SwiftUI / Liquid Glass / concurrency skills); details in `.claude/THIRD_PARTY.md` | `1e5fb80` |
 
 **Tier split:** Opus high did A, C1, B2 and B3 (plus their fix rounds) and all 6 QA runs. Sonnet medium did C2, C3 and B1 (plus B1's fix round). Every blocking and major defect was found by an Opus QA run: 2 on Opus-built stages (B2, B3), 3 on Sonnet-built B1.

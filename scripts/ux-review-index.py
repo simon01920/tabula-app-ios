@@ -14,7 +14,7 @@ import sys
 
 # route id -> (section, title, what it is / how to reach it)
 SCREENS = {
-    "onboarding": ("1 Onboarding", "Welcome", "First launch, step 0 (language)."),
+    "onboarding": ("1 Onboarding", "Welcome", "First launch, step 1 of 7: welcome + language (uses the iPhone language, link to per-app language)."),
     "onboarding.start": ("1 Onboarding", "Start", "Last onboarding step: import from photo / QR (coming soon), start blank, sample data."),
     "onboarding.profile": ("1 Onboarding", "Who are you?", "Profile: elementary / secondary / university / other; drives presets."),
     "onboarding.rotation": ("1 Onboarding", "Rotation", "Does the schedule change between weeks (A/B, odd/even, N-week cycle)?"),
@@ -51,9 +51,9 @@ SCREENS = {
     "exams.editor": ("6 Exams", "Exam editor", "Kind, date, times, room/building, topics, reminder."),
     "exams.editor-new": ("6 Exams", "New exam", "Same editor, empty."),
     "settings": ("7 Settings", "Settings", "Tab 5. Root list."),
-    "settings.appearance": ("7 Settings", "Appearance", "Theme, palette pack, default view, 12/24 h."),
-    "settings.calendar": ("7 Settings", "Calendar & week", "Week start, time zone handling, terminology."),
-    "settings.about": ("7 Settings", "About", "Version, licences, privacy."),
+    "settings.appearance": ("7 Settings", "Appearance", "Mode (system/light/dark), colour palette packs (Ocean/Sunset/Pastel are Pro), colours in the palette."),
+    "settings.calendar": ("7 Settings", "Calendar & time", "Week start, 12/24-hour format, time zone (follow device or fixed)."),
+    "settings.about": ("7 Settings", "About", "About the app."),
     "settings.reminders": ("7 Settings", "Reminders", "Per-kind reminder rules + health check entry."),
     "settings.reminder-rule": ("7 Settings", "Reminder rule", "Offsets, follow-up, delivery tier (standard / time sensitive / loud alarm), quiet hours."),
     "settings.reminder-health": ("7 Settings", "Reminder health check", "Permissions, Focus, Low Power, background refresh, pending count, test buttons."),
