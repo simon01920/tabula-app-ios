@@ -92,6 +92,7 @@ approximates them), system permission dialogs, notifications and alarms, the Wat
 
 | Screen | What it is / how to reach it | Seed · language | Light | Dark | Largest text |
 |---|---|---|---|---|---|
+| **Exams — Upcoming** (`exams`) | Tab 4. Prominent next exam with countdown; exam period (university). | secondary · de | [light](screens/6-exams/exams_secondary_de-light.png) | [dark](screens/6-exams/exams_secondary_de-dark.png) | [ax-xxxl-text](screens/6-exams/exams_secondary_de-ax-xxxl-text.png) |
 | **Exams — Upcoming** (`exams`) | Tab 4. Prominent next exam with countdown; exam period (university). | secondary · en | [light](screens/6-exams/exams_secondary-light.png) | [dark](screens/6-exams/exams_secondary-dark.png) | [ax-xxxl-text](screens/6-exams/exams_secondary-ax-xxxl-text.png) |
 | **Exams — Upcoming** (`exams`) | Tab 4. Prominent next exam with countdown; exam period (university). | secondary · sk | [light](screens/6-exams/exams_secondary_sk-light.png) | [dark](screens/6-exams/exams_secondary_sk-dark.png) | [ax-xxxl-text](screens/6-exams/exams_secondary_sk-ax-xxxl-text.png) |
 | **Exams — Upcoming** (`exams`) | Tab 4. Prominent next exam with countdown; exam period (university). | university · en | [light](screens/6-exams/exams_university-light.png) | [dark](screens/6-exams/exams_university-dark.png) | [ax-xxxl-text](screens/6-exams/exams_university-ax-xxxl-text.png) |
@@ -115,5 +116,20 @@ approximates them), system permission dialogs, notifications and alarms, the Wat
 | **Live Activities** (`settings.live-activities`) | Lesson / exam-day Live Activity switches, Start automatically. | secondary · en | [light](screens/7-settings/settings.live-activities_secondary-light.png) | [dark](screens/7-settings/settings.live-activities_secondary-dark.png) | [ax-xxxl-text](screens/7-settings/settings.live-activities_secondary-ax-xxxl-text.png) |
 | **Notification permission explainer** (`reminders.permission`) | Shown in context before iOS asks for notification permission. | secondary · en | [light](screens/7-settings/reminders.permission_secondary-light.png) | [dark](screens/7-settings/reminders.permission_secondary-dark.png) | [ax-xxxl-text](screens/7-settings/reminders.permission_secondary-ax-xxxl-text.png) |
 
+## Widgets & Live Activities
+
+| Screen | What it is / how to reach it | Seed · language | Light | Dark | Largest text |
+|---|---|---|---|---|---|
+| **Now & Next widget** (`widgets.gallery`) | DEBUG gallery: Home Screen small/medium + Lock Screen families (during a lesson, in a break). | secondary · en | [light](screens/8-widgets-live-activities/widgets.gallery_secondary-light.png) | [dark](screens/8-widgets-live-activities/widgets.gallery_secondary-dark.png) | — |
+| **Now & Next widget** (`widgets.gallery`) | DEBUG gallery: Home Screen small/medium + Lock Screen families (during a lesson, in a break). | secondary · sk | [light](screens/8-widgets-live-activities/widgets.gallery_secondary_sk-light.png) | [dark](screens/8-widgets-live-activities/widgets.gallery_secondary_sk-dark.png) | — |
+| **Now & Next — evening/holiday** (`widgets.gallery-evening`) | After school and holiday states. | secondary · en | [light](screens/8-widgets-live-activities/widgets.gallery-evening_secondary-light.png) | [dark](screens/8-widgets-live-activities/widgets.gallery-evening_secondary-dark.png) | — |
+| **Pro / unavailable states** (`widgets.gallery-pro`) | Free-tier 'Available in Tabula Pro' and 'Open Tabula' states. | secondary · en | [light](screens/8-widgets-live-activities/widgets.gallery-pro_secondary-light.png) | [dark](screens/8-widgets-live-activities/widgets.gallery-pro_secondary-dark.png) | — |
+| **Today widget** (`widgets.gallery-today`) | Medium/large. | secondary · en | [light](screens/8-widgets-live-activities/widgets.gallery-today_secondary-light.png) | [dark](screens/8-widgets-live-activities/widgets.gallery-today_secondary-dark.png) | — |
+| **Homework widget** (`widgets.gallery-homework`) | Small/medium/large. | secondary · en | [light](screens/8-widgets-live-activities/widgets.gallery-homework_secondary-light.png) | [dark](screens/8-widgets-live-activities/widgets.gallery-homework_secondary-dark.png) | — |
+| **Homework widget** (`widgets.gallery-homework`) | Small/medium/large. | secondary · sk | [light](screens/8-widgets-live-activities/widgets.gallery-homework_secondary_sk-light.png) | [dark](screens/8-widgets-live-activities/widgets.gallery-homework_secondary_sk-dark.png) | — |
+| **Next exam widget** (`widgets.gallery-exam`) | Small + Lock Screen. | secondary · en | [light](screens/8-widgets-live-activities/widgets.gallery-exam_secondary-light.png) | [dark](screens/8-widgets-live-activities/widgets.gallery-exam_secondary-dark.png) | — |
+| **Lesson Live Activity** (`widgets.gallery-live`) | Lock Screen + Dynamic Island (approximation). | secondary · en | [light](screens/8-widgets-live-activities/widgets.gallery-live_secondary-light.png) | [dark](screens/8-widgets-live-activities/widgets.gallery-live_secondary-dark.png) | — |
+| **Exam-day Live Activity** (`widgets.gallery-live-exam`) | Lock Screen + Dynamic Island (approximation). | secondary · en | [light](screens/8-widgets-live-activities/widgets.gallery-live-exam_secondary-light.png) | [dark](screens/8-widgets-live-activities/widgets.gallery-live-exam_secondary-dark.png) | — |
+
 ---
-162 screenshots in 54 screen/seed/language combinations. Regenerate: `python3 scripts/ux-review-index.py <downloaded artifacts dir>`.
+185 screenshots in 65 screen/seed/language combinations. Regenerate: `python3 scripts/ux-review-index.py <downloaded artifacts dir>`.
