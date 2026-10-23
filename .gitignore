@@ -58,3 +58,6 @@ tabula-kit.zip
 
 # --- Claude Code agent worktrees (temporary, per-agent checkouts)
 .claude/worktrees/
+
+# UI/UX review screenshots (large; regenerate with scripts/ux-review-index.py)
+docs/ux-review/screens/
