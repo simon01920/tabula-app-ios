@@ -25,6 +25,12 @@ Status: started 2026-10-16. The human approved Phase 3 and asked for Phase 4 end
      - `LiveActivityIntent` for alarms;
      - App Shortcuts ("What's next?").
    - Each one degrades to a deep link (`widgetURL` / `Link` → `AppNavigation`) on builds without metadata. The device checklist records which path was tested.
+   - **Stage B3 decisions (2026-10-23, ENVIRONMENT §32):** data-changing intents are `LiveActivityIntent`s declared in
+     both the app and the widget target (performed in the app process through `AppModel.apply`; the extension never
+     writes). Intent controls compile only with `TABULA_APP_INTENTS` (project.yml), because the Static/AppIntent widget
+     configuration cannot be chosen at run time; xtool builds keep the B1 fallbacks. The timetable choice reads
+     additive per-timetable sections of the snapshot (within the 19 000 B budget). Loud alarms for tasks/exams get
+     "Done" instead of Snooze on TestFlight builds (RISKS #82, decision for the human).
 3. **Widget kinds** (names are user-visible, so they go in the catalog):
    - *Now & Next*:
      - systemSmall and systemMedium;

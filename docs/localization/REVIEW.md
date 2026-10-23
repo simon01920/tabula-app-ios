@@ -154,3 +154,15 @@ fr "Activités en direct", sk/cs "Živé aktivity", ja "ライブアクティビ
 `liveActivity.exam.*` are one-line captions on the Lock Screen and must stay short; `liveActivity.alert.at` is the body of
 the alert iOS shows when a scheduled activity starts ("Mathematics at 8:00"; hu "%1$@ – kezdés: %2$@" avoids the time
 suffix, ja/zh put "start" after the time); the brand stays undeclined ("aplikácia Tabula").
+### Phase 4 Stage B3 additions (2026-10-23, notifications-engineer)
+19 new keys in Localizable.xcstrings (`intent.*`, `widget.homework.markDone`, `alarm.button.done`) and a new catalog,
+`Resources/AppShortcuts.xcstrings`, with the 4 App Shortcut phrases; all model-authored for 11 languages (`sr-Latn`
+derived), all `needs_review`. Reviewer: intent titles appear in the Shortcuts app and in Siri / Spotlight, so use the
+platform's imperative style ("Označiť úlohu ako hotovú", "Aufgabe als erledigt markieren"); `alarm.button.done` is the
+button on the full-screen alarm and must stay one short word; `widget.homework.markDone` is a VoiceOver label
+(language-specific quotation marks around the task title). The App Shortcut phrases are what people SAY to Siri: every
+translation must keep `${applicationName}` exactly once (validate_config.py checks it) and read naturally with the app
+name inserted (hu uses "a(z) ${applicationName}" because the article depends on the name; ja/zh put the name first).
+The AppShortcuts catalog is not part of the review export (the export covers Localizable + InfoPlist); review its 4 keys
+in the file itself. The brand stays undeclined ("aplikácia Tabula", "Отвара Tabula"). Final QA: + `intent.param.alarm`
+(an internal parameter title, rarely visible); `probe.intent.shortTitle` removed (the probe's App Shortcut is gone).

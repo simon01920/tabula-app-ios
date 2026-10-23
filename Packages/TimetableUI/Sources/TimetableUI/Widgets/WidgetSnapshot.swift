@@ -62,12 +62,17 @@ public struct WidgetSnapshot: Codable, Equatable, Sendable {
     /// The number of open tasks (the Tasks tab's Today + Upcoming + Overdue, undated ones included), for the Homework
     /// count (B1 QA M3). Additive and optional; absent in older files.
     public var openTaskCount: Int?
+    /// Every live timetable in display order (Phase 4 B3, the widgets' timetable choice): the active one with its name
+    /// only (its days are `days`), the others with their own days while the encoded snapshot stays within
+    /// `WidgetSnapshotBuilder.maxEncodedBytes` (a section that does not fit has `days == nil`). Additive and optional
+    /// (no version bump); absent in older files, where only the active timetable can be shown.
+    public var timetables: [TimetableSection]?
 
     enum CodingKeys: String, CodingKey {
         case version = "v", generatedAt = "at", timeZoneID = "tz", followsDeviceTimeZone = "ftz", localeID = "loc"
         case languageCode = "lang", hourCycle = "hc", tier, hasTimetable = "tt", days, followingLesson = "after"
         case tasks, overdueTaskCount = "overdue", nextExam = "exam", overdueItems = "od"
-        case exams = "exs", openTaskCount = "open"
+        case exams = "exs", openTaskCount = "open", timetables = "tts"
     }
 
     /// Creates a snapshot.
@@ -75,7 +80,7 @@ public struct WidgetSnapshot: Codable, Equatable, Sendable {
                 followsDeviceTimeZone: Bool, localeID: String, languageCode: String?, hourCycle: HourCycle, tier: Tier,
                 hasTimetable: Bool, days: [Day], followingLesson: Lesson?, tasks: [DueTask], overdueTaskCount: Int,
                 nextExam: UpcomingExam?, overdueItems: [DueTask]? = nil, exams: [UpcomingExam]? = nil,
-                openTaskCount: Int? = nil) {
+                openTaskCount: Int? = nil, timetables: [TimetableSection]? = nil) {
         self.version = version
         self.generatedAt = generatedAt
         self.timeZoneID = timeZoneID
@@ -93,6 +98,7 @@ public struct WidgetSnapshot: Codable, Equatable, Sendable {
         self.overdueItems = overdueItems
         self.exams = exams
         self.openTaskCount = openTaskCount
+        self.timetables = timetables
     }
 
     /// The listed overdue tasks (empty for snapshots written before B1).

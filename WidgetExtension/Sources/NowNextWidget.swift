@@ -1,6 +1,8 @@
 // *Now & Next* widget (PHASE4_PLAN §0.3, Stage A): the current lesson with its live remaining time and the next
 // lesson; small, medium and the three Lock Screen families (accessory families also serve StandBy / CarPlay styles).
-// A `StaticConfiguration` (works on both build paths; App Intent configuration comes later, RISKS #19).
+// A `StaticConfiguration` on the xtool path; since Phase 4 B3 an `AppIntentConfiguration` (`SelectTimetableIntent`:
+// which timetable, default = the active one) on builds compiled with `TABULA_APP_INTENTS` (project.yml), which ship
+// App Intents metadata (RISKS #19). Same kind and the same views/provider logic on both.
 //
 // Data flow: the app writes `WidgetSnapshot` to the App Group (App/Sources/Widgets/WidgetSnapshotWriter.swift) →
 // `WidgetSnapshotReader` reads it here → `WidgetTimelinePlanner` (pure, Linux-tested) plans entries at lesson
@@ -18,6 +20,7 @@
 //   View.containerBackground(_:for:) (iOS 17; ContainerBackgroundPlacement.widget), View.widgetURL(_:) (iOS 14; one per
 //   hierarchy), EnvironmentValues.widgetFamily, WidgetFamily (.systemSmall, .systemMedium, .accessoryCircular,
 //   .accessoryRectangular, .accessoryInline: iOS 16).
+import AppIntents
 import Foundation
 import SwiftUI
 import TimetableCore
@@ -39,25 +42,33 @@ struct NowNextProvider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping @Sendable (NowNextEntry) -> Void) {
-        // The extension process can outlive a time-zone change: drop Foundation's cached zone first (RISKS #67).
-        NSTimeZone.resetSystemTimeZone()
-        let read = WidgetSnapshotReader.read()
-        let entries = Self.entries(snapshot: read.snapshot, now: Date())
-        // The widget gallery (preview) shows sample content when there is nothing real to show yet.
-        if context.isPreview, case .unavailable = entries[0].display.kind {
-            completion(Self.sampleEntry())
-        } else {
-            completion(entries[0])
-        }
+        completion(Self.snapshotEntry(isPreview: context.isPreview, timetableID: nil))
     }
 
     func getTimeline(in context: Context, completion: @escaping @Sendable (Timeline<NowNextEntry>) -> Void) {
-        NSTimeZone.resetSystemTimeZone()   // see getSnapshot; the plan's reload is ≤ 6 h away for the same reason
+        completion(Self.timeline(timetableID: nil))
+    }
+
+    /// The gallery / transient entry for the widget configured for `timetableID` (`nil` = the active timetable).
+    static func snapshotEntry(isPreview: Bool, timetableID: String?) -> NowNextEntry {
+        // The extension process can outlive a time-zone change: drop Foundation's cached zone first (RISKS #67).
+        NSTimeZone.resetSystemTimeZone()
+        let snapshot = WidgetSnapshotReader.read().snapshot?.selecting(timetableID: timetableID)
+        let entries = Self.entries(snapshot: snapshot, now: Date())
+        // The widget gallery (preview) shows sample content when there is nothing real to show yet.
+        if isPreview, case .unavailable = entries[0].display.kind { return Self.sampleEntry() }
+        return entries[0]
+    }
+
+    /// The timeline for `timetableID` (`nil` = the active timetable; B3 `selecting(timetableID:)`).
+    static func timeline(timetableID: String?) -> Timeline<NowNextEntry> {
+        NSTimeZone.resetSystemTimeZone()   // see snapshotEntry; the plan's reload is ≤ 6 h away for the same reason
         let read = WidgetSnapshotReader.read()
+        let snapshot = read.snapshot?.selecting(timetableID: timetableID)
         let now = Date()
-        let plan = WidgetTimelinePlanner.plan(snapshot: read.snapshot, now: now, deviceTimeZone: TimeZone.current)
+        let plan = WidgetTimelinePlanner.plan(snapshot: snapshot, now: now, deviceTimeZone: TimeZone.current)
         WidgetSnapshotReader.recordRead(read, now: now, entries: plan.entries.count)
-        completion(Timeline(entries: Self.entries(snapshot: read.snapshot, plan: plan), policy: .after(plan.reloadDate)))
+        return Timeline(entries: Self.entries(snapshot: snapshot, plan: plan), policy: .after(plan.reloadDate))
     }
 
     // MARK: Building entries
@@ -95,10 +106,37 @@ struct NowNextProvider: TimelineProvider {
     }
 }
 
+/// Phase 4 B3: the same provider for a widget configured with `SelectTimetableIntent` (Xcode / TestFlight builds).
+struct NowNextIntentProvider: AppIntentTimelineProvider {
+    func placeholder(in context: Context) -> NowNextEntry {
+        NowNextProvider.sampleEntry()
+    }
+
+    func snapshot(for configuration: SelectTimetableIntent, in context: Context) async -> NowNextEntry {
+        NowNextProvider.snapshotEntry(isPreview: context.isPreview, timetableID: configuration.timetable?.id)
+    }
+
+    func timeline(for configuration: SelectTimetableIntent, in context: Context) async -> Timeline<NowNextEntry> {
+        NowNextProvider.timeline(timetableID: configuration.timetable?.id)
+    }
+}
+
 struct NowNextWidget: Widget {
     static let kind = "sk.simondev.tabula.widget.nowNext"
 
     var body: some WidgetConfiguration {
+        // Same kind on both paths. With App Intents metadata (TABULA_APP_INTENTS, project.yml) the widget is configurable
+        // (timetable choice, default = the active timetable); without it (xtool, RISKS #19) it stays static.
+        #if TABULA_APP_INTENTS
+        AppIntentConfiguration(kind: Self.kind, intent: SelectTimetableIntent.self, provider: NowNextIntentProvider()) { entry in
+            NowNextEntryView(entry: entry)
+                .containerBackground(.background, for: .widget)
+                .widgetURL(ItemLinkURL.url(for: entry.display.link))
+        }
+        .configurationDisplayName("widget.nowNext.name")
+        .description("widget.nowNext.description")
+        .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular, .accessoryCircular, .accessoryInline])
+        #else
         StaticConfiguration(kind: Self.kind, provider: NowNextProvider()) { entry in
             NowNextEntryView(entry: entry)
                 .containerBackground(.background, for: .widget)
@@ -108,6 +146,7 @@ struct NowNextWidget: Widget {
         .configurationDisplayName("widget.nowNext.name")
         .description("widget.nowNext.description")
         .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular, .accessoryCircular, .accessoryInline])
+        #endif
     }
 }
 

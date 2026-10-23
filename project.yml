@@ -69,6 +69,10 @@ targets:
       # <lang>.lproj/InfoPlist.strings; the xtool path generates the same files with scripts/infoplist-strings.py.
       - path: Resources/InfoPlist.xcstrings
         buildPhase: resources
+      # App Shortcut phrases in 12 languages (Phase 4 B3): the String Catalog must be called "AppShortcuts" and belong
+      # to the app target; Xcode's App Intents metadata step reads it. App target only (the shortcuts are the app's).
+      - path: Resources/AppShortcuts.xcstrings
+        buildPhase: resources
       - path: Resources/Assets.xcassets
         buildPhase: resources
       - path: Config/Privacy/App/PrivacyInfo.xcprivacy
@@ -89,7 +93,9 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         # CI always builds the macro-probe variant (Xcode ships Apple's macro plugins). The local xtool
         # default is the macro-free base variant (Package.swift, CLAUDE.md rule 5).
-        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) TABULA_MACRO_PROBES"
+        # TABULA_APP_INTENTS (Phase 4 B3): Xcode generates Metadata.appintents, so this path compiles the intent-driven
+        # controls (loud-alarm "Done"); xtool cannot (RISKS #19) and keeps the fallbacks (Package.swift).
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) TABULA_MACRO_PROBES TABULA_APP_INTENTS"
     dependencies:
       - package: TimetableCore
       - package: TimetableUI
@@ -115,6 +121,9 @@ targets:
         TARGETED_DEVICE_FAMILY: "1"
         APPLICATION_EXTENSION_API_ONLY: YES
         SKIP_INSTALL: YES
+        # Phase 4 B3: Homework checkbox (Button(intent:)) + configurable Now & Next / Today (AppIntentConfiguration);
+        # needs this target's Metadata.appintents, which Xcode generates (not xtool: Package.swift keeps them off).
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) TABULA_APP_INTENTS"
     dependencies:
       - package: TimetableCore
       - package: TimetableUI

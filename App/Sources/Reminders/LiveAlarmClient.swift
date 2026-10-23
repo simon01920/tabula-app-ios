@@ -16,11 +16,17 @@
 //   - `.fixed(Date)` is absolute and does not follow time-zone changes (F15): the coordinator re-plans on zone changes;
 //   - snooze uses `secondaryButtonBehavior: .countdown` + `postAlert`, which needs the TabulaWidgets Live Activity
 //     (`AlarmLiveActivity`, F13);
-//   - stop/snooze App Intents are not used (App Intents metadata under xtool unproven; Mark done is notification-only).
+//   - Phase 4 B3: on builds with App Intents metadata (`TABULA_APP_INTENTS`, Xcode / TestFlight) a task or exam alarm's
+//     secondary button is "Done" (`secondaryButtonBehavior: .custom` + `secondaryIntent` = MarkTaskDoneIntent /
+//     MarkExamDoneIntent, a `LiveActivityIntent` run in the app process; `AlarmSecondaryAction` decides); every other
+//     alarm, and every alarm on the xtool path, keeps Snooze. `stopIntent` stays nil (Stop only stops).
+//     APIs (iOS 27 SDK AlarmKit.swiftinterface): AlarmConfiguration.alarm(schedule:attributes:stopIntent:secondaryIntent:
+//     sound:) with `(any LiveActivityIntent)?`; AlarmPresentation.Alert.SecondaryButtonBehavior.custom (iOS 26).
 // Titles: the planner text is rendered by the app (`ReminderRequestBuilder`) and passed as an interpolated
 // `LocalizedStringResource` (catalog key "%@" is absent, so the system shows the rendered value); the Snooze/Stop
 // button titles are catalog keys.
 import AlarmKit
+import AppIntents
 import Foundation
 import SwiftUI
 import TimetableCore
@@ -52,8 +58,25 @@ struct LiveAlarmClient: AlarmClient {
         let title = LocalizedStringResource("\(spec.title)")
         let metadata = TabulaAlarmMetadata(kind: spec.reminderID.hasPrefix(ReminderRequestID.testPrefix) ? .test : .reminder,
                                            reminderID: spec.reminderID, source: spec.sourceRawValue, subtitle: spec.subtitle)
+        let secondary = AlarmSecondaryAction.make(sourceRawValue: spec.sourceRawValue,
+                                                  snoozeAvailable: spec.snoozeSeconds != nil,
+                                                  intentsAvailable: Self.intentsAvailable)
         do {
-            if let snooze = spec.snoozeSeconds {
+            if case .markDone(let action) = secondary {
+                // Phase 4 B3 (RISKS #51 resolved on builds with App Intents metadata): Stop (system) + "Done", which
+                // runs the Mark done intent in the app's process (`LiveActivityIntent`); no countdown, so no Snooze.
+                let presentation = AlarmPresentation(
+                    alert: Self.alert(title: title,
+                                      secondaryButton: AlarmButton(text: "alarm.button.done", textColor: .white,
+                                                                   systemImageName: "checkmark.circle"),
+                                      secondaryButtonBehavior: .custom))
+                let attributes = AlarmAttributes<TabulaAlarmMetadata>(presentation: presentation, metadata: metadata,
+                                                                      tintColor: Color.orange)
+                let configuration = AlarmManager.AlarmConfiguration<TabulaAlarmMetadata>.alarm(
+                    schedule: .fixed(spec.fireDate), attributes: attributes, stopIntent: nil,
+                    secondaryIntent: Self.doneIntent(for: action, alarmID: spec.id))
+                _ = try await AlarmManager.shared.schedule(id: spec.id, configuration: configuration)
+            } else if secondary == .snooze, let snooze = spec.snoozeSeconds {
                 let presentation = AlarmPresentation(
                     alert: Self.alert(title: title,
                                       secondaryButton: AlarmButton(text: "alarm.button.snooze", textColor: .white,
@@ -98,6 +121,22 @@ struct LiveAlarmClient: AlarmClient {
                 continuation.finish()
             }
             continuation.onTermination = { _ in task.cancel() }
+        }
+    }
+
+    /// `true` on builds that ship App Intents metadata (`TABULA_APP_INTENTS`, project.yml = Xcode / TestFlight). On the
+    /// xtool path an intent button would have no metadata to run (RISKS #19), so alarms keep Snooze (Phase 3).
+    #if TABULA_APP_INTENTS
+    static let intentsAvailable = true
+    #else
+    static let intentsAvailable = false
+    #endif
+
+    /// The Mark done intent of a task / exam alarm (CompletionIntents.swift); it stops `alarmID` whatever the outcome.
+    static func doneIntent(for action: IntentAction, alarmID: UUID) -> any LiveActivityIntent {
+        switch action {
+        case .completeTask(let id): return MarkTaskDoneIntent(taskID: id.uuidString, alarmID: alarmID.uuidString)
+        case .completeExam(let id): return MarkExamDoneIntent(examID: id.uuidString, alarmID: alarmID.uuidString)
         }
     }
 

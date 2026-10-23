@@ -195,7 +195,16 @@ if [ -x "$XCODEGEN" ] && command -v rsync >/dev/null; then
     grep -q 'dstPath = "$(CONTENTS_FOLDER_PATH)/Watch"' "$P" && ok "watch app embedded (Embed Watch Content)" || bad "watch embed phase missing"
     grep -q 'TabulaWidgets.appex in Embed Foundation Extensions' "$P" && ok "widget embedded (PlugIns)" || bad "widget embed phase missing"
     [ "$(grep -c 'PrivacyInfo.xcprivacy in Resources \*/ = {isa = PBXBuildFile' "$P")" -eq 2 ] && ok "both privacy manifests (app + widget) in Resources phases" || bad "privacy manifests not in Resources phases"
-    grep -q 'SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) TABULA_MACRO_PROBES"' "$P" && ok "TabulaApp defines TABULA_MACRO_PROBES (CI macro variant)" || bad "macro define missing in pbxproj"
+    grep -q 'SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) TABULA_MACRO_PROBES' "$P" && ok "TabulaApp defines TABULA_MACRO_PROBES (CI macro variant)" || bad "macro define missing in pbxproj"
+    # Phase 4 B3: the App Intents controls are compiled on this path (app: alarm "Done"; widget: checkbox + timetable
+    # choice), and the App Shortcut phrases catalog is an app resource (Xcode's metadata step reads it).
+    grep -q 'SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) TABULA_MACRO_PROBES TABULA_APP_INTENTS"' "$P" \
+      && grep -q 'SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) TABULA_APP_INTENTS"' "$P" \
+      && ok "TabulaApp + TabulaWidgets define TABULA_APP_INTENTS (App Intents controls on the Xcode path)" \
+      || bad "TABULA_APP_INTENTS missing from the app or widget target in pbxproj"
+    [ "$(grep -c 'AppShortcuts.xcstrings in Resources \*/ = {isa = PBXBuildFile' "$P")" -eq 1 ] \
+      && ok "AppShortcuts.xcstrings in the app's Resources phase only (App Shortcut phrases, 12 languages)" \
+      || bad "AppShortcuts.xcstrings must be in exactly one Resources phase (the app's)"
     if grep -q '^[[:space:]]*ARCHS = ' "$P"; then bad "ARCHS overridden in project (could drop arm64_32)"; else ok "no ARCHS override (watch keeps ARCHS_STANDARD incl. arm64_32)"; fi
     [ -f "$TMP/xg/Tabula.xcodeproj/xcshareddata/xcschemes/TabulaApp.xcscheme" ] && ok "shared scheme TabulaApp" || bad "scheme missing"
     for f in Config/App-Info.plist Config/Widgets-Info.plist Config/Watch-Info.plist; do

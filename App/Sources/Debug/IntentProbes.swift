@@ -36,16 +36,9 @@ struct Phase0ProbeIntent: AppIntent {
     }
 }
 
-struct Phase0AppShortcuts: AppShortcutsProvider {
-    static var appShortcuts: [AppShortcut] {
-        AppShortcut(
-            intent: Phase0ProbeIntent(),
-            phrases: ["Run \(.applicationName) probe"],
-            shortTitle: "probe.intent.shortTitle",
-            systemImageName: "checkmark.seal"
-        )
-    }
-}
+// Phase 4 B3: the probe's `AppShortcutsProvider` ("Run Tabula probe") was removed. An app may declare only ONE
+// provider and the production one is `TabulaAppShortcuts` (App/Sources/Intents/AppShortcuts.swift); the probe intent
+// stays runnable from the debug screen and as a (DEBUG-only) Shortcuts action.
 
 /// Runs the intent's `perform()` in-process, off the main actor, so the opaque result value never
 /// crosses an isolation boundary (keeps Swift 6 strict concurrency happy).
