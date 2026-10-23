@@ -1,5 +1,15 @@
 # Tabula: what exists right now
 
+> **Update after Phase 4 (2026-10-23):**
+> - **Widgets:** Now & Next, Today, Homework and Next exam, on the Home Screen, the Lock Screen and in StandBy.
+> - **Live Activities:** the current lesson and exam day.
+> - **App Intents** (TestFlight builds only): Mark done from widgets and alarms, timetable choice, Siri "What's next?".
+> - **Subject reordering.**
+> - **Translation review document:** `docs/localization/review/`.
+> - **Installed on the iPhone** via the relay route (`docs/DEVICE_SETUP.md`).
+> - **All screens for UI/UX review:** `docs/ux-review/README.md`.
+> - Gate: `docs/gates/PHASE-4.md`.
+
 > **Update after Phase 3 (2026-10-15):** five tabs: Today · Timetable · **Tasks** · **Exams** · Settings.
 > - **Tasks:** Today / Upcoming / Overdue / Completed, quick add, subtasks, repeat, attachments with photos, files, links and voice notes.
 > - **Exams:** countdown, history, exam period.

@@ -1,6 +1,6 @@
 # Phase 4 gate report — Widgets, Live Activities, App Intents (+ Phase 3 carry-overs)
 
-Status: **DRAFT — final screenshot review and the UX package pending** · Plan: `docs/specs/PHASE4_PLAN.md` · Device checklist: `docs/checklists/PHASE4_DEVICE.md`
+Status: **READY FOR REVIEW — waiting for your approval** (2026-10-23) · Plan: `docs/specs/PHASE4_PLAN.md` · Device checklist: `docs/checklists/PHASE4_DEVICE.md`
 
 ## Stages and model tier
 | Stage | Agent / tier | Result | Evidence |
@@ -26,6 +26,54 @@ Status: **DRAFT — final screenshot review and the UX package pending** · Plan
 
 **Tier split:** Opus high did A, C1, B2 and B3 (plus their fix rounds) and all 6 QA runs. Sonnet medium did C2, C3 and B1 (plus B1's fix round). Every blocking and major defect was found by an Opus QA run: 2 on Opus-built stages (B2, B3), 3 on Sonnet-built B1.
 
+## Runtime evidence
+### Final merged state (`d894f1b` and later), verified
+- **iOS CI** green on `c47e808` (run 39877356548) and on `d894f1b` (run 39878488985). Each run covers:
+  - the Linux core and UI tests;
+  - the XcodeGen iOS + watchOS build **with App Intents**;
+  - the xtool path.
+- **validate.sh** ALL CHECKS PASSED: **540 core + 489 UI tests**; String Catalog about 1,266 keys, InfoPlist 5 keys and AppShortcuts 4 phrases, each complete in 12 languages.
+- **Clean xtool builds** have 0 warnings: the base variant (what we install on the phone) and the `--app-intents` variant.
+- **Snapshot:** the true worst case is 16,383 B against a hard cap of 19,000 B, so the Watch (< 20 KB) can reuse it.
+
+### Screenshot review (orchestrator)
+- **Widget and Live Activity galleries** (run 39874696823) were reviewed.
+- **Four visual defects** were found and fixed (`ccb5873`):
+  1. a Live Activity title cut mid-word;
+  2. Homework rows in link blue with a low-contrast due line;
+  3. a truncated exam time on the Lock Screen;
+  4. gallery captions in UTC.
+- **The fixes were checked in run 39878489004:** the full subject name now shows, and captions read 10:20.
+- **Good, no change needed:** the Today widget (past lessons dimmed, the current one highlighted, tomorrow after school), the exam countdown escalation, Pro and "Open Tabula" states, the Live Activities settings, and the subject reorder list.
+- The curated set is in [`docs/screenshots/phase4/`](../screenshots/phase4/).
+
+### UI/UX review package (human request)
+- **Contents:** **185 screenshots, 65 screen/seed/language combinations, 8 sections:**
+  - onboarding, Today, Timetable (all 5 views), editors, Tasks, Exams, Settings;
+  - widgets and Live Activities;
+  - light, dark and largest text, plus Slovak for the key screens.
+- **How it was made:** iOS Simulator, CI runs 39877562723, 39877566060, 39877569444 and 39878489004.
+- **Where:** index at [`docs/ux-review/README.md`](../ux-review/README.md), with context for the reviewer, what each screen is and how to reach it. The images are in `docs/ux-review/screens/`, kept local and git-ignored because of size. Regenerate with `scripts/ux-review-index.py`.
+- **Next step:** this is the input for the human's UX consultation, which produces `design_ui_ux_fix.md`.
+
+### Device
+- **Done:** the Phase 3/4 dev build is **installed on the iPhone 16 Pro** (2026-10-16) through the relay route.
+- **Not yet run:**
+  - `PHASE4_DEVICE.md`;
+  - the earlier device checklists;
+  - everything that needs TestFlight.
+
+## Not done / known limits
+- **Real widget data needs an App Group.** Free-team dev builds on the phone show "Open Tabula" in widgets. Live Activities and everything else work without it (RISKS #65).
+- **All App Intent behaviour needs a TestFlight build, so the paid account:**
+  - the widget checkbox;
+  - alarm Done;
+  - the timetable picker;
+  - Siri / Shortcuts.
+- **Untested Live Activity behaviour:** the switch to the next lesson without the app (stale-date redraw, RISKS #73), background refresh timing, and how intrusive the alert is when an activity starts automatically. Device checklist only.
+- **Translations:** all new strings are machine-made `needs_review`. Use the review document in `docs/localization/review/`.
+- **Watch is Phase 5:** complications and Smart Stack. The snapshot is already sized for it.
+
 ## Decisions taken (reviewable)
 - Widgets read only a snapshot written by the app, never the database. The free team has no App Group, so dev builds on the phone show **"Open Tabula"** in widgets; real widget data needs the paid team or TestFlight (RISKS #65).
 - Everything is `StaticConfiguration` first. App Intent features exist only in Xcode/TestFlight builds (flag `TABULA_APP_INTENTS`), because xtool cannot produce intent metadata.
@@ -42,3 +90,7 @@ Status: **DRAFT — final screenshot review and the UX package pending** · Plan
 | P4-4 | RISKS #82: task and exam **loud alarms show "Done" instead of "Snooze"** (AlarmKit allows only one extra button). This changes the 9-minute Snooze in NOTIFICATIONS.md | Accept "Done" (it closes the loop); Snooze stays for lesson, pack-tonight and test alarms |
 | P4-5 | The "Add homework" Siri/Shortcuts action was not in the plan; it only opens the editor | Accept |
 | P4-6 | All App Intent behaviour (widget checkbox, alarm Done, timetable picker, Siri) is unverifiable until a TestFlight build exists, which needs the paid account | Accept for now; it goes on the paid-account switchover list |
+
+## Next
+- **UI/UX overhaul:** when `design_ui_ux_fix.md` arrives, it gets its own plan. It covers the app screens, widgets and Live Activities, using the installed `liquid-glass-design`, `swiftui-patterns` and `accessibility` skills.
+- **Phase 5:** Watch app and complications (today/tomorrow, current lesson countdown, next lesson, Smart Stack, offline cache from the snapshot).
