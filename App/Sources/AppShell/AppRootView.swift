@@ -23,6 +23,7 @@ struct AppRootView: View {
                 if let banner = model.banners.first {
                     StoreBannerView(banner: banner) { model.dismissBanner() }
                 }
+                if case .main = model.phase { SampleDataBanner() }   // "This is sample data · Remove" (U6)
                 phaseView
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }

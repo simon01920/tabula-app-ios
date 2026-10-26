@@ -46,6 +46,7 @@ struct TabulaRootApp: App {
                 .environment(services.navigation)
                 .environment(services.reminders)
                 .environment(services.liveActivities)
+                .environment(services.sampleContent)
                 .task { await services.model.load() }
                 // Widget taps (Phase 4 A): `tabula://open/…` (ItemLinkURL) → the same path as a notification tap.
                 // Anything else is ignored (any app or web page can send the app a URL).
