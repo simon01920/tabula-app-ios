@@ -55,8 +55,9 @@ struct TimetableNavigationTests {
 
         let ab = RotationScheme.weekCycle(WeekCycle(length: 2, anchor: .isoWeekParity(policy: .strict, offset: 0)))
         let four = RotationScheme.weekCycle(WeekCycle(length: 4, anchor: .isoWeekParity(policy: .strict, offset: 0)))
-        #expect(CycleLabel.week(2, scheme: ab, userLabel: nil) == .namedWeek("B"))
-        #expect(CycleLabel.week(2, scheme: ab, userLabel: " Odd ") == .namedWeek("Odd"))
+        #expect(CycleLabel.week(2, scheme: ab, userLabel: nil) == .parityWeek(isOdd: false))
+        #expect(CycleLabel.week(2, scheme: ab, userLabel: " B ") == .namedWeek("B"))
+        #expect(CycleLabel.week(2, scheme: ab, userLabel: " Odd ") == .customWeek("Odd"))
         #expect(CycleLabel.week(3, scheme: four, userLabel: nil) == .numberedWeek(3))
         #expect(CycleLabel.week(1, scheme: .none, userLabel: "A") == nil)
         #expect(CycleLabel.day(.cycleDay(2), userLabel: "B") == .namedDay("B"))
@@ -77,7 +78,7 @@ struct WeekStripTests {
         #expect(strip.days.map(\.isToday) == [false, true, false, false, false])
         #expect(strip.days.map(\.isSelected) == [false, true, false, false, false])
         #expect(strip.days.map(\.hasChanges) == [false, false, false, true, false])   // Thursday: short day + changes
-        #expect(strip.cycleWeek == .namedWeek("B"))
+        #expect(strip.cycleWeek == .namedWeek("B"))   // the sample's own labels "A"/"B"
         #expect(strip.containsToday)
         let tuesday = strip.days[1]
         #expect(WeekStripModel.accessibilityLabel(tuesday, renderer: renderer)

@@ -58,19 +58,64 @@ public struct LessonStatusBadgeModel: Equatable, Sendable {
     public let titleKey: String
 
     /// The badge for a lesson, or `nil` for a regular (`.scheduled`) lesson.
-    /// A modified lesson with exactly one reason shows that reason ("Room changed"); several → "Changed".
+    /// A modified lesson with exactly one reason shows that reason ("Room changed"); several → "Changed". The symbol
+    /// is the most important reason's (`LessonChangeSymbol`), the same in the grid, the lesson detail, Today and widgets.
     public static func make(status: ResolvedLesson.Status, reasons: [ModificationReason]) -> LessonStatusBadgeModel? {
         switch status {
         case .scheduled:
             return nil
         case .cancelled:
-            return LessonStatusBadgeModel(kind: .cancelled, symbolName: "xmark.circle", titleKey: "lesson.status.cancelled")
+            return LessonStatusBadgeModel(kind: .cancelled, symbolName: LessonChangeSymbol.cancelled,
+                                          titleKey: "lesson.status.cancelled")
         case .added:
-            return LessonStatusBadgeModel(kind: .added, symbolName: "plus.circle", titleKey: "lesson.status.added")
+            return LessonStatusBadgeModel(kind: .added, symbolName: LessonChangeSymbol.added, titleKey: "lesson.status.added")
         case .modified:
             let key = reasons.count == 1 ? reasons[0].l10nKey : "lesson.status.modified"
-            return LessonStatusBadgeModel(kind: .modified, symbolName: "arrow.triangle.2.circlepath", titleKey: key)
+            return LessonStatusBadgeModel(kind: .modified, symbolName: LessonChangeSymbol.symbol(forReasons: reasons),
+                                          titleKey: key)
         }
+    }
+}
+
+/// One SF Symbol per kind of change (Opus H5 / M8). `arrow.triangle.2.circlepath` is gone: it means sync/repeat
+/// elsewhere in iOS and in this app. Names checked against SF Symbols (SFSafeSymbols 4.0 list: `person.2.badge.gearshape`
+/// is SF Symbols 4 / iOS 16; the others are older); `clock.badge.exclamationmark` was already used by the day-change editor.
+// adopt U1 AppSymbol: these constants become AppSymbol cases once U1 lands.
+public enum LessonChangeSymbol {
+    public static let timeChanged = "clock.badge.exclamationmark"
+    public static let roomChanged = "arrow.right.square"
+    public static let substitute = "person.2.badge.gearshape"
+    public static let subjectChanged = "arrow.left.arrow.right"
+    /// Notes, lesson type or bring list changed.
+    public static let detailsChanged = "pencil.circle"
+    public static let added = "plus.circle.fill"
+    public static let cancelled = "xmark.circle.fill"
+
+    /// Reasons in the order of how much they change the student's day (where / when / who first).
+    public static let priority: [ModificationReason] = [
+        .timeChanged, .roomChanged, .buildingChanged, .teacherChanged, .subjectChanged,
+        .lessonTypeChanged, .notesChanged, .bringListChanged,
+    ]
+
+    /// The symbol of one reason.
+    public static func symbol(for reason: ModificationReason) -> String {
+        switch reason {
+        case .timeChanged: return timeChanged
+        case .roomChanged, .buildingChanged: return roomChanged
+        case .teacherChanged: return substitute
+        case .subjectChanged: return subjectChanged
+        case .lessonTypeChanged, .notesChanged, .bringListChanged: return detailsChanged
+        }
+    }
+
+    /// The most important reason of a modified lesson, `nil` without reasons.
+    public static func primaryReason(_ reasons: [ModificationReason]) -> ModificationReason? {
+        priority.first(where: reasons.contains) ?? reasons.first
+    }
+
+    /// The symbol of a modified lesson: its most important reason's, or the generic change symbol without reasons.
+    public static func symbol(forReasons reasons: [ModificationReason]) -> String {
+        primaryReason(reasons).map(symbol(for:)) ?? detailsChanged
     }
 }
 

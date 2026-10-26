@@ -31,7 +31,8 @@ public enum LessonFieldLine: Equatable, Sendable, Identifiable {
     /// SF Symbol shown before the value (decorative: VoiceOver reads `LessonAccessibilityLabel`).
     public var symbolName: String {
         switch self {
-        case .room: return "door.left.hand.open"
+        // adopt U1 AppSymbol: room = map pin app-wide (Opus M8; the door read as "▌" at small sizes).
+        case .room: return "mappin.and.ellipse"
         case .building: return "building.2"
         case .teacher: return "person"
         case .lessonType: return "tag"
