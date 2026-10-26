@@ -23,6 +23,7 @@ struct SettingsAppearanceView: View {
                     Text("settings.appearance.mode")
                 }
                 .pickerStyle(.inline)
+                .labelledBySectionHeader()   // M1: the header already says "Mode"
             } header: {
                 Text("settings.appearance.mode")
             }
@@ -95,7 +96,7 @@ private struct PackRow: View {
                 HStack {
                     Text(LocalizedStringKey(choice.pack.nameKey)).font(.body.weight(.semibold))
                     if choice.pack.requiresPro {
-                        Text("settings.appearance.palette.pro").font(.caption).foregroundStyle(.secondary)
+                        ProBadge()   // C2: was 1.88:1 light-blue text; ink on a neutral capsule, ≥ 7:1
                     }
                     Spacer()
                     if isSelected { Image(systemName: "checkmark").foregroundStyle(.tint).accessibilityHidden(true) }

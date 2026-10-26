@@ -11803,90 +11803,6 @@
         }
       }
     },
-    "editor.common.close" : {
-      "comment" : "Toolbar button that closes a sheet that has nothing to edit.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Zavřít"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Schließen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Close"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Fermer"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Bezárás"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "閉じる"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Zamknij"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Închide"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Zavrieť"
-          }
-        },
-        "sr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Затвори"
-          }
-        },
-        "sr-Latn" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Zatvori"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Закрити"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "关闭"
-          }
-        }
-      }
-    },
     "editor.common.delete" : {
       "comment" : "Swipe/context action that deletes a list row (opens a confirmation first).",
       "extractionState" : "manual",
@@ -27595,86 +27511,86 @@
         }
       }
     },
-    "editor.subject.name" : {
-      "comment" : "Subject editor input label.",
+    "editor.subject.name.prompt" : {
+      "comment" : "Hint text inside the empty name field of the subject editor (disappears when typing); also its VoiceOver label.",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Název"
+            "value" : "Název předmětu"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Name"
+            "value" : "Name des Fachs"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Name"
+            "value" : "Subject name"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Nom"
+            "value" : "Nom de la matière"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Név"
+            "value" : "Tantárgy neve"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "名前"
+            "value" : "科目名"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Nazwa"
+            "value" : "Nazwa przedmiotu"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Nume"
+            "value" : "Numele materiei"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Názov"
+            "value" : "Názov predmetu"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Назив"
+            "value" : "Назив предмета"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Naziv"
+            "value" : "Naziv predmeta"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Назва"
+            "value" : "Назва предмета"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "名称"
+            "value" : "科目名称"
           }
         }
       }
@@ -32047,86 +31963,86 @@
         }
       }
     },
-    "editor.timetable.name" : {
-      "comment" : "Timetable name input label.",
+    "editor.timetable.name.prompt" : {
+      "comment" : "Hint text inside the empty name field of the timetable editor (disappears when typing); also its VoiceOver label.",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Název"
+            "value" : "Název rozvrhu"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Name"
+            "value" : "Name des Stundenplans"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Name"
+            "value" : "Timetable name"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Nom"
+            "value" : "Nom de l’emploi du temps"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Név"
+            "value" : "Órarend neve"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "名前"
+            "value" : "時間割の名前"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Nazwa"
+            "value" : "Nazwa planu lekcji"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Nume"
+            "value" : "Numele orarului"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Názov"
+            "value" : "Názov rozvrhu"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Назив"
+            "value" : "Назив распореда"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Naziv"
+            "value" : "Naziv rasporeda"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Назва"
+            "value" : "Назва розкладу"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "名称"
+            "value" : "课程表名称"
           }
         }
       }
@@ -34395,6 +34311,90 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "没有可编辑的内容"
+          }
+        }
+      }
+    },
+    "editor.validation.announcement" : {
+      "comment" : "VoiceOver announcement after tapping Save in an editor whose entries are incomplete or wrong; the messages appear next to the fields.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Před uložením zkontrolujte některá pole."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Einige Felder müssen vor dem Sichern geprüft werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some fields need a look before you can save."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Certains champs sont à vérifier avant l’enregistrement."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Mentés előtt ellenőrizz néhány mezőt."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "保存する前に確認が必要な項目があります。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Przed zapisaniem sprawdź niektóre pola."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Unele câmpuri trebuie verificate înainte de salvare."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pred uložením skontrolujte niektoré polia."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Пре чувања проверите нека поља."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pre čuvanja proverite neka polja."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Перед збереженням перевірте деякі поля."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "保存前有些字段需要检查。"
           }
         }
       }
@@ -39481,86 +39481,86 @@
         }
       }
     },
-    "exams.editor.name" : {
-      "comment" : "Text field label in the exam editor: the exam's title.",
+    "exams.editor.name.prompt" : {
+      "comment" : "Hint text inside the empty title field of the exam editor (disappears when typing); also its VoiceOver label.",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Název"
+            "value" : "Název písemky"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Titel"
+            "value" : "Titel der Prüfung"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Title"
+            "value" : "Exam title"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Titre"
+            "value" : "Titre de l’examen"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Cím"
+            "value" : "Dolgozat címe"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "タイトル"
+            "value" : "テストのタイトル"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tytuł"
+            "value" : "Tytuł sprawdzianu"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Titlu"
+            "value" : "Titlul testului"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Názov"
+            "value" : "Názov písomky"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Наслов"
+            "value" : "Назив контролног"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Naslov"
+            "value" : "Naziv kontrolnog"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Назва"
+            "value" : "Назва контрольної"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "标题"
+            "value" : "考试标题"
           }
         }
       }
@@ -51321,6 +51321,90 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "今天考试"
+          }
+        }
+      }
+    },
+    "now.marker" : {
+      "comment" : "The highlighter marker on the lesson happening right now (Today, timetable cells, widgets). Shown in capitals by the app; VoiceOver reads it as written. One short word.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Teď"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Jetzt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Now"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Maintenant"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Most"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "今"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Teraz"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Acum"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Teraz"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Сада"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sada"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Зараз"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "现在"
           }
         }
       }
@@ -103489,86 +103573,86 @@
         }
       }
     },
-    "tasks.field.title" : {
-      "comment" : "Label of the task title text field in the task editor.",
+    "tasks.field.title.prompt" : {
+      "comment" : "Hint text inside the empty title field of the task editor (disappears when typing); also its VoiceOver label.",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Název"
+            "value" : "Název úkolu"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Titel"
+            "value" : "Titel der Aufgabe"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Title"
+            "value" : "Task title"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Titre"
+            "value" : "Titre de la tâche"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Cím"
+            "value" : "Feladat címe"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "タイトル"
+            "value" : "タスクのタイトル"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tytuł"
+            "value" : "Tytuł zadania"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Titlu"
+            "value" : "Titlul sarcinii"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Názov"
+            "value" : "Názov úlohy"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Наслов"
+            "value" : "Назив задатка"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Naslov"
+            "value" : "Naziv zadatka"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Назва"
+            "value" : "Назва завдання"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "标题"
+            "value" : "任务标题"
           }
         }
       }
@@ -107559,90 +107643,6 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "取消"
-          }
-        }
-      }
-    },
-    "timetable.action.done" : {
-      "comment" : "Toolbar button that closes the read-only lesson detail sheet.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Hotovo"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Fertig"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Done"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "OK"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Kész"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "完了"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Gotowe"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Gata"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Hotovo"
-          }
-        },
-        "sr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Готово"
-          }
-        },
-        "sr-Latn" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Gotovo"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Готово"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "完成"
           }
         }
       }

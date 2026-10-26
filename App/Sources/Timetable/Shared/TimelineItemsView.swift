@@ -108,8 +108,8 @@ struct DayEmptyView: View {
     }
 
     private var symbol: String {
-        if schedule.activeBreakID != nil { return "beach.umbrella" }
-        if schedule.cancellingOverrideID != nil { return "xmark.circle" }
+        if schedule.activeBreakID != nil { return AppSymbol.holiday.rawValue }
+        if schedule.cancellingOverrideID != nil { return AppSymbol.cancelled.rawValue }
         return "moon.zzz"
     }
 }

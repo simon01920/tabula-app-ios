@@ -471,7 +471,7 @@ struct TodayPresentationTests {
         #expect(content.rows.map(\.isPast) == [true, true, false, false])
         #expect(content.rows.map(\.isCancelled) == [false, true, false, false])
         #expect(content.rows[1].line.badgeText == EnglishCatalog.values["lesson.status.cancelled"])
-        #expect(content.rows[1].badgeSymbol == "xmark.circle")
+        #expect(content.rows[1].badgeSymbol == "xmark.circle.fill")
         #expect(content.rows[2].line.badgeText == EnglishCatalog.values[ModificationReason.roomChanged.l10nKey])
         #expect(content.rows[2].line.room == "105")
         #expect(content.rows[3].line.room == nil && content.rows[3].badgeSymbol == nil)

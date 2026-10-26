@@ -18,14 +18,17 @@ public struct DayChangeDraft: Equatable, Sendable {
         /// Catalog key of the kind's name.
         public var l10nKey: String { "editor.dayChange.kind.\(rawValue)" }
         /// SF Symbol of the kind.
-        public var symbolName: String {
+        public var symbolName: String { symbol.rawValue }
+
+        /// The app symbol of the kind (the same symbols as the lesson badges, M8).
+        public var symbol: AppSymbol {
             switch self {
-            case .cancelLesson: return "xmark.circle"
-            case .changeLesson: return "arrow.triangle.2.circlepath"
-            case .cancelDay: return "calendar.badge.minus"
-            case .shortDay: return "clock.badge.exclamationmark"
-            case .followDay: return "arrow.turn.up.right"
-            case .extraLesson: return "plus.circle"
+            case .cancelLesson: return .cancelled
+            case .changeLesson: return .changed
+            case .cancelDay: return .cancelledDay
+            case .shortDay: return .timeChanged
+            case .followDay: return .followsAnotherDay
+            case .extraLesson: return .extraLesson
             }
         }
     }

@@ -1,7 +1,7 @@
 // Small building blocks shared by the onboarding steps: step scaffold, selectable choice row, card container,
 // minutes stepper, and the terminology-dependent catalog keys.
 // Standard controls only (Button, Toggle, Stepper, DatePicker), so iOS 26 applies its look automatically.
-// APIs: LocalizedStringKey, @ScaledMetric, ShapeStyle.quaternary, View.accessibilityAddTraits(_:),
+// APIs: LocalizedStringKey, TimetableUI AdaptiveStack / ScaledIcon / cardSurface, View.accessibilityAddTraits(_:),
 //       View.accessibilityElement(children:), Stepper(value:in:step:label:), Text(_:format:).
 import SwiftUI
 import TimetableCore
@@ -36,7 +36,8 @@ struct StepScaffold<Content: View>: View {
     }
 }
 
-/// A rounded group background for related controls.
+/// A rounded group background for related controls: a white card (dark grey in dark mode) on the grouped page
+/// background (Phase 4U U1, C2 / M9: tinted text on the old grey `.quaternary` fill measured 2.22:1).
 struct OnboardingCard<Content: View>: View {
     @ViewBuilder let content: Content
 
@@ -44,11 +45,14 @@ struct OnboardingCard<Content: View>: View {
         VStack(alignment: .leading, spacing: 12) { content }
             .padding(16)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(.quaternary, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .cardSurface()
     }
 }
 
 /// A large, selectable row (single choice). Selection is shown by a checkmark and an outline, never colour alone.
+/// Phase 4U U1: white card surface, the detail in `pencil` (≥ 4.5:1; the grey-on-grey detail measured 3.06:1, Astra
+/// F04), and at accessibility text sizes the icon sits above the text (AdaptiveStack, capped ScaledIcon) so the title
+/// gets the full width (H13 / F01: "Elemen-tary" was hyphenated). The checkmark stays beside the text block.
 struct OnboardingChoiceRow: View {
     let title: LocalizedStringKey
     var detail: LocalizedStringKey?
@@ -57,33 +61,33 @@ struct OnboardingChoiceRow: View {
     var isEnabled = true
     var badge: LocalizedStringKey?
     let action: () -> Void
-    @ScaledMetric(relativeTo: .title2) private var iconWidth = 32.0
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 14) {
-                Image(systemName: systemImage)
-                    .font(.title2)
-                    .foregroundStyle(.tint)
-                    .frame(width: iconWidth)
-                    .accessibilityHidden(true)
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(title).font(.headline)
-                    if let detail {
-                        Text(detail).font(.subheadline).foregroundStyle(.secondary)
+            HStack(alignment: .center, spacing: 12) {
+                AdaptiveStack(spacing: 12) {
+                    ScaledIcon(systemName: systemImage, base: 28, maximum: 40, relativeTo: .title2)
+                        .foregroundStyle(.tint)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(title).font(TypeScale.rowTitle).foregroundStyle(Color.primary)
+                        if let detail {
+                            Text(detail).font(.subheadline).foregroundStyle(Color.pencil)
+                        }
+                        if let badge {
+                            Text(badge)
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(Color.primary)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 2)
+                                .background(DesignTokens.Surface.page, in: Capsule())
+                        }
                     }
-                    if let badge {
-                        Text(badge)
-                            .font(.caption.weight(.semibold))
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 2)
-                            .background(.quaternary, in: Capsule())
-                    }
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
                 }
-                .multilineTextAlignment(.leading)
-                Spacer(minLength: 8)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 if isSelected {
-                    Image(systemName: "checkmark.circle.fill")
+                    Image(AppSymbol.completed)
                         .font(.title3)
                         .foregroundStyle(.tint)
                         .accessibilityHidden(true)
@@ -91,12 +95,12 @@ struct OnboardingChoiceRow: View {
             }
             .padding(14)
             .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-            .background(.quaternary, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .cardSurface()
             .overlay {
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .strokeBorder(Color.accentColor, lineWidth: isSelected ? 2 : 0)
+                RoundedRectangle(cornerRadius: DesignTokens.Surface.cornerRadius, style: .continuous)
+                    .strokeBorder(.tint, lineWidth: isSelected ? 2 : 0)
             }
-            .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .contentShape(RoundedRectangle(cornerRadius: DesignTokens.Surface.cornerRadius, style: .continuous))
         }
         .buttonStyle(.plain)
         .disabled(!isEnabled)
@@ -119,8 +123,9 @@ struct OnboardingStepper: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(LocalizedStringKey(titleKey))
                 Text(verbatim: valueText(value))
-                    .font(.subheadline.monospacedDigit())
-                    .foregroundStyle(.secondary)
+                    .font(.subheadline)
+                    .timeStyle()
+                    .foregroundStyle(Color.pencil)
             }
         }
         .frame(minHeight: 44)
@@ -134,9 +139,9 @@ struct OnboardingErrorLine: View {
 
     var body: some View {
         Label {
-            Text(text).foregroundStyle(.red)
+            Text(text).foregroundStyle(Color.correction)
         } icon: {
-            Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.red)
+            Image(AppSymbol.warning).foregroundStyle(Color.correction)
         }
         .font(.subheadline)
     }

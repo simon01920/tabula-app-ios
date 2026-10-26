@@ -194,7 +194,7 @@ private struct TodayUnavailableColumn: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Image(systemName: "calendar")
+            Image(AppSymbol.date)
                 .font(.title3)
                 .foregroundStyle(.tint)
                 .widgetAccentable()

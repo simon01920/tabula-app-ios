@@ -1,5 +1,7 @@
 // Shared building blocks of the editors (stage B3): the Cancel/Save sheet scaffold with dirty-state confirmation,
 // the inline result of `AppModel.apply`, labelled inputs, date/time rows and the impact-confirmation sheet.
+// Phase 4U U1: validation appears after the first edit or a save attempt (M5, `ValidationMessage`,
+// `\.editorValidationVisible`); the title field of an editor is `EditorTitleField` (M6).
 //
 // Draft pattern (no `State(initialValue:)` in initialisers, which is unverified with the Xcode 27 macro-based
 // @State): the scaffold keeps `edited: Draft?`, `nil` meaning "unchanged = initial". Content edits through a
@@ -37,10 +39,16 @@ struct EditorScaffold<Draft: Equatable, Content: View>: View {
     @State private var confirmingDiscard = false
     @State private var warningLines: [ApplyWarningLine] = []
     @State private var showingWarnings = false
+    /// Save was tapped while the draft could not be saved (M5: from then on the validation messages show).
+    @State private var saveAttempted = false
     @Environment(AppModel.self) private var model
 
     private var current: Draft { edited ?? initial }
     private var isDirty: Bool { edited != nil && edited != initial }
+    /// M5 (Phase 4U U1; HIG entering-data.md "Dynamically validate field values"): validation messages appear after the
+    /// first edit or a save attempt, never on a form the user has not touched ("Enter at least one change." in red on
+    /// open, Opus review M5).
+    private var showsValidation: Bool { edited != nil || saveAttempted }
 
     private var binding: Binding<Draft> {
         Binding(get: { edited ?? initial }, set: { edited = $0 })
@@ -54,6 +62,7 @@ struct EditorScaffold<Draft: Equatable, Content: View>: View {
                 }
                 content(binding)
             }
+            .environment(\.editorValidationVisible, showsValidation)
             .navigationTitle(titleKey)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -65,12 +74,14 @@ struct EditorScaffold<Draft: Equatable, Content: View>: View {
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
+                    // Enabled while the draft is invalid (M5): tapping it then reveals why instead of doing nothing
+                    // silently behind a greyed-out button. Only a running copy disables it.
                     Button {
                         commit()
                     } label: {
                         Text("editor.common.save")
                     }
-                    .disabled(isBusy || !canSave(current))
+                    .disabled(isBusy)
                 }
             }
             .confirmationDialog("editor.common.discard.title", isPresented: $confirmingDiscard, titleVisibility: .visible) {
@@ -106,7 +117,13 @@ struct EditorScaffold<Draft: Equatable, Content: View>: View {
     }
 
     private func commit() {
-        guard !isBusy, let outcome = save(current) else { return }
+        guard !isBusy else { return }
+        guard canSave(current) else {
+            saveAttempted = true
+            AccessibilityNotification.Announcement(model.renderer.string(forKey: "editor.validation.announcement")).post()
+            return
+        }
+        guard let outcome = save(current) else { return }
         if case .applied(let warnings) = outcome {
             // The change is stored; warnings never block (spec), but the user sees them before the sheet closes.
             let lines = ApplyWarnings.lines(from: warnings)
@@ -175,14 +192,81 @@ struct EditorUnavailableView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button { dismiss() } label: { Text("editor.common.close") }
+                    SheetCloseButton()
                 }
             }
         }
     }
 }
 
+// MARK: - Validation (M5)
+
+private struct EditorValidationVisibleKey: EnvironmentKey {
+    /// Outside an `EditorScaffold` validation messages always show (the previous behaviour).
+    static let defaultValue = true
+}
+
+extension EnvironmentValues {
+    /// `false` until the user edits the draft or taps Save (set by `EditorScaffold`). `ValidationMessage` and
+    /// `EditorTitleField` read it; editors with custom message views can read it too.
+    var editorValidationVisible: Bool {
+        get { self[EditorValidationVisibleKey.self] }
+        set { self[EditorValidationVisibleKey.self] = newValue }
+    }
+}
+
+/// One inline validation message (icon + text, never colour alone), shown only after the first interaction or a save
+/// attempt (M5). `.hint` = what is still missing (secondary text, e.g. "Enter a title to save"); `.error` = a value that
+/// is wrong (correction red, e.g. "The end is before the start").
+struct ValidationMessage: View {
+    enum Severity { case hint, error }
+
+    let key: String
+    var severity: Severity = .error
+    @Environment(\.editorValidationVisible) private var isVisible
+
+    var body: some View {
+        if isVisible {
+            Label {
+                Text(LocalizedStringKey(key))
+            } icon: {
+                Image(severity == .error ? AppSymbol.warning : AppSymbol.info)
+            }
+            .font(.footnote)
+            .foregroundStyle(severity == .error ? Color.correction : Color.pencil)
+            .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+
 // MARK: - Inputs
+
+/// The main title / name field of an editor (M6, Phase 4U U1): a leading-aligned `TextField` in `.title3` that looks
+/// like a field, with a prompt in the system placeholder colour (HIG text-fields.md "Show a hint in a text field to
+/// help communicate its purpose") and its validation hint directly under it in footnote secondary text, shown after
+/// the first interaction or a save attempt (M5). The prompt is the field's purpose ("Exam title"), not data, so the
+/// PRODUCT.md field rule ("no placeholders" for empty optional values in summaries) is untouched: titles are required.
+/// VoiceOver reads the prompt key as the field's label.
+struct EditorTitleField: View {
+    /// Catalog key of the prompt and accessibility label ("Exam title").
+    let promptKey: LocalizedStringKey
+    @Binding var text: String
+    var axis: Axis = .horizontal
+    /// Catalog key of the hint shown while the title is missing (`nil` = no hint).
+    var missingHintKey: String?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            TextField(text: $text, prompt: Text(promptKey), axis: axis) { Text(promptKey) }
+                .font(.title3)
+                .multilineTextAlignment(.leading)
+            if let missingHintKey, EditorText.trimmedOrNil(text) == nil {
+                ValidationMessage(key: missingHintKey, severity: .hint)
+            }
+        }
+        .padding(.vertical, 2)
+    }
+}
 
 /// A text input with a visible label (right-aligned value, stacks at large Dynamic Type sizes). No placeholder text:
 /// an empty enabled field is simply an empty input.
@@ -216,7 +300,7 @@ struct TimeRow: View {
             Text(titleKey)
         }
         .environment(\.timeZone, LocalDateBridge.timeZone)
-        .environment(\.calendar, LocalDateBridge.calendar(locale: model.environment.locale()))
+        .environment(\.calendar, LocalDateBridge.calendar(locale: model.formatter.locale))
     }
 }
 
@@ -234,7 +318,7 @@ struct DateRow: View {
             Text(titleKey)
         }
         .environment(\.timeZone, LocalDateBridge.timeZone)
-        .environment(\.calendar, LocalDateBridge.calendar(locale: model.environment.locale()))
+        .environment(\.calendar, LocalDateBridge.calendar(locale: model.formatter.locale))
     }
 }
 

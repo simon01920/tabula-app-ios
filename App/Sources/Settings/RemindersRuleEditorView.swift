@@ -77,7 +77,8 @@ struct RemindersRuleEditorView: View {
                 kind: Binding(get: { FollowUpEditing.kind(of: current.followUp) }, set: { kind in
                     edit { $0.followUp = FollowUpEditing.followUp(choosing: kind, current: $0.followUp) }
                 }),
-                followUp: Binding(get: { current.followUp }, set: { value in edit { $0.followUp = value } }))
+                followUp: Binding(get: { current.followUp }, set: { value in edit { $0.followUp = value } }),
+                labelledByHeader: true)
         } header: {
             Text("reminders.followUp.title")
         } footer: {

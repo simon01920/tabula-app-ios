@@ -136,14 +136,21 @@ struct FollowUpRows: View {
     let forOverride: Bool
     @Binding var kind: FollowUpMenuKind
     @Binding var followUp: FollowUp?
+    /// `true` when the enclosing section's header already reads "Follow-up" (M1): the picker hides its own label.
+    var labelledByHeader = false
 
     var body: some View {
-        Picker(selection: $kind) {
+        let picker = Picker(selection: $kind) {
             ForEach(FollowUpEditing.options(forOverride: forOverride, current: kind), id: \.self) { option in
                 Text(LocalizedStringKey(option.titleKey)).tag(option)
             }
         } label: {
             Text("reminders.followUp.title")
+        }
+        if labelledByHeader {
+            picker.labelledBySectionHeader()
+        } else {
+            picker
         }
         if let minutes = FollowUpEditing.minutes(of: followUp) {
             Picker(selection: Binding(get: { minutes }, set: { followUp = .afterMinutes($0) })) {

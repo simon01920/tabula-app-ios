@@ -41,7 +41,7 @@ struct TaskDetailView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button { dismiss() } label: { Text("timetable.action.done") }
+                    SheetCloseButton()
                 }
                 if task != nil {
                     ToolbarItem(placement: .primaryAction) {

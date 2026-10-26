@@ -259,7 +259,8 @@ private struct NewTimetableSheet: View {
             },
             content: { draft in
                 Section {
-                    LabeledTextField(titleKey: "editor.timetable.name", text: draft.name)
+                    EditorTitleField(promptKey: "editor.timetable.name.prompt", text: draft.name,
+                                     missingHintKey: TimetableDraft.Issue.noName.l10nKey)
                     LabeledTextField(titleKey: "editor.timetable.emoji", text: draft.emoji)
                 }
                 Section {

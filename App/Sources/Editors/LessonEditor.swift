@@ -203,7 +203,7 @@ private struct LessonFormContent: View {
             Text("editor.slot.header")
         } footer: {
             ForEach(draft.slotIssues, id: \.self) { issue in
-                Text(LocalizedStringKey(issue.l10nKey)).foregroundStyle(.red)
+                ValidationMessage(key: issue.l10nKey)
             }
         }
     }
@@ -222,6 +222,7 @@ private struct LessonFormContent: View {
                 } label: {
                     Text("editor.validity")
                 }
+                .labelledBySectionHeader()   // M1: the header already says "Applies"
             }
             switch draft.validityMode {
             case .terms:
@@ -253,7 +254,7 @@ private struct LessonFormContent: View {
             Text("editor.validity.header")
         } footer: {
             ForEach(draft.issues(in: timetable).filter { $0 != .noSubject }, id: \.self) { issue in
-                Text(LocalizedStringKey(issue.l10nKey)).foregroundStyle(.red)
+                ValidationMessage(key: issue.l10nKey)
             }
         }
     }

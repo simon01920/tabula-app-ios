@@ -83,20 +83,20 @@ public struct WidgetProPlaceholderView: View {
                 Label {
                     Text(verbatim: title)
                 } icon: {
-                    Image(systemName: "lock.fill")
+                    Image(AppSymbol.proLocked)
                 }
             case .accessoryCircular:
                 ZStack {
                     AccessoryWidgetBackground()
                     VStack(spacing: 1) {
-                        Image(systemName: "lock.fill").font(.caption)
+                        Image(AppSymbol.proLocked).font(.caption)
                         Text(verbatim: short).font(.caption2.weight(.semibold)).lineLimit(1).minimumScaleFactor(0.6)
                     }
                     .widgetAccentable()
                 }
             default:
                 HStack(alignment: .center, spacing: 8) {
-                    Image(systemName: "lock.fill").font(.title3).widgetAccentable()
+                    Image(AppSymbol.proLocked).font(.title3).widgetAccentable()
                     Text(verbatim: title)
                         .font(.headline)
                         .lineLimit(3)
@@ -274,7 +274,7 @@ struct NowNextMainColumn: View {
                     Label {
                         Text(verbatim: badge)
                     } icon: {
-                        Image(systemName: "arrow.triangle.2.circlepath")
+                        Image(AppSymbol.changed)
                     }
                     .font(.caption2.weight(.semibold))
                     .lineLimit(1)
@@ -312,7 +312,7 @@ struct NowNextMainColumn: View {
                         .lineLimit(3)
                 }
             case let .unavailable(title, detail):
-                Image(systemName: "calendar")
+                Image(AppSymbol.date)
                     .font(.title3)
                     .foregroundStyle(.tint)
                     .widgetAccentable()
@@ -390,7 +390,7 @@ struct NowNextRectangularView: View {
                     .font(.headline)
                     .lineLimit(1)
                 HStack(spacing: 4) {
-                    Image(systemName: "hourglass")
+                    Image(AppSymbol.countdown)
                     NowNextTimerText(display: display, pauseTime: pauseTime)
                         .monospacedDigit()
                         .multilineTextAlignment(.leading)
@@ -458,7 +458,7 @@ struct NowNextCircularView: View {
             case let .status(symbol, _, _):
                 Image(systemName: symbol).font(.title2).widgetAccentable()
             case .unavailable:
-                Image(systemName: "calendar").font(.title2).widgetAccentable()
+                Image(AppSymbol.date).font(.title2).widgetAccentable()
             }
         }
     }
