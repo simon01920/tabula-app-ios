@@ -91,7 +91,7 @@ struct HomeworkDueText: View {
             Label {
                 Text(verbatim: line.dueText).foregroundStyle(Color.primary)
             } icon: {
-                Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.red)
+                Image(AppSymbol.overdue).foregroundStyle(.red)
             }
             .font(.caption2.weight(.bold))
             .lineLimit(1)
@@ -115,7 +115,7 @@ struct HomeworkMark: View {
         if let subject {
             WidgetSubjectMark(subject: subject, size: size)
         } else {
-            Image(systemName: "checklist")
+            Image(AppSymbol.task)
                 .font(.system(size: size * 0.6, weight: .semibold))
                 .frame(width: size, height: size)
                 .foregroundStyle(.secondary)
@@ -141,7 +141,7 @@ struct HomeworkRowContent: View {
             }
             Spacer(minLength: 2)
             if line.isHighPriority {
-                Image(systemName: "exclamationmark.2")
+                Image(AppSymbol.priorityHigh)
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(Color.primary)
                     .accessibilityHidden(true)
@@ -162,7 +162,7 @@ struct HomeworkSmallColumn: View {
                 Label {
                     Text(verbatim: display.title)
                 } icon: {
-                    Image(systemName: "checklist")
+                    Image(AppSymbol.task)
                 }
                 .font(.caption.weight(.bold))
                 .foregroundStyle(.secondary)
@@ -183,7 +183,7 @@ struct HomeworkSmallColumn: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
             case let .allDone(title, detail):
-                Image(systemName: "checkmark.circle.fill")
+                Image(AppSymbol.completed)
                     .font(.title2)
                     .foregroundStyle(.tint)
                     .widgetAccentable()
@@ -196,7 +196,7 @@ struct HomeworkSmallColumn: View {
                     .lineLimit(3)
                 Spacer(minLength: 0)
             case let .unavailable(title, detail):
-                Image(systemName: "calendar")
+                Image(AppSymbol.date)
                     .font(.title3)
                     .foregroundStyle(.tint)
                     .widgetAccentable()
@@ -261,7 +261,7 @@ struct HomeworkListColumn<Leading: View>: View {
             case let .allDone(title, detail):
                 Spacer(minLength: 0)
                 HStack(spacing: 10) {
-                    Image(systemName: "checkmark.circle.fill")
+                    Image(AppSymbol.completed)
                         .font(.largeTitle)
                         .foregroundStyle(.tint)
                         .widgetAccentable()
@@ -274,7 +274,7 @@ struct HomeworkListColumn<Leading: View>: View {
             case let .unavailable(title, detail):
                 Spacer(minLength: 0)
                 HStack(spacing: 10) {
-                    Image(systemName: "calendar")
+                    Image(AppSymbol.date)
                         .font(.title)
                         .foregroundStyle(.tint)
                         .widgetAccentable()

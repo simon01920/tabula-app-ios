@@ -18,7 +18,7 @@ struct ExamDetailSheet: View {
             ExamDetailContent(examID: examID)
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
-                        Button { dismiss() } label: { Text("timetable.action.done") }
+                        SheetCloseButton()
                     }
                 }
         }
@@ -185,7 +185,7 @@ struct ExamRouteEmptyView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button { dismiss() } label: { Text("editor.common.close") }
+                    SheetCloseButton()
                 }
             }
         }

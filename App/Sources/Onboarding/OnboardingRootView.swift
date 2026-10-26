@@ -52,6 +52,8 @@ struct OnboardingFlowView: View {
             }
             .scrollBounceBehavior(.basedOnSize)
         }
+        // Phase 4U U1: the grouped page behind the white option cards (C2 / M9; U6 restructures the flow).
+        .pageSurface()
         .safeAreaInset(edge: .bottom) { buttonBar }
         .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: flow.step)
         .onChange(of: flow.step) { AccessibilityNotification.ScreenChanged().post() }
@@ -73,7 +75,7 @@ struct OnboardingFlowView: View {
                 .accessibilityHidden(true)
             Text(verbatim: progressText)
                 .font(.footnote)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.pencil)
         }
         .padding(.horizontal, 20)
         .padding(.top, 8)
@@ -101,12 +103,17 @@ struct OnboardingFlowView: View {
                     Text("onboarding.action.back").frame(maxWidth: .infinity, minHeight: 44)
                 }
                 .buttonStyle(.bordered)
+                // C2 (Phase 4U U1): the capsule was #FCFCFC on the #F7F7F7 bar (1.04:1, invisible); a hairline in the
+                // secondary label colour (≥ 3:1 non-text) shows its edge. U6 replaces it with the navigation back.
+                .buttonBorderShape(.capsule)
+                .overlay(Capsule().strokeBorder(Color.secondary, lineWidth: 1))
             }
             Button {
                 if flow.isLastStep { flow.finish(model: model) } else { flow.advance() }
             } label: {
                 (flow.isLastStep ? Text("onboarding.action.finish") : Text("onboarding.action.next"))
                     .frame(maxWidth: .infinity, minHeight: 44)
+                    .onInkLabel()   // white on light ink 8.5:1, black on dark ink 8.8:1 (white would be 2.4:1)
             }
             .buttonStyle(.borderedProminent)
             .disabled(!flow.canAdvance)

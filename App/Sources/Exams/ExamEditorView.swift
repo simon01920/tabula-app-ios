@@ -114,7 +114,8 @@ private struct ExamFormContent: View {
             } label: {
                 Text("exams.editor.subject")
             }
-            LabeledTextField(titleKey: "exams.editor.name", text: $draft.title)
+            EditorTitleField(promptKey: "exams.editor.name.prompt", text: $draft.title,
+                             missingHintKey: ExamDraft.Issue.noTitle.l10nKey)
             Picker(selection: $draft.kindRaw) {
                 ForEach(draft.kindChoices, id: \.rawValue) { kind in
                     Text(verbatim: texts.kind(kind)).tag(kind.rawValue)
@@ -141,13 +142,9 @@ private struct ExamFormContent: View {
                 }
             }
         } footer: {
-            if draft.issues.contains(.noTitle) || draft.issues.contains(.endNotAfterStart) {
-                VStack(alignment: .leading, spacing: 4) {
-                    ForEach(draft.issues, id: \.rawValue) { issue in
-                        Label { Text(LocalizedStringKey(issue.l10nKey)) } icon: { Image(systemName: "exclamationmark.circle.fill") }
-                            .foregroundStyle(issue == .noTitle ? Color.secondary : Color.red)
-                    }
-                }
+            // The missing-title hint sits under the title field now (M6); this footer keeps the time errors.
+            if draft.issues.contains(.endNotAfterStart) {
+                ValidationMessage(key: ExamDraft.Issue.endNotAfterStart.l10nKey)
             }
         }
     }

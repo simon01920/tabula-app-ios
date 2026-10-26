@@ -130,6 +130,7 @@ private struct DayChangeFormContent: View {
                 Text("editor.dayChange.kind")
             }
             .pickerStyle(.inline)
+            .labelledBySectionHeader()   // M1: the header already says "What changes"
         } header: {
             Text("editor.dayChange.kind")
         } footer: {
@@ -249,7 +250,7 @@ private struct DayChangeFormContent: View {
                 Text("editor.slot.header")
             } footer: {
                 ForEach(draft.extraSlot.issues, id: \.self) { issue in
-                    Text(LocalizedStringKey(issue.l10nKey)).foregroundStyle(.red)
+                    ValidationMessage(key: issue.l10nKey)
                 }
             }
         }
@@ -272,7 +273,7 @@ private struct DayChangeFormContent: View {
     private var issueFooter: some View {
         ForEach(draft.issues(visibility: visibility), id: \.self) { issue in
             if issue != .nothingChanged || draft.kind == .changeLesson {
-                Text(LocalizedStringKey(issue.l10nKey)).foregroundStyle(.red)
+                ValidationMessage(key: issue.l10nKey, severity: issue.severity)
             }
         }
     }

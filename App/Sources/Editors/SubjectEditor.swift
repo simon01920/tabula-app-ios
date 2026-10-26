@@ -153,10 +153,9 @@ private struct SubjectFormContent: View {
 
     private var nameSection: some View {
         Section {
-            LabeledTextField(titleKey: "editor.subject.name", text: $draft.name)
+            EditorTitleField(promptKey: "editor.subject.name.prompt", text: $draft.name,
+                             missingHintKey: SubjectDraft.Issue.noName.l10nKey)
             LabeledTextField(titleKey: "editor.subject.shortName", text: $draft.shortName)
-        } footer: {
-            if let issue = draft.issues.first { Text(LocalizedStringKey(issue.l10nKey)).foregroundStyle(.red) }
         }
     }
 
@@ -387,7 +386,7 @@ struct SubjectsListView: View {
                     } description: {
                         Text("editor.subjects.empty.message")
                     } actions: {
-                        Button { editing = SubjectEditTarget(subjectID: nil) } label: { Text("editor.subjects.add") }
+                        Button { editing = SubjectEditTarget(subjectID: nil) } label: { Text("editor.subjects.add").onInkLabel() }
                             .buttonStyle(.borderedProminent)
                     }
                 } else {

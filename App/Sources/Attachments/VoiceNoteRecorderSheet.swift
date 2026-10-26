@@ -39,9 +39,10 @@ struct VoiceNoteRecorderSheet: View {
                     .font(.title3.weight(.semibold))
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
+                    .onInkLabel()   // white on light fills, black on the light dark-mode fills (RISKS #86)
                 }
                 .buttonStyle(.borderedProminent)
-                .tint(recorder.isRecording ? .red : .accentColor)
+                .tint(recorder.isRecording ? Color.correction : Color.ink)
                 .disabled(isStarting)
                 if let autoStop = recorder.autoStop {
                     Label {

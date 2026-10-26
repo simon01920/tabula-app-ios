@@ -36,7 +36,7 @@ struct LessonPresentationTests {
     @Test func statusBadges() {
         #expect(LessonStatusBadgeModel.make(status: .scheduled, reasons: []) == nil)
         #expect(LessonStatusBadgeModel.make(status: .cancelled, reasons: [])?.titleKey == "lesson.status.cancelled")
-        #expect(LessonStatusBadgeModel.make(status: .added, reasons: [])?.symbolName == "plus.circle")
+        #expect(LessonStatusBadgeModel.make(status: .added, reasons: [])?.symbolName == "plus.circle.fill")
         #expect(LessonStatusBadgeModel.make(status: .modified, reasons: [.roomChanged])?.titleKey == "schedule.change.roomChanged")
         #expect(LessonStatusBadgeModel.make(status: .modified, reasons: [.roomChanged, .teacherChanged])?.titleKey
                 == "lesson.status.modified")

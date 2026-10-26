@@ -84,7 +84,8 @@ private struct TimetableFormContent: View {
 
     private var generalSection: some View {
         Section {
-            LabeledTextField(titleKey: "editor.timetable.name", text: $draft.name)
+            EditorTitleField(promptKey: "editor.timetable.name.prompt", text: $draft.name,
+                             missingHintKey: TimetableDraft.Issue.noName.l10nKey)
             LabeledTextField(titleKey: "editor.timetable.emoji", text: $draft.emoji)
                 .onChange(of: draft.emoji) { _, newValue in
                     if let first = EditorText.firstCharacter(newValue), first != newValue { draft.emoji = first }
@@ -103,8 +104,8 @@ private struct TimetableFormContent: View {
         } footer: {
             VStack(alignment: .leading) {
                 Text("editor.timetable.days.footer")
-                ForEach(draft.issues, id: \.self) { issue in
-                    Text(LocalizedStringKey(issue.l10nKey)).foregroundStyle(.red)
+                ForEach(draft.issues.filter { $0 != .noName }, id: \.self) { issue in
+                    ValidationMessage(key: issue.l10nKey)
                 }
             }
         }
@@ -134,6 +135,7 @@ private struct TimetableFormContent: View {
             } label: {
                 Text("editor.rotation")
             }
+            .labelledBySectionHeader()   // M1: the header already says "Rotation"
         } header: {
             Text("editor.rotation.header")
         } footer: {

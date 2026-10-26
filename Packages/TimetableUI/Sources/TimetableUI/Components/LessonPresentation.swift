@@ -64,12 +64,16 @@ public struct LessonStatusBadgeModel: Equatable, Sendable {
         case .scheduled:
             return nil
         case .cancelled:
-            return LessonStatusBadgeModel(kind: .cancelled, symbolName: "xmark.circle", titleKey: "lesson.status.cancelled")
+            return LessonStatusBadgeModel(kind: .cancelled, symbolName: AppSymbol.cancelled.rawValue,
+                                          titleKey: "lesson.status.cancelled")
         case .added:
-            return LessonStatusBadgeModel(kind: .added, symbolName: "plus.circle", titleKey: "lesson.status.added")
+            return LessonStatusBadgeModel(kind: .added, symbolName: AppSymbol.extraLesson.rawValue,
+                                          titleKey: "lesson.status.added")
         case .modified:
+            // One reason → its own symbol (time, room, substitute …), several → the generic "changed" (H5, M8).
             let key = reasons.count == 1 ? reasons[0].l10nKey : "lesson.status.modified"
-            return LessonStatusBadgeModel(kind: .modified, symbolName: "arrow.triangle.2.circlepath", titleKey: key)
+            return LessonStatusBadgeModel(kind: .modified, symbolName: AppSymbol.change(for: reasons).rawValue,
+                                          titleKey: key)
         }
     }
 }

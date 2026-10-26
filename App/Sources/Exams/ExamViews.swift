@@ -48,7 +48,7 @@ struct ExamBadge: View {
         if let subject {
             SubjectBadge(subject: subject, size: size * scale)
         } else {
-            Image(systemName: "graduationcap")
+            Image(AppSymbol.exam)
                 .font(.system(size: size * 0.5 * scale))
                 .foregroundStyle(.secondary)
                 .frame(width: size * scale, height: size * scale)
@@ -64,15 +64,15 @@ private struct ExamFactLines: View {
     let texts: ExamTexts
 
     var body: some View {
-        Label { Text(verbatim: texts.date(exam.date)) } icon: { Image(systemName: "calendar") }
+        Label { Text(verbatim: texts.date(exam.date)) } icon: { Image(AppSymbol.date) }
         if let time = texts.time(exam) {
-            Label { Text(verbatim: time) } icon: { Image(systemName: "clock") }
+            Label { Text(verbatim: time) } icon: { Image(AppSymbol.time) }
         }
         if let location = facts.location {
-            Label { Text(verbatim: location) } icon: { Image(systemName: "mappin.and.ellipse") }
+            Label { Text(verbatim: location) } icon: { Image(AppSymbol.room) }
         }
         if let topics = texts.topicsPreview(facts.topics) {
-            Label { Text(verbatim: topics) } icon: { Image(systemName: "list.bullet") }
+            Label { Text(verbatim: topics) } icon: { Image(AppSymbol.topics) }
         }
     }
 }

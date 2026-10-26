@@ -20,10 +20,10 @@ public enum TaskSegment: String, CaseIterable, Sendable, Equatable {
     /// SF Symbol of the segment (empty states).
     public var symbolName: String {
         switch self {
-        case .today: return "sun.max"
-        case .upcoming: return "calendar"
-        case .overdue: return "exclamationmark.triangle"
-        case .completed: return "checkmark.circle"
+        case .today: return AppSymbol.today.rawValue
+        case .upcoming: return AppSymbol.date.rawValue
+        case .overdue: return AppSymbol.overdue.rawValue
+        case .completed: return AppSymbol.completed.rawValue
         }
     }
 }

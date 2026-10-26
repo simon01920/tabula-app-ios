@@ -101,7 +101,7 @@ struct ExamsRootView: View {
             } description: {
                 Text("exams.empty.detail")
             } actions: {
-                Button { editor = .new } label: { Text("exams.add").frame(minHeight: 44) }
+                Button { editor = .new } label: { Text("exams.add").frame(minHeight: 44).onInkLabel() }
                     .buttonStyle(.borderedProminent)
             }
         }

@@ -51,6 +51,7 @@ struct ReminderPermissionSheet: View {
                     } label: {
                         Text(isDenied ? "health.action.openSettings" : "reminders.permission.allow")
                             .frame(maxWidth: .infinity, minHeight: 44)
+                            .onInkLabel()
                     }
                     .buttonStyle(.borderedProminent)
                     .disabled(isRequesting)

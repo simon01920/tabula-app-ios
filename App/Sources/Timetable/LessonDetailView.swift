@@ -51,7 +51,7 @@ struct LessonDetailView: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
-                        Button { dismiss() } label: { Text("timetable.action.done") }
+                        SheetCloseButton()
                     }
                     ToolbarItem(placement: .primaryAction) {
                         Button { openLessonEditor() } label: { Text("timetable.detail.edit") }

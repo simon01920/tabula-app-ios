@@ -3,7 +3,7 @@
 //   on the leading edge with lesson numbers and times (no horizontal scrolling: 5/6/7 columns share the width, so the
 //   period column is always visible);
 // - cells span rows (double periods include the break between), break/lunch rows are thin bands, holidays shade
-//   their column, free lesson slots are dashed and tappable (quick add);
+//   their column, free lesson slots are outlined and tappable (quick add);
 // - short names/emoji in cells (user short name, else the name, scaled down), status icon + conflict icon, and the
 //   task / exam badges ("☑2 🎓", Phase 3 C1) in place of the room line (the room stays in VoiceOver and the detail);
 // - at accessibility text sizes, or when the columns would be narrower than `GridMode.minimumColumnWidth`, the same
@@ -186,12 +186,15 @@ struct GridWeekView: View {
                     onAdd(target)
                 }
             } label: {
+                // C2 (Phase 4U U1): the dashed outline measured 1.7–2.2:1. A solid 1-pt stroke and the `+` in the
+                // secondary label colour reach 3.4:1 on white and 6.3:1 on black (non-text minimum 3:1,
+                // DesignTokensTests). Tertiary label would be only 1.7:1. U4 decides whether empty slots stay drawn (M14).
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .strokeBorder(Color.secondary.opacity(0.35), style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
+                    .strokeBorder(Color.secondary, lineWidth: 1)
                     .overlay {
-                        Image(systemName: "plus")
+                        Image(AppSymbol.add)
                             .font(.caption)
-                            .foregroundStyle(Color.secondary.opacity(0.7))
+                            .foregroundStyle(Color.secondary)
                     }
                     .contentShape(Rectangle())
             }

@@ -58,12 +58,12 @@ struct LessonTileView: View {
                 }
             }
             HStack(spacing: 6) {
-                Image(systemName: "clock").imageScale(.small)
+                Image(AppSymbol.time).imageScale(.small)
                 Text(verbatim: model.formatter.timeRange(lesson.startTime, lesson.endTime))
-                    .monospacedDigit()
                     .strikethrough(isCancelled, pattern: .solid, color: foreground)
             }
             .font(size == .large ? .body : .subheadline)
+            .timeStyle()
             LessonFieldLinesView(lines: compact ? LessonFieldLines.make(lesson: lesson, visibility: visibility,
                                                                        only: [.room, .building, .teacher])
                                                 : LessonFieldLines.make(lesson: lesson, visibility: visibility),
@@ -145,7 +145,7 @@ struct PeriodNumberBadge: View {
     var body: some View {
         Text(verbatim: number.formatted())
             .font(.subheadline.weight(.bold))
-            .monospacedDigit()
+            .timeStyle()
             .padding(.horizontal, 8)
             .padding(.vertical, 2)
             .overlay(Capsule().strokeBorder(foreground, lineWidth: 1.5))
@@ -154,9 +154,12 @@ struct PeriodNumberBadge: View {
 }
 
 /// Icon + value lines of the visible, non-empty optional fields (nothing at all when there are none).
+/// Values use the inherited foreground (primary on cards, the WCAG text colour on subject tiles: M9); `quietIcons`
+/// draws only the icons in `.secondary` (cards, never on subject colours).
 struct LessonFieldLinesView: View {
     let lines: [LessonFieldLine]
     var font: Font = .subheadline
+    var quietIcons = false
     @Environment(AppModel.self) private var model
 
     var body: some View {
@@ -165,7 +168,11 @@ struct LessonFieldLinesView: View {
                 Text(verbatim: line.text(renderer: model.renderer))
                     .lineLimit(line.field == .notes ? 3 : 2)
             } icon: {
-                Image(systemName: line.symbolName)
+                if quietIcons {
+                    Image(line.symbol).foregroundStyle(.secondary)
+                } else {
+                    Image(line.symbol)
+                }
             }
             .font(font)
             .labelStyle(.titleAndIcon)
@@ -184,18 +191,19 @@ struct LessonRowView: View {
 
     var body: some View {
         let badges = work.badges(for: lesson.id)
-        HStack(alignment: .top, spacing: 12) {
+        // H13 / F01: the subject badge stacks above the text at accessibility sizes (AdaptiveStack). M9: time and
+        // room are primary data, so they use the primary colour; only the field icons are secondary.
+        AdaptiveStack(horizontalAlignment: .top, spacing: 12) {
             SubjectBadge(subject: lesson.subject, size: 40)
             VStack(alignment: .leading, spacing: 4) {
                 Text(verbatim: lesson.subject.name)
-                    .font(.headline)
+                    .font(TypeScale.rowTitle)
                     .strikethrough(lesson.status == .cancelled)
                 Text(verbatim: model.formatter.timeRange(lesson.startTime, lesson.endTime))
                     .font(.subheadline)
-                    .monospacedDigit()
-                    .foregroundStyle(.secondary)
-                LessonFieldLinesView(lines: LessonFieldLines.make(lesson: lesson, visibility: visibility), font: .footnote)
-                    .foregroundStyle(.secondary)
+                    .timeStyle()
+                LessonFieldLinesView(lines: LessonFieldLines.make(lesson: lesson, visibility: visibility),
+                                     font: .subheadline, quietIcons: true)
                 if let badge = LessonStatusBadgeModel.make(status: lesson.status, reasons: reasons) {
                     LessonStatusBadge(badge)
                 }
@@ -203,12 +211,12 @@ struct LessonRowView: View {
                     LessonWorkBadgeRow(badges: badges)
                 }
                 if isInConflict {
-                    Label { Text("timetable.conflict.badge") } icon: { Image(systemName: "exclamationmark.triangle") }
+                    Label { Text("timetable.conflict.badge") } icon: { Image(AppSymbol.warning) }
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.secondary)
                 }
             }
-            Spacer(minLength: 0)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.vertical, 4)
         .contentShape(Rectangle())

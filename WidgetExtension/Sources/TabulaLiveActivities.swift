@@ -28,6 +28,7 @@ struct LessonLiveActivity: Widget {
         ActivityConfiguration(for: LessonActivityAttributes.self) { context in
             let display = LiveActivityRendering.lesson(context.state)
             LiveActivityLockScreenView(display: display)
+                .tint(Color.ink)   // Phase 4U U1 (D1)
                 .widgetURL(ItemLinkURL.url(for: display.link))
         } dynamicIsland: { context in
             let display = LiveActivityRendering.lesson(context.state)
@@ -42,6 +43,7 @@ struct ExamLiveActivity: Widget {
         ActivityConfiguration(for: ExamActivityAttributes.self) { context in
             let display = LiveActivityRendering.exam(context.state, examID: context.attributes.examID)
             LiveActivityLockScreenView(display: display)
+                .tint(Color.ink)   // Phase 4U U1 (D1)
                 .widgetURL(ItemLinkURL.url(for: display.link))
         } dynamicIsland: { context in
             let display = LiveActivityRendering.exam(context.state, examID: context.attributes.examID)

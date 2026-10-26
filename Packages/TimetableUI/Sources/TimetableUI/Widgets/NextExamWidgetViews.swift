@@ -65,7 +65,7 @@ struct ExamSmallView: View {
                     if let subject = info.subject {
                         WidgetSubjectMark(subject: subject, size: 22)
                     } else {
-                        Image(systemName: "pencil.and.list.clipboard").font(.title3).widgetAccentable()
+                        Image(AppSymbol.exam).font(.title3).widgetAccentable()
                     }
                     Text(verbatim: info.subject?.name ?? display.title)
                         .font(.caption.weight(.bold))
@@ -109,7 +109,7 @@ struct ExamSmallView: View {
                     .widgetAccentable()
                 }
             case let .empty(title, detail):
-                Image(systemName: "pencil.and.list.clipboard")
+                Image(AppSymbol.exam)
                     .font(.title2)
                     .foregroundStyle(.tint)
                     .widgetAccentable()
@@ -123,7 +123,7 @@ struct ExamSmallView: View {
                     .minimumScaleFactor(0.8)
                 Spacer(minLength: 0)
             case let .unavailable(title, detail):
-                Image(systemName: "calendar")
+                Image(AppSymbol.date)
                     .font(.title3)
                     .foregroundStyle(.tint)
                     .widgetAccentable()
@@ -203,9 +203,9 @@ struct ExamCircularView: View {
                 .padding(4)
                 .widgetAccentable()
             case .empty:
-                Image(systemName: "pencil.and.list.clipboard").font(.title2).widgetAccentable()
+                Image(AppSymbol.exam).font(.title2).widgetAccentable()
             case .unavailable:
-                Image(systemName: "calendar").font(.title2).widgetAccentable()
+                Image(AppSymbol.date).font(.title2).widgetAccentable()
             }
         }
     }

@@ -119,8 +119,8 @@ struct GridListView: View {
     }
 
     private func emptySymbol(_ column: TimetableCore.GridLayout.Column) -> String {
-        if column.activeBreakID != nil { return "beach.umbrella" }
-        if column.cancellingOverrideID != nil { return "xmark.circle" }
+        if column.activeBreakID != nil { return AppSymbol.holiday.rawValue }
+        if column.cancellingOverrideID != nil { return AppSymbol.cancelled.rawValue }
         return "moon.zzz"
     }
 }
