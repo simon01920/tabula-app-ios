@@ -1,11 +1,16 @@
-// Settings → Reminders → Check that reminders work (route `settings.reminder-health`). Lays out the rows of
-// `ReminderCoordinator.healthItems` (permission states, Time Sensitive, loud alarms, Focus hint, Silent mode / Action
-// button, Low Power, Background App Refresh, scheduled x of 64, saturation and alarm-overflow notices) and the test
-// buttons. Status is shown by symbol shape AND a spoken/visible word (never colour only).
-// Actions: request notifications (pre-explainer first), request alarms, open (notification) settings.
+// Settings → Reminders → Test reminders & troubleshoot (route `settings.reminder-health`; Phase 4U U5a, H9 / M4 / M28).
+// Lays out `ReminderCoordinator.healthItems` through `ReminderHealthTriage`:
+//   - the summary counts ONLY user-fixable problems (permissions, Time Sensitive turned off in iOS, Background App Refresh,
+//     Low Power Mode); app-side limits never turn it into a warning;
+//   - "Checks": one row per user-facing check, status shown by symbol shape + colour with the status word as the
+//     accessibility label (no printed "OK / Check / Info"); one warning colour; "Focus" gets an Open Settings button;
+//   - "Technical details" (collapsed `DisclosureGroup`): scheduled reminders x of 64, reminder / alarm limits, Silent mode,
+//     hidden or locked app;
+//   - the Time Sensitive row is absent in builds without the entitlement (D7).
+// Actions: request notifications (pre-explainer first), request alarms, open (notification) settings, send tests.
 // The rows refresh when the screen appears and whenever the coordinator reports a change.
-// APIs: List, Section, Label, Button, EnvironmentValues.openURL, View.task, UIApplication.openSettingsURLString /
-//       openNotificationSettingsURLString.
+// APIs: List, Section, DisclosureGroup, Label, Button, EnvironmentValues.openURL, View.task, UIApplication
+//       .openSettingsURLString / openNotificationSettingsURLString.
 import SwiftUI
 import TimetableCore
 import TimetableUI
@@ -18,18 +23,32 @@ struct RemindersHealthView: View {
     @State private var showsExplainer = false
     @State private var testMessage: String?
     @State private var isTesting = false
+    @State private var showsTechnical = false
 
     var body: some View {
+        let items = reminders.healthItems
+        let technical = ReminderHealthTriage.technical(items)
         List {
             Section {
-                summary
+                summary(items)
             }
             Section {
-                ForEach(reminders.healthItems) { item in
-                    HealthRow(item: item) { perform($0) }
+                ForEach(ReminderHealthTriage.checks(items)) { item in
+                    HealthRow(item: item, action: ReminderHealthTriage.fallbackAction(for: item)) { perform($0) }
                 }
             } header: {
-                Text("health.rows.title")
+                Text("health.checks.title")
+            }
+            if !technical.isEmpty {
+                Section {
+                    DisclosureGroup(isExpanded: $showsTechnical) {
+                        ForEach(technical) { item in
+                            HealthRow(item: item, action: ReminderHealthTriage.fallbackAction(for: item)) { perform($0) }
+                        }
+                    } label: {
+                        Text("health.technical.title")
+                    }
+                }
             }
             testsSection
         }
@@ -40,16 +59,15 @@ struct RemindersHealthView: View {
         .reminderPermissionSheet(isPresented: $showsExplainer)
     }
 
-    private var summary: some View {
-        let status = ReminderHealthCheck.overall(reminders.healthItems)
+    private func summary(_ items: [ReminderHealthItem]) -> some View {
+        let status = ReminderHealthTriage.summaryStatus(items)
         return Label {
             VStack(alignment: .leading, spacing: 4) {
                 Text(LocalizedStringKey(ReminderHealthPresentation.summaryKey(status))).font(.headline)
                 Text("health.summary.footer").font(.subheadline).foregroundStyle(.secondary)
             }
         } icon: {
-            Image(systemName: ReminderHealthPresentation.symbol(status == .info ? .ok : status))
-                .foregroundStyle(HealthRow.color(status))
+            HealthStatusIcon(status: status)
         }
         .frame(minHeight: 44, alignment: .leading)
         .accessibilityElement(children: .combine)
@@ -115,35 +133,23 @@ struct RemindersHealthView: View {
 
 private struct HealthRow: View {
     let item: ReminderHealthItem
+    /// The button of the row (the item's own, or the Open Settings button of the Focus row).
+    let action: ReminderHealthAction?
     let perform: (ReminderHealthAction) -> Void
     @Environment(AppModel.self) private var model
-
-    static func color(_ status: ReminderHealthStatus) -> Color {
-        switch status {
-        case .ok: return .green
-        case .info: return .secondary
-        case .warning: return .orange
-        case .problem: return .red
-        }
-    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Label {
                 VStack(alignment: .leading, spacing: 4) {
-                    HStack(alignment: .firstTextBaseline) {
-                        Text(LocalizedStringKey(item.titleKey)).font(.headline)
-                        Spacer(minLength: 8)
-                        Text(LocalizedStringKey(ReminderHealthPresentation.statusKey(item.status)))
-                            .font(.subheadline).foregroundStyle(.secondary)
-                    }
+                    Text(LocalizedStringKey(item.titleKey)).font(.headline)
                     Text(verbatim: model.renderer.string(item.detail)).font(.subheadline).foregroundStyle(.secondary)
                 }
             } icon: {
-                Image(systemName: ReminderHealthPresentation.symbol(item.status)).foregroundStyle(Self.color(item.status))
+                HealthStatusIcon(status: item.status)
             }
             .accessibilityElement(children: .combine)
-            if let action = item.action {
+            if let action {
                 Button { perform(action) } label: {
                     Text(LocalizedStringKey(action.titleKey)).frame(minHeight: 44)
                 }
