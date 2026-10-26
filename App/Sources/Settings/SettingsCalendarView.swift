@@ -1,4 +1,9 @@
-// Settings → Calendar & time: week start, 12/24 h with a live sample, time-zone mode (+ fixed zone picker).
+// Settings → Date & Time (route `settings.calendar`; Phase 4U U5a, M27): week start, time format with a live sample, and the
+// time-zone override inside a collapsed `DisclosureGroup("Advanced")` (students rarely need it).
+// Stored-value semantics: `hourCycle` defaults to `.auto` = "System" (follows iOS 24-Hour Time, D4); an explicit 12-/24-hour
+// value written by an older build is kept and shown as chosen; an unknown stored value behaves as System
+// (`HourCycleChoice`). `weekStartOverride == nil` = "System" (the locale's first weekday). The root locale that makes
+// DatePickers follow the same hour cycle is U1's (D4); this screen only edits the stored values.
 // Writes only via `model.apply(.settings { … })`; AppModel rebuilds the calendar context and formatters.
 // APIs: Picker (menu style in Form), LabeledContent, NavigationLink, List + View.searchable(text:),
 //       TimeZone.knownTimeZoneIdentifiers, DismissAction (EnvironmentValues.dismiss).
@@ -8,6 +13,8 @@ import TimetableUI
 
 struct SettingsCalendarView: View {
     @Environment(AppModel.self) private var model
+    /// Collapsed unless a fixed zone is already in use (then the override is visible, not hidden).
+    @State private var showsAdvanced: Bool?
 
     var body: some View {
         Form {
@@ -15,7 +22,7 @@ struct SettingsCalendarView: View {
             hourCycleSection
             timeZoneSection
         }
-        .navigationTitle(Text("settings.calendar.title"))
+        .navigationTitle(Text("settings.datetime.title"))
         .navigationBarTitleDisplayMode(.inline)
         .disabled(model.isReadOnly)
     }
@@ -77,35 +84,39 @@ struct SettingsCalendarView: View {
 
     private var timeZoneSection: some View {
         let mode = model.settings.timeZoneMode
+        let isExpanded = Binding(
+            get: { showsAdvanced ?? (TimeZoneModeKind(mode) == .fixed) },
+            set: { showsAdvanced = $0 })
         return Section {
-            Picker(selection: timeZoneKind) {
-                Text("settings.calendar.timezone.follow").tag(TimeZoneModeKind.followDevice)
-                Text("settings.calendar.timezone.fixed").tag(TimeZoneModeKind.fixed)
-            } label: {
-                Text("settings.calendar.timezone.title")
-            }
-            switch mode {
-            case .followDevice:
-                LabeledContent {
-                    Text(TimeZoneChoices.displayName(model.environment.deviceTimeZone().identifier))
+            DisclosureGroup(isExpanded: isExpanded) {
+                Picker(selection: timeZoneKind) {
+                    Text("settings.calendar.timezone.follow").tag(TimeZoneModeKind.followDevice)
+                    Text("settings.calendar.timezone.fixed").tag(TimeZoneModeKind.fixed)
                 } label: {
-                    Text("settings.calendar.timezone.device")
+                    Text("settings.calendar.timezone.title")
                 }
-            case .fixed(let identifier):
-                NavigationLink {
-                    TimeZonePickerView(selected: identifier)
-                } label: {
+                switch mode {
+                case .followDevice:
                     LabeledContent {
-                        Text(TimeZoneChoices.displayName(identifier))
+                        Text(TimeZoneChoices.displayName(model.environment.deviceTimeZone().identifier))
                     } label: {
-                        Text("settings.calendar.timezone.zone")
+                        Text("settings.calendar.timezone.device")
                     }
+                    Text("settings.calendar.timezone.footer.follow").font(.footnote).foregroundStyle(.secondary)
+                case .fixed(let identifier):
+                    NavigationLink {
+                        TimeZonePickerView(selected: identifier)
+                    } label: {
+                        LabeledContent {
+                            Text(TimeZoneChoices.displayName(identifier))
+                        } label: {
+                            Text("settings.calendar.timezone.zone")
+                        }
+                    }
+                    Text("settings.calendar.timezone.footer.fixed").font(.footnote).foregroundStyle(.secondary)
                 }
-            }
-        } footer: {
-            switch mode {
-            case .followDevice: Text("settings.calendar.timezone.footer.follow")
-            case .fixed: Text("settings.calendar.timezone.footer.fixed")
+            } label: {
+                Text("settings.datetime.advanced")
             }
         }
     }

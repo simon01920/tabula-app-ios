@@ -291,7 +291,7 @@ struct TimetablesManagerView: View {
 }
 
 /// "New timetable": name, emoji and what its time structure starts from. The new timetable becomes the active one.
-/// Internal (not private) so Settings can present it (U5a; the orchestrator dedupes `SettingsNewTimetableSheet`).
+/// Internal (not private): Settings presents it too ("Add Another Timetable…", route `settings.timetable-new`).
 struct NewTimetableSheet: View {
     @Environment(AppModel.self) private var model
 

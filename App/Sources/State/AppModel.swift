@@ -119,7 +119,10 @@ final class AppModel {
     var entitlements: any EntitlementsProvider { environment.entitlements }
     var settings: AppSettings { database?.settings ?? .untouchedDefaults }
     var phase: ShellPhase { ShellPhase.derive(isLoading: isLoading, problem: problem, database: database) }
-    var appearance: AppearancePreference { AppearancePreference(settings.appearance) }
+    /// Always the system appearance (D3, Phase 4U U5a): the in-app Light/Dark override was removed (HIG Dark Mode: avoid an
+    /// app-specific appearance setting). `AppSettings.appearance` stays in the frozen schema, is never read here and is
+    /// never written by the UI; values stored by older builds are ignored and kept untouched.
+    var appearance: AppearancePreference { .system }
     /// The timetable the app shows (settings' active one, else the first).
     var activeTimetable: Timetable? { database.flatMap(ActiveTimetable.resolve) }
     /// Live timetables in display order.

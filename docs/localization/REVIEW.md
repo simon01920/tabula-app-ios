@@ -187,3 +187,13 @@ to check: **Breaks → Holidays** in the terms editor (`editor.breaks.*`, `edito
 `onboarding.fields.subtitle` now say that the detail switches only affect lesson cards (UX decision D10).
 `editor.lesson.weeks.named` is "Week %@" for a one- or two-letter week name ("Week A"); longer names are shown alone.
 `editor.lesson.weeks.every.segment` is one segment of a three-part segmented control and must stay short.
+### Phase 4U Stage U5a additions (2026-10-23, swiftui-engineer-sonnet)
+34 new keys (`settings.section.*`, `settings.bell.*`, `settings.terms.row`, `settings.timetables.add`, `settings.value.*`,
+`settings.reminders.summary.on`, `settings.reminders.delivery.*`, `settings.schooltype.title`, `settings.datetime.*`,
+`settings.colors.*`, `settings.aboutfeedback.title`, `settings.about.{feedback,privacyPolicy,rate,acknowledgements.body2}`,
+`reminders.tier.timeSensitive.unavailable`, `health.{checks,technical}.title`), model-authored for 11 languages (`sr-Latn`
+derived), all `needs_review`. 31 keys of the old Appearance / Calendar / Reminders / About screens were removed. Reviewer:
+count phrases (`settings.reminders.summary.on`, `settings.colors.applied`, `settings.colors.apply.confirm.message`) are
+written as "label: N" in the Slavic languages to avoid noun declension, check they read naturally; `settings.colors.undo`
+should differ from Cancel where the language allows (ro "Anulează modificarea"; fr uses Apple's "Annuler"); the Time Sensitive
+tier names reuse the existing `settings.reminders.timesensitive.title` wording per language.

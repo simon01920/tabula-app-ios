@@ -1,5 +1,7 @@
 // Settings → Reminders → <kind> (route `settings.reminder-rule`, seed: the homework rule). Edits one `ReminderRule`:
-// on/off, offsets, follow-up ("only if not done"), delivery tier with honest explanations, quiet hours.
+// "Remind me" (the ONLY switch of a kind, R4), offsets, follow-up ("only if not done"), delivery tier with honest
+// explanations, quiet hours. Time Sensitive is offered only where the build supports it (D7); a rule that saved it is
+// shown as Standard with a footnote and its stored value is left alone until the user picks a tier.
 // Every change is written at once through `model.apply(.upsert(rule))` and marks the rule user-made (`origin = .user`,
 // which the planner requires for loud alarms). A kind without a rule yet shows the default (profile preset) switched
 // off; switching it on creates the rule. Picking "Loud alarm" turns the alarm policy on and asks for the AlarmKit
@@ -33,6 +35,9 @@ struct RemindersRuleEditorView: View {
 
     private var terminology: ProfilePreset.Terminology { ProfilePreset.for(model.settings.profile).terminology }
     private var alarmsAllowed: Bool { model.entitlements.isAllowed(.loudAlarms) }
+    private var timeSensitiveAvailable: Bool {
+        TimeSensitiveAvailability.isAvailable(reminders.health?.notifications.timeSensitive)
+    }
 
     var body: some View {
         let current = rule
@@ -56,6 +61,7 @@ struct RemindersRuleEditorView: View {
         .navigationBarTitleDisplayMode(.inline)
         .disabled(model.isReadOnly)
         .reminderPermissionSheet(isPresented: $showsExplainer)
+        .task { await reminders.refreshHealth() }
     }
 
     // MARK: Sections
@@ -77,29 +83,31 @@ struct RemindersRuleEditorView: View {
                 kind: Binding(get: { FollowUpEditing.kind(of: current.followUp) }, set: { kind in
                     edit { $0.followUp = FollowUpEditing.followUp(choosing: kind, current: $0.followUp) }
                 }),
-                followUp: Binding(get: { current.followUp }, set: { value in edit { $0.followUp = value } }),
-                labelledByHeader: true)
-        } header: {
-            Text("reminders.followUp.title")
+                followUp: Binding(get: { current.followUp }, set: { value in edit { $0.followUp = value } }))
         } footer: {
             Text("reminders.followUp.footer")
         }
     }
 
     private func tierSection(_ current: ReminderRule) -> some View {
-        Section {
-            ForEach(ReminderTierInfo.choices, id: \.self) { tier in
-                ReminderTierRow(tier: tier, isSelected: current.tier.effective == tier,
+        let shown = TimeSensitiveAvailability.displayedTier(current.tier, timeSensitiveAvailable: timeSensitiveAvailable)
+        return Section {
+            ForEach(TimeSensitiveAvailability.offeredTiers(timeSensitiveAvailable: timeSensitiveAvailable), id: \.self) { tier in
+                ReminderTierRow(tier: tier, isSelected: shown == tier,
                                 isAvailable: tier != .alarm || alarmsAllowed) { select(tier) }
             }
         } header: {
             Text("reminders.tier.title")
         } footer: {
             VStack(alignment: .leading, spacing: 6) {
-                if current.tier.effective == .timeSensitive {
+                if TimeSensitiveAvailability.needsDowngradeFootnote(stored: current.tier,
+                                                                    timeSensitiveAvailable: timeSensitiveAvailable) {
+                    Text("reminders.tier.timeSensitive.unavailable")
+                }
+                if shown == .timeSensitive {
                     RenderedText(ReminderTierInfo.timeSensitivePolicyText(model.settings.timeSensitivePolicy))
                 }
-                if current.tier.effective == .alarm {
+                if shown == .alarm {
                     Text("reminders.tier.alarm.footer")
                     if alarmAuthorization == .denied || alarmAuthorization == .unavailable {
                         Text("health.alarms.denied")
@@ -114,8 +122,6 @@ struct RemindersRuleEditorView: View {
         Section {
             QuietHoursRows(toggleKey: "reminders.quiet.rule", quietHours: Binding(
                 get: { current.quietHours }, set: { value in edit { $0.quietHours = value } }))
-        } header: {
-            Text("reminders.quiet.title")
         } footer: {
             Text("reminders.quiet.rule.footer")
         }

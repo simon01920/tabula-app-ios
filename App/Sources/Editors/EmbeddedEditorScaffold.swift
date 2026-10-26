@@ -1,5 +1,5 @@
 // Embedded mode of the Save/Cancel editors (U5a hand-off): Settings pushes TimetableEditorView, BellScheduleEditorView
-// and TermsEditorView inside its own NavigationStack (`SettingsPushedEditor`). Embedded, an editor has no
+// and TermsEditorView inside its own NavigationStack (`embedded: true`). Embedded, an editor has no
 // NavigationStack of its own and no Cancel/Done while nothing is edited: the parent's Back button pops it. Save works
 // as in the sheet and pops after saving.
 //
