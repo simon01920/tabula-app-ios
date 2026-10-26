@@ -166,3 +166,14 @@ name inserted (hu uses "a(z) ${applicationName}" because the article depends on 
 The AppShortcuts catalog is not part of the review export (the export covers Localizable + InfoPlist); review its 4 keys
 in the file itself. The brand stays undeclined ("aplikácia Tabula", "Отвара Tabula"). Final QA: + `intent.param.alarm`
 (an internal parameter title, rarely visible); `probe.intent.shortTitle` removed (the probe's App Shortcut is gone).
+### Phase 4U Stage U4 additions (2026-10-26, swiftui-engineer)
+31 new keys (`timetable.cycle.oddWeek/evenWeek`, `timetable.quickAdd.every.*`, `.slot.period`, `.scope.*`,
+`.cycleWeekOnlyFooter`, `timetable.subtitle.withCycle`, `timetable.now`, `timetable.legend.*`, `timetable.day.*`,
+`timetable.a11y.todayHint.*`, `timetable.options.editTimetable/addLesson`, `timetable.empty.noLessons.*`,
+`timetable.detail.timeChanged.a11y`), model-authored for 11 languages (`sr-Latn` derived), all `needs_review`; and
+`timetable.detail.changes` changed to sentence case ("Changes on this day"; translations kept, `needs_review`).
+Reviewer: "Odd week" / "Even week" are what Slovak and Czech schools say (sk "Nepárny/Párny týždeň", cs "Lichý/Sudý
+týden"); `timetable.quickAdd.every.*` are complete phrases with the weekday in the right case and gender (sk "Každú
+stredu", cs "Každou středu", pl "W każdą środę", uk "Щосереди") joined to the week and period only by the
+`%1$@ · %2$@` formats; `timetable.now` is a one-word tag shown in capitals. Now unused (for U8 to remove):
+`timetable.quickAdd.period`, `timetable.quickAdd.cycleWeekFooter`.

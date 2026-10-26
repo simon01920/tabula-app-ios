@@ -81,7 +81,7 @@ struct TimetableRootView: View {
                 }
             }
             .navigationTitle(title)
-            .navigationSubtitle(subtitle)
+            .optionalNavigationSubtitle(subtitle)
             .navigationBarTitleDisplayMode(.inline)
             .timetableSwitcher(isEnabled: model.timetables.count > 1) { timetableMenu }
             .toolbar { toolbarContent }
@@ -120,11 +120,9 @@ struct TimetableRootView: View {
         return Text(verbatim: timetable.name)
     }
 
-    /// "12 Oct – 16 Oct · Odd week" for the shown week (empty without a timetable).
-    private var subtitle: Text {
-        guard let timetable = model.activeTimetable, let resolver = model.resolver(for: timetable.id) else {
-            return Text(verbatim: "")
-        }
+    /// "12 Oct – 16 Oct · Odd week" for the shown week (`nil` without a timetable: no subtitle at all).
+    private var subtitle: Text? {
+        guard let timetable = model.activeTimetable, let resolver = model.resolver(for: timetable.id) else { return nil }
         let current = selectionBinding(resolver).wrappedValue
         let days = TimetableSelection.shownDays(weekStart: current.weekStart, resolver: resolver)
         let first = days.first ?? current.weekStart
@@ -343,6 +341,16 @@ struct TimetableRootView: View {
 }
 
 private extension View {
+    /// The navigation subtitle only when there is one (no empty subtitle line).
+    @ViewBuilder
+    func optionalNavigationSubtitle(_ subtitle: Text?) -> some View {
+        if let subtitle {
+            navigationSubtitle(subtitle)
+        } else {
+            self
+        }
+    }
+
     /// The navigation title becomes a menu of timetables only when there is more than one (no empty menu chevron).
     @ViewBuilder
     func timetableSwitcher<Menu: View>(isEnabled: Bool, @ViewBuilder menu: () -> Menu) -> some View {
