@@ -1,9 +1,14 @@
 // "Change for this day" (`editor.day-change`): creates one `ScheduleOverride` for one date: cancel a lesson, change a
-// lesson (substitute subject, room, building, teacher), cancel the whole day, a short day through another bell
-// schedule, "follow another day", or an extra lesson. Already existing changes of the date are listed and can be
-// removed. Only the fields the timetable shows are offered (field rule).
+// lesson (substitute subject or teacher, room, building, a note, or move it to another time that day), no school,
+// shortened lessons through another bell schedule, "use another day's timetable", or an extra lesson. Changes that
+// already exist on the date are listed and can be undone.
+//
+// UX overhaul U5b: the date is shown once (M20); "Use another day's timetable" / "Shortened lessons" (M20); hints and
+// errors follow U1's `ValidationMessage` rule (M5, the disabled Save explains the rest); the kind picker has no repeated label (M1);
+// D10: every optional field is offered whatever the display setting; M15: "Change a lesson" can move the lesson
+// (`LessonPatch.slot`), matching the lesson detail's "Cancel, Move or Substitute…".
 // Logic: Packages/TimetableUI/.../Editors/DayChangeDraft.swift (Linux-tested).
-// APIs: Picker, Section, Label, ScheduleResolver.resolution(for:) (core), DatePicker through DateRow.
+// APIs: Picker (.inline, labelsHidden), Toggle, Section, Label, ScheduleResolver.resolution(for:) (core), DateRow.
 import SwiftUI
 import TimetableCore
 import TimetableUI
@@ -27,9 +32,9 @@ struct DayChangeEditorView: View {
             EditorScaffold(
                 titleKey: "editor.dayChange.title",
                 initial: draft,
-                canSave: { $0.canSave(visibility: timetable.fieldVisibility) },
+                canSave: { $0.canSave },
                 save: { draft in
-                    guard let override = draft.makeOverride(visibility: timetable.fieldVisibility) else { return nil }
+                    guard let override = draft.makeOverride() else { return nil }
                     return model.apply(.upsert(override))
                 },
                 content: { draft in DayChangeFormContent(draft: draft, timetable: timetable) })
@@ -71,7 +76,6 @@ private struct DayChangeFormContent: View {
 
     private var database: TabulaDatabase? { model.database }
     private var labels: EditorLabels { EditorLabels(model: model) }
-    private var visibility: FieldVisibility { timetable.fieldVisibility }
 
     private var entries: [DayLessonEntry] {
         DayChangeEditorView.lessonEntries(model: model, timetable: timetable, date: draft.date)
@@ -98,6 +102,11 @@ private struct DayChangeFormContent: View {
         }
     }
 
+    /// The regular slot of the chosen lesson (where a move starts).
+    private var selectedLessonSlot: LessonSlot? {
+        draft.lessonID.flatMap { id in database?.lessons.first { $0.id == id }?.slot }
+    }
+
     var body: some View {
         dateSection
         kindSection
@@ -107,16 +116,15 @@ private struct DayChangeFormContent: View {
 
     // MARK: Date and kind
 
+    /// The date once (M20): the picker row only, no repeated full date underneath.
     private var dateSection: some View {
         Section {
             DateRow(titleKey: "editor.dayChange.date", date: $draft.date)
                 .onChange(of: draft.date) { _, _ in
                     if let current = draft.lessonID, !entries.contains(where: { $0.lessonID == current }) {
-                        draft.lessonID = entries.first?.lessonID
+                        draft.selectLesson(entries.first?.lessonID)
                     }
                 }
-        } footer: {
-            Text(verbatim: model.formatter.date(draft.date, style: .full))
         }
     }
 
@@ -150,28 +158,7 @@ private struct DayChangeFormContent: View {
                 issueFooter
             }
         case .changeLesson:
-            Section {
-                lessonPicker
-            } footer: {
-                issueFooter
-            }
-            Section {
-                Picker(selection: $draft.substituteSubjectID) {
-                    Text("editor.dayChange.subject.same").tag(Subject.ID?.none)
-                    ForEach(subjects) { subject in
-                        Text(verbatim: subject.name).tag(Subject.ID?.some(subject.id))
-                    }
-                } label: {
-                    Text("editor.dayChange.subject")
-                }
-                if visibility.isVisible(.room) { LabeledTextField(titleKey: "editor.field.room", text: $draft.room) }
-                if visibility.isVisible(.building) { LabeledTextField(titleKey: "editor.field.building", text: $draft.building) }
-                if visibility.isVisible(.teacher) { LabeledTextField(titleKey: "editor.field.teacher", text: $draft.teacher) }
-            } header: {
-                Text("editor.dayChange.changes")
-            } footer: {
-                Text("editor.dayChange.changes.footer")
-            }
+            changeLessonSections
         case .cancelDay:
             Section {
                 LabeledTextField(titleKey: "editor.dayChange.note", text: $draft.note)
@@ -213,7 +200,8 @@ private struct DayChangeFormContent: View {
                     Picker(selection: $draft.followCycleWeek) {
                         Text("editor.dayChange.follow.week.natural").tag(Int?.none)
                         ForEach(1...max(1, cycle.length), id: \.self) { week in
-                            Text(verbatim: labels.week(week, in: timetable)).tag(Int?.some(week))
+                            Text(verbatim: EditorWeekNames.name(week, in: timetable, renderer: model.renderer))
+                                .tag(Int?.some(week))
                         }
                     } label: {
                         Text("editor.dayChange.follow.week")
@@ -239,8 +227,10 @@ private struct DayChangeFormContent: View {
                 } label: {
                     Text("editor.lesson.subject")
                 }
-                if visibility.isVisible(.room) { LabeledTextField(titleKey: "editor.field.room", text: $draft.extraRoom) }
-                if visibility.isVisible(.teacher) { LabeledTextField(titleKey: "editor.field.teacher", text: $draft.extraTeacher) }
+                LabeledTextField(titleKey: "editor.field.room", text: $draft.extraRoom)
+                LabeledTextField(titleKey: "editor.field.building", text: $draft.extraBuilding)
+                LabeledTextField(titleKey: "editor.field.teacher", text: $draft.extraTeacher)
+                LabeledTextField(titleKey: "editor.field.notes", text: $draft.extraNotes, axis: .vertical)
             } footer: {
                 issueFooter
             }
@@ -249,15 +239,51 @@ private struct DayChangeFormContent: View {
             } header: {
                 Text("editor.slot.header")
             } footer: {
-                ForEach(draft.extraSlot.issues, id: \.self) { issue in
-                    ValidationMessage(key: issue.l10nKey)
-                }
+                slotIssueFooter
             }
         }
     }
 
+    /// "Change a lesson": which lesson, then substitute / room / building / teacher / note, then an optional move.
+    @ViewBuilder
+    private var changeLessonSections: some View {
+        Section {
+            lessonPicker
+        } footer: {
+            issueFooter
+        }
+        Section {
+            Picker(selection: $draft.substituteSubjectID) {
+                Text("editor.dayChange.subject.same").tag(Subject.ID?.none)
+                ForEach(subjects) { subject in
+                    Text(verbatim: subject.name).tag(Subject.ID?.some(subject.id))
+                }
+            } label: {
+                Text("editor.dayChange.subject")
+            }
+            LabeledTextField(titleKey: "editor.field.room", text: $draft.room)
+            LabeledTextField(titleKey: "editor.field.building", text: $draft.building)
+            LabeledTextField(titleKey: "editor.field.teacher", text: $draft.teacher)
+            LabeledTextField(titleKey: "editor.field.notes", text: $draft.lessonNote, axis: .vertical)
+        } header: {
+            Text("editor.dayChange.changes")
+        } footer: {
+            Text("editor.dayChange.changes.footer")
+        }
+        Section {
+            Toggle(isOn: Binding(get: { draft.moves }, set: { draft.setMoves($0, lessonSlot: selectedLessonSlot) })) {
+                Text("editor.dayChange.move")
+            }
+            if draft.moves {
+                SlotEditorRows(slot: $draft.movedSlot, schedule: defaultSchedule, timetable: timetable)
+            }
+        } footer: {
+            slotIssueFooter
+        }
+    }
+
     private var lessonPicker: some View {
-        Picker(selection: $draft.lessonID) {
+        Picker(selection: Binding(get: { draft.lessonID }, set: { draft.selectLesson($0) })) {
             if draft.lessonID == nil { Text("editor.dayChange.lesson.choose").tag(Lesson.ID?.none) }
             ForEach(entries) { entry in
                 Text(verbatim: model.renderer.format(key: "editor.dayChange.lessonRow", arguments: [
@@ -269,12 +295,16 @@ private struct DayChangeFormContent: View {
         }
     }
 
-    @ViewBuilder
+    /// What blocks saving: missing choices are hints from the start, errors wait for the first edit (M5, U1).
     private var issueFooter: some View {
-        ForEach(draft.issues(visibility: visibility), id: \.self) { issue in
-            if issue != .nothingChanged || draft.kind == .changeLesson {
-                ValidationMessage(key: issue.l10nKey, severity: issue.severity)
-            }
+        ForEach(draft.issues, id: \.self) { issue in
+            ValidationMessage(key: issue.l10nKey, severity: issue.severity)
+        }
+    }
+
+    private var slotIssueFooter: some View {
+        ForEach(draft.slotIssues, id: \.self) { issue in
+            ValidationMessage(key: issue.l10nKey)
         }
     }
 
@@ -294,21 +324,20 @@ private struct DayChangeFormContent: View {
                         } icon: {
                             Image(systemName: symbol(of: item.change))
                         }
-                        Spacer(minLength: 0)
-                        Button(role: .destructive) {
+                        Spacer(minLength: 8)
+                        // A labelled button (no icon-only arrow that needed a footer to explain it, M5). It applies at
+                        // once, like the undo it is; the draft of this sheet is not affected.
+                        Button {
                             model.apply(.delete(item.id))
                         } label: {
-                            Image(systemName: "arrow.uturn.backward.circle").frame(minWidth: 44, minHeight: 44)
+                            Text("editor.dayChange.existing.remove").frame(minHeight: 44)
                         }
                         .buttonStyle(.borderless)
-                        .accessibilityLabel(Text("editor.dayChange.existing.remove"))
                     }
                     .accessibilityElement(children: .contain)
                 }
             } header: {
                 Text("editor.dayChange.existing")
-            } footer: {
-                Text("editor.dayChange.existing.footer")
             }
         }
     }

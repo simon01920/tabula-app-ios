@@ -5,7 +5,16 @@
 // its lessons instead, with confirmation). Deleting another timetable states exactly what is removed and, when it was
 // the active one, makes another active in the same atomic batch. All planning is in TimetableManagement (Linux-tested).
 // Changes apply immediately (this is a manager, not a Save/Cancel form).
-// APIs: List, Menu, EditButton, onMove(perform:), sheet(item:), ContentUnavailableView.
+//
+// UX overhaul U5b (M17): one action path. Tapping a row opens its settings; swipe left for Delete / Duplicate, swipe
+// right to show the timetable; the same actions are in the context menu (touch and hold), which also has Reset (Reset
+// is in the timetable's settings too, so it is never only behind a hidden gesture). No ⋯ menu that repeated the row
+// tap. Edit (reorder) appears only with two or more timetables. "Active" is secondary text with a checkmark, not a
+// blue, button-like label. Embedded mode (Settings): no own NavigationStack and no Done, rows push the settings.
+// HIG: lists-and-tables.md › "Let people edit a table when it makes sense"; toolbars.md › Make sure the meaning of
+//   each control is clear.
+// APIs: List, swipeActions(edge:allowsFullSwipe:content:), contextMenu, onMove(perform:), environment(\.editMode),
+//   sheet(item:), NavigationLink(destination:label:), ContentUnavailableView.
 import SwiftUI
 import TimetableCore
 import TimetableUI
@@ -26,6 +35,8 @@ private struct NewTimetableDraft: Equatable {
 }
 
 struct TimetablesManagerView: View {
+    /// `true` inside a parent navigation stack (Settings): no own stack, no Done; rows push the settings.
+    var embedded = false
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
     @State private var editing: TimetableTarget?
@@ -33,6 +44,9 @@ struct TimetablesManagerView: View {
     @State private var resetting: TimetableTarget?
     @State private var adding = false
     @State private var failure: ApplyResult?
+    /// Reorder mode, driven by our own toggle like the subjects list: the system EditButton would turn into a second
+    /// "Done" next to the sheet's Done (QA C1), so the sheet's Done is hidden while reordering.
+    @State private var editMode: EditMode = .inactive
 
     private var database: TabulaDatabase? { model.database }
     private var timetables: [Timetable] { model.timetables }
@@ -41,31 +55,53 @@ struct TimetablesManagerView: View {
     private var canAdd: Bool { database.map { TimetableManagement.canAdd(to: $0, limit: limit) } ?? false }
 
     var body: some View {
-        NavigationStack {
-            Group {
-                if timetables.isEmpty {
-                    ContentUnavailableView {
-                        Label { Text("editor.timetables.empty.title") } icon: { Image(systemName: "calendar") }
-                    } description: {
-                        Text("editor.timetables.empty.message")
+        if embedded {
+            content
+        } else {
+            NavigationStack { content }
+        }
+    }
+
+    private var content: some View {
+        Group {
+            if timetables.isEmpty {
+                ContentUnavailableView {
+                    Label { Text("editor.timetables.empty.title") } icon: { Image(systemName: "calendar") }
+                } description: {
+                    Text("editor.timetables.empty.message")
+                }
+            } else {
+                list
+            }
+        }
+        .environment(\.editMode, $editMode)
+        .onChange(of: timetables.count) { _, count in if count < 2 { editMode = .inactive } }
+        .navigationTitle(Text("editor.timetables.title"))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if !embedded {
+                ToolbarItem(placement: .confirmationAction) {
+                    if !editMode.isEditing {
+                        Button { dismiss() } label: { Text("editor.common.done") }
                     }
-                } else {
-                    list
                 }
             }
-            .navigationTitle(Text("editor.timetables.title"))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button { dismiss() } label: { Text("editor.common.done") }
+            ToolbarItem(placement: embedded ? .primaryAction : .topBarLeading) {
+                // Edit only reorders, so it is hidden with fewer than two timetables (M17).
+                if editMode.isEditing {
+                    Button { withAnimation { editMode = .inactive } } label: { Text("editor.common.done") }
+                        .fontWeight(.semibold)
+                        .accessibilityLabel(Text("editor.timetables.reorder.done"))
+                } else if timetables.count > 1 {
+                    Button { withAnimation { editMode = .active } } label: { Text("editor.common.edit") }
+                        .accessibilityLabel(Text("editor.timetables.reorder"))
                 }
-                ToolbarItem(placement: .topBarLeading) { EditButton() }
-                ToolbarItem(placement: .primaryAction) {
-                    Button { adding = true } label: {
-                        Label { Text("editor.timetables.add") } icon: { Image(systemName: "plus") }
-                    }
-                    .disabled(!canAdd || database == nil)
+            }
+            ToolbarItem(placement: .primaryAction) {
+                Button { adding = true } label: {
+                    Label { Text("editor.timetables.add") } icon: { Image(systemName: "plus") }
                 }
+                .disabled(!canAdd || database == nil)
             }
         }
         .sheet(item: $editing) { target in TimetableEditorView(timetableID: target.id) }
@@ -88,64 +124,97 @@ struct TimetablesManagerView: View {
                     if !canAdd, let limit {
                         Text(verbatim: model.renderer.format(key: "editor.timetables.limit", arguments: [.integer(Int64(limit))]))
                     }
-                    Text("editor.timetables.footer")
                 }
             }
         }
     }
 
+    /// Name, emoji, lesson count and "✓ Active" (secondary). Tap = settings; swipes and the context menu = actions.
+    private func rowLabel(_ timetable: Timetable, isActive: Bool, lessons: Int) -> some View {
+        HStack(spacing: 12) {
+            if let emoji = timetable.emoji { Text(verbatim: emoji).font(.title2).accessibilityHidden(true) }
+            VStack(alignment: .leading, spacing: 2) {
+                Text(verbatim: timetable.name).font(.body).foregroundStyle(.primary)
+                Text(verbatim: model.renderer.format(key: "editor.impact.lessons.count", arguments: [.integer(Int64(lessons))]))
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                if isActive {
+                    Label { Text("editor.timetables.active") } icon: { Image(systemName: "checkmark") }
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            Spacer(minLength: 0)
+        }
+        .frame(minHeight: 44)
+        .contentShape(Rectangle())
+        .accessibilityElement(children: .combine)
+    }
+
+    @ViewBuilder
     private func row(_ timetable: Timetable) -> some View {
         let isActive = timetable.id == activeID
         let lessons = (database?.lessons ?? []).filter { !$0.isDeleted && $0.timetableID == timetable.id }.count
-        return HStack(spacing: 12) {
-            Button {
-                editing = TimetableTarget(id: timetable.id)
-            } label: {
-                HStack(spacing: 12) {
-                    if let emoji = timetable.emoji { Text(verbatim: emoji).font(.title2) }
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(verbatim: timetable.name).font(.body).foregroundStyle(.primary)
-                        Text(verbatim: model.renderer.format(key: "editor.impact.lessons.count", arguments: [.integer(Int64(lessons))]))
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                        if isActive {
-                            Label { Text("editor.timetables.active") } icon: { Image(systemName: "checkmark.circle.fill") }
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(Color.accentColor)
-                        }
-                    }
-                    Spacer(minLength: 0)
+        Group {
+            if embedded {
+                NavigationLink {
+                    TimetableEditorView(timetableID: timetable.id, embedded: true)
+                } label: {
+                    rowLabel(timetable, isActive: isActive, lessons: lessons)
                 }
-                .frame(minHeight: 44)
-                .contentShape(Rectangle())
+            } else {
+                Button {
+                    editing = TimetableTarget(id: timetable.id)
+                } label: {
+                    HStack {
+                        rowLabel(timetable, isActive: isActive, lessons: lessons)
+                        Image(systemName: "chevron.forward").font(.footnote).foregroundStyle(.tertiary)
+                            .accessibilityHidden(true)
+                    }
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(.isButton)
             }
-            .buttonStyle(.plain)
-            Menu {
-                Button { editing = TimetableTarget(id: timetable.id) } label: {
-                    Label { Text("editor.timetables.edit") } icon: { Image(systemName: "pencil") }
+        }
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            if !isLast(timetable) {
+                Button(role: .destructive) { deleting = TimetableTarget(id: timetable.id) } label: {
+                    Label { Text("editor.common.delete") } icon: { Image(systemName: "trash") }
                 }
-                if !isActive {
-                    Button { setActive(timetable) } label: {
-                        Label { Text("editor.timetables.setActive") } icon: { Image(systemName: "checkmark.circle") }
-                    }
-                }
+            }
+            if canAdd {
                 Button { duplicate(timetable) } label: {
                     Label { Text("editor.timetables.duplicate") } icon: { Image(systemName: "plus.square.on.square") }
                 }
-                .disabled(!canAdd)
-                Button(role: .destructive) { resetting = TimetableTarget(id: timetable.id) } label: {
-                    Label { Text("editor.timetables.reset") } icon: { Image(systemName: "arrow.counterclockwise") }
-                }
-                Button(role: .destructive) { deleting = TimetableTarget(id: timetable.id) } label: {
-                    Label { Text("editor.timetables.delete") } icon: { Image(systemName: "trash") }
-                }
-                .disabled(isLast(timetable))
-            } label: {
-                Image(systemName: "ellipsis.circle").font(.title3).frame(minWidth: 44, minHeight: 44)
             }
-            .accessibilityLabel(Text("editor.timetables.actions"))
         }
-        .accessibilityElement(children: .contain)
+        .swipeActions(edge: .leading, allowsFullSwipe: true) {
+            if !isActive {
+                Button { setActive(timetable) } label: {
+                    Label { Text("editor.timetables.setActive") } icon: { Image(systemName: "checkmark.circle") }
+                }
+                .tint(.accentColor)
+            }
+        }
+        .contextMenu {
+            if !isActive {
+                Button { setActive(timetable) } label: {
+                    Label { Text("editor.timetables.setActive") } icon: { Image(systemName: "checkmark.circle") }
+                }
+            }
+            Button { duplicate(timetable) } label: {
+                Label { Text("editor.timetables.duplicate") } icon: { Image(systemName: "plus.square.on.square") }
+            }
+            .disabled(!canAdd)
+            Button(role: .destructive) { resetting = TimetableTarget(id: timetable.id) } label: {
+                Label { Text("editor.timetables.reset.action") } icon: { Image(systemName: "arrow.counterclockwise") }
+            }
+            if !isLast(timetable) {
+                Button(role: .destructive) { deleting = TimetableTarget(id: timetable.id) } label: {
+                    Label { Text("editor.timetables.delete.action") } icon: { Image(systemName: "trash") }
+                }
+            }
+        }
     }
 
     private func isLast(_ timetable: Timetable) -> Bool {
@@ -222,7 +291,8 @@ struct TimetablesManagerView: View {
 }
 
 /// "New timetable": name, emoji and what its time structure starts from. The new timetable becomes the active one.
-private struct NewTimetableSheet: View {
+/// Internal (not private) so Settings can present it (U5a; the orchestrator dedupes `SettingsNewTimetableSheet`).
+struct NewTimetableSheet: View {
     @Environment(AppModel.self) private var model
 
     private var activeUsesBellSchedule: Bool {

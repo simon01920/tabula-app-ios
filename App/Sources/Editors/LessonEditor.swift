@@ -1,11 +1,16 @@
-// The lesson editor (`editor.lesson`, `editor.lesson-new`): subject, day / cycle day, period(s) or times, cycle weeks
-// (week rotation only), validity (always / terms / date range), the optional fields the timetable shows, live overlap
-// warnings (warn, never block) and delete with confirmation.
+// The lesson editor (`editor.lesson`, `editor.lesson-new`): subject, day / cycle day, period(s) or times, weeks
+// (week rotation only), validity (always / terms / date range), every optional field under "More details", live
+// overlap warnings (warn, never block) and delete with confirmation.
 //
-// Field rule: only fields enabled in `Timetable.fieldVisibility` appear; hidden fields keep their stored value
-// (LessonDraft.makeLesson). Logic: Packages/TimetableUI/Sources/TimetableUI/Editors/LessonDraft.swift (Linux-tested).
-// APIs: Picker(selection:content:label:), Toggle(isOn:), ForEach, Section(content:header:footer:), sheet(isPresented:),
-//   onChange(of:initial:_:) (iOS 17 two-parameter closure), swipe-free explicit remove buttons.
+// UX overhaul U5b:
+// - H8/D9: weeks are "Every week | Week A | Week B" (segmented, two-week cycles) or a checklist with "Every week"
+//   first (longer cycles), mapped onto the unchanged model by `CycleWeekSelection` (no explanatory footer).
+// - F06/D10: every optional field is offered under "More details" whatever `Timetable.fieldVisibility` says (that
+//   setting only affects summaries); the group starts expanded when a field holds a value.
+// - M1: no section header repeating its row label ("Applies"). M5: red errors only after the first edit.
+// Logic: Packages/TimetableUI/Sources/TimetableUI/Editors/LessonDraft.swift, CycleWeekSelection.swift (Linux-tested).
+// APIs: Picker(selection:content:label:) with .segmented / .inline, DisclosureGroup(isExpanded:content:label:),
+//   Section(content:header:footer:), sheet(isPresented:), onChange(of:initial:_:) (iOS 17 two-parameter closure).
 import SwiftUI
 import TimetableCore
 import TimetableUI
@@ -80,9 +85,12 @@ private struct LessonFormContent: View {
     let timetable: Timetable
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize) private var typeSize
     @State private var creatingSubject = false
     @State private var confirmingDelete = false
     @State private var deleteFailed = false
+    /// `nil` until the user opens or closes "More details" (then it starts from `draft.hasOptionalDetails`).
+    @State private var detailsExpanded: Bool?
 
     private var database: TabulaDatabase? { model.database }
     private var labels: EditorLabels { EditorLabels(model: model) }
@@ -108,7 +116,8 @@ private struct LessonFormContent: View {
         if case .weekCycle(let cycle) = timetable.rotation { weeksSection(cycle) }
         slotSection
         validitySection
-        detailsSection
+        moreDetailsSection
+        if isDetailsExpanded { bringListSection }
         conflictSection
         if !draft.isNew { deleteSection }
     }
@@ -141,7 +150,7 @@ private struct LessonFormContent: View {
             }
             .onChange(of: draft.subjectID) { _, newValue in
                 guard draft.isNew, let newValue, let subject = subjects.first(where: { $0.id == newValue }) else { return }
-                draft.applySubjectDefaults(subject, visibility: timetable.fieldVisibility)
+                draft.applySubjectDefaults(subject)
             }
             Button {
                 creatingSubject = true
@@ -178,22 +187,79 @@ private struct LessonFormContent: View {
         }
     }
 
+    /// "Week A" / "Odd" / "Week 2" as one full phrase (D11: no "Week " + label concatenation).
+    private func weekName(_ week: Int, in cycle: WeekCycle) -> String {
+        EditorWeekNames.name(week, in: timetable, renderer: model.renderer)
+    }
+
+    @ViewBuilder
     private func weeksSection(_ cycle: WeekCycle) -> some View {
-        Section {
-            ForEach(1...max(1, cycle.length), id: \.self) { week in
-                Toggle(isOn: Binding(
-                    get: { draft.cycleWeeks.contains(week) },
-                    set: { isOn in
-                        if isOn { draft.cycleWeeks.insert(week) } else { draft.cycleWeeks.remove(week) }
-                    })) {
-                    Text(verbatim: labels.week(week, in: timetable))
+        switch CycleWeekSelection.style(length: cycle.length) {
+        case .segmented?:
+            Section {
+                weekSegments(cycle)
+            } header: {
+                Text("editor.lesson.weeks")
+            }
+        case .list?:
+            Section {
+                weekRow(Text("editor.lesson.weeks.every"),
+                        checked: CycleWeekSelection.isEveryWeek(draft.cycleWeeks, length: cycle.length)) {
+                    draft.cycleWeeks = CycleWeekSelection.selectingEveryWeek()
+                }
+                ForEach(1...cycle.length, id: \.self) { week in
+                    weekRow(Text(verbatim: weekName(week, in: cycle)),
+                            checked: CycleWeekSelection.isChecked(week, in: draft.cycleWeeks, length: cycle.length)) {
+                        draft.cycleWeeks = CycleWeekSelection.toggling(week, in: draft.cycleWeeks, length: cycle.length)
+                    }
+                }
+            } header: {
+                Text("editor.lesson.weeks")
+            }
+        case nil:
+            EmptyView()
+        }
+    }
+
+    /// Two-week cycle: one segmented choice (an inline list at accessibility sizes, where segments would truncate).
+    @ViewBuilder
+    private func weekSegments(_ cycle: WeekCycle) -> some View {
+        let selection = Binding(
+            get: { CycleWeekSelection.segment(of: draft.cycleWeeks, length: cycle.length) },
+            set: { draft.cycleWeeks = CycleWeekSelection.weeks(for: $0) })
+        let picker = Picker(selection: selection) {
+            ForEach(CycleWeekSelection.segments(length: cycle.length), id: \.self) { segment in
+                switch segment {
+                case .everyWeek: Text("editor.lesson.weeks.every.segment").tag(segment)
+                case .week(let week): Text(verbatim: weekName(week, in: cycle)).tag(segment)
                 }
             }
-        } header: {
+        } label: {
             Text("editor.lesson.weeks")
-        } footer: {
-            Text("editor.lesson.weeks.footer")
         }
+        if typeSize.isAccessibilitySize {
+            picker.pickerStyle(.inline).labelsHidden()
+        } else {
+            picker.pickerStyle(.segmented)
+        }
+    }
+
+    /// A checklist row (multi-select): the whole row is the target, the checkmark shows the state.
+    private func weekRow(_ title: Text, checked: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack {
+                title.foregroundStyle(.primary)
+                Spacer(minLength: 8)
+                Image(systemName: "checkmark")
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(.tint)
+                    .opacity(checked ? 1 : 0)
+                    .accessibilityHidden(true)
+            }
+            .frame(minHeight: 44)
+            .contentShape(Rectangle())
+        }
+        .accessibilityAddTraits(checked ? .isSelected : [])
     }
 
     private var slotSection: some View {
@@ -250,8 +316,6 @@ private struct LessonFormContent: View {
             case .always, .unknown:
                 EmptyView()
             }
-        } header: {
-            Text("editor.validity.header")
         } footer: {
             ForEach(draft.issues(in: timetable).filter { $0 != .noSubject }, id: \.self) { issue in
                 ValidationMessage(key: issue.l10nKey)
@@ -259,22 +323,23 @@ private struct LessonFormContent: View {
         }
     }
 
-    // MARK: Optional fields (field rule: only enabled fields are offered)
+    // MARK: Optional fields (D10: all of them, under "More details")
 
-    @ViewBuilder
-    private var detailsSection: some View {
-        let shown = EditorFieldPolicy.shownFields(timetable.fieldVisibility)
-        if !shown.isEmpty {
-            Section {
-                if shown.contains(.room) { LabeledTextField(titleKey: "editor.field.room", text: $draft.room) }
-                if shown.contains(.building) { LabeledTextField(titleKey: "editor.field.building", text: $draft.building) }
-                if shown.contains(.teacher) { LabeledTextField(titleKey: "editor.field.teacher", text: $draft.teacher) }
-                if shown.contains(.lessonType) { lessonTypePicker }
-                if shown.contains(.notes) { LabeledTextField(titleKey: "editor.field.notes", text: $draft.notes, axis: .vertical) }
-            } header: {
-                Text("editor.lesson.details")
+    private var isDetailsExpanded: Bool { detailsExpanded ?? draft.hasOptionalDetails }
+
+    private var moreDetailsSection: some View {
+        Section {
+            DisclosureGroup(isExpanded: Binding(get: { isDetailsExpanded }, set: { detailsExpanded = $0 })) {
+                LabeledTextField(titleKey: "editor.field.room", text: $draft.room)
+                LabeledTextField(titleKey: "editor.field.building", text: $draft.building)
+                LabeledTextField(titleKey: "editor.field.teacher", text: $draft.teacher)
+                lessonTypePicker
+                LabeledTextField(titleKey: "editor.field.notes", text: $draft.notes, axis: .vertical)
+            } label: {
+                Text("editor.lesson.moreDetails").frame(minHeight: 44, alignment: .leading)
             }
-            if shown.contains(.bringList) { bringListSection }
+        } footer: {
+            if !isDetailsExpanded { Text("editor.lesson.moreDetails.footer") }
         }
     }
 
@@ -364,7 +429,8 @@ private struct LessonFormContent: View {
         var when = labels.day(conflict.dayKey, in: timetable)
         if let week = conflict.cycleWeek {
             when = model.renderer.format(key: "editor.lesson.conflict.dayWeek",
-                                         arguments: [.text(when), .text(labels.week(week, in: timetable))])
+                                         arguments: [.text(when), .text(EditorWeekNames.name(week, in: timetable,
+                                                                                             renderer: model.renderer))])
         }
         let others = model.formatter.list(Array(Set(conflict.otherSubjectNames)).sorted())
         if others.isEmpty {

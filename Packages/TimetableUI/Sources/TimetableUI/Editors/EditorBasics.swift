@@ -1,21 +1,23 @@
 // Shared pure helpers of the editors (stage B3): the field rule for editor inputs, text cleaning, new-entity
 // placeholders and time/date bridges for SwiftUI `DatePicker`s. Linux-tested.
 //
-// Field rule (PHASE2_PLAN §0.8): a field the timetable disables is hidden in the editors too (its stored value is
-// kept untouched); an enabled field is an input even when empty (the *absence* rule applies to read-only views).
+// Field rule, UX overhaul D10 (Astra F06), replacing PHASE2_PLAN §0.8 for editors: `Timetable.fieldVisibility`
+// controls what summaries show (cards, detail, widgets) and never what editors offer. Every editor offers every
+// optional field under "More details", and changing the visibility never deletes or hides a stored value. The
+// *absence* rule (an empty field shows nothing) still applies to read-only views.
 import Foundation
 import TimetableCore
 
-/// Which optional lesson fields an editor offers.
+/// Which optional lesson fields an editor offers (D10: all of them, whatever the display setting).
 public enum EditorFieldPolicy {
-    /// The optional lesson fields enabled by `visibility`, in presentation order.
-    public static func shownFields(_ visibility: FieldVisibility) -> [LessonField] {
-        LessonField.knownValues.filter { visibility.isVisible($0) }
-    }
+    /// The optional lesson fields every editor offers, in presentation order.
+    public static var editorFields: [LessonField] { LessonField.knownValues }
 
-    /// `true` when the editor offers an input for `field`.
-    public static func isShown(_ field: LessonField, in visibility: FieldVisibility) -> Bool {
-        visibility.isVisible(field)
+    /// `true` when the "More details" group starts expanded: some optional field already holds a value, so nothing
+    /// stored is hidden behind a collapsed row. Empty details start collapsed (progressive disclosure).
+    public static func moreDetailsStartsExpanded(texts: [String], lessonType: LessonType?, bringList: [String]) -> Bool {
+        lessonType != nil || texts.contains { EditorText.trimmedOrNil($0) != nil }
+            || !EditorText.cleanedList(bringList).isEmpty
     }
 }
 

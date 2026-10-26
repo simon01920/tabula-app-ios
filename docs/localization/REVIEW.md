@@ -175,3 +175,15 @@ title-field hints `exams.editor.name.prompt`, `tasks.field.title.prompt`, `edito
 language's existing `exams.*` wording, e.g. sk "skúška", cs "zkouška"). Removed as unused (the screens now use the standard × close button and the new prompts):
 `timetable.action.done`, `editor.common.close`, `exams.editor.name`, `tasks.field.title`, `editor.subject.name`,
 `editor.timetable.name`.
+### Phase 4U Stage U5b additions (2026-10-26, swiftui-engineer)
+44 new keys (`editor.bell.*` for the restructured bell schedule editor, `editor.lesson.weeks.*`, `editor.lesson.moreDetails*`,
+`editor.timetables.reorder*` / `*.action`, `editor.common.edit`, `editor.timetable.days`, `editor.subject.icon`,
+`editor.subject.palette.locked*`, `editor.dayChange.move`) and 21 rewritten keys (translations dropped and re-authored),
+model-authored for 11 languages (`sr-Latn` derived), all `needs_review`; 29 unused editor keys removed. Meaning changes
+to check: **Breaks → Holidays** in the terms editor (`editor.breaks.*`, `editor.terms.title/open`, `editor.impact.breaks`,
+`editor.rotation.day.skipsBreaks`): "holidays" are days off school, never the gap between lessons (sk "voľné dni", de
+"Ferien", fr "vacances"); the day-change kinds "Use another day's timetable" / "Shortened lessons";
+`timetable.detail.changeDay` "Cancel, Move or Substitute…" (a button, keep it short); `editor.fields.*` and
+`onboarding.fields.subtitle` now say that the detail switches only affect lesson cards (UX decision D10).
+`editor.lesson.weeks.named` is "Week %@" for a one- or two-letter week name ("Week A"); longer names are shown alone.
+`editor.lesson.weeks.every.segment` is one segment of a three-part segmented control and must stay short.
