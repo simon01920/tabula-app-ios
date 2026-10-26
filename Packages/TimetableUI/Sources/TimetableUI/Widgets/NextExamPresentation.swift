@@ -47,8 +47,10 @@ public struct ExamDisplay: Equatable, Sendable {
         public var rectangularLine: String
         /// The small family's line: the date is left out on the exam day (the countdown says it).
         public var smallLine: String
-        /// "Today, 10:00 · Starts in" above the exam-day countdown (small family).
+        /// "Today, 10:00 · in 1 h 30 min" (static sentence; the live view shows the pieces separately).
         public var whenLine: String
+        /// The countdown with its unit word, minutes only (never seconds); `nil` without a timer (U7, H2).
+        public var countdown: WidgetCountdown?
     }
 
     public enum Kind: Equatable, Sendable {
@@ -164,20 +166,32 @@ public struct ExamPresenter: Sendable {
         let smallLine = [timer == nil ? dateText : nil, timeText, exam.room].compactMap { $0 }.joined(separator: dot)
         let rectangularLine = [timer == nil ? formatter.date(exam.date, style: .weekdayDay) : nil, startText, exam.room]
             .compactMap { $0 }.joined(separator: dot)
-        let whenLine = [whenText, timerCaption].compactMap { $0 }.joined(separator: dot)
+        // U7 (H2): never seconds before an exam. The countdown is minutes only with its unit word; `whenLine` is the static
+        // sentence "Today, 10:00 · in 1 h 30 min" (VoiceOver, paused gallery); the live view shows `whenText` and the
+        // countdown separately (`Text(date, style: .relative)` keeps the minutes current without timeline entries).
+        var countdown: WidgetCountdown?
+        if let timer {
+            let running: Bool
+            if case .inProgress? = phase { running = true } else { running = false }
+            countdown = WidgetCountdownBuilder(renderer: renderer)
+                .make(interval: timer, now: instant, kind: running ? .left : .untilStart, allowsSeconds: false)
+        }
+        let whenLine = [whenText, countdown?.phrase].compactMap { $0 }.joined(separator: dot)
         let subjectName = exam.subject?.name
         // Spoken: exam, subject, when, full date, start time, room.
         var spoken = [renderer.string(forKey: "widget.exam.name"), exam.title]
         if let subjectName { spoken.append(subjectName) }
         spoken.append(whenText)
+        if let countdown { spoken.append(countdown.phrase) }
         spoken.append(formatter.date(exam.date, style: .full))
         if let timeText { spoken.append(timeText) }
         if let room = exam.room { spoken.append(renderer.format(key: "exams.a11y.room", arguments: [.text(room)])) }
-        let info = ExamDisplay.Info(id: exam.id, subject: exam.subject, title: exam.title, dateText: dateText,
+        var info = ExamDisplay.Info(id: exam.id, subject: exam.subject, title: exam.title, dateText: dateText,
                                     timeText: timeText, room: exam.room, whenText: whenText, circularValue: circular,
                                     escalation: escalation, symbol: symbol, timer: timer, timerCaption: timerCaption,
                                     detailLine: detailLine, rectangularLine: rectangularLine, smallLine: smallLine,
                                     whenLine: whenLine)
+        info.countdown = countdown
         return ExamDisplay(date: instant, kind: .exam(info), title: title,
                            accessibilityLabel: formatter.list(spoken), link: .exam(Exam.ID(exam.id)))
     }

@@ -153,7 +153,7 @@ struct LessonActivityPlannerTests {
         #expect(content == LiveActivityPlanner.scheduledLessonContent(lessonDay(tue), style))
         // A scheduled activity that starts needs no update: its content equals the running content before lesson 1.
         #expect(content == LiveActivityPlanner.runningLessonContent(lessonDay(tue), style, now: at(tue, 7, 50)))
-        #expect(alert.title == "First Lesson" && alert.body == "Mathematics at \(t(tue, 8))")
+        #expect(alert.title == "First lesson" && alert.body == "Mathematics at \(t(tue, 8))")
         // Without "Start automatically" nothing is scheduled.
         #expect(planner.plan(input(sources(), now: at(tue, 6))).lessonSteps.isEmpty)
         // After school: tomorrow.
@@ -228,6 +228,9 @@ struct ExamActivityPlannerTests {
         let shown = presenter.exam(content.state, examID: examID, now: at(tue, 8))
         #expect(shown.phase == .upcoming && shown.caption == "Exam today" && shown.timerCaption == "Starts in")
         #expect(shown.timer == at(tue, 8)...at(tue, 10))
+        // Exam countdowns never show seconds: minutes only with a unit word (U7, H2).
+        #expect(shown.countdown?.mode == .minutes && shown.countdown?.phrase == "in 2 h")
+        #expect(shown.countdown?.unitLabel == "until start" && !shown.showsNowMarker)
         #expect(shown.link == .exam(Exam.ID(examID)))
     }
 
@@ -245,6 +248,9 @@ struct ExamActivityPlannerTests {
         #expect(content.staleDate == at(tue, 11, 30))
         let shown = presenter.exam(content.state, examID: examID, now: at(tue, 10, 5))
         #expect(shown.phase == .running && shown.caption == "In progress" && shown.timer == at(tue, 10)...at(tue, 11, 30))
+        #expect(shown.countdown?.mode == .minutes && shown.countdown?.phrase == "1 h 25 min left")
+        let nearEnd = presenter.exam(content.state, examID: examID, now: at(tue, 11, 28))
+        #expect(nearEnd.countdown?.mode == .minutes && nearEnd.countdown?.phrase == "2 min left")   // never mm:ss
         // The room was edited: update.
         var edited = original
         edited.room = "B2"
@@ -311,15 +317,33 @@ struct LiveActivityPresentationTests {
         #expect(gap.timerAccessibilityLabel == "Mathematics, starts at \(t(tue, 9, 50))")
         // Before the first lesson: "First Lesson".
         let first = presenter.lesson(state(now: at(tue, 7, 50)), now: at(tue, 7, 50))
-        #expect(first.caption == "First Lesson" && first.phase == .upcoming)
+        #expect(first.caption == "First lesson" && first.phase == .upcoming)
         // A clock that went back never shows an earlier lesson than the update's index (lesson 3, not lesson 1).
         let back = presenter.lesson(state(now: at(tue, 10)), now: at(tue, 8, 10))
         #expect(back.title == "Mathematics" && back.phase == .upcoming && back.timer?.upperBound == at(tue, 9, 50))
     }
 
+    @Test func countdownCarriesAUnitAndTheNowMarkerFollowsTheRunningLesson() throws {
+        // U7 (H2): a unit word beside every countdown; the highlighter "NOW" only while a lesson runs.
+        let running = presenter.lesson(state(now: at(tue, 8, 10)), now: at(tue, 8, 10))
+        let left = try #require(running.countdown)
+        #expect(running.showsNowMarker && left.mode == .timer && left.kind == .left && left.unitLabel == "left")
+        #expect(left.phrase == "35 min left" && left.interval == at(tue, 8)...at(tue, 8, 45))
+        let gap = presenter.lesson(state(now: at(tue, 8, 10)), now: at(tue, 9, 45))
+        let until = try #require(gap.countdown)
+        #expect(!gap.showsNowMarker && until.kind == .untilStart && until.unitLabel == "until start")
+        #expect(until.mode == .timer && until.phrase == "in 5 min")
+        // 90 minutes or more: minutes only, no seconds.
+        let early = presenter.lesson(state(now: at(tue, 6)), now: at(tue, 6, 30))
+        let hours = try #require(early.countdown)
+        #expect(hours.mode == .minutes && hours.phrase == "in 1 h 30 min" && hours.durationText == "1 h 30 min")
+        let over = presenter.lesson(state(now: at(tue, 10)), now: at(tue, 10, 40))
+        #expect(over.countdown == nil && !over.showsNowMarker)
+    }
+
     @Test func afterTheLastLessonAndFinalContentShowTheDayIsOver() {
         let over = presenter.lesson(state(now: at(tue, 10)), now: at(tue, 10, 40))
-        #expect(over.phase == .finished && over.title == "No more lessons today" && over.timer == nil)
+        #expect(over.phase == .finished && over.title == "Done for today" && over.timer == nil)
         let final = presenter.lesson(LiveActivityPlanner.finalLessonContent(style).state, now: at(tue, 9))
         #expect(final.phase == .finished)
     }

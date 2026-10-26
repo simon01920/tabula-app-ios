@@ -54,6 +54,11 @@ public struct LiveActivityDisplay: Equatable, Sendable {
     public var timerAccessibilityLabel: String
     /// Where a tap goes.
     public var link: ItemLink
+    /// The countdown with its unit word ("left" / "until start"); `nil` without a timer (U7, H2). Exams are always
+    /// minutes only.
+    public var countdown: WidgetCountdown?
+    /// `true` while a lesson runs: the views draw the highlighter "NOW" marker in place of the caption (U7).
+    public var showsNowMarker = false
 
     /// Fraction of `progress` elapsed at `instant` (0…1), for static (paused) progress views.
     public func progressValue(at instant: Date) -> Double {
@@ -88,10 +93,27 @@ public struct LiveActivityPresenter: Sendable {
 
     /// The lesson activity at `now`.
     public func lesson(_ state: LessonActivityAttributes.ContentState, now: Date) -> LiveActivityDisplay {
+        var shown = lessonBase(state, now: now)
+        shown.showsNowMarker = shown.phase == .running
+        return withCountdown(shown, now: now, allowsSeconds: true)
+    }
+
+    /// `display` with its countdown (unit word, minutes-only above an hour, never seconds for exams; U7 H2).
+    func withCountdown(_ display: LiveActivityDisplay, now: Date, allowsSeconds: Bool) -> LiveActivityDisplay {
+        var shown = display
+        if let timer = display.timer {
+            shown.countdown = WidgetCountdownBuilder(renderer: renderer).make(
+                interval: timer, now: now, kind: display.phase == .running ? .left : .untilStart,
+                allowsSeconds: allowsSeconds)
+        }
+        return shown
+    }
+
+    private func lessonBase(_ state: LessonActivityAttributes.ContentState, now: Date) -> LiveActivityDisplay {
         let lessons = state.lessons
         let lowerBound = min(max(0, state.index), lessons.count)
         guard !state.isFinal, let index = LiveActivityTimeline.currentIndex(in: lessons, at: now, from: lowerBound) else {
-            let title = renderer.string(forKey: "today.header.dayOver")
+            let title = renderer.string(forKey: "widget.dayOver")
             return LiveActivityDisplay(phase: .finished, isExam: false, caption: nil, title: title, subject: nil,
                                        symbol: "checkmark.circle.fill", detail: nil, timerCaption: nil, timer: nil,
                                        progress: nil, next: nil, compactText: "✓", accessibilityLabel: title,
@@ -139,6 +161,10 @@ public struct LiveActivityPresenter: Sendable {
 
     /// The exam activity of `examID` at `now`.
     public func exam(_ state: ExamActivityAttributes.ContentState, examID: UUID, now: Date) -> LiveActivityDisplay {
+        withCountdown(examBase(state, examID: examID, now: now), now: now, allowsSeconds: false)
+    }
+
+    private func examBase(_ state: ExamActivityAttributes.ContentState, examID: UUID, now: Date) -> LiveActivityDisplay {
         let separator = renderer.string(forKey: "a11y.separator")
         let when = state.end.map { timeRange(state.start, $0) } ?? time(state.start)
         let detail = [state.room, when].compactMap { $0 }.joined(separator: " · ")

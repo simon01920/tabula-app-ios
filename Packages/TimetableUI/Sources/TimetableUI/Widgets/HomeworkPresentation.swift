@@ -64,7 +64,11 @@ public struct HomeworkDisplay: Equatable, Sendable {
     /// "+3 more" for `hidden` items (plural variations).
     var moreFormat: @Sendable (Int) -> String
 
-    /// Rows per family: the small widget shows the top task only.
+    /// Tasks the small widget lists (U7, L10: two compact rows use the space the single big title left empty; with only
+    /// one task it keeps the larger type).
+    public static let smallTaskCount = 2
+
+    /// Rows per family (the small widget's `capacity` stays 1: its second row is `smallTaskCount`, not a list row).
     public static func capacity(for family: WidgetFamilyKind) -> Int {
         switch family {
         case .systemSmall, .accessoryCircular, .accessoryRectangular, .accessoryInline: return 1
@@ -148,7 +152,8 @@ public struct HomeworkPresenter: Sendable {
             }
             let count = renderer.format(key: "widget.homework.count", arguments: [.integer(Int64(list.total))])
             var spoken = [title, count]
-            if let top = lines.first { spoken.append(top.accessibilityLabel) }
+            // The small family lists the top `smallTaskCount` tasks (U7, L10).
+            spoken += lines.prefix(HomeworkDisplay.smallTaskCount).map(\.accessibilityLabel)
             return HomeworkDisplay(date: entry.date, kind: .tasks, title: title, countText: count, lines: lines,
                                    unlistedOverdue: list.unlistedOverdue, overdueCount: list.overdueTotal, totalCount: list.total,
                                    accessibilityLabel: spoken.joined(separator: separator), separator: separator, moreFormat: more)

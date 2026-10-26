@@ -73,6 +73,8 @@ public struct TodayDisplay: Equatable, Sendable {
     var spokenHeader: String
     var spokenSeparator: String
     var moreFormat: @Sendable (Int) -> String
+    /// "Now": the word on the highlighter marker of the current row (U7).
+    public var nowText: String = ""
     /// Where a tap goes.
     public var link: ItemLink { .today }
 
@@ -134,7 +136,10 @@ public struct TodayPresenter: Sendable {
             renderer.format(key: "widget.more", arguments: [.integer(Int64(hidden))])
         }
         func make(_ kind: TodayDisplay.Kind, spoken: String) -> TodayDisplay {
-            TodayDisplay(date: entry.date, kind: kind, spokenHeader: spoken, spokenSeparator: separator, moreFormat: more)
+            var display = TodayDisplay(date: entry.date, kind: kind, spokenHeader: spoken, spokenSeparator: separator,
+                                       moreFormat: more)
+            display.nowText = renderer.string(forKey: "today.header.now")
+            return display
         }
         let today = context.localDate(of: entry.date)
         switch entry.state {

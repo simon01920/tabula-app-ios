@@ -375,8 +375,8 @@ struct ExamPresentationTests {
         let shortDate = formatter.date(date(2026, 10, 22), style: .weekdayDay)
         #expect(details.rectangularLine == "\(shortDate)\(dot)\(formatter.time(time(10)))\(dot)Lab")
         #expect(!details.rectangularLine.contains(formatter.time(time(10, 45))))
-        #expect(shown.link == .exam(Exam.ID(details.id)) && shown.title == "Next Exam")
-        for part in ["Next Exam", "Organic chemistry", "Biology", "in 9 days", "Room Lab"] {
+        #expect(shown.link == .exam(Exam.ID(details.id)) && shown.title == "Next exam")
+        for part in ["Next exam", "Organic chemistry", "Biology", "in 9 days", "Room Lab"] {
             #expect(shown.accessibilityLabel.contains(part), "\(part) missing from \(shown.accessibilityLabel)")
         }
     }
@@ -389,7 +389,15 @@ struct ExamPresentationTests {
         #expect(before.whenText == "Today, \(formatter.time(time(10)))" && before.escalation == .today && before.symbol == "alarm.fill")
         #expect(before.timer == instant(day, 8, 30)...instant(day, 10) && before.timerCaption == "Starts in")
         #expect(before.circularValue == formatter.time(time(10)))
+        // U7 (H2): never seconds before an exam; minutes only with a unit word, "Today, 10:00 · in 1 h 30 min".
+        let countdown = try #require(before.countdown)
+        #expect(countdown.mode == .minutes && countdown.kind == .untilStart && countdown.unitLabel == "until start")
+        #expect(countdown.phrase == "in 1 h 30 min")
+        #expect(before.whenLine == "Today, \(formatter.time(time(10))) · in 1 h 30 min")
+        let close = try info(examDisplay(snap, at: instant(day, 9, 58)))
+        #expect(close.countdown?.mode == .minutes && close.countdown?.phrase == "in 2 min")
         let during = try info(examDisplay(snap, at: instant(day, 10, 20)))
+        #expect(during.countdown?.mode == .minutes && during.countdown?.phrase == "25 min left")
         #expect(during.whenText == "In progress" && during.escalation == .inProgress)
         #expect(during.timer == instant(day, 10)...instant(day, 10, 45) && during.timerCaption == "Time left")
         let after = try info(examDisplay(snap, at: instant(day, 11)))
@@ -552,14 +560,14 @@ struct TodayPresentationTests {
             return
         }
         #expect(symbol == "beach.umbrella" && title == "Autumn break" && detail == "Holidays")
-        #expect(next?.name == "Mathematics" && caption == "Next Lesson")
+        #expect(next?.name == "Mathematics" && caption == "Next lesson")
         #expect(shown.visibleRows(for: .systemMedium).rows.isEmpty)
         // Lessons over and nothing tomorrow → "No more lessons today" with the next lesson.
         let evening = todayDisplay(snapshot(days: [school(today, [lesson("a", today, time(8), time(8, 45))]),
                                                    school(today.adding(days: 1)), school(today.adding(days: 2))]),
                                    at: instant(today, 17))
         guard case let .status(_, overTitle, _, _, _, _) = evening.kind else { Issue.record("expected status"); return }
-        #expect(overTitle == "No more lessons today")
+        #expect(overTitle == "Done for today")
     }
 
     @Test func unavailableWithoutASnapshotAndThePlannerKeepsCancelledBoundariesOnRequest() throws {
