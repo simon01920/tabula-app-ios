@@ -17,11 +17,9 @@ private func errors(_ database: TabulaDatabase) -> [ValidationIssue] {
 
 @Suite("Editor field rule and text")
 struct EditorBasicsTests {
-    @Test func disabledFieldsAreNotOffered() {
-        let visibility = FieldVisibility([.room, .notes])
-        #expect(EditorFieldPolicy.shownFields(visibility) == [.room, .notes])
-        #expect(!EditorFieldPolicy.isShown(.teacher, in: visibility))
-        #expect(EditorFieldPolicy.shownFields(FieldVisibility()).isEmpty)
+    /// D10 (UX overhaul): the display setting no longer removes fields from editors (EditorU5bTests has the details).
+    @Test func everyFieldIsOfferedInEditors() {
+        #expect(EditorFieldPolicy.editorFields == [.room, .building, .teacher, .lessonType, .notes, .bringList])
     }
 
     @Test func blankTextBecomesAbsent() {
@@ -70,17 +68,18 @@ struct LessonDraftTests {
         #expect(made == expected)
     }
 
-    @Test func hiddenFieldsKeepTheirStoredValue() throws {
+    /// D10: a field hidden in summaries is still edited (and an untouched one keeps its value).
+    @Test func fieldsHiddenInSummariesAreStillEdited() throws {
         var timetable = scenario.timetable
         timetable.fieldVisibility = FieldVisibility([.room])
         var lesson = existing
         lesson.teacher = "Mgr. X"
         lesson.notes = "keep me"
         var draft = LessonDraft(lesson: lesson, timetable: timetable, today: Self.today)
-        draft.teacher = "changed but hidden"
+        draft.teacher = "changed while hidden"
         draft.room = "  301 "
         let made = try #require(draft.makeLesson(in: timetable))
-        #expect(made.teacher == "Mgr. X")
+        #expect(made.teacher == "changed while hidden")
         #expect(made.notes == "keep me")
         #expect(made.room == "301")
     }
@@ -154,10 +153,10 @@ struct LessonDraftTests {
         #expect(draft.day == .weekday(.wednesday))
         #expect(draft.slot.periodID == period.id)
         #expect(draft.room == (subject.defaultRoom ?? ""))
-        #expect(draft.building == "")   // hidden field not prefilled
+        #expect(draft.building == (subject.defaultBuilding ?? ""))   // D10: prefilled even when hidden in summaries
         let made = try #require(draft.makeLesson(in: timetable))
         #expect(made.id == id)
-        #expect(made.building == nil)
+        #expect(made.building == subject.defaultBuilding.flatMap(EditorText.trimmedOrNil))
     }
 
     @Test func savedNewLessonValidates() throws {
@@ -484,7 +483,6 @@ struct TimetableDraftTests {
 @Suite("Day change draft")
 struct DayChangeDraftTests {
     private let scenario = SampleScenarios.secondary()
-    private var visibility: FieldVisibility { FieldVisibility([.room]) }
 
     private func draft(lessonID: Lesson.ID? = nil) -> DayChangeDraft {
         DayChangeDraft(timetable: scenario.timetable, date: scenario.overrideDate, lessonID: lessonID,
@@ -501,28 +499,28 @@ struct DayChangeDraftTests {
         let subject = scenario.database.subjects[1]
         var draft = draft(lessonID: lesson.id)
         draft.kind = .cancelLesson
-        #expect(draft.makeOverride(visibility: visibility)?.change == .cancelLesson(lesson.id))
+        #expect(draft.makeOverride()?.change == .cancelLesson(lesson.id))
         draft.kind = .changeLesson
-        #expect(draft.issues(visibility: visibility) == [.nothingChanged])
+        #expect(draft.issues == [.nothingChanged])
         draft.room = " 301 "
-        draft.teacher = "hidden teacher"      // field disabled -> ignored
-        #expect(draft.makeOverride(visibility: visibility)?.change == .modifyLesson(lesson.id, LessonPatch(room: "301")))
+        draft.teacher = "substitute"          // D10: every field is used whatever the display setting
+        #expect(draft.makeOverride()?.change == .modifyLesson(lesson.id, LessonPatch(room: "301", teacher: "substitute")))
         draft.kind = .cancelDay
         draft.note = " Trip "
-        #expect(draft.makeOverride(visibility: visibility)?.change == .cancelDay(note: "Trip"))
+        #expect(draft.makeOverride()?.change == .cancelDay(note: "Trip"))
         draft.kind = .shortDay
-        #expect(draft.issues(visibility: visibility) == [.noBellSchedule])
+        #expect(draft.issues == [.noBellSchedule])
         draft.bellScheduleID = scenario.shortBell.id
-        #expect(draft.makeOverride(visibility: visibility)?.change == .useBellSchedule(scenario.shortBell.id))
+        #expect(draft.makeOverride()?.change == .useBellSchedule(scenario.shortBell.id))
         draft.kind = .followDay
-        #expect(draft.issues(visibility: visibility) == [.noFollowDay])
+        #expect(draft.issues == [.noFollowDay])
         draft.followDay = .weekday(.monday)
-        #expect(draft.makeOverride(visibility: visibility)?.change == .followDay(.weekday(.monday), cycleWeek: nil))
+        #expect(draft.makeOverride()?.change == .followDay(.weekday(.monday), cycleWeek: nil))
         draft.kind = .extraLesson
-        #expect(draft.issues(visibility: visibility) == [.noSubject])
+        #expect(draft.issues == [.noSubject])
         draft.extraSubjectID = subject.id
         draft.extraRoom = "A1"
-        let override = try #require(draft.makeOverride(visibility: visibility))
+        let override = try #require(draft.makeOverride())
         guard case .addLesson(let oneOff) = override.change else { Issue.record("addLesson"); return }
         #expect(oneOff.subjectID == subject.id && oneOff.room == "A1" && oneOff.teacher == nil)
         let stored = try apply(.upsert(override), to: scenario.database)

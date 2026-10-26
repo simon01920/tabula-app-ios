@@ -1,4 +1,7 @@
 // Edit state of "Change for this day": builds one `ScheduleOverride` of a chosen kind for one date. Pure, Linux-tested.
+// "Change a lesson" covers substitute (subject, teacher), room and building changes, a note and a move to another time
+// on the same date (`LessonPatch.slot`), which is what the lesson detail's "Cancel, Move or Substitute…" promises.
+// D10: every optional field is offered whatever the timetable's display setting.
 // The data model applies several overrides on one date in a fixed order (follow day, bell schedule, then the
 // per-lesson ones), so each kind is a separate override and the editor can be used repeatedly for the same day.
 import Foundation
@@ -52,6 +55,12 @@ public struct DayChangeDraft: Equatable, Sendable {
     public var room: String
     public var building: String
     public var teacher: String
+    /// Note for this occurrence ("change a lesson").
+    public var lessonNote: String
+    /// `true` when "change a lesson" also moves the lesson to `movedSlot` on the same date.
+    public var moves: Bool
+    public var movedSlot: SlotDraft
+    /// Note of "no school".
     public var note: String
     public var bellScheduleID: BellSchedule.ID?
     public var followDay: DayKey?
@@ -59,7 +68,9 @@ public struct DayChangeDraft: Equatable, Sendable {
     public var extraSubjectID: Subject.ID?
     public var extraSlot: SlotDraft
     public var extraRoom: String
+    public var extraBuilding: String
     public var extraTeacher: String
+    public var extraNotes: String
 
     /// A fresh draft for `date`; `lessonID` pre-selects a lesson (the user tapped one). `kind` defaults to
     /// "change lesson" when a lesson is selected, else "cancel day".
@@ -74,6 +85,9 @@ public struct DayChangeDraft: Equatable, Sendable {
         room = ""
         building = ""
         teacher = ""
+        lessonNote = ""
+        moves = false
+        movedSlot = SlotDraft(defaultFor: timetable, schedule: schedule)
         note = ""
         bellScheduleID = nil
         followDay = nil
@@ -81,20 +95,35 @@ public struct DayChangeDraft: Equatable, Sendable {
         extraSubjectID = nil
         extraSlot = SlotDraft(defaultFor: timetable, schedule: schedule)
         extraRoom = ""
+        extraBuilding = ""
         extraTeacher = ""
+        extraNotes = ""
+    }
+
+    /// Turns the move on or off; turning it on starts from the lesson's regular slot (`lessonSlot`).
+    public mutating func setMoves(_ on: Bool, lessonSlot: LessonSlot?) {
+        if on && !moves, let lessonSlot { movedSlot = SlotDraft(slot: lessonSlot) }
+        moves = on
+    }
+
+    /// Another lesson was chosen: a move started for the previous lesson no longer applies.
+    public mutating func selectLesson(_ id: Lesson.ID?) {
+        guard id != lessonID else { return }
+        lessonID = id
+        moves = false
     }
 
     /// Kinds that need the day to have at least one lesson to pick from.
     public static func kindsNeedingLesson() -> Set<Kind> { [.cancelLesson, .changeLesson] }
 
     /// Problems that block saving.
-    public func issues(visibility: FieldVisibility) -> [Issue] {
+    public var issues: [Issue] {
         switch kind {
         case .cancelLesson:
             return lessonID == nil ? [.noLesson] : []
         case .changeLesson:
             if lessonID == nil { return [.noLesson] }
-            return patch(visibility: visibility).isEmpty ? [.nothingChanged] : []
+            return patch.isEmpty ? [.nothingChanged] : []
         case .cancelDay:
             return []
         case .shortDay:
@@ -106,24 +135,33 @@ public struct DayChangeDraft: Equatable, Sendable {
         }
     }
 
-    /// The lesson patch of "change lesson": only fields the timetable shows, only non-blank values.
-    public func patch(visibility: FieldVisibility) -> LessonPatch {
+    /// The lesson patch of "change lesson": only non-blank values (an empty field keeps the regular value).
+    public var patch: LessonPatch {
         var patch = LessonPatch()
         patch.subjectID = substituteSubjectID
-        if visibility.isVisible(.room) { patch.room = EditorText.trimmedOrNil(room) }
-        if visibility.isVisible(.building) { patch.building = EditorText.trimmedOrNil(building) }
-        if visibility.isVisible(.teacher) { patch.teacher = EditorText.trimmedOrNil(teacher) }
+        if moves { patch.slot = movedSlot.slot }
+        patch.room = EditorText.trimmedOrNil(room)
+        patch.building = EditorText.trimmedOrNil(building)
+        patch.teacher = EditorText.trimmedOrNil(teacher)
+        patch.notes = EditorText.trimmedOrNil(lessonNote)
         return patch
     }
 
-    /// `true` when nothing blocks saving.
-    public func canSave(visibility: FieldVisibility) -> Bool {
-        issues(visibility: visibility).isEmpty && (kind != .extraLesson || extraSlot.issues.isEmpty)
+    /// Problems of the time slot that block saving (the extra lesson's slot, or the moved slot).
+    public var slotIssues: [SlotDraft.Issue] {
+        switch kind {
+        case .extraLesson: return extraSlot.issues
+        case .changeLesson where moves: return movedSlot.issues
+        default: return []
+        }
     }
 
+    /// `true` when nothing blocks saving.
+    public var canSave: Bool { issues.isEmpty && slotIssues.isEmpty }
+
     /// The override to store, or `nil` while input is missing.
-    public func makeOverride(visibility: FieldVisibility) -> ScheduleOverride? {
-        guard canSave(visibility: visibility) else { return nil }
+    public func makeOverride() -> ScheduleOverride? {
+        guard canSave else { return nil }
         let change: OverrideChange
         switch kind {
         case .cancelLesson:
@@ -131,7 +169,7 @@ public struct DayChangeDraft: Equatable, Sendable {
             change = .cancelLesson(lessonID)
         case .changeLesson:
             guard let lessonID else { return nil }
-            change = .modifyLesson(lessonID, patch(visibility: visibility))
+            change = .modifyLesson(lessonID, patch)
         case .cancelDay:
             change = .cancelDay(note: EditorText.trimmedOrNil(note))
         case .shortDay:
@@ -144,8 +182,8 @@ public struct DayChangeDraft: Equatable, Sendable {
             guard let extraSubjectID, let slot = extraSlot.slot else { return nil }
             change = .addLesson(OneOffLesson(
                 subjectID: extraSubjectID, slot: slot,
-                room: visibility.isVisible(.room) ? EditorText.trimmedOrNil(extraRoom) : nil,
-                teacher: visibility.isVisible(.teacher) ? EditorText.trimmedOrNil(extraTeacher) : nil))
+                room: EditorText.trimmedOrNil(extraRoom), building: EditorText.trimmedOrNil(extraBuilding),
+                teacher: EditorText.trimmedOrNil(extraTeacher), notes: EditorText.trimmedOrNil(extraNotes)))
         }
         return ScheduleOverride(id: overrideID, meta: EditorEntities.placeholderMeta, timetableID: timetableID,
                                 date: date, change: change)
