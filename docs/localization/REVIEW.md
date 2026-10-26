@@ -166,3 +166,14 @@ name inserted (hu uses "a(z) ${applicationName}" because the article depends on 
 The AppShortcuts catalog is not part of the review export (the export covers Localizable + InfoPlist); review its 4 keys
 in the file itself. The brand stays undeclined ("aplikácia Tabula", "Отвара Tabula"). Final QA: + `intent.param.alarm`
 (an internal parameter title, rarely visible); `probe.intent.shortTitle` removed (the probe's App Shortcut is gone).
+### Phase 4U U6 onboarding (2026-10-26, swiftui-engineer)
+52 new keys (`onboarding.schoolType.*`, `onboarding.language.*`, `onboarding.action.continue|start`,
+`onboarding.start.setUp*|lookAround*|action.lookAround`, `onboarding.week.*`, `onboarding.time.kind.fixed*|individual*`,
+`onboarding.time.later*`, `onboarding.unit.minutes`, `sample.banner.*`, `sample.remove.*`), model-authored for 11 languages
+(`sr-Latn` derived), all `needs_review`. Slovak follows the Astra copy table where it fits ("Vyberte typ školy",
+"Pevné časy hodín", "Vlastné časy hodín", "Otvoriť ukážku"). 55 obsolete onboarding keys removed (welcome / language card,
+fields step, reminders step including every delivery-tier and Time Sensitive text, old rotation and start options).
+Reviewer: "Week A / Week B" and "Day A / Day B" are full phrases (no concatenation); `onboarding.week.parity.*` name the
+calendar (ISO) week number; `onboarding.action.start` keeps the brand undeclined ("aplikáciu Tabula", "aplikaci Tabula",
+"aplikacji Tabula"); `onboarding.unit.minutes` is the unit after a number field; `sample.remove.addedByUser|unlinked` are
+plural sentences appended to the confirmation message.
