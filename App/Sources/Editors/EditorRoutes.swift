@@ -6,8 +6,9 @@
 //   editor.subject       first subject (alphabetical)
 //   editor.subjects      subjects list
 //   editor.bell          bell schedule(s) of the active timetable
+//   editor.bell-period   the bell schedule editor with its first period's detail page pushed (U5b)
 //   editor.timetable     settings of the active timetable
-//   editor.terms         terms & breaks of the active timetable
+//   editor.terms         terms & holidays of the active timetable
 //   editor.day-change    "Change for this day" for today with its first lesson selected
 //   editor.timetables    timetables manager
 //
@@ -35,6 +36,7 @@ enum EditorRoutes: RouteProvider {
             AppRoute("editor.subject", .sheet(over: .timetable)) { SubjectEditorRoute() },
             AppRoute("editor.subjects", .sheet(over: .timetable)) { SubjectsListView() },
             AppRoute("editor.bell", .sheet(over: .timetable)) { BellScheduleEditorView() },
+            AppRoute("editor.bell-period", .sheet(over: .timetable)) { BellScheduleEditorView(opensFirstPeriod: true) },
             AppRoute("editor.timetable", .sheet(over: .timetable)) { TimetableEditorView() },
             AppRoute("editor.terms", .sheet(over: .timetable)) { TermsEditorView() },
             AppRoute("editor.day-change", .sheet(over: .timetable)) { DayChangeEditorRoute() },

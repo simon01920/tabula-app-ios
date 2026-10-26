@@ -1,20 +1,29 @@
-// The terms & breaks editor (`editor.terms`): terms (semesters) and breaks (holiday / vacation / exam period / no
-// school) of one timetable, add / edit / remove. A term that lessons are limited to cannot be removed.
+// The terms & holidays editor (`editor.terms`): terms (semesters) and holidays (`CalendarBreak`: holiday / vacation /
+// exam period / no school) of one timetable, add / edit / delete. A term that lessons are limited to cannot be deleted.
+//
+// UX overhaul U5b (M19, D11): the UI says "Holidays" (days off) so "break" only means the gap between lessons; the
+// model keeps its names (`CalendarBreak`, `breaks`). Deleting is a swipe (or the VoiceOver "Delete" action from
+// `onDelete`) instead of a permanent red ⊖ inside the name row; a term in use says so in its row ("Used by lessons")
+// instead of an unexplained lock, and cannot be swiped away (`deleteDisabled`).
 // Logic: Packages/TimetableUI/.../Editors/TermsDraft.swift (Linux-tested).
-// APIs: Form, Section, Picker, DatePicker through DateRow, Button(role:).
+// HIG: lists-and-tables.md › "Let people edit a table when it makes sense"; entering-data.md › validation.
+// APIs: Form, Section, ForEach.onDelete(perform:), deleteDisabled(_:), Picker, DatePicker through DateRow.
 import SwiftUI
 import TimetableCore
 import TimetableUI
 
-/// Opens the terms & breaks editor as sheet content for `timetableID` (default: the active timetable).
+/// Opens the terms & holidays editor for `timetableID` (default: the active timetable): as sheet content, or
+/// `embedded` in a parent navigation stack (Settings; no own stack, Back leaves while nothing is edited).
 struct TermsEditorView: View {
     var timetableID: Timetable.ID?
+    var embedded = false
     @Environment(AppModel.self) private var model
 
     var body: some View {
         if let database = model.database,
            let timetable = timetableID.flatMap({ id in model.timetables.first { $0.id == id } }) ?? model.activeTimetable {
-            EditorScaffold(
+            EmbeddableEditorScaffold(
+                embedded: embedded,
                 titleKey: "editor.terms.title",
                 initial: TermsDraft(timetableID: timetable.id, database: database),
                 canSave: { $0.canSave },
@@ -23,7 +32,7 @@ struct TermsEditorView: View {
                     TermsFormContent(draft: draft, locked: TermsDraft.lockedTerms(lessons: database.lessons, timetableID: timetable.id))
                 })
         } else {
-            EditorUnavailableView(messageKey: "editor.terms.unavailable")
+            EmbeddableUnavailableView(embedded: embedded, messageKey: "editor.terms.unavailable")
         }
     }
 }
@@ -35,7 +44,7 @@ private struct TermsFormContent: View {
 
     var body: some View {
         termsSection
-        breaksSection
+        holidaysSection
     }
 
     private func termBinding(_ id: Term.ID) -> Binding<Term> {
@@ -46,9 +55,9 @@ private struct TermsFormContent: View {
             })
     }
 
-    private func breakBinding(_ id: CalendarBreak.ID) -> Binding<CalendarBreak> {
+    private func holidayBinding(_ id: CalendarBreak.ID) -> Binding<CalendarBreak> {
         Binding(
-            get: { draft.breaks.first { $0.id == id } ?? placeholderBreak(id) },
+            get: { draft.breaks.first { $0.id == id } ?? placeholderHoliday(id) },
             set: { newValue in
                 if let index = draft.breaks.firstIndex(where: { $0.id == id }) { draft.breaks[index] = newValue }
             })
@@ -59,7 +68,7 @@ private struct TermsFormContent: View {
              range: LocalDateRange(day: model.today))
     }
 
-    private func placeholderBreak(_ id: CalendarBreak.ID) -> CalendarBreak {
+    private func placeholderHoliday(_ id: CalendarBreak.ID) -> CalendarBreak {
         CalendarBreak(id: id, meta: EditorEntities.placeholderMeta, timetableID: draft.timetableID, name: "",
                       range: LocalDateRange(day: model.today))
     }
@@ -69,36 +78,28 @@ private struct TermsFormContent: View {
     private var termsSection: some View {
         Section {
             ForEach(draft.terms) { term in
+                let binding = termBinding(term.id)
                 VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        LabeledTextField(titleKey: "editor.terms.name", text: Binding(
-                            get: { termBinding(term.id).wrappedValue.name },
-                            set: { termBinding(term.id).wrappedValue.name = $0 }))
-                        if locked.contains(term.id) {
-                            Image(systemName: "lock.fill").foregroundStyle(.secondary).frame(minWidth: 44, minHeight: 44)
-                                .accessibilityLabel(Text("editor.terms.inUse"))
-                        } else {
-                            Button(role: .destructive) {
-                                draft.terms.removeAll { $0.id == term.id }
-                            } label: {
-                                Image(systemName: "minus.circle.fill").frame(minWidth: 44, minHeight: 44)
-                            }
-                            .buttonStyle(.borderless)
-                            .accessibilityLabel(Text("editor.terms.remove"))
-                        }
-                    }
-                    DateRow(titleKey: "editor.terms.start", date: Binding(
-                        get: { termBinding(term.id).wrappedValue.range.start },
-                        set: { termBinding(term.id).wrappedValue.range.start = $0 }))
-                    DateRow(titleKey: "editor.terms.end", date: Binding(
-                        get: { termBinding(term.id).wrappedValue.range.end },
-                        set: { termBinding(term.id).wrappedValue.range.end = $0 }))
-                    if termBinding(term.id).wrappedValue.range.isEmpty {
+                    LabeledTextField(titleKey: "editor.terms.name", text: binding.name)
+                    DateRow(titleKey: "editor.terms.start", date: binding.range.start)
+                    DateRow(titleKey: "editor.terms.end", date: binding.range.end)
+                    if binding.wrappedValue.range.isEmpty {
                         Label { Text("editor.terms.issue.range") } icon: { Image(systemName: "xmark.octagon.fill") }
                             .foregroundStyle(.red).font(.footnote)
                     }
+                    if locked.contains(term.id) {
+                        // Informational, not a control: why this row has no Delete.
+                        Label { Text("editor.terms.inUse") } icon: { Image(systemName: "info.circle") }
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 .padding(.vertical, 4)
+                .deleteDisabled(locked.contains(term.id))
+            }
+            .onDelete { offsets in
+                let ids = offsets.map { draft.terms[$0].id }.filter { !locked.contains($0) }
+                draft.terms.removeAll { ids.contains($0.id) }
             }
             Button {
                 let start = draft.terms.map(\.range.end).max().map { $0.adding(days: 1) } ?? model.today
@@ -110,31 +111,19 @@ private struct TermsFormContent: View {
         } header: {
             Text("editor.terms.header")
         } footer: {
-            if draft.terms.isEmpty { Text("editor.terms.empty.footer") } else { Text("editor.terms.footer") }
+            if draft.terms.isEmpty { Text("editor.terms.empty.footer") }
         }
     }
 
-    // MARK: Breaks
+    // MARK: Holidays (CalendarBreak in the model)
 
-    private var breaksSection: some View {
+    private var holidaysSection: some View {
         Section {
             ForEach(draft.breaks) { item in
+                let binding = holidayBinding(item.id)
                 VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        LabeledTextField(titleKey: "editor.breaks.name", text: Binding(
-                            get: { breakBinding(item.id).wrappedValue.name },
-                            set: { breakBinding(item.id).wrappedValue.name = $0 }))
-                        Button(role: .destructive) {
-                            draft.breaks.removeAll { $0.id == item.id }
-                        } label: {
-                            Image(systemName: "minus.circle.fill").frame(minWidth: 44, minHeight: 44)
-                        }
-                        .buttonStyle(.borderless)
-                        .accessibilityLabel(Text("editor.breaks.remove"))
-                    }
-                    Picker(selection: Binding(
-                        get: { breakBinding(item.id).wrappedValue.kind },
-                        set: { breakBinding(item.id).wrappedValue.kind = $0 })) {
+                    LabeledTextField(titleKey: "editor.breaks.name", text: binding.name)
+                    Picker(selection: binding.kind) {
                         ForEach(BreakKind.knownValues, id: \.self) { kind in
                             Text(LocalizedStringKey(DynamicL10nKeys.breakKind(kind))).tag(kind)
                         }
@@ -142,18 +131,18 @@ private struct TermsFormContent: View {
                     } label: {
                         Text("editor.breaks.kind")
                     }
-                    DateRow(titleKey: "editor.terms.start", date: Binding(
-                        get: { breakBinding(item.id).wrappedValue.range.start },
-                        set: { breakBinding(item.id).wrappedValue.range.start = $0 }))
-                    DateRow(titleKey: "editor.terms.end", date: Binding(
-                        get: { breakBinding(item.id).wrappedValue.range.end },
-                        set: { breakBinding(item.id).wrappedValue.range.end = $0 }))
-                    if breakBinding(item.id).wrappedValue.range.isEmpty {
+                    DateRow(titleKey: "editor.terms.start", date: binding.range.start)
+                    DateRow(titleKey: "editor.terms.end", date: binding.range.end)
+                    if binding.wrappedValue.range.isEmpty {
                         Label { Text("editor.terms.issue.range") } icon: { Image(systemName: "xmark.octagon.fill") }
                             .foregroundStyle(.red).font(.footnote)
                     }
                 }
                 .padding(.vertical, 4)
+            }
+            .onDelete { offsets in
+                let ids = offsets.map { draft.breaks[$0].id }
+                draft.breaks.removeAll { ids.contains($0.id) }
             }
             Button {
                 let start = draft.breaks.map(\.range.end).max().map { $0.adding(days: 1) } ?? model.today

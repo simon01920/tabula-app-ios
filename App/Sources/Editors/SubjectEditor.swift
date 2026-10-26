@@ -2,6 +2,12 @@
 // or SF Symbol, default room / building / teacher, live tile preview with contrast information) and `editor.subjects`
 // (the list: add, edit, delete with an impact confirmation, reorder).
 //
+// UX overhaul U5b: "Palette" is a normal row with a chevron that opens the palette list (M18; it was a blue Menu
+// label that looked like a button); the contrast number is gone, only a failing colour is flagged (M4, editor
+// control audit: information, not a control); the raw "Symbol name" text field is removed (only the symbol grid,
+// which keeps a symbol from older data selectable); the defaults are offered whatever the display setting (D10);
+// the name error waits for the first edit (M5). The list's toolbar says "Edit" like the timetables manager (M18).
+//
 // Order (P3-2, Phase 4 C1): subjects have a manual order (`Subject.sortIndex`) shown everywhere through `SubjectOrder`.
 // The list reorders in reorder mode (toolbar "Reorder", drag handles, `onMove`) and, for VoiceOver, with the "Move up" /
 // "Move down" accessibility actions on each row, which announce the new position. New subjects are added at the end; the editor never changes the order
@@ -81,8 +87,9 @@ private struct SubjectFormContent: View {
     @State private var browsingPack: PalettePackID?
     @State private var confirmingDelete = false
     @State private var deleteFailed = false
+    /// Set by the first edit: the red name error waits for it (M5).
+    @State private var touched = false
 
-    private var visibility: FieldVisibility { timetable.fieldVisibility }
     private var activePack: PalettePack {
         let id = browsingPack ?? currentPaletteChoice ?? timetable.palettePackID ?? model.settings.palettePackID
         return PalettePack.pack(id) ?? .classic
@@ -136,8 +143,6 @@ private struct SubjectFormContent: View {
             Text("editor.subject.preview")
         } footer: {
             VStack(alignment: .leading, spacing: 4) {
-                Text(verbatim: model.renderer.format(key: "editor.subject.contrast",
-                                                     arguments: [.text(draft.contrastRatio.formatted(.number.precision(.fractionLength(1))))]))
                 if draft.hasLowContrast {
                     Label { Text("editor.subject.contrast.low") } icon: { Image(systemName: "exclamationmark.triangle.fill") }
                         .foregroundStyle(.orange)
@@ -156,8 +161,9 @@ private struct SubjectFormContent: View {
             LabeledTextField(titleKey: "editor.subject.name", text: $draft.name)
             LabeledTextField(titleKey: "editor.subject.shortName", text: $draft.shortName)
         } footer: {
-            if let issue = draft.issues.first { Text(LocalizedStringKey(issue.l10nKey)).foregroundStyle(.red) }
+            if touched, let issue = draft.issues.first { Text(LocalizedStringKey(issue.l10nKey)).foregroundStyle(.red) }
         }
+        .onChange(of: draft) { _, _ in touched = true }
     }
 
     // MARK: Colour
@@ -181,23 +187,10 @@ private struct SubjectFormContent: View {
         }
     }
 
+    /// A normal navigation row (label, current value, chevron) that opens the palette list (M18).
     private var packMenu: some View {
-        Menu {
-            ForEach(PalettePack.all) { pack in
-                let locked = pack.requiresPro && !model.entitlements.isAllowed(.themePacks)
-                Button {
-                    browsingPack = pack.id
-                } label: {
-                    if locked {
-                        Label { Text(LocalizedStringKey(pack.nameKey)) } icon: { Image(systemName: "lock.fill") }
-                    } else if pack.id == activePack.id {
-                        Label { Text(LocalizedStringKey(pack.nameKey)) } icon: { Image(systemName: "checkmark") }
-                    } else {
-                        Text(LocalizedStringKey(pack.nameKey))
-                    }
-                }
-                .disabled(locked)
-            }
+        NavigationLink {
+            PalettePackList(selection: Binding(get: { activePack.id }, set: { browsingPack = $0 }))
         } label: {
             LabeledContent {
                 Text(LocalizedStringKey(activePack.nameKey))
@@ -206,8 +199,6 @@ private struct SubjectFormContent: View {
             }
             .frame(minHeight: 44)
         }
-        .accessibilityLabel(Text("editor.subject.palette"))
-        .accessibilityValue(Text(LocalizedStringKey(activePack.nameKey)))
     }
 
     private func swatch(_ colour: PaletteColor, in pack: PalettePack) -> some View {
@@ -251,8 +242,11 @@ private struct SubjectFormContent: View {
                         if let first = EditorText.firstCharacter(newValue), first != newValue { draft.emoji = first }
                     }
             case .systemImage:
+                // The suggestions, plus a symbol stored by an older version that is not among them (stays selectable).
+                let names = SubjectDraft.symbolSuggestions.contains(draft.systemImage) || EditorText.trimmedOrNil(draft.systemImage) == nil
+                    ? SubjectDraft.symbolSuggestions : SubjectDraft.symbolSuggestions + [draft.systemImage]
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 48), spacing: 8)], spacing: 8) {
-                    ForEach(SubjectDraft.symbolSuggestions, id: \.self) { name in
+                    ForEach(names, id: \.self) { name in
                         let selected = draft.systemImage == name
                         Button {
                             draft.systemImage = name
@@ -271,29 +265,24 @@ private struct SubjectFormContent: View {
                     }
                 }
                 .padding(.vertical, 4)
-                LabeledTextField(titleKey: "editor.subject.symbol.system.field", text: $draft.systemImage)
             }
         } header: {
-            Text("editor.subject.symbol")
+            Text("editor.subject.icon")
         }
     }
 
-    // MARK: Defaults (field rule)
+    // MARK: Defaults (D10: offered whatever the display setting)
 
-    @ViewBuilder
     private var defaultsSection: some View {
-        let shown = EditorFieldPolicy.shownFields(visibility).filter { [.room, .building, .teacher, .notes].contains($0) }
-        if !shown.isEmpty {
-            Section {
-                if shown.contains(.room) { LabeledTextField(titleKey: "editor.field.room", text: $draft.defaultRoom) }
-                if shown.contains(.building) { LabeledTextField(titleKey: "editor.field.building", text: $draft.defaultBuilding) }
-                if shown.contains(.teacher) { LabeledTextField(titleKey: "editor.field.teacher", text: $draft.defaultTeacher) }
-                if shown.contains(.notes) { LabeledTextField(titleKey: "editor.field.notes", text: $draft.notes, axis: .vertical) }
-            } header: {
-                Text("editor.subject.defaults")
-            } footer: {
-                Text("editor.subject.defaults.footer")
-            }
+        Section {
+            LabeledTextField(titleKey: "editor.field.room", text: $draft.defaultRoom)
+            LabeledTextField(titleKey: "editor.field.building", text: $draft.defaultBuilding)
+            LabeledTextField(titleKey: "editor.field.teacher", text: $draft.defaultTeacher)
+            LabeledTextField(titleKey: "editor.field.notes", text: $draft.notes, axis: .vertical)
+        } header: {
+            Text("editor.subject.defaults")
+        } footer: {
+            Text("editor.subject.defaults.footer")
         }
     }
 
@@ -312,6 +301,59 @@ private struct SubjectFormContent: View {
         .sheet(isPresented: $confirmingDelete) {
             SubjectDeleteConfirmation(subjectID: draft.subjectID, name: draft.name) { dismiss() } onFailure: { deleteFailed = true }
         }
+    }
+}
+
+/// The palette packs as a pushed list (one checkmark; Pro packs show a lock and stay disabled, with the reason in the
+/// footer). Choosing a pack shows its colours in the editor; the subject's colour changes only when a swatch is tapped.
+private struct PalettePackList: View {
+    @Binding var selection: PalettePackID
+    @Environment(AppModel.self) private var model
+    @Environment(\.dismiss) private var dismiss
+
+    private func isLocked(_ pack: PalettePack) -> Bool {
+        pack.requiresPro && !model.entitlements.isAllowed(.themePacks)
+    }
+
+    var body: some View {
+        Form {
+            Section {
+                ForEach(PalettePack.all) { pack in
+                    let selected = pack.id == selection
+                    Button {
+                        selection = pack.id
+                        dismiss()
+                    } label: {
+                        HStack(spacing: 12) {
+                            HStack(spacing: -4) {
+                                ForEach(pack.colors.prefix(5)) { colour in
+                                    Circle().fill(Color(colour.value)).frame(width: 18, height: 18)
+                                        .overlay(Circle().strokeBorder(Color.secondary.opacity(0.5), lineWidth: 1))
+                                }
+                            }
+                            .accessibilityHidden(true)
+                            Text(LocalizedStringKey(pack.nameKey)).foregroundStyle(.primary)
+                            Spacer(minLength: 8)
+                            if isLocked(pack) {
+                                Image(systemName: "lock.fill").foregroundStyle(.secondary)
+                                    .accessibilityLabel(Text("editor.subject.palette.locked"))
+                            } else if selected {
+                                Image(systemName: "checkmark").font(.body.weight(.semibold)).foregroundStyle(.tint)
+                                    .accessibilityHidden(true)
+                            }
+                        }
+                        .frame(minHeight: 44)
+                        .contentShape(Rectangle())
+                    }
+                    .disabled(isLocked(pack))
+                    .accessibilityAddTraits(selected ? .isSelected : [])
+                }
+            } footer: {
+                if PalettePack.all.contains(where: isLocked) { Text("editor.subject.palette.locked.footer") }
+            }
+        }
+        .navigationTitle(Text("editor.subject.palette"))
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
@@ -353,6 +395,9 @@ private struct SubjectEditTarget: Identifiable {
 /// `editor.subjects`: all subjects of a timetable in display order: add, edit, delete, reorder.
 struct SubjectsListView: View {
     var timetableID: Timetable.ID?
+    /// `true` inside a parent navigation stack (Settings): no own stack and no Done; Back leaves (changes here apply
+    /// at once). The subject editor stays a sheet (a Save/Cancel form).
+    var embedded = false
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
     @State private var editing: SubjectEditTarget?
@@ -373,54 +418,64 @@ struct SubjectsListView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            Group {
-                if timetable == nil {
-                    ContentUnavailableView {
-                        Label { Text("editor.unavailable.title") } icon: { Image(systemName: "books.vertical") }
-                    } description: {
-                        Text("editor.subject.unavailable")
-                    }
-                } else if subjects.isEmpty {
-                    ContentUnavailableView {
-                        Label { Text("editor.subjects.empty.title") } icon: { Image(systemName: "books.vertical") }
-                    } description: {
-                        Text("editor.subjects.empty.message")
-                    } actions: {
-                        Button { editing = SubjectEditTarget(subjectID: nil) } label: { Text("editor.subjects.add") }
-                            .buttonStyle(.borderedProminent)
-                    }
-                } else {
-                    list
+        if embedded {
+            content
+        } else {
+            NavigationStack { content }
+        }
+    }
+
+    private var content: some View {
+        Group {
+            if timetable == nil {
+                ContentUnavailableView {
+                    Label { Text("editor.unavailable.title") } icon: { Image(systemName: "books.vertical") }
+                } description: {
+                    Text("editor.subject.unavailable")
                 }
+            } else if subjects.isEmpty {
+                ContentUnavailableView {
+                    Label { Text("editor.subjects.empty.title") } icon: { Image(systemName: "books.vertical") }
+                } description: {
+                    Text("editor.subjects.empty.message")
+                } actions: {
+                    Button { editing = SubjectEditTarget(subjectID: nil) } label: { Text("editor.subjects.add") }
+                        .buttonStyle(.borderedProminent)
+                }
+            } else {
+                list
             }
-            .environment(\.editMode, $editMode)
-            .onChange(of: subjects.count) { _, count in if count < 2 { editMode = .inactive } }
-            .navigationTitle(Text("editor.subjects.title"))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
+        }
+        .environment(\.editMode, $editMode)
+        .onChange(of: subjects.count) { _, count in if count < 2 { editMode = .inactive } }
+        .navigationTitle(Text("editor.subjects.title"))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if !embedded {
                 ToolbarItem(placement: .confirmationAction) {
                     if !editMode.isEditing {
                         Button { dismiss() } label: { Text("editor.common.done") }
                     }
                 }
-                ToolbarItem(placement: .topBarLeading) {
-                    // Reorder mode shows the drag handles (nothing to order with fewer than two subjects).
-                    if editMode.isEditing {
-                        Button { withAnimation { editMode = .inactive } } label: { Text("editor.common.done") }
-                            .fontWeight(.semibold)
-                            .accessibilityLabel(Text("editor.subjects.reorder.done"))
-                    } else {
-                        Button { withAnimation { editMode = .active } } label: { Text("editor.subjects.reorder") }
-                            .disabled(subjects.count < 2)
-                    }
+            }
+            ToolbarItem(placement: embedded ? .primaryAction : .topBarLeading) {
+                // Reorder mode shows the drag handles (nothing to order with fewer than two subjects).
+                if editMode.isEditing {
+                    Button { withAnimation { editMode = .inactive } } label: { Text("editor.common.done") }
+                        .fontWeight(.semibold)
+                        .accessibilityLabel(Text("editor.subjects.reorder.done"))
+                } else if subjects.count > 1 {
+                    // "Edit" like the timetables manager (M18); it only reorders, so it is hidden when there is
+                    // nothing to order (M17's rule). VoiceOver hears what it does.
+                    Button { withAnimation { editMode = .active } } label: { Text("editor.common.edit") }
+                        .accessibilityLabel(Text("editor.subjects.reorder"))
                 }
-                ToolbarItem(placement: .primaryAction) {
-                    Button { editing = SubjectEditTarget(subjectID: nil) } label: {
-                        Label { Text("editor.subjects.add") } icon: { Image(systemName: "plus") }
-                    }
-                    .disabled(timetable == nil)
+            }
+            ToolbarItem(placement: .primaryAction) {
+                Button { editing = SubjectEditTarget(subjectID: nil) } label: {
+                    Label { Text("editor.subjects.add") } icon: { Image(systemName: "plus") }
                 }
+                .disabled(timetable == nil)
             }
         }
         .sheet(item: $editing) { target in
@@ -477,12 +532,8 @@ struct SubjectsListView: View {
                 }
                 .onMove(perform: move)
             } footer: {
-                // The reorder hint only when reordering is possible (two or more subjects).
-                if ordered.count > 1 {
-                    Text("editor.subjects.footer")
-                } else {
-                    Text("editor.subjects.footer.single")
-                }
+                // No instructions for the controls (M5); only how the order works.
+                Text("editor.subjects.footer.single")
             }
         }
     }

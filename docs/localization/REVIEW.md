@@ -166,3 +166,15 @@ name inserted (hu uses "a(z) ${applicationName}" because the article depends on 
 The AppShortcuts catalog is not part of the review export (the export covers Localizable + InfoPlist); review its 4 keys
 in the file itself. The brand stays undeclined ("aplikácia Tabula", "Отвара Tabula"). Final QA: + `intent.param.alarm`
 (an internal parameter title, rarely visible); `probe.intent.shortTitle` removed (the probe's App Shortcut is gone).
+### Phase 4U Stage U5b additions (2026-10-26, swiftui-engineer)
+44 new keys (`editor.bell.*` for the restructured bell schedule editor, `editor.lesson.weeks.*`, `editor.lesson.moreDetails*`,
+`editor.timetables.reorder*` / `*.action`, `editor.common.edit`, `editor.timetable.days`, `editor.subject.icon`,
+`editor.subject.palette.locked*`, `editor.dayChange.move`) and 21 rewritten keys (translations dropped and re-authored),
+model-authored for 11 languages (`sr-Latn` derived), all `needs_review`; 29 unused editor keys removed. Meaning changes
+to check: **Breaks → Holidays** in the terms editor (`editor.breaks.*`, `editor.terms.title/open`, `editor.impact.breaks`,
+`editor.rotation.day.skipsBreaks`): "holidays" are days off school, never the gap between lessons (sk "voľné dni", de
+"Ferien", fr "vacances"); the day-change kinds "Use another day's timetable" / "Shortened lessons";
+`timetable.detail.changeDay` "Cancel, Move or Substitute…" (a button, keep it short); `editor.fields.*` and
+`onboarding.fields.subtitle` now say that the detail switches only affect lesson cards (UX decision D10).
+`editor.lesson.weeks.named` is "Week %@" for a one- or two-letter week name ("Week A"); longer names are shown alone.
+`editor.lesson.weeks.every.segment` is one segment of a three-part segmented control and must stay short.
