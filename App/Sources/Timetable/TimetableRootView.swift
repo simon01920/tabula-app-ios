@@ -375,8 +375,9 @@ private struct EmptyTimetableBanner: View {
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
             Button(action: onAdd) {
-                Label { Text("timetable.options.addLesson") } icon: { Image(systemName: "plus") }
+                Label { Text("timetable.options.addLesson") } icon: { Image(AppSymbol.add) }
                     .frame(minHeight: 44)
+                    .onInkLabel()
             }
             .buttonStyle(.borderedProminent)
             .disabled(!EditorRouteLookup.isAvailable(EditorContext.RouteID.lesson))
