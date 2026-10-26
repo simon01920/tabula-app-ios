@@ -1,6 +1,7 @@
 // The grid as a list (accessibility text sizes up to AX5, or columns too narrow): one section per day, lessons in
 // period order (a double period once), free periods as "add" rows, break/lunch separators only between items.
-// Built from `GridPresentation.listSections` (TimetableUI, Linux-tested).
+// Built from `GridPresentation.listSections` (TimetableUI, Linux-tested). U4: the lesson in progress shows the
+// highlighter "NOW" tag; today's header tag is ink, not red (red = cancelled / overdue only, UX plan D1).
 // APIs: List, Section(content:header:), Button, Label(title:icon:), accessibilityElement(children:),
 //       accessibilityHint(_:), listStyle(.insetGrouped).
 import SwiftUI
@@ -12,6 +13,8 @@ struct GridListView: View {
     let strip: WeekStripModel
     let timetable: Timetable
     let reasons: [OccurrenceID: [ModificationReason]]
+    let today: LocalDate
+    let nowMinute: Int
     let onOpen: (ResolvedLesson) -> Void
     let onAdd: (QuickAddTarget) -> Void
     @Environment(AppModel.self) private var model
@@ -47,7 +50,8 @@ struct GridListView: View {
         case let .lesson(cell, _):
             Button { onOpen(cell.entry) } label: {
                 LessonRowView(lesson: cell.entry, reasons: reasons[cell.entry.id] ?? [],
-                              visibility: timetable.fieldVisibility, isInConflict: cell.isInConflict)
+                              visibility: timetable.fieldVisibility, isInConflict: cell.isInConflict,
+                              isCurrent: NowLinePresentation.isCurrent(cell.entry, today: today, minuteOfDay: nowMinute))
             }
             .buttonStyle(.plain)
             .accessibilityHint(Text("timetable.a11y.openHint"))
@@ -100,8 +104,8 @@ struct GridListView: View {
                         .font(.caption.weight(.bold))
                         .padding(.horizontal, 6)
                         .padding(.vertical, 1)
-                        .foregroundStyle(Color.white)
-                        .background(Capsule().fill(Color.red))
+                        .foregroundStyle(Color.onInk)
+                        .background(Capsule().fill(Color.ink))
                 }
                 if let cycle = day.cycleDay {
                     Text(verbatim: cycle.text(renderer: model.renderer))

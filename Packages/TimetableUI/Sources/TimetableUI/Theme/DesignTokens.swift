@@ -70,6 +70,12 @@ public enum DesignTokens {
                                               lightIncreasedContrast: hex("#A11B1B"),
                                               darkIncreasedContrast: hex("#FF8F88"))
 
+    /// Text on a correction fill (the timetable's "10:20" now-line label, U4): white light (5.6:1), black dark.
+    public static let onCorrection = ColorToken(light: .white, dark: .black)
+
+    /// A changed value in the lesson detail (the moved time, Opus M15, U4). 4.5:1 on the light and dark cards (tested).
+    public static let changed = ColorToken(light: hex("#B35C00"), dark: hex("#FFB340"))
+
     /// The "Now" highlighter fill. The same yellow in every appearance (a real marker); text on it is always black.
     public static let highlighter = ColorToken(light: hex("#FFE04A"), dark: hex("#FFE04A"))
 

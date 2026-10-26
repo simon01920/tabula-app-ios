@@ -44,6 +44,10 @@ extension Color {
     public static let onInk = DesignTokens.onInk.color
     /// Overdue, cancelled, destructive only.
     public static let correction = DesignTokens.correction.color
+    /// Text on a correction fill (the now-line time label).
+    public static let onCorrection = DesignTokens.onCorrection.color
+    /// A changed value (the moved time in the lesson detail).
+    public static let changed = DesignTokens.changed.color
     /// The "Now" highlighter fill (NowMarker only).
     public static let highlighter = DesignTokens.highlighter.color
     /// Text on the highlighter (black).

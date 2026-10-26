@@ -197,3 +197,16 @@ count phrases (`settings.reminders.summary.on`, `settings.colors.applied`, `sett
 written as "label: N" in the Slavic languages to avoid noun declension, check they read naturally; `settings.colors.undo`
 should differ from Cancel where the language allows (ro "Anulează modificarea"; fr uses Apple's "Annuler"); the Time Sensitive
 tier names reuse the existing `settings.reminders.timesensitive.title` wording per language.
+### Phase 4U Stage U4 additions (2026-10-26, swiftui-engineer)
+31 new keys (`timetable.cycle.oddWeek/evenWeek`, `timetable.quickAdd.every.*`, `.slot.period`, `.scope.*`,
+`.cycleWeekOnlyFooter`, `timetable.subtitle.withCycle`, `timetable.now`, `timetable.legend.*`, `timetable.day.*`,
+`timetable.a11y.todayHint.*`, `timetable.options.editTimetable/addLesson`, `timetable.empty.noLessons.*`,
+`timetable.detail.timeChanged.a11y`), model-authored for 11 languages (`sr-Latn` derived), all `needs_review`; and
+`timetable.detail.changes` changed to sentence case ("Changes on this day"; translations kept, `needs_review`).
+Reviewer: "Odd week" / "Even week" are what Slovak and Czech schools say (sk "Nepárny/Párny týždeň", cs "Lichý/Sudý
+týden"); `timetable.quickAdd.every.*` are complete phrases with the weekday in the right case and gender (sk "Každú
+stredu", cs "Každou středu", pl "W każdą środę", uk "Щосереди") joined to the week and period only by the
+`%1$@ · %2$@` formats; `timetable.now` is a one-word tag shown in capitals. Now unused (for U8 to remove):
+`timetable.quickAdd.period`, `timetable.quickAdd.cycleWeekFooter`.
+Integration (2026-10-26): `timetable.now` removed again; the timetable shows U1's `now.marker` (same word in all
+13 languages, checked before removal).

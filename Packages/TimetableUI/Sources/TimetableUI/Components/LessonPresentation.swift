@@ -58,7 +58,8 @@ public struct LessonStatusBadgeModel: Equatable, Sendable {
     public let titleKey: String
 
     /// The badge for a lesson, or `nil` for a regular (`.scheduled`) lesson.
-    /// A modified lesson with exactly one reason shows that reason ("Room changed"); several → "Changed".
+    /// A modified lesson with exactly one reason shows that reason ("Room changed") and its symbol; several →
+    /// "Changed" and the generic symbol (`AppSymbol.change(for:)`), the same in the grid, the lesson detail, Today and widgets.
     public static func make(status: ResolvedLesson.Status, reasons: [ModificationReason]) -> LessonStatusBadgeModel? {
         switch status {
         case .scheduled:

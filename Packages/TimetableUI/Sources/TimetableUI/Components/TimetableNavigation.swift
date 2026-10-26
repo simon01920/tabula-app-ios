@@ -6,29 +6,65 @@
 import Foundation
 import TimetableCore
 
-/// How a rotation position is shown ("Week A", "Week 2", "Day B", "Day 3"). Rendered by `catalogKey` + `argument`.
+/// How a rotation position is shown ("Week A", "Odd week", "Week 2", "Day B", "Day 3"). Every label is one complete
+/// catalog phrase (`catalogKey` + optional `argument`); a user label is never glued after "Week " unless it is a
+/// short token such as "A", "2" or "II" (D11 / Opus M3: "Week " + "Párny" produced "Week Párny").
 public enum CycleLabel: Equatable, Sendable {
-    /// A named cycle week: the user's label, or a derived letter for A/B weeks without labels.
+    /// A cycle week named by a short token: the user's "A"/"B"/"2", or a derived letter for A/B weeks ("Week %@").
     case namedWeek(String)
     /// A numbered cycle week (cycles of 3+ weeks without labels).
     case numberedWeek(Int)
-    /// A named cycle day (user label).
+    /// A two-week cycle counted by the printed ISO week number: "Odd week" / "Even week" (own catalog phrases).
+    case parityWeek(isOdd: Bool)
+    /// A user label that is a word or phrase ("Párny", "Blue week"): shown as written, never prefixed.
+    case customWeek(String)
+    /// A cycle day named by a short token ("Day %@").
     case namedDay(String)
     /// A numbered cycle day.
     case numberedDay(Int)
+    /// A user day label that is a word or phrase: shown as written.
+    case customDay(String)
+
+    /// Longest non-numeric user label that is still treated as a token after "Week"/"Day" ("A", "B", "A1", "II").
+    public static let maximumTokenLength = 2
+
+    /// `true` for labels such as "A", "II" or "12" that read as a name after "Week"/"Day"; `false` for words such as
+    /// "Odd" or "Párny" (shown as written instead).
+    public static func isToken(_ label: String) -> Bool {
+        guard !label.isEmpty, !label.contains(where: \.isWhitespace) else { return false }
+        return label.count <= maximumTokenLength || label.allSatisfy(\.isNumber)
+    }
 
     /// The label of a week-cycle week, or `nil` without a week cycle.
+    ///
+    /// Order: the user's label (a short token → "Week A", a word → the word itself); else, for a two-week cycle
+    /// anchored to the printed (strict) ISO week number, "Odd week" / "Even week"; else "Week A"/"Week B" for two
+    /// weeks and "Week n" for longer cycles. A continuous parity count alternates strictly and can disagree with the
+    /// printed number after a 53-week year, so it keeps A/B.
     public static func week(_ cycleWeek: Int?, scheme: RotationScheme, userLabel: String?) -> CycleLabel? {
         guard case .weekCycle(let cycle) = scheme, let cycleWeek else { return nil }
-        if let label = userLabel?.trimmingCharacters(in: .whitespacesAndNewlines), !label.isEmpty { return .namedWeek(label) }
-        if cycle.length == 2, (1...2).contains(cycleWeek) { return .namedWeek(cycleWeek == 1 ? "A" : "B") }
+        if let label = userLabel?.trimmingCharacters(in: .whitespacesAndNewlines), !label.isEmpty {
+            return isToken(label) ? .namedWeek(label) : .customWeek(label)
+        }
+        if cycle.length == 2, (1...2).contains(cycleWeek) {
+            if case let .isoWeekParity(policy, offset) = cycle.anchor, policy.effective == .strict {
+                // WeekParity.cycleWeek: cycle week = (isoWeek - 1 + offset) mod 2 + 1, so the ISO week is odd
+                // exactly when (cycleWeek - 1 - offset) is even. `offset` is persisted data: reduce it first
+                // (no overflow for hostile values).
+                let shift = (offset % 2 + 2) % 2
+                return .parityWeek(isOdd: (cycleWeek - 1 - shift + 2) % 2 == 0)
+            }
+            return .namedWeek(cycleWeek == 1 ? "A" : "B")
+        }
         return .numberedWeek(cycleWeek)
     }
 
     /// The label of a day-cycle day, or `nil` unless `dayKey` is a cycle day.
     public static func day(_ dayKey: DayKey?, userLabel: String?) -> CycleLabel? {
         guard case .cycleDay(let index)? = dayKey else { return nil }
-        if let label = userLabel?.trimmingCharacters(in: .whitespacesAndNewlines), !label.isEmpty { return .namedDay(label) }
+        if let label = userLabel?.trimmingCharacters(in: .whitespacesAndNewlines), !label.isEmpty {
+            return isToken(label) ? .namedDay(label) : .customDay(label)
+        }
         return .numberedDay(index)
     }
 
@@ -41,27 +77,42 @@ public enum CycleLabel: Equatable, Sendable {
         }
     }
 
-    /// Catalog key of the format.
-    public var catalogKey: String {
+    /// Catalog keys of every rotation phrase (for `DynamicL10nKeys`).
+    public static let allCatalogKeys = [
+        "timetable.cycle.namedWeek", "timetable.cycle.numberedWeek", "timetable.cycle.oddWeek",
+        "timetable.cycle.evenWeek", "timetable.cycle.namedDay", "timetable.cycle.numberedDay",
+    ]
+
+    /// Catalog key of the phrase; `nil` for user labels shown as written.
+    public var catalogKey: String? {
         switch self {
         case .namedWeek: return "timetable.cycle.namedWeek"
         case .numberedWeek: return "timetable.cycle.numberedWeek"
+        case .parityWeek(let isOdd): return isOdd ? "timetable.cycle.oddWeek" : "timetable.cycle.evenWeek"
         case .namedDay: return "timetable.cycle.namedDay"
         case .numberedDay: return "timetable.cycle.numberedDay"
+        case .customWeek, .customDay: return nil
         }
     }
 
-    /// The format argument.
-    public var argument: CatalogArgument {
+    /// The format argument, if the phrase has one.
+    public var argument: CatalogArgument? {
         switch self {
-        case .namedWeek(let text), .namedDay(let text): return .text(text)
+        case .namedWeek(let text), .namedDay(let text), .customWeek(let text), .customDay(let text): return .text(text)
         case .numberedWeek(let number), .numberedDay(let number): return .integer(Int64(number))
+        case .parityWeek: return nil
         }
     }
 
-    /// The rendered text ("Week A").
+    /// The rendered text ("Week A", "Odd week", or the user's own label).
     public func text(renderer: LocalizedTextRenderer) -> String {
-        renderer.format(key: catalogKey, arguments: [argument])
+        switch self {
+        case .customWeek(let label), .customDay(let label):
+            return label
+        default:
+            guard let key = catalogKey else { return "" }
+            return renderer.format(key: key, arguments: argument.map { [$0] } ?? [])
+        }
     }
 }
 

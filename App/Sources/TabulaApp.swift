@@ -9,6 +9,7 @@
 //       UIApplication.endBackgroundTask(_:), View.onOpenURL(perform:) (iOS 14; WidgetKit passes widgetURL / Link URLs to it:
 //       "Linking to specific app scenes from your widget or Live Activity", checked 2026-10-16).
 import SwiftUI
+import TipKit
 import UIKit
 import TimetableUI
 
@@ -47,6 +48,11 @@ struct TabulaRootApp: App {
                 .environment(services.reminders)
                 .environment(services.liveActivities)
                 .task { await services.model.load() }
+                // TipKit once per launch (the Timetable symbol legend, U4); its screenshot route shows every tip.
+                .task {
+                    if LaunchContext.options.screen == "timetable.grid-legend" { Tips.showAllTipsForTesting() }
+                    try? Tips.configure()
+                }
                 // Widget taps (Phase 4 A): `tabula://open/…` (ItemLinkURL) → the same path as a notification tap.
                 // Anything else is ignored (any app or web page can send the app a URL).
                 .onOpenURL { url in
