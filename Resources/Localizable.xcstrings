@@ -39488,7 +39488,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Název písemky"
+            "value" : "Název zkoušky"
           }
         },
         "de" : {
@@ -39512,49 +39512,49 @@
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Dolgozat címe"
+            "value" : "Vizsga címe"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "テストのタイトル"
+            "value" : "試験のタイトル"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tytuł sprawdzianu"
+            "value" : "Tytuł egzaminu"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Titlul testului"
+            "value" : "Titlul examenului"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Názov písomky"
+            "value" : "Názov skúšky"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Назив контролног"
+            "value" : "Назив испита"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Naziv kontrolnog"
+            "value" : "Naziv ispita"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Назва контрольної"
+            "value" : "Назва іспиту"
           }
         },
         "zh-Hans" : {

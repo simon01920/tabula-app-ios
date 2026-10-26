@@ -85,6 +85,7 @@ struct HomeworkWidget: Widget {
         StaticConfiguration(kind: Self.kind, provider: HomeworkProvider()) { entry in
             HomeworkEntryView(entry: entry)
                 .containerBackground(.background, for: .widget)
+                .tint(Color.ink)   // Phase 4U U1 (D1): the app tint in widgets
         }
         .configurationDisplayName("widget.homework.name")
         .description("widget.homework.description")
