@@ -194,10 +194,7 @@ struct WidgetGalleryScreen: View {
     private func homeworkList(_ display: HomeworkDisplay, _ family: WidgetFamilyKind) -> some View {
         #if TABULA_APP_INTENTS
         HomeworkWidgetView(display: display, family: family, withCheckbox: true) { _ in
-            Image(systemName: "circle")
-                .font(.body.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .frame(width: 44, height: 44, alignment: .leading)
+            HomeworkCheckboxMark()
         }
         #else
         HomeworkWidgetView(display: display, family: family)

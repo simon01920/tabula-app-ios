@@ -91,7 +91,7 @@ struct HomeworkDueText: View {
             Label {
                 Text(verbatim: line.dueText).foregroundStyle(Color.primary)
             } icon: {
-                Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.red)
+                Image(systemName: "exclamationmark.triangle.fill").modifier(CorrectionForeground())   // adopt U1 tokens
             }
             .font(.caption2.weight(.bold))
             .lineLimit(1)
@@ -172,20 +172,35 @@ struct HomeworkSmallColumn: View {
                     .lineLimit(2)
                     .minimumScaleFactor(0.8)
                 Spacer(minLength: 0)
-                if let top = display.lines.first {
+                // L10: two compact rows use the space; a single task keeps the larger type.
+                let top = Array(display.lines.prefix(HomeworkDisplay.smallTaskCount))
+                if top.count == 1, let only = top.first {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(verbatim: top.title)
+                        Text(verbatim: only.title)
                             .font(.subheadline.weight(.semibold))
-                            .lineLimit(2)
+                            .lineLimit(3)
                             .minimumScaleFactor(0.85)
-                        HomeworkDueText(line: top)
+                        HomeworkDueText(line: only)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                } else if !top.isEmpty {
+                    VStack(alignment: .leading, spacing: 6) {
+                        ForEach(top) { line in
+                            VStack(alignment: .leading, spacing: 0) {
+                                Text(verbatim: line.title)
+                                    .font(.caption.weight(.semibold))
+                                    .lineLimit(2)
+                                    .minimumScaleFactor(0.85)
+                                HomeworkDueText(line: line)
+                            }
+                        }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
             case let .allDone(title, detail):
                 Image(systemName: "checkmark.circle.fill")
                     .font(.title2)
-                    .foregroundStyle(.tint)
+                    .inkForeground()   // adopt U1 tokens
                     .widgetAccentable()
                 Text(verbatim: title)
                     .font(.headline)
@@ -198,7 +213,7 @@ struct HomeworkSmallColumn: View {
             case let .unavailable(title, detail):
                 Image(systemName: "calendar")
                     .font(.title3)
-                    .foregroundStyle(.tint)
+                    .inkForeground()   // adopt U1 tokens
                     .widgetAccentable()
                 Text(verbatim: title)
                     .font(.headline)
@@ -242,7 +257,9 @@ struct HomeworkListColumn<Leading: View>: View {
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(Text(verbatim: display.listHeaderLabel))
                 ForEach(shown.lines) { line in
-                    HStack(alignment: .center, spacing: 6) {
+                    // M31: no spacing after the checkbox (its 44 pt target already leaves an 11 pt gap to the badge); without a
+                    // checkbox `leading` is empty, so nothing precedes the row.
+                    HStack(alignment: .center, spacing: 0) {
                         leading(line)
                         Link(destination: ItemLinkURL.url(for: line.link)) {
                             HomeworkRowContent(line: line)
@@ -263,7 +280,7 @@ struct HomeworkListColumn<Leading: View>: View {
                 HStack(spacing: 10) {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.largeTitle)
-                        .foregroundStyle(.tint)
+                        .inkForeground()   // adopt U1 tokens
                         .widgetAccentable()
                     VStack(alignment: .leading, spacing: 2) {
                         Text(verbatim: title).font(.headline).lineLimit(2)
@@ -276,7 +293,7 @@ struct HomeworkListColumn<Leading: View>: View {
                 HStack(spacing: 10) {
                     Image(systemName: "calendar")
                         .font(.title)
-                        .foregroundStyle(.tint)
+                        .inkForeground()   // adopt U1 tokens
                         .widgetAccentable()
                     VStack(alignment: .leading, spacing: 2) {
                         Text(verbatim: title).font(.headline).lineLimit(2)

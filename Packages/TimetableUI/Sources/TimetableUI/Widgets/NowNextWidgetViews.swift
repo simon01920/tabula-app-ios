@@ -8,6 +8,9 @@
 // background: the extension applies `containerBackground(_:for: .widget)` (removable, so StandBy works), the gallery
 // draws its own frame.
 //
+// Phase 4U U7: countdowns come from `NowNextDisplay.countdown` (WidgetCountdown.swift) and always carry a unit word
+// ("left" / "until start"); from an hour on they are minutes only. Lock Screen families put the time first and use
+// short subject names (M29); the current lesson wears the highlighter "NOW" marker (WidgetIdentity.swift, `// adopt U1`).
 // Live time: `Text(timerInterval:countsDown:showsHours:)` and `ProgressView(timerInterval:countsDown:)` — the system
 // updates them without timeline reloads. With `pauseTime` (the gallery's fixed clock) static values are shown instead
 // (`Text(timerInterval:pauseTime:)` showed the full interval when paused, see NowNextHeaderView).
@@ -112,18 +115,16 @@ public struct WidgetProPlaceholderView: View {
 
 // MARK: - Shared pieces
 
-/// Live or paused remaining time of `display.timer` ("12:34", "1:02:03").
-struct NowNextTimerText: View {
+/// The countdown of `display` with its unit word (H2): "24:59 left" under an hour, "1 h 30 min until start" from an hour on
+/// (minutes only, never seconds). Nothing when the display has no countdown.
+struct NowNextCountdown: View {
     let display: NowNextDisplay
     let pauseTime: Date?
+    var layout: WidgetCountdownText.Layout = .stacked
 
     var body: some View {
-        if let interval = display.timer {
-            if let pauseTime {
-                Text(verbatim: CountdownFormat.string(remaining: interval.upperBound.timeIntervalSince(max(pauseTime, interval.lowerBound))))
-            } else {
-                Text(timerInterval: interval, countsDown: true, showsHours: true)
-            }
+        if let countdown = display.countdown {
+            WidgetCountdownText(countdown: countdown, pauseTime: pauseTime, layout: layout)
         }
     }
 }
@@ -229,10 +230,7 @@ struct NowNextMainColumn: View {
             case .current(let lesson):
                 HStack(alignment: .center, spacing: 6) {
                     WidgetSubjectMark(subject: lesson.subject, size: 24)
-                    Text(verbatim: display.caption ?? "")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(.secondary)
-                        .widgetAccentable()
+                    NowHighlighterTag(text: display.caption ?? "", font: .caption)   // adopt U1 NowMarker
                 }
                 Text(verbatim: lesson.name)
                     .font(.headline)
@@ -280,14 +278,11 @@ struct NowNextMainColumn: View {
                     .lineLimit(1)
                 }
                 Spacer(minLength: 0)
-                Text(verbatim: display.timerCaption ?? "")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                timer
+                timer   // value + "until start" (H2)
             case let .status(symbol, title, detail):
                 Image(systemName: symbol)
                     .font(.title3)
-                    .foregroundStyle(.tint)
+                    .inkForeground()   // adopt U1 tokens
                     .widgetAccentable()
                 Text(verbatim: title)
                     .font(.headline)
@@ -314,7 +309,7 @@ struct NowNextMainColumn: View {
             case let .unavailable(title, detail):
                 Image(systemName: "calendar")
                     .font(.title3)
-                    .foregroundStyle(.tint)
+                    .inkForeground()   // adopt U1 tokens
                     .widgetAccentable()
                 Text(verbatim: title)
                     .font(.headline)
@@ -330,12 +325,13 @@ struct NowNextMainColumn: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
+    /// The value (live, rounded monospaced digits) with the unit word under it.
     private var timer: some View {
-        NowNextTimerText(display: display, pauseTime: pauseTime)
+        NowNextCountdown(display: display, pauseTime: pauseTime)
             .font(.system(compact ? .title2 : .title, design: .rounded).weight(.bold))
             .monospacedDigit()
             .lineLimit(1)
-            .minimumScaleFactor(0.6)
+            .minimumScaleFactor(0.5)
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, alignment: .leading)
             .widgetAccentable()
@@ -378,6 +374,10 @@ struct NowNextMediumView: View {
 
 // MARK: - accessoryRectangular
 
+/// Lock Screen rectangle (U7, M29): time first, then a short name; nothing the eye needs is at the truncated end.
+///   in a lesson   "24:59 left" / "SJL · 214" / "Next: BIO, 10:55"
+///   before one    "Next 8:00 ANJ" / full name · room
+///   after school  "Done for today" / "Next: BIO, Tomorrow, 8:00"
 struct NowNextRectangularView: View {
     let display: NowNextDisplay
     let pauseTime: Date?
@@ -386,38 +386,34 @@ struct NowNextRectangularView: View {
         VStack(alignment: .leading, spacing: 1) {
             switch display.kind {
             case .current(let lesson):
-                Text(verbatim: [lesson.name, lesson.room].compactMap { $0 }.joined(separator: " · "))
-                    .font(.headline)
+                NowNextCountdown(display: display, pauseTime: pauseTime, layout: .inline)
+                    .font(.system(.headline, design: .rounded))
+                    .monospacedDigit()
                     .lineLimit(1)
-                HStack(spacing: 4) {
-                    Image(systemName: "hourglass")
-                    NowNextTimerText(display: display, pauseTime: pauseTime)
-                        .monospacedDigit()
-                        .multilineTextAlignment(.leading)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .font(.body.weight(.semibold))
-                .widgetAccentable()
-                if let next = display.nextShort {
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .widgetAccentable()
+                Text(verbatim: [lesson.shortName, lesson.room].compactMap { $0 }.joined(separator: " · "))
+                    .font(.body.weight(.semibold))
+                    .lineLimit(1)
+                if let next = display.nextCompact {
                     Text(verbatim: next).font(.caption).lineLimit(1)
                 }
             case .upcoming(let lesson):
-                Text(verbatim: display.caption ?? "")
-                    .font(.caption.weight(.semibold))
-                    .widgetAccentable()
-                Text(verbatim: lesson.name)
-                    .font(.headline)
-                    .lineLimit(1)
-                Text(verbatim: [lesson.startText, lesson.room].compactMap { $0 }.joined(separator: " · "))
-                    .font(.caption)
+                Text(verbatim: display.inlineText)
+                    .font(.system(.headline, design: .rounded))
                     .monospacedDigit()
                     .lineLimit(1)
+                    .widgetAccentable()
+                Text(verbatim: [lesson.name, lesson.room].compactMap { $0 }.joined(separator: " · "))
+                    .font(.caption)
+                    .lineLimit(2)
             case let .status(_, title, _):
                 Text(verbatim: title)
                     .font(.headline)
                     .lineLimit(2)
                     .widgetAccentable()
-                Text(verbatim: display.nextShort ?? display.nothingAhead ?? "")
+                Text(verbatim: display.nextCompact ?? display.nothingAhead ?? "")
                     .font(.caption)
                     .lineLimit(2)
             case let .unavailable(title, detail):
@@ -431,6 +427,16 @@ struct NowNextRectangularView: View {
 
 // MARK: - accessoryCircular
 
+/// Lock Screen circle (U7, M29, L9).
+///   in a lesson   a ring of the lesson's remaining time with the short name and the time left in the centre
+///   before one    short name over the start time
+///   after school  tomorrow's first start time (L9) under the next lesson's short name, a check mark only without one
+///
+/// Ring: HIG gauges.md › Anatomy: "accessory ... works well in iOS Lock Screen widgets" (`Gauge` +
+/// `.gaugeStyle(.accessoryCircular)`, Apple docs checked 2026-10-23: `Gauge.init(value:in:label:currentValueLabel:)`;
+/// `Gauge` has no timer-interval initialiser). A `Gauge`'s value is static between timeline entries, and entries exist
+/// only at lesson boundaries, so the real widget keeps the system's live date-relative ring (`ProgressView(timerInterval:)`,
+/// which the Lock Screen draws as the same ring) and the paused gallery uses the `Gauge`.
 struct NowNextCircularView: View {
     let display: NowNextDisplay
     let pauseTime: Date?
@@ -440,58 +446,71 @@ struct NowNextCircularView: View {
             AccessoryWidgetBackground()
             switch display.kind {
             case .current(let lesson):
-                ring(label: WidgetSubjectMark.label(for: lesson.subject))
+                ring(label: lesson.shortName)
             case .upcoming(let lesson):
-                VStack(spacing: 0) {
-                    Text(verbatim: WidgetSubjectMark.label(for: lesson.subject))
-                        .font(.caption2.weight(.semibold))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.6)
-                    Text(verbatim: lesson.startText)
-                        .font(.system(.body, design: .rounded).weight(.bold))
-                        .monospacedDigit()
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.5)
-                        .widgetAccentable()
-                }
-                .padding(6)
+                labelOverTime(lesson.shortName, lesson.startText)
             case let .status(symbol, _, _):
-                Image(systemName: symbol).font(.title2).widgetAccentable()
+                if let next = display.next, let time = display.nextStartText {
+                    labelOverTime(next.shortName, time)
+                } else {
+                    Image(systemName: symbol).font(.title2).widgetAccentable()
+                }
             case .unavailable:
                 Image(systemName: "calendar").font(.title2).widgetAccentable()
             }
         }
     }
 
-    /// Remaining time of the current lesson as a ring with the subject label and the time inside.
-    @ViewBuilder
-    private func ring(label: String) -> some View {
-        let inner = VStack(spacing: 0) {
+    private func labelOverTime(_ label: String, _ time: String) -> some View {
+        VStack(spacing: 0) {
+            Text(verbatim: label)
+                .font(.caption2.weight(.semibold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+            Text(verbatim: time)
+                .font(.system(.body, design: .rounded).weight(.bold))
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .widgetAccentable()
+        }
+        .padding(6)
+    }
+
+    /// The short name and the time left, inside the ring.
+    private func centre(label: String) -> some View {
+        VStack(spacing: 0) {
             Text(verbatim: label)
                 .font(.caption2.weight(.semibold))
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
-            NowNextTimerText(display: display, pauseTime: pauseTime)
-                .font(.system(size: 12, weight: .bold, design: .rounded))
-                .monospacedDigit()
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
-                .multilineTextAlignment(.center)
-                .frame(maxWidth: 44)
+            if let countdown = display.countdown {
+                WidgetCountdownText(countdown: countdown, pauseTime: pauseTime, layout: .valueOnly)
+                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: 44)
+            }
         }
+    }
+
+    @ViewBuilder
+    private func ring(label: String) -> some View {
         if let pauseTime {
-            ProgressView(value: 1 - display.progress(at: pauseTime)) {
+            Gauge(value: 1 - display.progress(at: pauseTime)) {
                 EmptyView()
             } currentValueLabel: {
-                inner
+                centre(label: label)
             }
-            .progressViewStyle(.circular)
+            .gaugeStyle(.accessoryCircular)
             .widgetAccentable()
         } else if let interval = display.timer {
             ProgressView(timerInterval: interval, countsDown: true) {
                 EmptyView()
             } currentValueLabel: {
-                inner
+                centre(label: label)
             }
             .progressViewStyle(.circular)
             .widgetAccentable()
@@ -501,22 +520,27 @@ struct NowNextCircularView: View {
 
 // MARK: - accessoryInline
 
+/// Lock Screen line above the clock (U7, M29): time first, then the short name.
+///   in a lesson   "25 min · SJL"   (live, minutes only, so it always carries a unit)
+///   before one    "Next 8:00 ANJ"
+///   after school  "Done for today"
 struct NowNextInlineView: View {
     let display: NowNextDisplay
     let pauseTime: Date?
 
     var body: some View {
-        if case .current = display.kind, let interval = display.timer {
-            // "Math · 12:34": one catalog format ("%1$@ · %2$@") with the subject name and the live timer as a `Text`
-            // argument (`Text + Text` is deprecated in iOS 26; LocalizedStringKey interpolation of a Text is the
-            // documented replacement). The format is the same in every language, so the extension's own lookup is fine.
+        if case .current = display.kind, let countdown = display.countdown {
+            // One catalog format ("%1$@ · %2$@", same in every language, so the extension's own lookup is fine) with the
+            // live minutes as a `Text` argument (`Text + Text` is deprecated in iOS 26; LocalizedStringKey interpolation
+            // of a Text is the documented replacement). The value is minutes only (`Text(date, style: .relative)` or the
+            // static duration), never mm:ss, because the inline family has no room for a separate unit word.
             let name = Text(verbatim: display.inlineText)
-            if let pauseTime {
-                let remaining = Text(verbatim: CountdownFormat.string(remaining: interval.upperBound.timeIntervalSince(pauseTime)))
-                Text("widget.nowNext.inline.current \(name) \(remaining)")
+            if pauseTime != nil {
+                let remaining = Text(verbatim: countdown.durationText)
+                Text("widget.nowNext.inline.current \(remaining) \(name)")
             } else {
-                let remaining = Text(timerInterval: interval, countsDown: true, showsHours: true)
-                Text("widget.nowNext.inline.current \(name) \(remaining)")
+                let remaining = Text(countdown.interval.upperBound, style: .relative)
+                Text("widget.nowNext.inline.current \(remaining) \(name)")
             }
         } else {
             Text(verbatim: display.inlineText)
