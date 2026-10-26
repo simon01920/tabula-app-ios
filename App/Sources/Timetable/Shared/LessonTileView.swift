@@ -2,10 +2,16 @@
 // list fallback. Every optional field goes through `LessonFieldLines` (field rule), text on the subject colour uses
 // `LessonTileStyle.foreground` (WCAG black/white), the status is an icon + text badge, and VoiceOver reads the single
 // `LessonAccessibilityLabel` sentence (which ends with the task / exam badges of `\.lessonWork`, Phase 3 C1).
+// Phase 4U U4 (Opus M13, Astra F03 / F21):
+// - past lessons are dimmed (opacity 0.6) and carry no checkmark (children read it as "homework done");
+// - the current lesson gets the highlighter outline and a "NOW" tag (words, not a black ring);
+// - at accessibility text sizes the subject name gets a full-width row (symbol and period number above it), time and
+//   fields beneath, badges on the following lines, so "Matematika" no longer breaks inside the word.
 // APIs: RoundedRectangle(cornerRadius:style:), strokeBorder(_:lineWidth:), Label(title:icon:), Text(verbatim:),
 //       strikethrough(_:pattern:color:), monospacedDigit(), accessibilityElement(children:), accessibilityLabel(_:),
 //       accessibilityValue(_:), accessibilityHint(_:), accessibilityAddTraits(_:), @ScaledMetric,
-//       Environment(\.colorScheme), Environment(\.colorSchemeContrast) — availability checked in Apple's docs.
+//       Environment(\.colorScheme), Environment(\.colorSchemeContrast), Environment(\.dynamicTypeSize),
+//       dynamicTypeSize(_:) (range) - availability checked in Apple's docs.
 import SwiftUI
 import TimetableCore
 import TimetableUI
@@ -31,6 +37,7 @@ struct LessonTileView: View {
     @Environment(\.lessonWork) private var work
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.colorSchemeContrast) private var contrast
+    @Environment(\.dynamicTypeSize) private var typeSize
     @ScaledMetric(relativeTo: .body) private var padding: CGFloat = 14
 
     var body: some View {
@@ -40,21 +47,27 @@ struct LessonTileView: View {
         let isCancelled = lesson.status == .cancelled
         let compact = density.effective == .compact
         VStack(alignment: .leading, spacing: compact ? 4 : 6) {
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                SubjectSymbolText(subject: lesson.subject, font: size == .large ? .title2 : .title3)
-                Text(verbatim: lesson.subject.name)
-                    .font(size == .large ? .title2.weight(.semibold) : .headline)
-                    .strikethrough(isCancelled, pattern: .solid, color: foreground)
-                    .fixedSize(horizontal: false, vertical: true)
-                Spacer(minLength: 4)
-                if timing == .past {
-                    // Inline (not an overlay) so it never collides with the period number.
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.footnote)
-                        .accessibilityHidden(true)
+            if typeSize.isAccessibilitySize {
+                // Symbol, period number and "NOW" on their own row; the name below gets the full width (Astra F03).
+                HStack(alignment: .center, spacing: 8) {
+                    SubjectSymbolText(subject: lesson.subject, font: .title3)
+                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                    if let number = lesson.periodNumber {
+                        PeriodNumberBadge(number: number, foreground: foreground)
+                    }
+                    if timing == .current { HighlighterNowTag() }
+                    Spacer(minLength: 0)
                 }
-                if let number = lesson.periodNumber {
-                    PeriodNumberBadge(number: number, foreground: foreground)
+                title(foreground: foreground, isCancelled: isCancelled)
+            } else {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    SubjectSymbolText(subject: lesson.subject, font: size == .large ? .title2 : .title3)
+                    title(foreground: foreground, isCancelled: isCancelled)
+                    Spacer(minLength: 4)
+                    if timing == .current { HighlighterNowTag() }
+                    if let number = lesson.periodNumber {
+                        PeriodNumberBadge(number: number, foreground: foreground)
+                    }
                 }
             }
             HStack(spacing: 6) {
@@ -85,18 +98,28 @@ struct LessonTileView: View {
         .background(RoundedRectangle(cornerRadius: 18, style: .continuous).fill(Color(style.background)))
         .overlay {
             if timing == .current {
-                // The current lesson: a ring in the label colour (shape, not colour alone; VoiceOver says "in progress").
-                RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(Color.primary, lineWidth: 3)
+                // The current lesson: highlighter outline + the "NOW" tag (shape and words, not colour alone;
+                // VoiceOver says "in progress").
+                HighlighterOutline(cornerRadius: 18)
             } else if style.needsOutline(isDark: colorScheme == .dark) || contrast == .increased {
                 RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(Color.secondary.opacity(0.6), lineWidth: 1)
             }
         }
+        // Past lessons step back (Opus M13: dimmed, no checkmark); the current one has the strongest hierarchy (F21).
+        .opacity(timing == .past ? 0.6 : 1)
         .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(verbatim: LessonAccessibilityLabel.make(lesson: lesson, visibility: visibility,
                                                                          reasons: reasons, badges: badges,
                                                                          renderer: model.renderer)))
         .accessibilityValue(ifPresent: timingValue)
+    }
+
+    private func title(foreground: Color, isCancelled: Bool) -> some View {
+        Text(verbatim: lesson.subject.name)
+            .font(size == .large ? .title2.weight(.semibold) : .headline)
+            .strikethrough(isCancelled, pattern: .solid, color: foreground)
+            .fixedSize(horizontal: false, vertical: true)
     }
 
     private var timingValue: LocalizedStringKey? {
@@ -179,6 +202,8 @@ struct LessonRowView: View {
     let reasons: [ModificationReason]
     let visibility: FieldVisibility
     var isInConflict = false
+    /// The lesson in progress: a "NOW" tag above the name (U4).
+    var isCurrent = false
     @Environment(AppModel.self) private var model
     @Environment(\.lessonWork) private var work
 
@@ -187,6 +212,7 @@ struct LessonRowView: View {
         HStack(alignment: .top, spacing: 12) {
             SubjectBadge(subject: lesson.subject, size: 40)
             VStack(alignment: .leading, spacing: 4) {
+                if isCurrent { HighlighterNowTag() }
                 Text(verbatim: lesson.subject.name)
                     .font(.headline)
                     .strikethrough(lesson.status == .cancelled)
@@ -211,10 +237,12 @@ struct LessonRowView: View {
             Spacer(minLength: 0)
         }
         .padding(.vertical, 4)
+        .opacity(lesson.status == .cancelled ? 0.6 : 1)
         .contentShape(Rectangle())
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(verbatim: LessonAccessibilityLabel.make(lesson: lesson, visibility: visibility,
                                                                          reasons: reasons, badges: badges,
                                                                          renderer: model.renderer)))
+        .accessibilityValue(ifPresent: isCurrent ? "today.a11y.inProgress" : nil)
     }
 }

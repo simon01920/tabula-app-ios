@@ -1,62 +1,17 @@
-// The week strip: a navigation bar (previous/next week, the week's date range, the cycle label "Week A") and, for
-// day-based views, the row of day pills (selected-day pill, today marker, change dot). Week-based views (grid,
-// time blocks) draw the same day data as their column headers (`DayColumnHeader`) so the columns line up.
-// The dot never carries meaning alone: each day's VoiceOver label says "2 changes" (`WeekStripModel`).
-// APIs: Button, Image(systemName:), Capsule, Circle, accessibilityLabel(_:), accessibilityAddTraits(.isSelected /
-//       .isHeader), accessibilityHint(_:), @ScaledMetric, Environment(\.dynamicTypeSize).
+// Day headers of the Timetable tab (Phase 4U U4). The week's date range and rotation phrase moved to the navigation
+// subtitle and previous / next week to the toolbar (TimetableRootView); what stays here:
+// - `WeekDayStrip`: the row of day pills for day-based views (selected day = tinted pill, today = filled ink circle;
+//   the two never look alike, Astra F20);
+// - `DayColumnHeader`: one day's header, shared with the grid and week columns (today's column header is tinted,
+//   Opus H5); a day with changes shows a small `exclamationmark.circle` instead of the unexplained orange dot, and its
+//   VoiceOver sentence says "2 changes" (`WeekStripModel`);
+// - `DayPagerHeader`: the compact header of day views at accessibility text sizes (Astra F03): previous day, a date
+//   picker and next day instead of five weekday columns.
+// APIs: Button, Image(systemName:), Circle, RoundedRectangle, DatePicker(.compact) bridged with `LocalDateBridge`,
+//       ViewThatFits, accessibilityLabel(_:), accessibilityAddTraits(.isSelected / .isHeader), @ScaledMetric.
 import SwiftUI
 import TimetableCore
 import TimetableUI
-
-/// Previous / range + cycle label / next.
-struct WeekNavigationBar: View {
-    let strip: WeekStripModel
-    let onPrevious: () -> Void
-    let onNext: () -> Void
-    @Environment(AppModel.self) private var model
-
-    var body: some View {
-        HStack(spacing: 8) {
-            Button(action: onPrevious) {
-                Image(systemName: "chevron.backward")
-                    .frame(minWidth: 44, minHeight: 44)
-            }
-            .accessibilityLabel(Text("timetable.week.previous"))
-            Spacer(minLength: 0)
-            VStack(spacing: 2) {
-                Text(verbatim: rangeText)
-                    .font(.headline)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-                if let cycle = strip.cycleWeek {
-                    Text(verbatim: cycle.text(renderer: model.renderer))
-                        .font(.caption.weight(.semibold))
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 2)
-                        .background(Capsule().fill(.tint.opacity(0.15)))
-                        .overlay(Capsule().strokeBorder(.tint, lineWidth: 1))
-                }
-            }
-            .accessibilityElement(children: .combine)
-            .accessibilityAddTraits(.isHeader)
-            Spacer(minLength: 0)
-            Button(action: onNext) {
-                Image(systemName: "chevron.forward")
-                    .frame(minWidth: 44, minHeight: 44)
-            }
-            .accessibilityLabel(Text("timetable.week.next"))
-        }
-        .font(.body.weight(.semibold))
-    }
-
-    private var rangeText: String {
-        let first = strip.days.first?.date ?? strip.weekStart
-        let last = strip.days.last?.date ?? strip.weekStart.adding(days: 6)
-        return model.renderer.format(key: "timetable.week.range", arguments: [
-            .text(model.formatter.date(first, style: .dayMonth)), .text(model.formatter.date(last, style: .dayMonth)),
-        ])
-    }
-}
 
 /// The row of day pills for day-based views.
 struct WeekDayStrip: View {
@@ -79,12 +34,14 @@ struct WeekDayStrip: View {
     }
 }
 
-/// One day's header: short weekday, day number (filled circle = today, pill = selected), change dot, day-cycle label.
+/// One day's header: short weekday, day number (filled ink circle = today; tinted pill = selected), the change symbol,
+/// the day-cycle label. In week columns (`showsSelection == false`) today's whole header is tinted.
 struct DayColumnHeader: View {
     let day: WeekStripDay
     var showsSelection = false
     @Environment(AppModel.self) private var model
     @ScaledMetric(relativeTo: .body) private var circle: CGFloat = 30
+    @ScaledMetric(relativeTo: .caption2) private var markerHeight: CGFloat = 11
 
     var body: some View {
         let selected = showsSelection && day.isSelected
@@ -92,25 +49,25 @@ struct DayColumnHeader: View {
             Text(verbatim: model.formatter.weekdayName(day.date.weekday, width: .abbreviated))
                 .font(.caption2.weight(.semibold))
                 .textCase(.uppercase)
-                .foregroundStyle(selected ? Color.primary : Color.secondary)
+                .foregroundStyle(selected || day.isToday ? Color.primary : Color.secondary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
             Text(verbatim: day.date.day.formatted())
                 .font(.callout.weight(day.isToday || selected ? .bold : .regular))
                 .monospacedDigit()
-                .foregroundStyle(day.isToday ? Color.white : Color.primary)
+                .foregroundStyle(day.isToday ? TimetableColor.onInk : Color.primary)
                 .frame(minWidth: circle, minHeight: circle)
                 .background {
-                    if day.isToday {
-                        Circle().fill(Color.red)   // white on system red ≥ 4.5:1 (same as Calendar's today marker)
-                    } else if selected {
-                        Circle().strokeBorder(Color.primary, lineWidth: 1.5)
-                    }
+                    // Ink, not red: red means "cancelled / overdue" only (UX plan D1). White on #2541B2 8.5:1;
+                    // black on the dark-mode ink #8EA2FF 8.8:1.
+                    if day.isToday { Circle().fill(TimetableColor.ink) }
                 }
-            // Change dot (meaning also in the VoiceOver label); a fixed-height slot keeps the rows aligned.
-            Circle()
-                .fill(day.hasChanges ? Color.orange : Color.clear)
-                .frame(width: 6, height: 6)
+            // A fixed-height slot keeps the rows aligned; the meaning is also in the VoiceOver sentence.
+            Image(systemName: "exclamationmark.circle")
+                .font(.system(size: markerHeight, weight: .semibold))
+                .foregroundStyle(Color.secondary)
+                .opacity(day.hasChanges ? 1 : 0)
+                .frame(height: markerHeight)
             if let cycle = day.cycleDay {
                 Text(verbatim: cycle.text(renderer: model.renderer))
                     .font(.caption2)
@@ -122,11 +79,70 @@ struct DayColumnHeader: View {
         .padding(.vertical, 4)
         .background {
             if selected {
-                RoundedRectangle(cornerRadius: 12, style: .continuous).fill(.tint.opacity(0.12))
+                RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Color.secondary.opacity(0.16))
+            } else if !showsSelection && day.isToday {
+                RoundedRectangle(cornerRadius: 12, style: .continuous).fill(TimetableColor.ink.opacity(0.12))
             }
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(verbatim: WeekStripModel.accessibilityLabel(day, renderer: model.renderer)))
         .accessibilityAddTraits(selected ? [.isSelected] : [])
+    }
+}
+
+/// Day views at accessibility text sizes: ‹ previous day · date picker · next day › (stacks when it does not fit).
+struct DayPagerHeader: View {
+    let date: LocalDate
+    let onPrevious: () -> Void
+    let onNext: () -> Void
+    let onPick: (LocalDate) -> Void
+    @Environment(AppModel.self) private var model
+
+    var body: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 8) {
+                previous
+                Spacer(minLength: 0)
+                picker
+                Spacer(minLength: 0)
+                next
+            }
+            VStack(spacing: 4) {
+                picker
+                HStack {
+                    previous
+                    Spacer(minLength: 0)
+                    next
+                }
+            }
+        }
+        .font(.body.weight(.semibold))
+    }
+
+    private var previous: some View {
+        Button(action: onPrevious) {
+            Image(systemName: "chevron.backward").frame(minWidth: 44, minHeight: 44)
+        }
+        .accessibilityLabel(Text("timetable.day.previous"))
+    }
+
+    private var next: some View {
+        Button(action: onNext) {
+            Image(systemName: "chevron.forward").frame(minWidth: 44, minHeight: 44)
+        }
+        .accessibilityLabel(Text("timetable.day.next"))
+    }
+
+    private var picker: some View {
+        DatePicker(selection: Binding(
+            get: { LocalDateBridge.instant(date) },
+            set: { onPick(LocalDateBridge.date($0, fallback: date)) }
+        ), displayedComponents: .date) {
+            Text("timetable.day.pick")
+        }
+        .labelsHidden()
+        .datePickerStyle(.compact)
+        .environment(\.timeZone, LocalDateBridge.timeZone)
+        .environment(\.calendar, LocalDateBridge.calendar(locale: model.environment.locale()))
     }
 }

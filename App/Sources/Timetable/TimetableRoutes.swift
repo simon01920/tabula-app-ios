@@ -1,6 +1,8 @@
 // Launch routes of the Timetable feature (owned by stage B2). Add entries here only; see Routing/RouteRegistry.swift.
 //   timetable                 → the tab with the timetable's remembered view
 //   timetable.grid|week|day|tiles → the tab forced to that view (not persisted)
+//   timetable.grid-next-week  → the grid one week ahead (shows the "Today" button and the other rotation week) (U4)
+//   timetable.grid-legend     → the grid with the one-time symbol legend forced visible (TipKit test mode) (U4)
 //   timetable.lesson-detail   → sheet: a changed lesson of the shown week (else the first lesson)
 //   timetable.quick-add       → sheet: the subject picker for the first free slot of the shown week
 // Sheets pick their subject from the `-TabulaSeed` data; with no matching data they show an empty state.
@@ -16,6 +18,10 @@ enum TimetableRoutes: RouteProvider {
             AppRoute("timetable.week", .tabRoot(.timetable)) { TimetableRootView(initialView: .timeBlocks) },
             AppRoute("timetable.day", .tabRoot(.timetable)) { TimetableRootView(initialView: .day) },
             AppRoute("timetable.tiles", .tabRoot(.timetable)) { TimetableRootView(initialView: .tiles) },
+            AppRoute("timetable.grid-next-week", .tabRoot(.timetable)) { TimetableRootView(initialView: .grid, weekOffset: 1) },
+            AppRoute("timetable.grid-legend", .tabRoot(.timetable)) {
+                TimetableRootView(initialView: .grid, forcesLegendTip: true)
+            },
             AppRoute("timetable.lesson-detail", .sheet(over: .timetable)) { LessonDetailRouteView() },
             AppRoute("timetable.quick-add", .sheet(over: .timetable)) { QuickAddRouteView() },
         ]
