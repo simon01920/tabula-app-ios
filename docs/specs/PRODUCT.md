@@ -32,7 +32,7 @@ Presets are data in `TimetableCore` (testable), not hard-coded in views.
 - Multiple timetables ("School", "Sport", "College"), each with own days, grid, theme, fields.
 - Subjects: name, unique colour, optional emoji/icon, optional short name for grid cells.
 - Lessons: subject, slot (period or start/end), room, building/faculty, teacher, type, notes, bring-list.
-- Field rule: disabled → hidden everywhere (including editor). Enabled but empty → absent from the UI; no placeholders, dashes or blank lines.
+- Field rule: disabled → hidden in summaries (cards, lesson detail, widgets). Editors always offer every optional field under "More details", and changing the setting never deletes a value (UX overhaul decision D10, 2026-10-23, `docs/specs/UX_OVERHAUL_PLAN.md`; it replaced "hidden everywhere, including editor"). Enabled but empty → absent from read-only views; no placeholders, dashes or blank lines.
 - Per-day overrides (e.g. short Friday); one-off overrides (substitution, cancellation, room change); term ranges; holidays/breaks; rotation resolution; conflict warnings (warn, never block).
 
 ## Views (selectable per timetable, remembered)
