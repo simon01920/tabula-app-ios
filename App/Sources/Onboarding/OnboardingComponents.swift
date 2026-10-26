@@ -274,7 +274,7 @@ struct OnboardingMinutesField: View {
             if isFocused {
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
-                    Button { isFocused = false } label: { Text("onboarding.action.doneTyping") }
+                    Button { isFocused = false } label: { Text("editor.common.done") }
                 }
             }
         }
