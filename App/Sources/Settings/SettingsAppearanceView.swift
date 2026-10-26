@@ -96,7 +96,7 @@ private struct PackRow: View {
                 HStack {
                     Text(LocalizedStringKey(choice.pack.nameKey)).font(.body.weight(.semibold))
                     if choice.pack.requiresPro {
-                        ProBadge()   // C2: was 1.88:1 light-blue text; ink on a neutral capsule, ≥ 7:1
+                        ProBadge()   // C2: was 1.88:1 light-blue text; ink on an ink-tinted capsule, ≥ 4.5:1 (tested)
                     }
                     Spacer()
                     if isSelected { Image(systemName: "checkmark").foregroundStyle(.tint).accessibilityHidden(true) }

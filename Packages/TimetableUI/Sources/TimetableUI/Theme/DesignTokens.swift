@@ -64,6 +64,8 @@ public enum DesignTokens {
     public static let onInk = ColorToken(light: .white, dark: .black)
 
     /// Overdue, cancelled, destructive. 5.6:1 on white, 6.0:1 on #1C1C1E.
+    /// Rule: only on the `Reference` surfaces (white / grouped-grey page, dark cards). Not as text on system grey
+    /// fills (`.quaternary`, systemGray5/6 capsules): it drops to about 4.4:1 there. Use a card surface instead.
     public static let correction = ColorToken(light: hex("#C62828"), dark: hex("#FF6961"),
                                               lightIncreasedContrast: hex("#A11B1B"),
                                               darkIncreasedContrast: hex("#FF8F88"))
@@ -75,6 +77,8 @@ public enum DesignTokens {
     public static let onHighlighter = ColorToken(light: .black, dark: .black)
 
     /// Secondary text that carries data on cards (≥ 4.5:1 on white and grouped grey, and on dark cards).
+    /// Rule: only on the `Reference` surfaces. Not on system grey fills (`.quaternary`, systemGray5/6 capsules): it
+    /// drops to about 4.1:1 there. Put the text on a card surface (`cardSurface()`) instead.
     public static let pencil = ColorToken(light: hex("#6C6C70"), dark: hex("#A1A1A6"),
                                           lightIncreasedContrast: hex("#48484A"), darkIncreasedContrast: hex("#C7C7CC"))
 

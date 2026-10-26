@@ -355,6 +355,7 @@ private struct WeekdayToggle: View {
                 Text(verbatim: name).lineLimit(1).minimumScaleFactor(0.7)
             }
             .frame(maxWidth: .infinity, minHeight: 44)
+            .foregroundStyle(isSelected ? Color.onInk : Color.ink)   // onInk on the prominent fill (RISKS #86)
         }
         .accessibilityAddTraits(isSelected ? .isSelected : [])
         if isSelected {

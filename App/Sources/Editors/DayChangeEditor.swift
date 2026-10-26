@@ -273,7 +273,7 @@ private struct DayChangeFormContent: View {
     private var issueFooter: some View {
         ForEach(draft.issues(visibility: visibility), id: \.self) { issue in
             if issue != .nothingChanged || draft.kind == .changeLesson {
-                ValidationMessage(key: issue.l10nKey)
+                ValidationMessage(key: issue.l10nKey, severity: issue.severity)
             }
         }
     }

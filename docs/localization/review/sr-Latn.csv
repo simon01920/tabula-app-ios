@@ -406,7 +406,6 @@ editor.timetables.reset.title,,Title of the reset confirmation sheet.,Reset this
 editor.timetables.setActive,,Menu action: make the timetable the active one.,Show This Timetable,Prikaži ovaj raspored,,
 editor.timetables.title,,Navigation title of the timetables manager.,Timetables,Rasporedi,,
 editor.unavailable.title,,Title shown in an editor sheet that was opened for something that does not exist (e.g. no timetable).,Nothing to edit,Nema šta da se uređuje,,
-editor.validation.announcement,,VoiceOver announcement after tapping Save in an editor whose entries are incomplete or wrong; the messages appear next to the fields.,Some fields need a look before you can save.,Pre čuvanja proverite neka polja.,,
 editor.validity,,Picker label: when the lesson takes place (always / selected terms / date range).,Applies,Važi,,
 editor.validity.always,,Validity option.,Always,Uvek,,
 editor.validity.from,,Date picker label: first day of the validity range.,From,Od,,

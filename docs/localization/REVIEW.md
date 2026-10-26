@@ -167,7 +167,7 @@ The AppShortcuts catalog is not part of the review export (the export covers Loc
 in the file itself. The brand stays undeclined ("aplikácia Tabula", "Отвара Tabula"). Final QA: + `intent.param.alarm`
 (an internal parameter title, rarely visible); `probe.intent.shortTitle` removed (the probe's App Shortcut is gone).
 ### Phase 4U U1 additions (2026-10-26, swiftui-engineer)
-6 new keys, model-authored for 11 languages (`sr-Latn` derived), all `needs_review`: `now.marker` (the highlighter
+6 new keys (5 after QA: `editor.validation.announcement` was removed again), model-authored for 11 languages (`sr-Latn` derived), all `needs_review`: `now.marker` (the highlighter
 "NOW" marker on the current lesson; the app shows it in capitals, VoiceOver reads it as written, so keep one short word:
 "Teraz", "Jetzt", 今), `editor.validation.announcement` (VoiceOver only, after Save on an incomplete form), and the
 title-field hints `exams.editor.name.prompt`, `tasks.field.title.prompt`, `editor.subject.name.prompt`,

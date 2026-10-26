@@ -2,7 +2,7 @@
 // appearance preference from settings, and the launch route (`-TabulaScreen`).
 // APIs: View.preferredColorScheme(_:), VStack, ProgressView, NavigationStack, View.sheet(isPresented:content:),
 //       Environment(AppModel.self) (Observation), ContentUnavailableView (iOS 17), View.tint(_:) (iOS 15),
-//       View.environment(\.locale, _:) (EnvironmentValues.locale).
+//       (no root `\.locale` override: see body).
 import SwiftUI
 import TimetableUI
 
@@ -15,9 +15,9 @@ struct AppRootView: View {
             .preferredColorScheme(model.appearance.colorScheme)
             // Phase 4U U1 (D1): the ink tint replaces system blue (3.5:1 on white) app-wide.
             .tint(Color.ink)
-            // Phase 4U U1 (D4 / H1): one locale with the effective hour cycle (app setting, else System), so every
-            // DatePicker and SwiftUI date text shows the same 12/24-hour clock as the app's formatted text.
-            .environment(\.locale, model.formatter.locale)
+            // D4 / H1: the hour-cycle locale is applied to the time pickers only (`.hourCycleLocale(_:)` on TimeRow and
+            // the onboarding time picker), not here: a root `\.locale` would also drive SwiftUI's string lookup and
+            // replace `Locale.current` (with the user's iOS region preferences) everywhere (QA M1, RISKS #87).
     }
 
     @ViewBuilder

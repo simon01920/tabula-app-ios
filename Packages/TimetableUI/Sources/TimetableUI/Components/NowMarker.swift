@@ -65,6 +65,8 @@ public struct NowMarker: View {
 
 /// The marker's shape: a band with softly rounded, slightly slanted ends and a faint wave along the edges, like one
 /// pass of a chisel-tip highlighter. Fills its rect; usable on its own (e.g. behind a grid cell's time).
+/// Never use it as the only cue for "now": the yellow can be desaturated (widget accented / vibrant modes) and colour
+/// alone is not a signal (HIG accessibility). Pair it with the word (NowMarker) or a VoiceOver value ("in progress").
 public struct HighlighterStroke: Shape {
     public init() {}
 

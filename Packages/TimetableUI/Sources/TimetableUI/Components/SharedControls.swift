@@ -6,8 +6,9 @@
 //   Apple docs `ButtonRole.close` and `Button.init(role:action:)` "Creates a button that displays a default label",
 //   checked 2026-10-23). Put it in `ToolbarItem(placement: .cancellationAction)`; the trailing item is Edit.
 // - ProBadge (C2): the "Pro" marker on Pro-only choices. Was light-blue text on white (1.88:1, measured); now ink text
-//   on a neutral capsule with explicit colours, so a disabled parent control cannot fade it (ink on white 8.5:1, on the
-//   capsule's 12 % grey ≥ 7:1, tested in DesignTokensTests).
+//   on a capsule filled with ink at 12 % opacity (plus a 35 % ink hairline), with explicit colours so a disabled parent
+//   control cannot fade it (ink on white 8.5:1; on its own tinted fill ≥ 4.5:1 in every appearance, tested in
+//   DesignTokenContrastTests.proBadgeTextOnItsTintedCapsule).
 #if canImport(SwiftUI)
 import SwiftUI
 
@@ -30,6 +31,14 @@ public struct SheetCloseButton: View {
 }
 
 extension View {
+    /// D4 / H1: shows a time `DatePicker` with the app's effective hour cycle (`TimeFormatLocale.locale`, which is
+    /// `AppModel.formatter.locale`). Scoped to the picker on purpose: a root `\.locale` would also drive SwiftUI's
+    /// string lookup and replace `Locale.current`, with the user's iOS region preferences, everywhere (RISKS #87).
+    /// The app's own text already follows the setting through `TimetableFormatter`.
+    public func hourCycleLocale(_ locale: Locale) -> some View {
+        environment(\.locale, locale)
+    }
+
     /// M1 (Opus review): a control whose label repeats its section header ("Rotation" header over a "Rotation" picker)
     /// shows only the header. The label stays the control's accessibility label, so VoiceOver still names it.
     ///

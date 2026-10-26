@@ -184,11 +184,59 @@ struct TimeFormatLocaleTests {
         #expect(sk.language.languageCode?.identifier == "sk")
     }
 
+    @Test(arguments: ["sr-Latn_RS", "zh-Hans_CN", "pt_BR", "en_GB", "sk_SK", "en_US@fw=mon"])
+    func overrideKeepsScriptRegionAndWeekStart(identifier: String) {
+        let system = Locale(identifier: identifier)
+        for setting in [HourCycle.h12, .h24] {
+            let result = TimeFormatLocale.locale(system: system, setting: setting)
+            #expect(result.hourCycle == (setting == .h24 ? .zeroToTwentyThree : .oneToTwelve), "\(identifier)")
+            #expect(result.language.languageCode == system.language.languageCode, "\(identifier) language")
+            #expect(result.language.script == system.language.script, "\(identifier) script")
+            #expect(result.region == system.region, "\(identifier) region")
+            #expect(result.firstDayOfWeek == system.firstDayOfWeek, "\(identifier) first weekday")
+            #expect(result.calendar.identifier == system.calendar.identifier, "\(identifier) calendar")
+        }
+    }
+
+    @Test func scriptSurvivesInFormattedText() {
+        let zone = TimeZone(identifier: "Europe/Belgrade")!
+        let latin = TimetableFormatter(locale: Locale(identifier: "sr-Latn_RS"), hourCycle: .h24, timeZone: zone)
+        let date = LocalDate(year: 2026, month: 10, day: 13)!
+        let text = latin.contextualDate(date, today: date)
+        // Latin script ("utorak"), not Cyrillic ("уторак").
+        #expect(text.unicodeScalars.allSatisfy { $0.value < 0x0400 || $0.value > 0x04FF }, "\(text)")
+    }
+
     @Test func formatterAndInjectedLocaleAgree() {
         let zone = TimeZone(identifier: "Europe/Bratislava")!
         let formatter = TimetableFormatter(locale: Locale(identifier: "en_US"), hourCycle: .h24, timeZone: zone)
         #expect(formatter.locale == TimeFormatLocale.locale(system: Locale(identifier: "en_US"), setting: .h24))
         #expect(formatter.time(LocalTime(hour: 17, minute: 0)!) == "17:00")
+    }
+}
+
+@Suite("Validation visibility (M5)")
+struct ValidationVisibilityTests {
+    @Test func hintsShowFromTheStartErrorsAfterTheFirstEdit() {
+        // Untouched editor: the hint explains the disabled Save; no red error yet.
+        #expect(ValidationVisibility.isShown(.hint, hasEdited: false))
+        #expect(!ValidationVisibility.isShown(.error, hasEdited: false))
+        // After the first edit: both.
+        #expect(ValidationVisibility.isShown(.hint, hasEdited: true))
+        #expect(ValidationVisibility.isShown(.error, hasEdited: true))
+        #expect(!ValidationVisibility.errorsVisible(hasEdited: false))
+        #expect(ValidationVisibility.errorsVisible(hasEdited: true))
+    }
+
+    @Test func dayChangeMissingChoicesAreHints() {
+        #expect(DayChangeDraft.Issue.nothingChanged.severity == .hint)
+        #expect(DayChangeDraft.Issue.noLesson.severity == .hint)
+        #expect(DayChangeDraft.Issue.noFollowDay.severity == .hint)
+        #expect(DayChangeDraft.Issue.noSubject.severity == .hint)
+        #expect(DayChangeDraft.Issue.noBellSchedule.severity == .error)
+        // "Enter at least one change." is never red on a form nobody touched.
+        #expect(!(DayChangeDraft.Issue.nothingChanged.severity == .error
+                  && ValidationVisibility.isShown(.error, hasEdited: false)))
     }
 }
 

@@ -35,25 +35,33 @@ The debug screen `debug.design` (DEBUG builds: launch argument `-TabulaScreen de
 ### U1.3 Prominent buttons in dark mode (RISKS #86)
 - [ ] Dark mode, onboarding: the **Next** / **Get Started** button label is black on the light ink and easy to read.
 - [ ] Dark mode, Tasks: the selected filter chip has black text on ink; unselected chips have white (primary) text.
-- [ ] Note whether other prominent buttons (not yet converted by later stages) show white text on the light ink
-      (expected to be hard to read; report where).
+- [ ] Dark mode, every editor sheet (new exam, new task, lesson, subject): the toolbar **Save** (the
+      `.confirmationAction` item, drawn by the system) is readable on its ink-tinted glass: note the label colour
+      (white / black) and whether it is easy to read. Same for the disabled state.
+- [ ] Dark mode: Exams empty state "Add Exam", Subjects empty state "Add Subject", the reminder permission sheet
+      "Allow", the voice-note record button and the selected weekday chips in the task repeat editor have black
+      labels on the light ink (the recording state: black on the light red).
+- [ ] Note any other prominent button with white text on the light ink (validate.sh fails on new ones without
+      `.onInkLabel()`; system-drawn buttons are outside that check).
 
 ### U1.4 12/24-hour clock (D4 / H1)
 - [ ] Settings › Calendar & time › Time format shows **System** on a fresh install (onboarding does not change it).
 - [ ] iOS 24-Hour Time **off**, app setting System: lesson editor, exam editor, bell editor and reminder-rule time
       pickers show AM/PM, and so does the app's text ("8:00 AM").
 - [ ] iOS 24-Hour Time **on**, app setting System: all of the above show 24-hour times, pickers included.
-- [ ] App setting **24-hour** with iOS set to 12-hour (US region): every DatePicker wheel/compact picker shows 24-hour
-      values (no AM/PM column), matching the text. The reminder-rule screen no longer mixes "at 17:00" with
+- [ ] App setting **24-hour** with iOS set to 12-hour (US region): every time picker (lesson, exam, bell, reminder
+      rule, onboarding first lesson) shows 24-hour values (no AM/PM column), matching the text. The reminder-rule screen no longer mixes "at 17:00" with
       "7:00 AM".
 - [ ] App setting **12-hour** with a Slovak region: pickers show AM/PM.
 - [ ] Changing the setting while an editor is closed, then opening the editor: the picker follows immediately.
 
-### U1.5 Language still correct with the injected locale (RISKS #87)
-- [ ] Device language Slovak: all app text is Slovak (spot-check Today, Settings, an editor).
-- [ ] Per-app language German (device English): app text is German, dates are German.
-- [ ] Device language not supported by the app (e.g. Swedish): app text falls back to English, as before U1.
-- [ ] Japanese or Simplified Chinese: the NowMarker reads 今 / 现在 and fits; time pickers follow the setting.
+### U1.5 Time pickers keep the region (RISKS #87)
+The hour-cycle locale is applied to the time pickers only (not the whole app).
+- [ ] Region with a custom iOS first weekday or date format (Settings › General › Language & Region): the lesson
+      editor's time picker still uses the device's language and numbering; the rest of the app is unchanged.
+- [ ] Serbian (Latin) device language: time picker labels are Latin, not Cyrillic.
+- [ ] Japanese or Simplified Chinese: the NowMarker on `debug.design` reads 今 / 现在 and fits; time pickers follow
+      the 12/24-hour setting.
 
 ### U1.6 Contrast fixes in shared components (C2)
 - [ ] Settings › Appearance: the **Pro** marker next to Pro palettes is ink text in a light-ink capsule, clearly
@@ -80,12 +88,12 @@ The debug screen `debug.design` (DEBUG builds: launch argument `-TabulaScreen de
 ### U1.9 Title fields and validation (M5, M6)
 - [ ] New exam / new task / new subject / new timetable: the first text field is a large, left-aligned field with a
       grey hint ("Exam title", "Task title", "Subject name", "Timetable name"); it looks like a field you can type in.
-- [ ] Opening a new editor shows **no** red or grey validation message. After typing a letter and deleting it, the hint
-      ("Enter a title to save …" / "Enter a name.") appears directly under the title field.
-- [ ] Day change editor: "Enter at least one change." is not shown on open; it appears after changing anything, or
-      after tapping Save.
-- [ ] Tapping **Save** on an incomplete form does not close the sheet; the messages appear next to the fields and
-      VoiceOver announces "Some fields need a look before you can save."
+- [ ] Opening a new editor: **Save is disabled** and the grey hint ("Enter a title to save …" / "Enter a name.")
+      shows directly under the empty title field, with an info icon. No red message is shown.
+- [ ] Typing a title removes the hint and enables Save.
+- [ ] Day change editor: "Enter at least one change." (Change a lesson) is grey with an info icon, never red, and
+      Save is disabled until a change is entered.
+- [ ] Errors (e.g. exam end before start, a lesson slot problem) appear in red only after you changed something.
 - [ ] A complete form saves and closes as before.
 - [ ] German and Slovak: the hint text and messages wrap, no truncation; AX-XXXL: the title field grows, the hint sits
       under it.
@@ -116,7 +124,6 @@ The debug screen `debug.design` (DEBUG builds: launch argument `-TabulaScreen de
 
 ### Not verifiable without a device
 Actual resolved colours of the dynamic tokens (trait resolution in sheets, widgets and Live Activities), whether
-`Button(role: .close)` renders the system ×, whether DatePickers honour the locale's hour-cycle keyword, string lookup
-under the injected locale, whether a disabled row dims the ProBadge, the AX layouts, VoiceOver wording, and the SF
+`Button(role: .close)` renders the system ×, whether the time pickers honour the locale's hour-cycle keyword, whether a disabled row dims the ProBadge, the AX layouts, VoiceOver wording, and the SF
 Symbol names that were not confirmed from an external list (`pencil.circle`, `exclamationmark.circle`, `circle`,
 `list.bullet.indent`).

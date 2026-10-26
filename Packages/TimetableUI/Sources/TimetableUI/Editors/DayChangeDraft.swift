@@ -43,6 +43,15 @@ public struct DayChangeDraft: Equatable, Sendable {
 
         /// Catalog key of the explanation.
         public var l10nKey: String { "editor.dayChange.issue.\(rawValue)" }
+
+        /// How the editor shows it (M5): a missing choice is a hint, visible from the start next to the disabled Save;
+        /// a timetable without a bell schedule for a short day is an error.
+        public var severity: ValidationSeverity {
+            switch self {
+            case .nothingChanged, .noLesson, .noFollowDay, .noSubject: return .hint
+            case .noBellSchedule: return .error
+            }
+        }
     }
 
     public let overrideID: ScheduleOverride.ID

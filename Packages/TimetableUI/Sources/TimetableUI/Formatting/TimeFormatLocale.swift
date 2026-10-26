@@ -5,8 +5,10 @@
 // vocabulary `AppSettings.hourCycle` (`auto` / `h12` / `h24`): its default is already `auto` = System and unknown
 // values (newer app versions) behave as `auto`, so no schema change is needed.
 //
-// The app root injects this locale with `.environment(\.locale, …)` (AppRootView), so every `DatePicker` and SwiftUI
-// date text shows the same clock as the app's own `TimetableFormatter` text.
+// The time pickers get this locale through `.hourCycleLocale(_:)` (TimeRow, the onboarding time picker), so they
+// show the same clock as the app's own `TimetableFormatter` text. It is deliberately not injected at the app root
+// (RISKS #87): there `\.locale` would also drive string lookup and replace the user's iOS region preferences.
+// Linux tests: the script, region, calendar and first weekday survive the round trip (sr-Latn_RS, zh-Hans_CN, pt_BR).
 // APIs (Apple docs JSON, checked 2026-10-23): Locale.Components.init(locale:), Locale.Components.hourCycle
 //   (`Locale.HourCycle?`, iOS 16), Locale.init(components:) (iOS 16), Locale.hourCycle (iOS 16).
 import Foundation

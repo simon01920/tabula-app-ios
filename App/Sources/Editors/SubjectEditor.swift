@@ -386,7 +386,7 @@ struct SubjectsListView: View {
                     } description: {
                         Text("editor.subjects.empty.message")
                     } actions: {
-                        Button { editing = SubjectEditTarget(subjectID: nil) } label: { Text("editor.subjects.add") }
+                        Button { editing = SubjectEditTarget(subjectID: nil) } label: { Text("editor.subjects.add").onInkLabel() }
                             .buttonStyle(.borderedProminent)
                     }
                 } else {

@@ -145,6 +145,7 @@ struct TimeStepView: View {
             }
             .environment(\.timeZone, model.calendarContext.timeZone)
             .environment(\.calendar, model.calendarContext.calendar)
+            .hourCycleLocale(model.formatter.locale)   // D4 / H1: the app's 12/24-hour clock
             .frame(minHeight: 44)
             OnboardingStepper(titleKey: draft.termKey("onboarding.time.length"), value: $flow.draft.lessonMinutes,
                               range: OnboardingDraft.lessonMinutesRange, step: 5, valueText: minutes)

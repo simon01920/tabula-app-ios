@@ -202,6 +202,24 @@ for folder in ALL_APP_CODE:
 if FAILS == macro_fails_before:
     ok("macro policy: no SwiftData anywhere; Debug/, TimetableUI, TimetableCore macro-free outside TABULA_MACRO_PROBES")
 
+# Prominent buttons on the ink tint (Phase 4U U1, RISKS #86): the dark-mode ink #8EA2FF is light, so the system's white
+# label on a `.borderedProminent` / `.glassProminent` fill is 2.40:1. Every such button must give its label the
+# `onInk` colour (`.onInkLabel()` or `Color.onInk`) within the 20 lines before the style (the Button's label block).
+# Exemption: a trailing `// onInk-exempt: <reason>` comment on the style line (e.g. a fill that is not the ink).
+PROMINENT = re.compile(r"\.buttonStyle\(\.(borderedProminent|glassProminent)\)")
+missing_on_ink = []
+for folder in ("App/Sources", "WidgetExtension/Sources", "WatchApp/Sources", "Packages/TimetableUI/Sources"):
+    for f in sorted((ROOT / folder).rglob("*.swift")):
+        lines = f.read_text(encoding="utf-8").splitlines()
+        for no, line in enumerate(lines):
+            if line.strip().startswith("//") or not PROMINENT.search(line) or "onInk-exempt:" in line:
+                continue
+            window = "\n".join(lines[max(0, no - 20):no + 1])
+            if "onInkLabel()" not in window and "Color.onInk" not in window:
+                missing_on_ink.append(f"{f.relative_to(ROOT).as_posix()}:{no + 1}")
+check(not missing_on_ink, "prominent buttons use the onInk label colour (.onInkLabel() / Color.onInk; RISKS #86)",
+      f"prominent button without .onInkLabel() (white on the dark ink is 2.40:1): {missing_on_ink}")
+
 # Debug gating (PHASE2_PLAN §0.2): every file in App/Sources/Debug compiles only in DEBUG builds.
 ungated = []
 for f in sorted((ROOT / "App/Sources/Debug").rglob("*.swift")):
