@@ -166,3 +166,13 @@ name inserted (hu uses "a(z) ${applicationName}" because the article depends on 
 The AppShortcuts catalog is not part of the review export (the export covers Localizable + InfoPlist); review its 4 keys
 in the file itself. The brand stays undeclined ("aplikácia Tabula", "Отвара Tabula"). Final QA: + `intent.param.alarm`
 (an internal parameter title, rarely visible); `probe.intent.shortTitle` removed (the probe's App Shortcut is gone).
+### Phase 4U Stage U5a additions (2026-10-23, swiftui-engineer-sonnet)
+34 new keys (`settings.section.*`, `settings.bell.*`, `settings.terms.row`, `settings.timetables.add`, `settings.value.*`,
+`settings.reminders.summary.on`, `settings.reminders.delivery.*`, `settings.schooltype.title`, `settings.datetime.*`,
+`settings.colors.*`, `settings.aboutfeedback.title`, `settings.about.{feedback,privacyPolicy,rate,acknowledgements.body2}`,
+`reminders.tier.timeSensitive.unavailable`, `health.{checks,technical}.title`), model-authored for 11 languages (`sr-Latn`
+derived), all `needs_review`. 31 keys of the old Appearance / Calendar / Reminders / About screens were removed. Reviewer:
+count phrases (`settings.reminders.summary.on`, `settings.colors.applied`, `settings.colors.apply.confirm.message`) are
+written as "label: N" in the Slavic languages to avoid noun declension, check they read naturally; `settings.colors.undo`
+should differ from Cancel where the language allows (ro "Anulează modificarea"; fr uses Apple's "Annuler"); the Time Sensitive
+tier names reuse the existing `settings.reminders.timesensitive.title` wording per language.
