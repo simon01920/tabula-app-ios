@@ -139,11 +139,12 @@ public struct ProfilePreset: Hashable, Sendable {
         ]
     )
 
-    /// Other: ask about time structure · all fields off · ask about rotation · grid · simple exams.
+    /// Other: ask about time structure · Room, Teacher (the school default; onboarding no longer asks, U6/D8) · ask
+    /// about rotation · grid · simple exams.
     public static let other = ProfilePreset(
         profile: .other,
         timeStructure: nil,
-        visibleFields: [],
+        visibleFields: [.room, .teacher],
         rotationPrompt: .ask,
         defaultView: .grid,
         examProminence: .simple,

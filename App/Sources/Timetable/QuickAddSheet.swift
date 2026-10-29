@@ -2,8 +2,12 @@
 // lesson for that slot through `model.apply(.upsert(...))` and closes the sheet; "New subject…" opens the subject
 // editor (route `editor.subject`, disabled while it is not registered). The lesson itself is built by
 // `QuickAddTarget.makeLesson` (TimetableUI, Linux-tested: day key, cycle week, period/time slot).
+// Phase 4U U4 (Opus H14): an opaque grouped background (no grid bleeding through the glass sheet), and a header that
+// states the weekly scope, "Every Monday · Week B · Period 7 (13:40–14:25)" (`QuickAddScope`), instead of one date.
+// HIG: sheets.md › Mobile (medium detent for progressive disclosure, Cancel on the leading edge).
 // APIs: NavigationStack, List, Section(content:header:footer:), Button, ContentUnavailableView,
-//       presentationDetents(_:), sensoryFeedback(_:trigger:) (iOS 17), Environment(\.dismiss).
+//       presentationDetents(_:), presentationBackground(_:) (iOS 16.4), sensoryFeedback(_:trigger:) (iOS 17),
+//       Environment(\.dismiss).
 import SwiftUI
 import TimetableCore
 import TimetableUI
@@ -45,15 +49,15 @@ struct QuickAddSheet: View {
                         .accessibilityHint(Text("timetable.quickAdd.subjectHint"))
                     }
                 } header: {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(verbatim: model.formatter.date(target.date, style: .full))
-                        Text(verbatim: slotText)
-                    }
+                    Text(verbatim: scopeText)
+                        .textCase(nil)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.primary)
                 } footer: {
                     if failed {
                         Label { Text("timetable.quickAdd.failed") } icon: { Image(systemName: "exclamationmark.triangle") }
-                    } else if let week = cycleWeekText {
-                        Text(verbatim: model.renderer.format(key: "timetable.quickAdd.cycleWeekFooter", arguments: [.text(week)]))
+                    } else if cycleWeek != nil {
+                        Text("timetable.quickAdd.cycleWeekOnlyFooter")
                     }
                 }
                 Section {
@@ -75,6 +79,8 @@ struct QuickAddSheet: View {
             }
         }
         .presentationDetents([.medium, .large])
+        // Opaque: the colourful grid must not show through behind the subject list (Opus H14).
+        .presentationBackground(Color(.systemGroupedBackground))
         .sensoryFeedback(.success, trigger: added)
         .editorSheet($editor)
     }
@@ -84,17 +90,19 @@ struct QuickAddSheet: View {
         return QuickAddSubjects.list(database, timetableID: target.timetableID, locale: model.formatter.locale)
     }
 
-    /// "Period 3 · 9:50 – 10:35", or the time range for free-form rows.
-    private var slotText: String {
-        let range = model.formatter.timeRange(target.start, target.end)
-        guard let number = target.lessonNumber, target.periodID != nil else { return range }
-        return model.renderer.format(key: "timetable.quickAdd.period", arguments: [.integer(Int64(number)), .text(range)])
+    /// "Every Monday · Week B · Period 7 (13:40–14:25)": quick add creates a weekly slot (UX plan Q1).
+    private var scopeText: String {
+        var dayLabel: String?
+        if case .cycleDay(let index) = target.dayKey {
+            dayLabel = model.resolver(for: target.timetableID)?.rotation.label(forCycleDay: index)
+        }
+        return QuickAddScope.text(target, cycleWeek: cycleWeek, userDayLabel: dayLabel, renderer: model.renderer)
     }
 
-    private var cycleWeekText: String? {
-        guard let week = target.cycleWeek, let timetable = model.resolver(for: target.timetableID) else { return nil }
-        return CycleLabel.week(week, scheme: timetable.timetable.rotation,
-                               userLabel: timetable.rotation.label(forCycleWeek: week))?.text(renderer: model.renderer)
+    private var cycleWeek: CycleLabel? {
+        guard let week = target.cycleWeek, let resolver = model.resolver(for: target.timetableID) else { return nil }
+        return CycleLabel.week(week, scheme: resolver.timetable.rotation,
+                               userLabel: resolver.rotation.label(forCycleWeek: week))
     }
 
     private func add(_ subject: Subject) {

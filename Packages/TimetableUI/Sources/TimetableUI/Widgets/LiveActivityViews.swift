@@ -48,12 +48,7 @@ public struct LiveActivityLockScreenView: View {
             HStack(alignment: .center, spacing: 12) {
                 LiveActivityMark(display: display, size: 40)
                 VStack(alignment: .leading, spacing: 1) {
-                    if let caption = display.caption {
-                        Text(verbatim: caption)
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    }
+                    LiveActivityCaption(display: display, font: .caption)
                     Text(verbatim: display.title)
                         .font(.headline)
                         .lineLimit(2)
@@ -68,22 +63,15 @@ public struct LiveActivityLockScreenView: View {
                     }
                 }
                 Spacer(minLength: 8)
-                if display.timer != nil {
-                    VStack(alignment: .trailing, spacing: 1) {
-                        if let caption = display.timerCaption {
-                            Text(verbatim: caption)
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(1)
-                        }
-                        LiveActivityTimerText(display: display, pauseTime: pauseTime)
-                            .font(.system(.title, design: .rounded).weight(.bold))
-                            .monospacedDigit()
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.6)
-                            .multilineTextAlignment(.trailing)
-                            .frame(maxWidth: 120, alignment: .trailing)
-                    }
+                if let countdown = display.countdown {
+                    // Value with its unit word under it ("24:59 / left", "1 h 30 min / until start"; H2).
+                    WidgetCountdownText(countdown: countdown, pauseTime: pauseTime, alignment: .trailing)
+                        .font(.system(.title, design: .rounded).weight(.bold))
+                        .monospacedDigit()
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
+                        .multilineTextAlignment(.trailing)
+                        .frame(maxWidth: 130, alignment: .trailing)
                 }
             }
             if display.progress != nil || display.next != nil {
@@ -117,13 +105,7 @@ public struct LiveActivityExpandedLeading: View {
     public var body: some View {
         HStack(alignment: .center, spacing: 6) {
             LiveActivityMark(display: display, size: 28)
-            if let caption = display.caption {
-                Text(verbatim: caption)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-            }
+            LiveActivityCaption(display: display, font: .caption)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityHidden(true)   // the center region carries the whole sentence
@@ -142,8 +124,8 @@ public struct LiveActivityExpandedTrailing: View {
 
     public var body: some View {
         Group {
-            if display.timer != nil {
-                LiveActivityTimerText(display: display, pauseTime: pauseTime)
+            if let countdown = display.countdown {
+                WidgetCountdownText(countdown: countdown, pauseTime: pauseTime, alignment: .trailing)
                     .font(.system(.title2, design: .rounded).weight(.bold))
                     .monospacedDigit()
                     .lineLimit(1)
@@ -197,10 +179,6 @@ public struct LiveActivityExpandedBottom: View {
                         .monospacedDigit()
                         .lineLimit(1)
                 }
-                Spacer(minLength: 4)
-                if let caption = display.timerCaption {
-                    Text(verbatim: caption).lineLimit(1)
-                }
             }
             .font(.caption)
             .foregroundStyle(.secondary)
@@ -244,8 +222,9 @@ public struct LiveActivityCompactTrailing: View {
 
     public var body: some View {
         Group {
-            if display.timer != nil {
-                LiveActivityTimerText(display: display, pauseTime: pauseTime)
+            if let countdown = display.countdown {
+                // Minutes only ("25 min"): the compact area has no room for mm:ss plus a unit word.
+                WidgetCountdownText(countdown: countdown, pauseTime: pauseTime, layout: .valueOnly, minutesOnly: true)
                     .multilineTextAlignment(.trailing)
             } else {
                 Text(verbatim: display.compactText)
@@ -299,18 +278,22 @@ struct LiveActivityMark: View {
     }
 }
 
-/// Live or paused remaining time of `display.timer`.
-struct LiveActivityTimerText: View {
+/// The caption above the title: the highlighter "NOW" marker while a lesson runs (U7, replaces plain "Now"), else the
+/// caption text.
+struct LiveActivityCaption: View {
     let display: LiveActivityDisplay
-    let pauseTime: Date?
+    let font: Font
 
     var body: some View {
-        if let interval = display.timer {
-            if let pauseTime {
-                Text(verbatim: CountdownFormat.string(
-                    remaining: interval.upperBound.timeIntervalSince(max(pauseTime, interval.lowerBound))))
+        if let caption = display.caption {
+            if display.showsNowMarker {
+                NowMarker(size: .small, label: caption).accessibilityHidden(true)
             } else {
-                Text(timerInterval: interval, countsDown: true, showsHours: true)
+                Text(verbatim: caption)
+                    .font(font.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
             }
         }
     }

@@ -76,8 +76,9 @@ public enum DynamicL10nKeys {
         keys += managementTitleKeys
         // Known lesson types only: an unknown type has no key and shows its raw text (user / newer-version data).
         keys += LessonType.knownValues.compactMap(VisibleLessonFields.nameKey(of:))
-        keys += ["timetable.cycle.namedWeek", "timetable.cycle.numberedWeek", "timetable.cycle.namedDay",
-                 "timetable.cycle.numberedDay"]
+        keys += CycleLabel.allCatalogKeys
+        keys += QuickAddScope.allCatalogKeys   // Phase 4U U4
+        keys += TimetableSubtitle.catalogKeys
         keys += ReminderUIKeys.allKeys
         keys += ReminderRuleDefaults.targets.map { ReminderKindList.titleKey($0, terminology: .classLecture) }
         keys += IntentL10nKeys.allKeys   // Phase 4 B3: App Intent titles / parameters, checkbox + alarm "Done"
@@ -109,6 +110,10 @@ public enum DynamicL10nKeys {
         "exams.a11y.room", "a11y.task.overdue", "a11y.task.due", "widget.separator",
         // The interpolated `Text` key of NowNextInlineView (subject + live timer); validate.sh skips interpolated keys.
         "widget.nowNext.inline.current %@ %@",
+        // Phase 4U U7: time-first Lock Screen text, countdown units and durations (WidgetCountdown.swift).
+        "widget.dayOver", "widget.nowNext.inline.next", "widget.countdown.left", "widget.countdown.untilStart",
+        "widget.countdown.leftPhrase", "widget.countdown.inPhrase", "widget.duration.min", "widget.duration.h",
+        "widget.duration.hm",
     ]
 
     /// Keys the Live Activity presenter and planner (`LiveActivityPresenter`, `LiveActivityPlanner` alerts) pick at
@@ -117,6 +122,8 @@ public enum DynamicL10nKeys {
     public static let liveActivityKeys: [String] = [
         "liveActivity.exam.today", "liveActivity.exam.inProgress", "liveActivity.exam.finished", "liveActivity.alert.at",
         "today.header.first", "today.header.dayOver", "widget.nowNext.nextShort", "widget.nowNext.a11y.endsAt",
-        "widget.nowNext.a11y.startsAt",
+        "widget.nowNext.a11y.startsAt", "widget.dayOver", "widget.countdown.left", "widget.countdown.untilStart",
+        "widget.countdown.leftPhrase", "widget.countdown.inPhrase", "widget.duration.min", "widget.duration.h",
+        "widget.duration.hm",
     ]
 }

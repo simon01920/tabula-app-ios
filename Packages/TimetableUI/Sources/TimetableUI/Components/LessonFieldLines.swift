@@ -28,17 +28,20 @@ public enum LessonFieldLine: Equatable, Sendable, Identifiable {
 
     public var id: String { field.rawValue }
 
-    /// SF Symbol shown before the value (decorative: VoiceOver reads `LessonAccessibilityLabel`).
-    public var symbolName: String {
+    /// The app symbol shown before the value (decorative: VoiceOver reads `LessonAccessibilityLabel`).
+    public var symbol: AppSymbol {
         switch self {
-        case .room: return "door.left.hand.open"
-        case .building: return "building.2"
-        case .teacher: return "person"
-        case .lessonType: return "tag"
-        case .notes: return "note.text"
-        case .bring: return "backpack"
+        case .room: return .room
+        case .building: return .building
+        case .teacher: return .teacher
+        case .lessonType: return .lessonType
+        case .notes: return .notes
+        case .bring: return .bringList
         }
     }
+
+    /// SF Symbol name of `symbol`.
+    public var symbolName: String { symbol.rawValue }
 
     /// The value text. Lesson types use the catalog name (`lessonType.<raw>`), unknown types their raw value;
     /// the bring list is a locale list ("A, B and C").

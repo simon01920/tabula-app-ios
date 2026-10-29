@@ -128,7 +128,9 @@ public struct TaskRowModel: Identifiable, Equatable, Sendable {
     public var priorityBadgeKey: String? { showsPriorityBadge ? TaskL10nKeys.priority(priority) : nil }
 
     /// SF Symbol of the priority badge (shape, never colour alone).
-    public var prioritySymbolName: String { priority == .urgent ? "exclamationmark.3" : "exclamationmark.2" }
+    public var prioritySymbolName: String {
+        (priority == .urgent ? AppSymbol.priorityUrgent : AppSymbol.priorityHigh).rawValue
+    }
 
     /// The one-sentence VoiceOver label: parts joined with the catalog's list separator, empty parts omitted.
     public func accessibilityLabel(renderer: LocalizedTextRenderer) -> String {

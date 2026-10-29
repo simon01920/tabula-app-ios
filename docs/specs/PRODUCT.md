@@ -8,20 +8,19 @@ One app for the whole school day: timetable, homework, assignments, exams, remin
 ## Onboarding (drives everything)
 Goal: ask the minimum, then pre-configure tiles, fields, grid and reminders. Everything is changeable later in Settings; nothing is locked by the onboarding choice.
 
-Steps:
-1. **Language** (defaults to device language if supported).
-2. **Who are you?** Elementary school · Secondary/High school · University/College · Other (custom).
-3. **Rotation:** "Does your schedule change between weeks/days?" → None · Day A/B · Odd/Even weeks · N-week cycle (2–6) · Different per semester. Ask for term/semester dates if applicable (skippable).
-4. **Time structure:** Fixed bell schedule (editable periods) or free-form times. Preset by profile (below).
-5. **Fields to show:** Room · Building/Faculty · Teacher · Lesson type (lecture/seminar/lab) · Notes · "Bring" list. Preset by profile; each toggleable.
-6. **Reminders:** which kinds to turn on (homework, exams, lessons) and when; explain delivery tiers (standard / time sensitive / loud alarm) with honest Focus and silent-switch guidance. Permissions are requested in context, not all at once.
-7. **Start:** Import from photo · Import via QR/code · Start blank · Use sample data.
+Steps (Phase 4U U6, UX_OVERHAUL_PLAN D8: 7 steps became 4; back = the standard navigation back chevron, one full-width primary button at the bottom):
+1. **Welcome · School type.** "Choose your school type": Elementary school · Secondary/High school · University/College · Other, with the product line "Your classes, tasks, and exams in one place." A compact row "App language: English · Change" opens iOS Settings (the app uses the device language by default); the chosen school type survives the relaunch iOS does after a per-app language change.
+2. **How do you want to start?** "Set up my timetable" (primary, preselected) · "Just look around": creates the school type's sample timetable and opens the app with a dismissible banner "This is sample data · Remove". Remove deletes only that sample timetable with its children and the sample task/exam (tracked device-locally, outside the synced data, with each item's last-change stamp). The user's own tasks/exams stay and only lose links to the sample. What the user added inside the sample timetable, and edits to sample items, are removed with it: the confirmation counts both and says "everything you created stays" only when there are none. Import from photo / QR is hidden until it works.
+3. **Your week.** School days as chips (in the locale's week order); "How does your timetable repeat?" → Same every week · Alternating weeks (A/B) · Alternating days (A/B) · Custom cycle (3–6 weeks). Alternating weeks ask "Which week is this week?" (A or B) and offer "Follow calendar odd/even weeks" explicitly; alternating days ask which day the next school day is; a custom cycle asks which week this week is. Term/semester dates are a separate, optional toggle available with every pattern ("Different per semester" is not a rotation: lessons can be limited to terms in the lesson editor).
+4. **Lesson times.** "Fixed lesson periods" (use the same lesson times each day; generator + live preview) or "Individual start and end times" (default length). Steppers plus direct number entry; "I'll do this later" finishes with the suggested times. The last button reads "Start Using Tabula".
+
+Not asked any more (defaults from the profile, changeable later): **fields to show** (the preset's "Fields on"; editors always offer every field) and **reminders** (the preset rules with their default switches: homework and exams on for every profile; notification permission is requested in context, the first time a reminder has something to deliver; delivery tiers are explained in Settings → Reminders).
 
 ### Profile presets
 | | Elementary | Secondary | University | Other |
 |---|---|---|---|---|
 | Time structure | Bell schedule, 45-min periods | Bell schedule, 45-min periods | Free-form, 90-min default blocks | Ask |
-| Fields on | Room, Teacher, Bring | Room, Teacher, Notes | Building/Faculty, Room, Teacher, Type, Notes | All off |
+| Fields on | Room, Teacher, Bring | Room, Teacher, Notes | Building/Faculty, Room, Teacher, Type, Notes | Room, Teacher |
 | Rotation prompt | Light | Yes | Yes + semester range + odd/even | Ask |
 | Default view | Big vertical tiles | Grid | Week time-blocks | Grid |
 | Exams | Simple | Prominent | Prominent + exam period | Simple |
@@ -32,7 +31,7 @@ Presets are data in `TimetableCore` (testable), not hard-coded in views.
 - Multiple timetables ("School", "Sport", "College"), each with own days, grid, theme, fields.
 - Subjects: name, unique colour, optional emoji/icon, optional short name for grid cells.
 - Lessons: subject, slot (period or start/end), room, building/faculty, teacher, type, notes, bring-list.
-- Field rule: disabled → hidden everywhere (including editor). Enabled but empty → absent from the UI; no placeholders, dashes or blank lines.
+- Field rule: disabled → hidden in summaries (cards, lesson detail, widgets). Editors always offer every optional field under "More details", and changing the setting never deletes a value (UX overhaul decision D10, 2026-10-23, `docs/specs/UX_OVERHAUL_PLAN.md`; it replaced "hidden everywhere, including editor"). Enabled but empty → absent from read-only views; no placeholders, dashes or blank lines.
 - Per-day overrides (e.g. short Friday); one-off overrides (substitution, cancellation, room change); term ranges; holidays/breaks; rotation resolution; conflict warnings (warn, never block).
 
 ## Views (selectable per timetable, remembered)
@@ -48,7 +47,7 @@ Dedicated tab: upcoming prominent with date/time, subject, room, topics, countdo
 See ROADMAP phases 4–5. Widgets: small, medium, large, Lock Screen (circular/rectangular/inline), StandBy; Today, Now & Next with live remaining time, upcoming homework, next exam countdown; configurable through App Intents. Live Activity for current lesson. Watch: today/tomorrow, current lesson remaining time, next lesson, complication/Smart Stack; offline cache. Current-lesson remaining time also in the iPhone Today/Now header.
 
 ## Themes
-Palette packs, per-subject colours, light/dark/auto, optional wallpaper background with legibility protection, alternate app icons later. Use standard SwiftUI controls so iOS 26 Liquid Glass applies naturally.
+Palette packs, per-subject colours, always the system light/dark appearance (no in-app override, D3), optional wallpaper background with legibility protection, alternate app icons later. Use standard SwiftUI controls so iOS 26 Liquid Glass applies naturally.
 
 ## Sharing / Export / AI import
 See SHARING.md, AI_IMPORT.md. Export: image (grid/week/day, themed), PDF, CSV, XLSX (decide library vs minimal writer in the phase plan), `.ics`; user chooses type and view.

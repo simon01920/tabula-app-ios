@@ -131,6 +131,7 @@ struct NowNextWidget: Widget {
         AppIntentConfiguration(kind: Self.kind, intent: SelectTimetableIntent.self, provider: NowNextIntentProvider()) { entry in
             NowNextEntryView(entry: entry)
                 .containerBackground(.background, for: .widget)
+                .tint(Color.ink)   // Phase 4U U1 (D1): the app tint in widgets
                 .widgetURL(ItemLinkURL.url(for: entry.display.link))
         }
         .configurationDisplayName("widget.nowNext.name")
@@ -140,6 +141,7 @@ struct NowNextWidget: Widget {
         StaticConfiguration(kind: Self.kind, provider: NowNextProvider()) { entry in
             NowNextEntryView(entry: entry)
                 .containerBackground(.background, for: .widget)
+                .tint(Color.ink)   // Phase 4U U1 (D1): the app tint in widgets
                 .widgetURL(ItemLinkURL.url(for: entry.display.link))
         }
         // Widget gallery strings are user-visible: they come from the String Catalog.

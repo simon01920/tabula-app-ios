@@ -133,7 +133,8 @@ private struct TaskFormContent: View {
 
     private var titleSection: some View {
         Section {
-            LabeledTextField(titleKey: "tasks.field.title", text: $draft.title, axis: .vertical)
+            EditorTitleField(promptKey: "tasks.field.title.prompt", text: $draft.title, axis: .vertical,
+                             missingHintKey: TaskDraft.Issue.titleEmpty.l10nKey)
             Picker(selection: $draft.kind) {
                 ForEach(kindOptions, id: \.rawValue) { kind in
                     if let key = TaskL10nKeys.kind(kind) {
@@ -153,8 +154,6 @@ private struct TaskFormContent: View {
             } label: {
                 Text("tasks.field.subject")
             }
-        } footer: {
-            IssueFooter(issues: draft.issues.filter { $0 == .titleEmpty })
         }
     }
 
@@ -183,6 +182,7 @@ private struct TaskFormContent: View {
             } label: {
                 Text("tasks.field.due")
             }
+            .labelledBySectionHeader()   // M1: the header already says "Due"
             switch draft.dueMode {
             case .none:
                 EmptyView()
@@ -355,6 +355,7 @@ private struct WeekdayToggle: View {
                 Text(verbatim: name).lineLimit(1).minimumScaleFactor(0.7)
             }
             .frame(maxWidth: .infinity, minHeight: 44)
+            .foregroundStyle(isSelected ? Color.onInk : Color.ink)   // onInk on the prominent fill (RISKS #86)
         }
         .accessibilityAddTraits(isSelected ? .isSelected : [])
         if isSelected {
@@ -365,7 +366,8 @@ private struct WeekdayToggle: View {
     }
 }
 
-/// The inline validation messages of a section (icon + text, so colour is not the only cue).
+/// The inline validation messages of a section (icon + text, so colour is not the only cue), shown after the first
+/// edit or a save attempt (M5, `ValidationMessage`).
 private struct IssueFooter: View {
     let issues: [TaskDraft.Issue]
 
@@ -373,12 +375,7 @@ private struct IssueFooter: View {
         if !issues.isEmpty {
             VStack(alignment: .leading, spacing: 4) {
                 ForEach(issues, id: \.self) { issue in
-                    Label {
-                        Text(LocalizedStringKey(issue.l10nKey))
-                    } icon: {
-                        Image(systemName: "exclamationmark.circle.fill")
-                    }
-                    .foregroundStyle(issue == .titleEmpty ? Color.secondary : Color.red)
+                    ValidationMessage(key: issue.l10nKey, severity: issue == .titleEmpty ? .hint : .error)
                 }
             }
         }

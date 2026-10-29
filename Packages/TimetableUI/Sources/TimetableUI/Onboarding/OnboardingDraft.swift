@@ -1,20 +1,26 @@
-// The pure state of the onboarding flow (PHASE2_PLAN §1, PRODUCT.md "Onboarding"): what the user has answered so
-// far, the defaults a profile preset pre-fills, validation of the term dates, and the translation into
-// `OnboardingAnswers` / the first database. No SwiftUI, so it builds and is unit-tested on Linux.
+// The pure state of the onboarding flow (UX_OVERHAUL_PLAN D8, PRODUCT.md "Onboarding"): what the user has answered so
+// far, the defaults a profile preset pre-fills, validation, and the translation into `OnboardingAnswers` / the first
+// database. No SwiftUI, so it builds and is unit-tested on Linux.
+//
+// Four steps (Phase 4U U6, R5/F08): school type → how to start → your week → lesson times. Fields to show and the
+// reminder rules are no longer asked: both come from the profile preset (fields: `ProfilePreset.visibleFields`;
+// reminders: the preset rules with their own enabled flags, i.e. homework and exams on for every profile). The
+// notification permission is asked in context (Phase 3 Q1).
 //
 // The views (App/Sources/Onboarding) only read and mutate an `OnboardingDraft` and call `makeDatabase` at the end.
 import Foundation
 import TimetableCore
 
-/// The steps of the flow, in order. Raw values are the route suffixes (`onboarding.<rawValue>` except `welcome`).
+/// The steps of the flow, in order.
 public enum OnboardingStep: String, CaseIterable, Sendable, Hashable {
-    case welcome
-    case profile
-    case rotation
-    case time
-    case fields
-    case reminders
+    /// Welcome + "Choose your school type" (+ the app-language row).
+    case schoolType
+    /// "How do you want to start?": set up my timetable, or just look around (sample data).
     case start
+    /// "Your week": school days, how the timetable repeats, optional term dates.
+    case week
+    /// "Lesson times": fixed lesson periods or individual start and end times.
+    case times
 
     /// 0-based position.
     public var index: Int { Self.allCases.firstIndex(of: self) ?? 0 }
@@ -24,24 +30,27 @@ public enum OnboardingStep: String, CaseIterable, Sendable, Hashable {
     public var next: OnboardingStep? { Self.allCases.indices.contains(index + 1) ? Self.allCases[index + 1] : nil }
     /// The preceding step, `nil` before the first.
     public var previous: OnboardingStep? { index > 0 ? Self.allCases[index - 1] : nil }
+    /// The navigation path that shows this step: every step after the root (`schoolType`) up to and including this
+    /// one (`[]` for the root).
+    public var path: [OnboardingStep] { Array(Self.allCases.dropFirst().prefix(index)) }
 }
 
-/// The answer to "Does your schedule change between weeks or days?".
+/// The answer to "How does your timetable repeat?" (F07). Term dates are a separate, optional answer.
 public enum RotationChoice: String, CaseIterable, Sendable, Hashable {
+    /// Same every week.
     case none
-    /// Day A / Day B (a 2-day cycle that advances on school days).
-    case dayAB
-    /// Odd / even ISO weeks.
-    case oddEven
-    /// A cycle of `OnboardingDraft.cycleLength` weeks.
-    case cycle
-    /// The schedule differs per semester: no rotation, but the term dates matter.
-    case perSemester
+    /// Alternating weeks (Week A / Week B): a 2-week cycle, anchored by "Which week is this week?" or by calendar
+    /// odd/even weeks.
+    case alternatingWeeks
+    /// Alternating days (Day A / Day B): a 2-day cycle that advances on school days.
+    case alternatingDays
+    /// A cycle of `OnboardingDraft.customCycleLength` weeks (3…6).
+    case customCycle
 
-    /// The choices shown for a preset's prompt level (PRODUCT.md "Rotation prompt").
+    /// The choices shown for a preset's prompt level (PRODUCT.md "Rotation prompt"): elementary gets the short list.
     public static func available(for prompt: ProfilePreset.RotationPrompt) -> [RotationChoice] {
         switch prompt {
-        case .light: return [.none, .oddEven, .dayAB]
+        case .light: return [.none, .alternatingWeeks, .alternatingDays]
         case .standard, .extended, .ask: return allCases
         }
     }
@@ -49,21 +58,18 @@ public enum RotationChoice: String, CaseIterable, Sendable, Hashable {
 
 /// How lesson times are defined.
 public enum TimeStructureKind: String, CaseIterable, Sendable, Hashable {
+    /// "Fixed lesson periods": a bell schedule, the same lesson times each day.
     case bellSchedule
+    /// "Individual start and end times": free-form lessons with a default length.
     case freeForm
 }
 
-/// How the app starts.
+/// How the app starts. Imports (photo, QR / share code) are not offered until they work (F09).
 public enum StartChoice: String, CaseIterable, Sendable, Hashable {
+    /// "Set up my timetable" (primary path): an empty timetable from the answers.
     case blank
+    /// "Just look around": the profile's sample timetable, removable later (`SampleContent`).
     case sample
-    /// Import pipeline (later phase): shown but not selectable.
-    case photo
-    /// Share codes (later phase): shown but not selectable.
-    case code
-
-    /// Whether the choice can be selected today.
-    public var isAvailable: Bool { self == .blank || self == .sample }
 }
 
 /// Why the term dates cannot be used.
@@ -91,7 +97,8 @@ public struct OnboardingNames: Sendable, Hashable {
 public struct OnboardingDraft: Equatable, Sendable {
     // MARK: Limits (steppers and validation)
 
-    public static let cycleLengths = WeekCycle.validLengths
+    /// Lengths offered for "Custom cycle" (2 weeks is "Alternating weeks").
+    public static let customCycleLengths = 3...WeekCycle.validLengths.upperBound
     public static let lessonMinutesRange = 20...120
     public static let freeFormMinutesRange = 15...240
     public static let lessonCountRange = 1...14
@@ -101,11 +108,21 @@ public struct OnboardingDraft: Equatable, Sendable {
 
     // MARK: Answers
 
-    /// `nil` until chosen (the profile step cannot be left without one).
+    /// `nil` until chosen (the school-type step cannot be left without one).
     public private(set) var profile: UserProfile?
+    public var start: StartChoice = .blank
+    /// School days (at least one is required).
+    public var enabledDays: Set<Weekday> = Weekday.workweek
     public var rotation: RotationChoice = .none
-    /// Length of the cycle for `.cycle` (2…6).
-    public var cycleLength = 3
+    /// Alternating weeks / custom cycle: the cycle week of the current week (1-based; 1 = Week A).
+    public var currentCycleWeek = 1
+    /// Alternating weeks only: follow calendar (ISO) odd/even weeks instead of counting from this week. The
+    /// current week keeps the cycle week chosen in `currentCycleWeek`; the parity mapping follows from it.
+    public var followsCalendarParity = false
+    /// Alternating days: the cycle day (1 = Day A) of `dayCycleAnchorDate`.
+    public var currentCycleDay = 1
+    /// Length of the custom cycle (3…6 weeks).
+    public var customCycleLength = 3
     public var termEnabled = false
     public var termStart: LocalDate
     public var termEnd: LocalDate
@@ -118,14 +135,10 @@ public struct OnboardingDraft: Equatable, Sendable {
     /// Break after the 2nd lesson.
     public var longBreakMinutes = 20
     public var lessonCount = 8
-    /// Default block length of a free-form timetable.
+    /// Default lesson length of "Individual start and end times".
     public var freeFormMinutes = 90
-    public var visibleFields: Set<LessonField> = []
-    /// Reminder kinds that start enabled (a subset of the preset's own rules).
-    public var reminderTargets: Set<ReminderTarget> = []
-    public var start: StartChoice = .blank
 
-    /// The date the term suggestion and cycle anchors are based on.
+    /// The date the term suggestion and the rotation anchors are based on.
     public let today: LocalDate
 
     // MARK: Creation
@@ -149,6 +162,23 @@ public struct OnboardingDraft: Equatable, Sendable {
 
     private mutating func applyPreset(of profile: UserProfile) {
         let preset = ProfilePreset.for(profile)
+        enabledDays = preset.enabledDays
+        rotation = .none
+        currentCycleWeek = 1
+        followsCalendarParity = false
+        currentCycleDay = 1
+        customCycleLength = Self.customCycleLengths.lowerBound
+        termEnabled = preset.rotationPrompt == .extended
+        applyPresetTimes(of: profile)
+    }
+
+    /// Resets the lesson-time answers to the profile's suggestion ("I'll do this later").
+    public mutating func applyPresetTimes() {
+        applyPresetTimes(of: profile ?? .secondary)
+    }
+
+    private mutating func applyPresetTimes(of profile: UserProfile) {
+        let preset = ProfilePreset.for(profile)
         var template = Self.fallbackTemplate
         switch preset.timeStructure {
         case .bellSchedule(let presetTemplate)?:
@@ -167,10 +197,6 @@ public struct OnboardingDraft: Equatable, Sendable {
         shortBreakMinutes = template.breakMinutes.first ?? 10
         longBreakMinutes = template.breakMinutes.dropFirst().first ?? shortBreakMinutes
         lessonCount = template.count
-        visibleFields = preset.visibleFields
-        reminderTargets = Set(preset.reminderRules.filter(\.isEnabled).map(\.target))
-        rotation = .none
-        termEnabled = preset.rotationPrompt == .extended
     }
 
     /// The template used when the preset has no bell schedule of its own.
@@ -185,11 +211,43 @@ public struct OnboardingDraft: Equatable, Sendable {
     public var preset: ProfilePreset { ProfilePreset.for(profile ?? .secondary) }
     /// Rotation choices offered for the profile.
     public var availableRotations: [RotationChoice] { RotationChoice.available(for: preset.rotationPrompt) }
-    /// The reminder kinds the preset defines, in preset order (without duplicates).
-    public var offeredReminderTargets: [ReminderTarget] {
-        var seen: Set<ReminderTarget> = []
-        return preset.reminderRules.map(\.target).filter { seen.insert($0).inserted }
+    /// Fields shown on lesson summaries: derived from the profile (no step; F06/F12). School: room, teacher (+ the
+    /// preset's bring list / notes); university: + building, type. Editable later in the timetable settings.
+    public var visibleFields: Set<LessonField> { preset.visibleFields }
+
+    /// The school days in display order for a week starting on `firstWeekday` (the chips of "Your week").
+    public static func orderedWeekdays(firstWeekday: Weekday) -> [Weekday] { Weekday.week(startingAt: firstWeekday) }
+
+    /// Turns a school day on or off.
+    public mutating func set(_ day: Weekday, enabled: Bool) {
+        if enabled { enabledDays.insert(day) } else { enabledDays.remove(day) }
     }
+
+    /// The cycle weeks "Which week is this week?" offers: 2 for alternating weeks, the custom length otherwise.
+    public var cycleWeekCount: Int {
+        rotation == .customCycle ? clampedCustomLength : 2
+    }
+
+    private var clampedCustomLength: Int {
+        min(max(customCycleLength, Self.customCycleLengths.lowerBound), Self.customCycleLengths.upperBound)
+    }
+
+    /// `currentCycleWeek` within 1…`cycleWeekCount` (a shorter custom cycle may leave it out of range).
+    public var effectiveCycleWeek: Int { min(max(currentCycleWeek, 1), cycleWeekCount) }
+
+    /// The ISO week of the current rotation week (shown next to "Follow calendar odd/even weeks").
+    public func currentISOWeek(firstWeekday: Weekday) -> ISOWeek {
+        WeekParity.representativeISOWeek(containing: today, firstWeekday: firstWeekday)
+    }
+
+    /// With calendar parity: `true` when Week A falls on odd calendar weeks.
+    public func weekAIsOdd(firstWeekday: Weekday) -> Bool {
+        let thisWeekIsOdd = currentISOWeek(firstWeekday: firstWeekday).week % 2 == 1
+        return thisWeekIsOdd == (effectiveCycleWeek == 1)
+    }
+
+    /// The school day the "Alternating days" anchor refers to: today, or the next school day.
+    public var dayCycleAnchorDate: LocalDate { Self.firstSchoolDay(onOrAfter: today, in: enabledDays) }
 
     /// The bell schedule the answers describe.
     public var bellTemplate: BellScheduleTemplate {
@@ -218,13 +276,13 @@ public struct OnboardingDraft: Equatable, Sendable {
         return nil
     }
 
-    /// Whether the step's answers are complete and valid, so "Next" may be offered.
+    /// Whether the step's answers are complete and valid, so the primary button may be offered.
     public func canAdvance(from step: OnboardingStep) -> Bool {
         switch step {
-        case .welcome, .fields, .reminders, .start: return true
-        case .profile: return profile != nil
-        case .rotation: return termIssue == nil
-        case .time:
+        case .schoolType: return profile != nil
+        case .start: return profile != nil
+        case .week: return !enabledDays.isEmpty && termIssue == nil
+        case .times:
             switch timeKind {
             case .bellSchedule: return !bellPreview.isEmpty
             case .freeForm: return Self.freeFormMinutesRange.contains(freeFormMinutes)
@@ -232,39 +290,42 @@ public struct OnboardingDraft: Equatable, Sendable {
         }
     }
 
-    /// Switching to "Different per semester" turns the term on (its dates are what the choice is about).
-    public mutating func choose(rotation choice: RotationChoice) {
-        rotation = choice
-        if choice == .perSemester { termEnabled = true }
-    }
-
-    /// Toggles a lesson field.
-    public mutating func set(_ field: LessonField, visible: Bool) {
-        if visible { visibleFields.insert(field) } else { visibleFields.remove(field) }
-    }
-
-    /// Toggles a reminder kind.
-    public mutating func set(reminder target: ReminderTarget, enabled: Bool) {
-        if enabled { reminderTargets.insert(target) } else { reminderTargets.remove(target) }
+    /// Whether the flow may finish now: the steps up to and including `step` are valid, and the later ones keep
+    /// their (always valid) defaults. "Just look around" finishes from `.start`; "I'll do this later" from `.times`.
+    public func canFinish(from step: OnboardingStep) -> Bool {
+        OnboardingStep.allCases.prefix(step.index + 1).allSatisfy(canAdvance(from:))
+            && canAdvance(from: .week) && canAdvance(from: .times)
     }
 
     // MARK: Output
 
-    /// The rotation scheme of the answers. Cycles are anchored to the term start (or today without a term).
-    public var rotationScheme: RotationScheme {
-        let reference = termEnabled && termIssue == nil ? termStart : today
+    /// The rotation scheme of the answers, counted in rotation weeks that start on `firstWeekday` (the new
+    /// timetable's `rotationWeekStart`).
+    /// - Alternating weeks: this week is `currentCycleWeek` (`referenceWeek` on today), or with calendar parity an
+    ///   `isoWeekParity` cycle whose `offset` makes this week `currentCycleWeek`.
+    /// - Custom cycle: `referenceWeek` on today with the chosen week.
+    /// - Alternating days: `dayCycleAnchorDate` is Day `currentCycleDay`; the cycle advances on the school days.
+    public func rotationScheme(firstWeekday: Weekday) -> RotationScheme {
         switch rotation {
-        case .none, .perSemester:
+        case .none:
             return .none
-        case .oddEven:
-            return .weekCycle(WeekCycle(length: 2, anchor: .isoWeekParity(policy: .strict, offset: 0)))
-        case .cycle:
-            let length = min(max(cycleLength, Self.cycleLengths.lowerBound), Self.cycleLengths.upperBound)
-            return .weekCycle(WeekCycle(length: length, anchor: .referenceWeek(date: reference, cycleWeek: 1)))
-        case .dayAB:
-            let days = preset.enabledDays
-            return .dayCycle(DayCycle(length: 2, anchorDate: Self.firstSchoolDay(onOrAfter: reference, in: days),
-                                      anchorIndex: 1, schoolDays: days))
+        case .alternatingWeeks:
+            let week = effectiveCycleWeek
+            if followsCalendarParity {
+                let iso = currentISOWeek(firstWeekday: firstWeekday)
+                let offset = (0..<2).first {
+                    WeekParity.cycleWeek(for: iso, policy: .strict, offset: $0, length: 2) == week
+                } ?? 0
+                return .weekCycle(WeekCycle(length: 2, anchor: .isoWeekParity(policy: .strict, offset: offset)))
+            }
+            return .weekCycle(WeekCycle(length: 2, anchor: .referenceWeek(date: today, cycleWeek: week)))
+        case .customCycle:
+            return .weekCycle(WeekCycle(length: clampedCustomLength,
+                                        anchor: .referenceWeek(date: today, cycleWeek: effectiveCycleWeek)))
+        case .alternatingDays:
+            let days = enabledDays.isEmpty ? preset.enabledDays : enabledDays
+            return .dayCycle(DayCycle(length: 2, anchorDate: Self.firstSchoolDay(onOrAfter: today, in: days),
+                                      anchorIndex: min(max(currentCycleDay, 1), 2), schoolDays: days))
         }
     }
 
@@ -275,23 +336,25 @@ public struct OnboardingDraft: Equatable, Sendable {
         return date
     }
 
-    /// The answers for `OnboardingBuilder`.
+    /// The answers for `OnboardingBuilder`. Reminder rules: `enabledReminderTargets == nil`, so every preset rule is
+    /// created with the preset's own enabled flag (the defaults the removed reminders step started with).
     public func answers(names: OnboardingNames, localeFirstWeekday: Weekday) -> OnboardingAnswers {
         OnboardingAnswers(
             profile: profile ?? .secondary,
             timetableName: names.timetable,
             bellScheduleName: names.bellSchedule,
-            rotation: rotationScheme,
+            rotation: rotationScheme(firstWeekday: localeFirstWeekday),
             timeStructure: timeStructure,
             visibleFields: visibleFields,
+            enabledDays: enabledDays.isEmpty ? nil : enabledDays,
             term: termEnabled && termIssue == nil
                 ? OnboardingAnswers.TermAnswer(name: names.term, range: LocalDateRange(start: termStart, end: termEnd))
                 : nil,
-            enabledReminderTargets: reminderTargets,
+            enabledReminderTargets: nil,
             localeFirstWeekday: localeFirstWeekday)
     }
 
-    /// The first database: `OnboardingBuilder.makeInitialDatabase`, plus `SampleData` when "Use sample data" is
+    /// The first database: `OnboardingBuilder.makeInitialDatabase`, plus `SampleData` when "Just look around" is
     /// chosen. `localize` turns the sample's catalog keys into the user's language.
     public func makeDatabase<G: IDGenerator, C: TimestampClock>(
         names: OnboardingNames, localeFirstWeekday: Weekday, localize: (LocalizedText) -> String,

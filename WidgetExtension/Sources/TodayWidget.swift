@@ -115,6 +115,7 @@ struct TodayWidget: Widget {
         AppIntentConfiguration(kind: Self.kind, intent: SelectTimetableIntent.self, provider: TodayIntentProvider()) { entry in
             TodayEntryView(entry: entry)
                 .containerBackground(.background, for: .widget)
+                .tint(Color.ink)   // Phase 4U U1 (D1): the app tint in widgets
                 .widgetURL(ItemLinkURL.url(for: entry.display.link))
         }
         .configurationDisplayName("widget.today.name")
@@ -124,6 +125,7 @@ struct TodayWidget: Widget {
         StaticConfiguration(kind: Self.kind, provider: TodayProvider()) { entry in
             TodayEntryView(entry: entry)
                 .containerBackground(.background, for: .widget)
+                .tint(Color.ink)   // Phase 4U U1 (D1): the app tint in widgets
                 .widgetURL(ItemLinkURL.url(for: entry.display.link))
         }
         .configurationDisplayName("widget.today.name")

@@ -81,6 +81,7 @@ struct NextExamWidget: Widget {
         StaticConfiguration(kind: Self.kind, provider: NextExamProvider()) { entry in
             NextExamEntryView(entry: entry)
                 .containerBackground(.background, for: .widget)
+                .tint(Color.ink)   // Phase 4U U1 (D1): the app tint in widgets
         }
         .configurationDisplayName("widget.exam.name")
         .description("widget.exam.description")

@@ -346,7 +346,7 @@ struct NowNextPresentationTests {
         #expect(shown.caption == "Now" && shown.timerCaption == "Time left")
         #expect(shown.timer == instant(day, 8)...instant(day, 8, 45))
         #expect(shown.nextShort == "Next: Biology, 8:55")
-        #expect(shown.inlineText == "Mathematics")
+        #expect(shown.inlineText == "MAT")   // short name (U7, M29)
         #expect(shown.laterCaption == "Next")
         #expect(shown.link == .today)
         #expect(abs(shown.progress(at: instant(day, 8, 15)) - 1.0 / 3.0) < 0.0001)
@@ -360,9 +360,9 @@ struct NowNextPresentationTests {
         let day = date(2026, 10, 13)
         let a = lesson("a", day, time(8), time(8, 45), room: "105", status: .modified, reasons: [.roomChanged])
         let shown = display(snapshot([school(day, [a])]), at: instant(day, 7, 30))
-        #expect(shown.caption == "First Lesson" && shown.timerCaption == "Starts in")
+        #expect(shown.caption == "First lesson" && shown.timerCaption == "Starts in")
         #expect(shown.timer == instant(day, 7, 30)...instant(day, 8))
-        #expect(shown.inlineText == "Next: Mathematics, 8:00")
+        #expect(shown.inlineText == "Next 8:00 MAT")   // time first (U7, M29)
         #expect(shown.laterCaption == "Later")
         guard case .upcoming(let line) = shown.kind else {
             Issue.record("expected upcoming, got \(shown.kind)")
@@ -381,18 +381,18 @@ struct NowNextPresentationTests {
             Issue.record("expected status, got \(evening.kind)")
             return
         }
-        #expect(title == "No more lessons today")
+        #expect(title == "Done for today")
         let next = try #require(evening.next)
         #expect(next.whenText.hasPrefix("Tomorrow, "))
-        #expect(evening.nextCaption == "Next Lesson")
-        #expect(evening.inlineText.hasPrefix("Next: "))
+        #expect(evening.nextCaption == "Next lesson")
+        #expect(evening.inlineText == "Done for today")   // U7, M29
         let midnight = display(snap, at: context.startOfDay(today.adding(days: 1)))
         guard case .upcoming(let line) = midnight.kind else {
             Issue.record("expected upcoming at midnight, got \(midnight.kind)")
             return
         }
         #expect(line.id == next.id && line.whenText == line.startText)
-        #expect(midnight.caption == "First Lesson")
+        #expect(midnight.caption == "First lesson")
     }
 
     @Test func holidayUnavailableAndNothingAhead() {
@@ -412,6 +412,57 @@ struct NowNextPresentationTests {
         #expect(outdated.timer == nil && outdated.accessibilityLabel.contains("Open Tabula"))
         let texts = presenter.proTexts()
         #expect(texts.title == "Available in Tabula Pro" && texts.short == "Pro")
+    }
+
+    @Test func countdownCarriesAUnitAndStaysLiveUnderAnHour() throws {
+        let day = date(2026, 10, 13)
+        let shown = display(snapshot([school(day, [lesson("a", day, time(8), time(8, 45))])]), at: instant(day, 8, 20))
+        let countdown = try #require(shown.countdown)
+        #expect(countdown.mode == .timer && countdown.kind == .left && countdown.unitLabel == "left")
+        #expect(countdown.durationText == "25 min" && countdown.phrase == "25 min left")
+        #expect(countdown.interval == instant(day, 8)...instant(day, 8, 45))
+        // The circular family's ring: 20 of 45 minutes are over.
+        #expect(abs(shown.progress(at: instant(day, 8, 20)) - 20.0 / 45.0) < 0.0001)
+    }
+
+    @Test func anHourOrMoreIsMinutesOnlyWithNoSeconds() throws {
+        let day = date(2026, 10, 13)
+        // 90-minute double lesson at its start: "1 h 30 min left", not 1:30:00.
+        let double = display(snapshot([school(day, [lesson("a", day, time(8), time(9, 30))])]), at: instant(day, 8))
+        let running = try #require(double.countdown)
+        #expect(running.mode == .minutes && running.phrase == "1 h 30 min left")
+        // Before the first lesson: "in 1 h 30 min" with "until start"; exactly 60 minutes is already minutes only.
+        let snap = snapshot([school(day, [lesson("a", day, time(10), time(10, 45))])])
+        let early = try #require(display(snap, at: instant(day, 8, 30)).countdown)
+        #expect(early.mode == .minutes && early.kind == .untilStart && early.unitLabel == "until start")
+        #expect(early.phrase == "in 1 h 30 min")
+        let hour = try #require(display(snap, at: instant(day, 9)).countdown)
+        #expect(hour.mode == .minutes && hour.phrase == "in 1 h")
+        let under = try #require(display(snap, at: instant(day, 9, 1)).countdown)
+        #expect(under.mode == .timer && under.phrase == "in 59 min")
+    }
+
+    @Test func lockScreenTextIsTimeFirstWithShortNames() throws {
+        let day = date(2026, 10, 13)
+        let a = lesson("a", day, time(8), time(8, 45))
+        let b = lesson("b", day, time(8, 55), time(9, 40), subject: bio, room: nil)
+        // In a lesson: the short name follows the countdown; the next lesson is abbreviated too.
+        let current = display(snapshot([school(day, [a, b])]), at: instant(day, 8, 15))
+        #expect(current.inlineText == "MAT" && current.nextCompact == "Next: BIO, 8:55")
+        // Derived abbreviation for a subject without a short name; time first before a lesson.
+        let upcoming = display(snapshot([school(day, [a, b])]), at: instant(day, 8, 47))
+        #expect(upcoming.inlineText == "Next 8:55 BIO")
+        // After school: "Done for today"; the circular family gets tomorrow's first start time (L9).
+        let tomorrow = lesson("t", day.adding(days: 1), time(8), time(8, 45), subject: bio)
+        let evening = display(snapshot([school(day, [a]), school(day.adding(days: 1), [tomorrow])]), at: instant(day, 17))
+        guard case let .status(_, title, _) = evening.kind else {
+            Issue.record("expected status, got \(evening.kind)")
+            return
+        }
+        #expect(title == "Done for today" && evening.inlineText == "Done for today")
+        #expect(evening.nextStartText == "8:00" && evening.next?.shortName == "BIO")
+        #expect(evening.nextCompact == "Next: BIO, Tomorrow, 8:00")
+        #expect(evening.countdown == nil)
     }
 
     @Test func rendererUsesTheSnapshotLocaleAndHourCycle() {

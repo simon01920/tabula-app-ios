@@ -1,4 +1,4 @@
-// Shared building blocks of the Tasks screens: the subject-coloured completion control, the priority badge, the
+// Shared building blocks of the Tasks screens: the neutral completion control, the priority badge, the
 // segment chips and the row. State and meaning come from the Linux-tested models in TimetableUI/Tasks
 // (TaskRowModel, TaskSegmentCounts); these views only draw them.
 // Rules: meaning is never carried by colour alone (checkmark shape, strikethrough, icon + text badges), every control
@@ -18,26 +18,26 @@ extension Text {
     }
 }
 
-/// The round completion control in the subject colour: an outline when open, a filled disc with a checkmark when done.
+/// The round completion control (Phase 4U U1, Opus review H7 / C2): a neutral ring in the secondary-label colour when
+/// open (≥ 3:1 non-text contrast on white and dark cards, DesignTokensTests), a filled disc with a checkmark in the
+/// tint (ink) when done. The subject is no longer drawn on the ring: a red, green or yellow ring read as "overdue",
+/// "done" or nothing (yellow measured 1.74:1); the row names the subject. `subject` is kept for callers and VoiceOver.
 struct TaskCompletionControl: View {
     let isCompleted: Bool
     let subject: SubjectSummary?
     let action: () -> Void
-    @Environment(\.colorScheme) private var colorScheme
     @ScaledMetric(relativeTo: .body) private var diameter: CGFloat = 28
 
     var body: some View {
         Button(action: action) {
             ZStack {
-                Circle().strokeBorder(tint, lineWidth: 2.5)
-                if needsOutline {
-                    Circle().strokeBorder(Color.secondary.opacity(0.5), lineWidth: 1).padding(-1.5)
-                }
                 if isCompleted {
-                    Circle().fill(tint)
+                    Circle().fill(.tint)
                     Image(systemName: "checkmark")
                         .font(.system(size: diameter * 0.45, weight: .bold))
-                        .foregroundStyle(checkColor)
+                        .foregroundStyle(Color.onInk)
+                } else {
+                    Circle().strokeBorder(Color.secondary, lineWidth: 2)
                 }
             }
             .frame(width: diameter, height: diameter)
@@ -47,11 +47,6 @@ struct TaskCompletionControl: View {
         .buttonStyle(.plain)
         .accessibilityLabel(Text(catalogKey: isCompleted ? "tasks.action.reopen" : "tasks.action.complete"))
     }
-
-    private var style: LessonTileStyle? { subject.map { LessonTileStyle(color: $0.color) } }
-    private var tint: Color { subject.map { Color($0.color) } ?? Color.secondary }
-    private var checkColor: Color { style.map { Color($0.foreground) } ?? Color.white }
-    private var needsOutline: Bool { style?.needsOutline(isDark: colorScheme == .dark) ?? false }
 }
 
 /// "High" / "Urgent": icon + text in a capsule (shape and words carry the meaning, the tint is secondary).
@@ -119,14 +114,14 @@ struct TaskRowText: View {
                             .integer(Int64(row.subtasksDone)), .integer(Int64(row.subtasksTotal)),
                         ]))
                     } icon: {
-                        Image(systemName: "checklist")
+                        Image(AppSymbol.subtasks)
                     }
                 }
                 if row.attachmentCount > 0 {
-                    Image(systemName: "paperclip")
+                    Image(AppSymbol.attachment)
                 }
                 if row.repeats {
-                    Image(systemName: "repeat")
+                    Image(AppSymbol.repeats)
                 }
             }
             .font(.caption)
@@ -158,7 +153,7 @@ struct TaskRowView: View {
     }
 }
 
-/// Today / Upcoming / Overdue / Completed as capsule buttons with counts; Overdue turns red and gets a warning icon
+/// Today / Upcoming / Overdue / Completed as capsule buttons with counts; Overdue gets a red warning icon
 /// while it has tasks. Scrolls horizontally when the labels do not fit (long languages, large Dynamic Type).
 struct TaskSegmentBar: View {
     let counts: TaskSegmentCounts
@@ -183,18 +178,25 @@ struct TaskSegmentBar: View {
         let isSelected = segment == selection
         let isAlert = segment == .overdue && counts.overdue > 0
         let title = model.renderer.format(key: segment.countedTitleKey, arguments: [.integer(Int64(counts[segment]))])
+        // C2 (Phase 4U U1): unselected chips had ink-blue text on a grey fill (2.90:1); now primary text, and the
+        // selected chip is ink with `onInk` text (8.5:1 light / 8.8:1 dark). The overdue warning keeps its icon in
+        // the correction red, so the unselected Overdue chip no longer outshouts the selected one (C3).
+        let textColor = isSelected ? Color.onInk : Color.primary
         let button = Button {
             selection = segment
         } label: {
             if isAlert {
-                Label { Text(verbatim: title) } icon: { Image(systemName: "exclamationmark.triangle.fill") }
+                Label {
+                    Text(verbatim: title).foregroundStyle(textColor)
+                } icon: {
+                    Image(AppSymbol.overdue).foregroundStyle(isSelected ? Color.onInk : Color.correction)
+                }
             } else {
-                Text(verbatim: title)
+                Text(verbatim: title).foregroundStyle(textColor)
             }
         }
         .buttonBorderShape(.capsule)
         .controlSize(.large)
-        .tint(isAlert ? Color.red : nil)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
         if isSelected {
             button.buttonStyle(.borderedProminent)

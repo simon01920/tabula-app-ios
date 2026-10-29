@@ -1,7 +1,8 @@
 // The root of the window: loading → onboarding / main tabs / blocking problem, the store banner on top, the
 // appearance preference from settings, and the launch route (`-TabulaScreen`).
 // APIs: View.preferredColorScheme(_:), VStack, ProgressView, NavigationStack, View.sheet(isPresented:content:),
-//       Environment(AppModel.self) (Observation), ContentUnavailableView (iOS 17).
+//       Environment(AppModel.self) (Observation), ContentUnavailableView (iOS 17), View.tint(_:) (iOS 15),
+//       (no root `\.locale` override: see body).
 import SwiftUI
 import TimetableUI
 
@@ -12,6 +13,11 @@ struct AppRootView: View {
     var body: some View {
         content
             .preferredColorScheme(model.appearance.colorScheme)
+            // Phase 4U U1 (D1): the ink tint replaces system blue (3.5:1 on white) app-wide.
+            .tint(Color.ink)
+            // D4 / H1: the hour-cycle locale is applied to the time pickers only (`.hourCycleLocale(_:)` on TimeRow and
+            // the onboarding time picker), not here: a root `\.locale` would also drive SwiftUI's string lookup and
+            // replace `Locale.current` (with the user's iOS region preferences) everywhere (QA M1, RISKS #87).
     }
 
     @ViewBuilder
@@ -23,6 +29,7 @@ struct AppRootView: View {
                 if let banner = model.banners.first {
                     StoreBannerView(banner: banner) { model.dismissBanner() }
                 }
+                if case .main = model.phase { SampleDataBanner() }   // "This is sample data · Remove" (U6)
                 phaseView
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }

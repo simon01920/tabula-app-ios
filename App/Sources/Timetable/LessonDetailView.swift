@@ -7,6 +7,9 @@
 // through; complete / reopen inline, tap → task detail) and "Add homework for this lesson", which opens the
 // `tasks.editor-new` route with `EditorContext(.newTask(TaskPrefill))` (subject, due = this date, linked occurrence).
 // Data comes from `LessonDetailModel` (TimetableUI, Linux-tested).
+// Phase 4U U4 (Opus M15): section "Changes on this day" (sentence case) with each change's symbol; a changed time is
+// shown in the change colour with the usual time struck through; the room uses the map pin (`LessonFieldLine`).
+// The "Change for This Day" button wording belongs to stage U5b and is unchanged here.
 // APIs: NavigationStack, List, Section(content:header:footer:), LabeledContent(content:label:), ToolbarItem
 //       (.cancellationAction / .primaryAction), Button(action:label:), disabled(_:), ContentUnavailableView,
 //       presentationDetents(_:), Environment(\.dismiss).
@@ -51,7 +54,7 @@ struct LessonDetailView: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
-                        Button { dismiss() } label: { Text("timetable.action.done") }
+                        SheetCloseButton()
                     }
                     ToolbarItem(placement: .primaryAction) {
                         Button { openLessonEditor() } label: { Text("timetable.detail.edit") }
@@ -102,14 +105,19 @@ struct LessonDetailView: View {
                 if !detail.changes.isEmpty {
                     Section {
                         ForEach(detail.changes) { change in
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(LocalizedStringKey(change.reason.l10nKey)).font(.body.weight(.semibold))
-                                if let usual = change.usualValue {
-                                    Text(verbatim: model.renderer.format(key: "timetable.detail.usually",
-                                                                         arguments: [.text(usual)]))
-                                        .font(.subheadline)
-                                        .foregroundStyle(.secondary)
+                            Label {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(LocalizedStringKey(change.reason.l10nKey)).font(.body.weight(.semibold))
+                                    if let usual = change.usualValue {
+                                        Text(verbatim: model.renderer.format(key: "timetable.detail.usually",
+                                                                             arguments: [.text(usual)]))
+                                            .font(.subheadline)
+                                            .foregroundStyle(.secondary)
+                                    }
                                 }
+                            } icon: {
+                                // The same symbol as the grid badge and Today.
+                                Image(AppSymbol.change(for: [change.reason]))
                             }
                             .accessibilityElement(children: .combine)
                         }
@@ -162,12 +170,7 @@ struct LessonDetailView: View {
             } icon: {
                 Image(systemName: "calendar")
             }
-            Label {
-                Text(verbatim: model.formatter.timeRange(detail.lesson.startTime, detail.lesson.endTime))
-                    .monospacedDigit()
-            } icon: {
-                Image(systemName: "clock")
-            }
+            timeRow(detail)
             if let number = detail.lesson.periodNumber {
                 Label {
                     Text(verbatim: model.renderer.format(key: "timetable.detail.period", arguments: [.integer(Int64(number))]))
@@ -189,6 +192,39 @@ struct LessonDetailView: View {
                 } icon: {
                     Image(systemName: "repeat")
                 }
+            }
+        }
+    }
+
+    /// The time row. When the time changed on this date (Opus M15): the new time in the change colour (contrast-safe
+    /// orange, ≥ 4.5:1) with the time-changed symbol, the usual time struck through in secondary beneath it.
+    @ViewBuilder
+    private func timeRow(_ detail: LessonDetailModel) -> some View {
+        let range = model.formatter.timeRange(detail.lesson.startTime, detail.lesson.endTime)
+        if let usual = detail.changes.first(where: { $0.reason == .timeChanged })?.usualValue {
+            Label {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(verbatim: range)
+                        .monospacedDigit()
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Color.changed)
+                    Text(verbatim: usual)
+                        .font(.subheadline)
+                        .monospacedDigit()
+                        .strikethrough()
+                        .foregroundStyle(.secondary)
+                }
+            } icon: {
+                Image(AppSymbol.timeChanged).foregroundStyle(Color.changed)
+            }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text(verbatim: model.renderer.format(key: "timetable.detail.timeChanged.a11y",
+                                                                     arguments: [.text(range), .text(usual)])))
+        } else {
+            Label {
+                Text(verbatim: range).monospacedDigit()
+            } icon: {
+                Image(systemName: "clock")
             }
         }
     }

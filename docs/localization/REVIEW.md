@@ -166,3 +166,64 @@ name inserted (hu uses "a(z) ${applicationName}" because the article depends on 
 The AppShortcuts catalog is not part of the review export (the export covers Localizable + InfoPlist); review its 4 keys
 in the file itself. The brand stays undeclined ("aplikácia Tabula", "Отвара Tabula"). Final QA: + `intent.param.alarm`
 (an internal parameter title, rarely visible); `probe.intent.shortTitle` removed (the probe's App Shortcut is gone).
+### Phase 4U U1 additions (2026-10-26, swiftui-engineer)
+6 new keys (5 after QA: `editor.validation.announcement` was removed again), model-authored for 11 languages (`sr-Latn` derived), all `needs_review`: `now.marker` (the highlighter
+"NOW" marker on the current lesson; the app shows it in capitals, VoiceOver reads it as written, so keep one short word:
+"Teraz", "Jetzt", 今), `editor.validation.announcement` (VoiceOver only, after Save on an incomplete form), and the
+title-field hints `exams.editor.name.prompt`, `tasks.field.title.prompt`, `editor.subject.name.prompt`,
+`editor.timetable.name.prompt` (grey text inside the empty field, also its VoiceOver label; the exam word follows each
+language's existing `exams.*` wording, e.g. sk "skúška", cs "zkouška"). Removed as unused (the screens now use the standard × close button and the new prompts):
+`timetable.action.done`, `editor.common.close`, `exams.editor.name`, `tasks.field.title`, `editor.subject.name`,
+`editor.timetable.name`.
+### Phase 4U Stage U5b additions (2026-10-26, swiftui-engineer)
+44 new keys (`editor.bell.*` for the restructured bell schedule editor, `editor.lesson.weeks.*`, `editor.lesson.moreDetails*`,
+`editor.timetables.reorder*` / `*.action`, `editor.common.edit`, `editor.timetable.days`, `editor.subject.icon`,
+`editor.subject.palette.locked*`, `editor.dayChange.move`) and 21 rewritten keys (translations dropped and re-authored),
+model-authored for 11 languages (`sr-Latn` derived), all `needs_review`; 29 unused editor keys removed. Meaning changes
+to check: **Breaks → Holidays** in the terms editor (`editor.breaks.*`, `editor.terms.title/open`, `editor.impact.breaks`,
+`editor.rotation.day.skipsBreaks`): "holidays" are days off school, never the gap between lessons (sk "voľné dni", de
+"Ferien", fr "vacances"); the day-change kinds "Use another day's timetable" / "Shortened lessons";
+`timetable.detail.changeDay` "Cancel, Move or Substitute…" (a button, keep it short); `editor.fields.*` and
+`onboarding.fields.subtitle` now say that the detail switches only affect lesson cards (UX decision D10).
+`editor.lesson.weeks.named` is "Week %@" for a one- or two-letter week name ("Week A"); longer names are shown alone.
+`editor.lesson.weeks.every.segment` is one segment of a three-part segmented control and must stay short.
+### Phase 4U Stage U5a additions (2026-10-23, swiftui-engineer-sonnet)
+34 new keys (`settings.section.*`, `settings.bell.*`, `settings.terms.row`, `settings.timetables.add`, `settings.value.*`,
+`settings.reminders.summary.on`, `settings.reminders.delivery.*`, `settings.schooltype.title`, `settings.datetime.*`,
+`settings.colors.*`, `settings.aboutfeedback.title`, `settings.about.{feedback,privacyPolicy,rate,acknowledgements.body2}`,
+`reminders.tier.timeSensitive.unavailable`, `health.{checks,technical}.title`), model-authored for 11 languages (`sr-Latn`
+derived), all `needs_review`. 31 keys of the old Appearance / Calendar / Reminders / About screens were removed. Reviewer:
+count phrases (`settings.reminders.summary.on`, `settings.colors.applied`, `settings.colors.apply.confirm.message`) are
+written as "label: N" in the Slavic languages to avoid noun declension, check they read naturally; `settings.colors.undo`
+should differ from Cancel where the language allows (ro "Anulează modificarea"; fr uses Apple's "Annuler"); the Time Sensitive
+tier names reuse the existing `settings.reminders.timesensitive.title` wording per language.
+### Phase 4U Stage U4 additions (2026-10-26, swiftui-engineer)
+31 new keys (`timetable.cycle.oddWeek/evenWeek`, `timetable.quickAdd.every.*`, `.slot.period`, `.scope.*`,
+`.cycleWeekOnlyFooter`, `timetable.subtitle.withCycle`, `timetable.now`, `timetable.legend.*`, `timetable.day.*`,
+`timetable.a11y.todayHint.*`, `timetable.options.editTimetable/addLesson`, `timetable.empty.noLessons.*`,
+`timetable.detail.timeChanged.a11y`), model-authored for 11 languages (`sr-Latn` derived), all `needs_review`; and
+`timetable.detail.changes` changed to sentence case ("Changes on this day"; translations kept, `needs_review`).
+Reviewer: "Odd week" / "Even week" are what Slovak and Czech schools say (sk "Nepárny/Párny týždeň", cs "Lichý/Sudý
+týden"); `timetable.quickAdd.every.*` are complete phrases with the weekday in the right case and gender (sk "Každú
+stredu", cs "Každou středu", pl "W każdą środę", uk "Щосереди") joined to the week and period only by the
+`%1$@ · %2$@` formats; `timetable.now` is a one-word tag shown in capitals. Now unused (for U8 to remove):
+`timetable.quickAdd.period`, `timetable.quickAdd.cycleWeekFooter`.
+Integration (2026-10-26): `timetable.now` removed again; the timetable shows U1's `now.marker` (same word in all
+13 languages, checked before removal).
+### Phase 4U U6 onboarding (2026-10-26, swiftui-engineer)
+52 new keys (`onboarding.schoolType.*`, `onboarding.language.*`, `onboarding.action.continue|start`,
+`onboarding.start.setUp*|lookAround*|action.lookAround`, `onboarding.week.*`, `onboarding.time.kind.fixed*|individual*`,
+`onboarding.time.later*`, `onboarding.unit.minutes`, `sample.banner.*`, `sample.remove.*`), model-authored for 11 languages
+(`sr-Latn` derived), all `needs_review`. Slovak follows the Astra copy table where it fits ("Vyberte typ školy",
+"Pevné časy hodín", "Vlastné časy hodín", "Otvoriť ukážku"). 55 obsolete onboarding keys removed (welcome / language card,
+fields step, reminders step including every delivery-tier and Time Sensitive text, old rotation and start options).
+Reviewer: "Week A / Week B" and "Day A / Day B" are full phrases (no concatenation); `onboarding.week.parity.*` name the
+calendar (ISO) week number; `onboarding.action.start` keeps the brand undeclined ("aplikáciu Tabula", "aplikaci Tabula",
+"aplikacji Tabula"); `onboarding.unit.minutes` is the unit after a number field; `sample.remove.addedByUser|unlinked` are
+plural sentences appended to the confirmation message.
+
+### Phase 4U integration QA additions (2026-10-29)
+2 new keys, model-authored for 11 languages (`sr-Latn` derived), all `needs_review`: `sample.remove.message.scope`
+(the first sentence of `sample.remove.message` without "Everything you created yourself stays"; shown when the user
+added or edited something in the sample) and `sample.remove.changedByUser` (plural: "Your changes to %lld sample
+entries are removed too.").

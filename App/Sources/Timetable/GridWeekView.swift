@@ -1,18 +1,21 @@
 // Classic periods × days grid (route `timetable.grid`), drawn from `GridLayout`:
-// - day headers pinned above the scroll view (aligned with the columns, today marker + change dot), the period column
-//   on the leading edge with lesson numbers and times (no horizontal scrolling: 5/6/7 columns share the width, so the
-//   period column is always visible);
-// - cells span rows (double periods include the break between), break/lunch rows are thin bands, holidays shade
-//   their column, free lesson slots are dashed and tappable (quick add);
-// - short names/emoji in cells (user short name, else the name, scaled down), status icon + conflict icon, and the
-//   task / exam badges ("☑2 🎓", Phase 3 C1) in place of the room line (the room stays in VoiceOver and the detail);
+// - day headers pinned above the scroll view (aligned with the columns; today's header tinted, change symbol), the
+//   period column on the leading edge with lesson numbers and times (no horizontal scrolling: 5/6/7 columns share the
+//   width, so the period column is always visible); the current period's number gets the highlighter;
+// - lesson rows grow to fill the available height, with a minimum (Opus L3); cells span rows (double periods include
+//   the break between), break/lunch rows are thin bands, holidays shade their column;
+// - fixed cell anatomy (Opus H5): line 1 = short name (emoji above it when it fits, dropped first via ViewThatFits),
+//   line 2 = room, always (field rule: absent when hidden or empty), one badge slot bottom-trailing with priority
+//   cancelled > exam > tasks > change (`LessonCellBadge`); cancelled cells are dimmed and struck through; the current
+//   lesson has the highlighter outline (VoiceOver value "in progress");
+// - free lesson slots stay quiet (Opus M14): no outline; tap opens quick add, the dashed "+" shows while pressed;
 // - at accessibility text sizes, or when the columns would be narrower than `GridMode.minimumColumnWidth`, the same
-//   layout is shown as a list (`GridListView`).
+//   layout is shown as a list (`GridListView`, kept from Phase 2: Opus §3 "What works").
 // VoiceOver: cells read "<date>: <lesson sentence>" column by column (sort priority), free slots read
 // "<date>, period n, <time>, free" with the hint "Adds a lesson".
-// APIs: GeometryReader, ScrollView, ZStack + frame/offset, RoundedRectangle.strokeBorder(style:), StrokeStyle(dash:),
-//       accessibilitySortPriority(_:), accessibilityElement(children: .contain), @ScaledMetric,
-//       Environment(\.dynamicTypeSize) + DynamicTypeSize.isAccessibilitySize (iOS 15), rotationEffect(_:).
+// APIs: GeometryReader, ScrollView, ZStack + frame/offset, RoundedRectangle, ViewThatFits(in: .vertical),
+//       ButtonStyle, accessibilitySortPriority(_:), accessibilityElement(children: .contain), @ScaledMetric,
+//       Environment(\.dynamicTypeSize) + DynamicTypeSize.isAccessibilitySize.
 import SwiftUI
 import TimetableCore
 import TimetableUI
@@ -22,6 +25,8 @@ struct GridWeekView: View {
     let strip: WeekStripModel
     let timetable: Timetable
     let reasons: [OccurrenceID: [ModificationReason]]
+    let today: LocalDate
+    let nowMinute: Int
     let onOpen: (ResolvedLesson) -> Void
     let onAdd: (QuickAddTarget) -> Void
 
@@ -35,6 +40,9 @@ struct GridWeekView: View {
     @ScaledMetric(relativeTo: .caption2) private var lunchRowHeight: CGFloat = 22
 
     private let horizontalPadding: CGFloat = 8
+    private let verticalPadding: CGFloat = 8
+    /// Rows grow at most to this multiple of their minimum (a 4-period day should not get half-screen cells).
+    private let maximumGrowth: CGFloat = 2
 
     var body: some View {
         GeometryReader { proxy in
@@ -47,8 +55,8 @@ struct GridWeekView: View {
                 grid(width: proxy.size.width - 2 * horizontalPadding)
                     .padding(.horizontal, horizontalPadding)
             case .list:
-                GridListView(layout: layout, strip: strip, timetable: timetable, reasons: reasons, onOpen: onOpen,
-                             onAdd: onAdd)
+                GridListView(layout: layout, strip: strip, timetable: timetable, reasons: reasons, today: today,
+                             nowMinute: nowMinute, onOpen: onOpen, onAdd: onAdd)
             }
         }
     }
@@ -57,29 +65,35 @@ struct GridWeekView: View {
 
     private var isCompact: Bool { timetable.density.effective == .compact }
 
-    private func height(of row: TimetableCore.GridLayout.Row) -> CGFloat {
-        if row.isLessonRow { return isCompact ? compactRowHeight : comfortableRowHeight }
-        return row.kind == .lunch ? lunchRowHeight : breakRowHeight
-    }
-
-    private var rowTops: [CGFloat] {
-        var tops: [CGFloat] = []
-        var y: CGFloat = 0
-        for row in layout.rows {
-            tops.append(y)
-            y += height(of: row)
+    /// Heights of all rows when the scroll area is `available` points tall: break rows fixed, lesson rows share the
+    /// rest (at least their minimum, at most `maximumGrowth` times it).
+    private func rowHeights(available: CGFloat) -> [CGFloat] {
+        let minimum = isCompact ? compactRowHeight : comfortableRowHeight
+        let lessonRows = layout.rows.filter(\.isLessonRow).count
+        let fixed = layout.rows.filter { !$0.isLessonRow }
+            .reduce(CGFloat(0)) { $0 + ($1.kind == .lunch ? lunchRowHeight : breakRowHeight) }
+        let share = lessonRows > 0 ? (available - 2 * verticalPadding - fixed) / CGFloat(lessonRows) : minimum
+        let lessonHeight = min(max(minimum, share), minimum * maximumGrowth)
+        return layout.rows.map { row in
+            row.isLessonRow ? lessonHeight : (row.kind == .lunch ? lunchRowHeight : breakRowHeight)
         }
-        return tops
     }
 
-    private var totalHeight: CGFloat { layout.rows.reduce(0) { $0 + height(of: $1) } }
+    private func tops(_ heights: [CGFloat]) -> [CGFloat] {
+        var result: [CGFloat] = []
+        var y: CGFloat = 0
+        for height in heights {
+            result.append(y)
+            y += height
+        }
+        return result
+    }
 
     // MARK: Grid
 
     private func grid(width: CGFloat) -> some View {
         let columnCount = max(1, layout.columns.count)
         let columnWidth = max(1, (width - periodColumnWidth) / CGFloat(columnCount))
-        let tops = rowTops
         return VStack(spacing: 0) {
             HStack(spacing: 0) {
                 Color.clear.frame(width: periodColumnWidth, height: 1)
@@ -92,23 +106,28 @@ struct GridWeekView: View {
                 }
             }
             Divider()
-            ScrollView(.vertical) {
-                ZStack(alignment: .topLeading) {
-                    rowBands(tops: tops, width: width)
-                    periodLabels(tops: tops)
-                    nonSchoolColumns(columnWidth: columnWidth)
-                    freeSlots(tops: tops, columnWidth: columnWidth)
-                    lessonCells(tops: tops, columnWidth: columnWidth)
+            GeometryReader { scrollProxy in
+                let heights = rowHeights(available: scrollProxy.size.height)
+                let tops = tops(heights)
+                let total = heights.reduce(0, +)
+                ScrollView(.vertical) {
+                    ZStack(alignment: .topLeading) {
+                        rowBands(tops: tops, heights: heights, width: width)
+                        periodLabels(tops: tops, heights: heights)
+                        nonSchoolColumns(columnWidth: columnWidth, totalHeight: total)
+                        freeSlots(tops: tops, heights: heights, columnWidth: columnWidth)
+                        lessonCells(tops: tops, heights: heights, columnWidth: columnWidth)
+                    }
+                    .frame(width: width, height: total, alignment: .topLeading)
+                    .accessibilityElement(children: .contain)
+                    .padding(.vertical, verticalPadding)
+                    unplacedSection
                 }
-                .frame(width: width, height: totalHeight, alignment: .topLeading)
-                .accessibilityElement(children: .contain)
-                .padding(.vertical, 8)
-                unplacedSection
             }
         }
     }
 
-    private func rowBands(tops: [CGFloat], width: CGFloat) -> some View {
+    private func rowBands(tops: [CGFloat], heights: [CGFloat], width: CGFloat) -> some View {
         ForEach(layout.rows, id: \.index) { row in
             Group {
                 if row.isLessonRow {
@@ -117,21 +136,37 @@ struct GridWeekView: View {
                     Rectangle().fill(Color.secondary.opacity(row.kind == .lunch ? 0.14 : 0.08))
                 }
             }
-            .frame(width: width, height: height(of: row))
+            .frame(width: width, height: heights[row.index])
             .offset(y: tops[row.index])
             .accessibilityHidden(true)
         }
     }
 
-    private func periodLabels(tops: [CGFloat]) -> some View {
+    /// `true` when `row` is today's current lesson period.
+    private func isCurrentRow(_ row: TimetableCore.GridLayout.Row) -> Bool {
+        row.isLessonRow && layout.columns.contains { $0.date == today }
+            && row.start.minuteOfDay <= nowMinute && nowMinute < row.end.minuteOfDay
+    }
+
+    private func periodLabels(tops: [CGFloat], heights: [CGFloat]) -> some View {
         ForEach(layout.rows, id: \.index) { row in
             VStack(spacing: 1) {
                 if row.isLessonRow {
                     if let label = GridPresentation.rowLabel(row) {
+                        let current = isCurrentRow(row)
                         Text(verbatim: label)
                             .font(.callout.weight(.bold))
+                            .monospacedDigit()
                             .lineLimit(1)
                             .minimumScaleFactor(0.6)
+                            .foregroundStyle(current ? Color.onHighlighter : Color.primary)
+                            .padding(.horizontal, current ? 5 : 0)
+                            .background {
+                                // The current period: the highlighter marker in the gutter (Opus §9 signature).
+                                if current {
+                                    HighlighterStroke().fill(Color.highlighter)
+                                }
+                            }
                     }
                     Text(verbatim: model.formatter.time(row.start))
                         .font(.caption2)
@@ -150,13 +185,13 @@ struct GridWeekView: View {
                     Image(systemName: "fork.knife").font(.caption2).foregroundStyle(.secondary)
                 }
             }
-            .frame(width: periodColumnWidth, height: height(of: row))
+            .frame(width: periodColumnWidth, height: heights[row.index])
             .offset(y: tops[row.index])
             .accessibilityHidden(true)
         }
     }
 
-    private func nonSchoolColumns(columnWidth: CGFloat) -> some View {
+    private func nonSchoolColumns(columnWidth: CGFloat, totalHeight: CGFloat) -> some View {
         ForEach(layout.columns.filter { $0.activeBreakID != nil }, id: \.index) { column in
             VStack(spacing: 8) {
                 Image(systemName: "beach.umbrella")
@@ -178,7 +213,7 @@ struct GridWeekView: View {
         }
     }
 
-    private func freeSlots(tops: [CGFloat], columnWidth: CGFloat) -> some View {
+    private func freeSlots(tops: [CGFloat], heights: [CGFloat], columnWidth: CGFloat) -> some View {
         ForEach(layout.emptySlots, id: \.self) { slot in
             let row = layout.rows[slot.row]
             Button {
@@ -186,17 +221,10 @@ struct GridWeekView: View {
                     onAdd(target)
                 }
             } label: {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .strokeBorder(Color.secondary.opacity(0.35), style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
-                    .overlay {
-                        Image(systemName: "plus")
-                            .font(.caption)
-                            .foregroundStyle(Color.secondary.opacity(0.7))
-                    }
-                    .contentShape(Rectangle())
+                EmptyView()
             }
-            .buttonStyle(.plain)
-            .frame(width: columnWidth - 4, height: height(of: row) - 4)
+            .buttonStyle(QuietFreeSlotButtonStyle())
+            .frame(width: columnWidth - 4, height: heights[slot.row] - 4)
             .offset(x: periodColumnWidth + CGFloat(slot.column) * columnWidth + 2, y: tops[slot.row] + 2)
             .accessibilityLabel(Text(verbatim: GridPresentation.freeSlotAccessibilityLabel(
                 column: layout.columns[slot.column], row: row, renderer: model.renderer)))
@@ -205,14 +233,15 @@ struct GridWeekView: View {
         }
     }
 
-    private func lessonCells(tops: [CGFloat], columnWidth: CGFloat) -> some View {
+    private func lessonCells(tops: [CGFloat], heights: [CGFloat], columnWidth: CGFloat) -> some View {
         ForEach(layout.cells, id: \.entry.id) { cell in
-            let spanHeight = (cell.row..<(cell.row + cell.rowSpan)).reduce(CGFloat(0)) { $0 + height(of: layout.rows[$1]) }
+            let spanHeight = (cell.row..<min(cell.row + cell.rowSpan, heights.count)).reduce(CGFloat(0)) { $0 + heights[$1] }
+            let current = NowLinePresentation.isCurrent(cell.entry, today: today, minuteOfDay: nowMinute)
             Button {
                 onOpen(cell.entry)
             } label: {
                 GridCellView(cell: cell, reasons: reasons[cell.entry.id] ?? [], visibility: timetable.fieldVisibility,
-                             showsDetails: !isCompact, badges: work.badges(for: cell.entry.id))
+                             badges: work.badges(for: cell.entry.id), isCurrent: current)
             }
             .buttonStyle(.plain)
             .frame(width: columnWidth - 4, height: spanHeight - 4)
@@ -220,6 +249,7 @@ struct GridWeekView: View {
             .accessibilityLabel(Text(verbatim: GridPresentation.cellAccessibilityLabel(
                 cell, reasons: reasons[cell.entry.id] ?? [], visibility: timetable.fieldVisibility,
                 badges: work.badges(for: cell.entry.id), renderer: model.renderer)))
+            .accessibilityValue(ifPresent: current ? "today.a11y.inProgress" : nil)
             .accessibilityHint(Text("timetable.a11y.openHint"))
             .accessibilitySortPriority(sortPriority(column: cell.column, row: cell.row))
         }
@@ -235,7 +265,8 @@ struct GridWeekView: View {
                     .accessibilityAddTraits(.isHeader)
                 ForEach(layout.unplaced) { lesson in
                     Button { onOpen(lesson) } label: {
-                        LessonRowView(lesson: lesson, reasons: reasons[lesson.id] ?? [], visibility: timetable.fieldVisibility)
+                        LessonRowView(lesson: lesson, reasons: reasons[lesson.id] ?? [], visibility: timetable.fieldVisibility,
+                                      isCurrent: NowLinePresentation.isCurrent(lesson, today: today, minuteOfDay: nowMinute))
                     }
                     .buttonStyle(.plain)
                 }
@@ -257,24 +288,61 @@ struct GridWeekView: View {
     }
 }
 
-/// One lesson in the grid: subject colour, emoji, short name, the task / exam badges or else the optional room,
-/// status/conflict icons.
+/// One lesson in the grid (Opus H5 anatomy): short name (emoji above when it fits), the room on line 2 whenever it is
+/// visible and set, one badge slot bottom-trailing, a conflict icon top-leading.
 struct GridCellView: View {
     let cell: TimetableCore.GridLayout.Cell
     let reasons: [ModificationReason]
     let visibility: FieldVisibility
-    let showsDetails: Bool
     var badges: LessonBadges?
+    var isCurrent = false
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.colorSchemeContrast) private var contrast
+
+    private let cornerRadius: CGFloat = 8
 
     var body: some View {
         let lesson = cell.entry
         let style = LessonTileStyle(color: lesson.subject.color)
         let foreground = Color(style.foreground)
         let cancelled = lesson.status == .cancelled
+        let badge = LessonCellBadge.make(status: lesson.status, reasons: reasons, badges: badges)
+        let room = VisibleLessonFields(lesson: lesson, visibility: visibility).room
+        ViewThatFits(in: .vertical) {
+            lines(lesson: lesson, room: room, foreground: foreground, cancelled: cancelled, withEmoji: true)
+            lines(lesson: lesson, room: room, foreground: foreground, cancelled: cancelled, withEmoji: false)
+        }
+        .foregroundStyle(foreground)
+        .padding(.horizontal, 2)
+        .padding(.vertical, 3)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous).fill(Color(style.background)))
+        .overlay {
+            if style.needsOutline(isDark: colorScheme == .dark) || contrast == .increased {
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .strokeBorder(Color.secondary.opacity(0.6), lineWidth: 1)
+            }
+        }
+        // Cancelled: the whole cell steps back (Opus H5); the badge below stays at full strength.
+        .opacity(cancelled ? 0.4 : 1)
+        .overlay {
+            if isCurrent { HighlighterOutline(cornerRadius: cornerRadius) }
+        }
+        .overlay(alignment: .bottomTrailing) {
+            if let badge { CellBadgeView(badge: badge) }
+        }
+        .overlay(alignment: .topLeading) {
+            if cell.isInConflict {
+                ConflictCornerIcon()
+            }
+        }
+        .contentShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+    }
+
+    private func lines(lesson: ResolvedLesson, room: String?, foreground: Color, cancelled: Bool,
+                       withEmoji: Bool) -> some View {
         VStack(spacing: 1) {
-            if let emoji = GridPresentation.emoji(lesson.subject) {
+            if withEmoji, let emoji = GridPresentation.emoji(lesson.subject) {
                 Text(verbatim: emoji).font(.caption)
             }
             Text(verbatim: GridPresentation.cellTitle(lesson.subject))
@@ -283,46 +351,21 @@ struct GridCellView: View {
                 .lineLimit(2)
                 .minimumScaleFactor(0.6)
                 .strikethrough(cancelled, pattern: .solid, color: foreground)
-            if let badges {
-                // Replaces the room line: the cell has no room for both (44 pt columns, Phase 2).
-                CompactLessonWorkBadges(badges: badges)
-            } else if showsDetails, let room = VisibleLessonFields(lesson: lesson, visibility: visibility).room {
+            if let room {
                 Text(verbatim: room)
                     .font(.caption2)
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
+                    .strikethrough(cancelled, pattern: .solid, color: foreground)
             }
         }
-        .foregroundStyle(foreground)
-        .padding(.horizontal, 2)
-        .padding(.vertical, 3)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color(style.background)))
-        .overlay {
-            if style.needsOutline(isDark: colorScheme == .dark) || contrast == .increased {
-                RoundedRectangle(cornerRadius: 8, style: .continuous).strokeBorder(Color.secondary.opacity(0.6), lineWidth: 1)
-            }
-        }
-        .overlay(alignment: .topTrailing) {
-            if let badge = LessonStatusBadgeModel.make(status: lesson.status, reasons: reasons) {
-                CornerIcon(symbolName: badge.symbolName)
-            }
-        }
-        .overlay(alignment: .topLeading) {
-            if cell.isInConflict {
-                CornerIcon(symbolName: "exclamationmark.triangle.fill")
-            }
-        }
-        .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 }
 
-/// A tiny symbol on a material disc in a cell corner (legible on any subject colour).
-struct CornerIcon: View {
-    let symbolName: String
-
+/// The overlap/conflict marker: a tiny symbol on a material disc in a cell corner (legible on any subject colour).
+struct ConflictCornerIcon: View {
     var body: some View {
-        Image(systemName: symbolName)
+        Image(systemName: "exclamationmark.triangle.fill")
             .font(.system(size: 9, weight: .bold))
             .foregroundStyle(Color.primary)
             .padding(3)

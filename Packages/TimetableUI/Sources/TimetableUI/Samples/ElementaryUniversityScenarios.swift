@@ -98,8 +98,9 @@ extension SampleScenarios {
 
         let rotation = RotationScheme.weekCycle(WeekCycle(
             length: 2,
-            anchor: .isoWeekParity(policy: WeekParity.defaultPolicy(for: .university, regionCode: "SK"), offset: 0),
-            labels: ["Nepárny", "Párny"]))
+            anchor: .isoWeekParity(policy: WeekParity.defaultPolicy(for: .university, regionCode: "SK"), offset: 0)))
+            // No user labels (U4 / D11): the app's own localised "Odd week" / "Even week" phrases name the weeks;
+            // the former Slovak labels showed as "Week Párny" in English.
         let answers = OnboardingAnswers(
             profile: .university, timetableName: "FIIT – 2. ročník", timetableEmoji: "🎓", bellScheduleName: "Bloky",
             rotation: rotation,

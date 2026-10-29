@@ -54,9 +54,9 @@ public struct LessonBadges: Equatable, Sendable {
     public var isEmpty: Bool { openTasks <= 0 && !hasExam }
 
     /// SF Symbol of the task badge.
-    public static let taskSymbol = "checklist"
+    public static let taskSymbol = AppSymbol.task.rawValue
     /// SF Symbol of the exam badge.
-    public static let examSymbol = "graduationcap.fill"
+    public static let examSymbol = AppSymbol.exam.rawValue
 
     /// "2 tasks" (plural variations), `nil` when there are none.
     public func tasksText(renderer: LocalizedTextRenderer) -> String? {

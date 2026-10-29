@@ -25,7 +25,7 @@ Verification reality: there is no device; UI is verified through **iOS Simulator
 
    Release builds ignore `-TabulaSeed` and `-TabulaNow`.
 7. **Colour and contrast:** subject colours from palette packs or custom; tile text colour always from `ColorValue.preferredTextColor` (WCAG). Colour is never the only carrier of meaning (status badges carry text and icons).
-8. **Field rule** (PRODUCT.md): a disabled field is hidden everywhere, including editors; an enabled-but-empty field is absent (no placeholders, dashes or blank lines).
+8. **Field rule** (PRODUCT.md): a disabled field is hidden everywhere, including editors; an enabled-but-empty field is absent (no placeholders, dashes or blank lines). *Superseded for editors by UX overhaul D10 (2026-10-23): editors offer every field; the setting only affects summaries.*
 9. **Strings:** every user-facing string goes in `Resources/Localizable.xcstrings` with a context comment as it is written. At the end of the phase all 12 languages are scaffolded with machine translations, logged in `docs/localization/REVIEW.md` as "needs native review". Language list: en, sk, cs, pl, hu, ro, de, fr, uk, sr-Cyrl + sr-Latn, ja, zh-Hans.
 10. **Not in Phase 2:**
     - Tasks/exams UI and real notification scheduling (Phase 3).

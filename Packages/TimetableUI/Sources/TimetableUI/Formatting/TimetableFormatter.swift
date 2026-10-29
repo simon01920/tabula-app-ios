@@ -112,6 +112,32 @@ public struct TimetableFormatter: Sendable {
         }
     }
 
+    /// How much of a date `contextualDate` shows (the year is added only when it is not the current year).
+    public enum ContextualDateStyle: Sendable {
+        /// "Tuesday, October 13" / "utorok 13. októbra".
+        case full
+        /// "Tue, Oct 13" / "ut 13. 10.".
+        case abbreviated
+        /// "Oct 13" / "13. 10.".
+        case dayMonth
+    }
+
+    /// A date without the year when it falls in `today`'s year, with the year otherwise (Opus review L1: "Tuesday,
+    /// October 13, 2026" → "Tuesday, October 13"). The locale's own pattern decides the order and punctuation
+    /// (Date.FormatStyle fields, never concatenated); both are calendar dates, so no time zone can move them across a
+    /// year boundary.
+    public func contextualDate(_ date: LocalDate, today: LocalDate, style: ContextualDateStyle = .full) -> String {
+        let instant = Date(timeIntervalSince1970: TimeInterval(date.daysSinceEpoch) * 86_400)
+        var format = Date.FormatStyle(locale: locale, calendar: utcCalendar, timeZone: utc)
+        switch style {
+        case .full: format = format.weekday(.wide).day().month(.wide)
+        case .abbreviated: format = format.weekday(.abbreviated).day().month(.abbreviated)
+        case .dayMonth: format = format.day().month(.abbreviated)
+        }
+        if date.year != today.year { format = format.year() }
+        return instant.formatted(format)
+    }
+
     /// Stand-alone weekday name (for column headers and pickers).
     public func weekdayName(_ weekday: Weekday, width: WeekdayWidth = .wide) -> String {
         let symbols: [String]

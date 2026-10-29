@@ -161,7 +161,7 @@ public struct LessonDraft: Equatable, Sendable {
     public var lessonType: LessonType?
     public var notes: String
     public var bringList: [String]
-    /// The stored lesson (or a skeleton): hidden fields and unknown validity are taken from here.
+    /// The stored lesson (or a skeleton): unknown validity and fields of newer versions are taken from here.
     private let base: Lesson
 
     /// Edits `lesson`. `today` seeds the validity range of lessons that have none (today until 30 days later).
@@ -196,7 +196,8 @@ public struct LessonDraft: Equatable, Sendable {
         bringList = lesson.bringList
     }
 
-    /// A new lesson in `timetable`. Subject defaults (room, building, teacher) are applied for the enabled fields.
+    /// A new lesson in `timetable`. Subject defaults (room, building, teacher) are applied (D10: whatever the
+    /// timetable's display setting).
     public init(newIn timetable: Timetable, context: NewLessonContext, schedule: BellSchedule?, subject: Subject?,
                 firstWeekday: Weekday, id: Lesson.ID, today: LocalDate) {
         lessonID = id
@@ -226,14 +227,21 @@ public struct LessonDraft: Equatable, Sendable {
         base = Lesson(id: id, meta: EditorEntities.placeholderMeta, timetableID: timetable.id,
                       subjectID: subject?.id ?? Subject.ID(UUID()), occurrence: LessonOccurrenceRule(day: startDay),
                       slot: .time(start: SlotDraft.defaultStart, end: SlotDraft.defaultEnd))
-        if let subject { applySubjectDefaults(subject, visibility: timetable.fieldVisibility) }
+        if let subject { applySubjectDefaults(subject) }
     }
 
-    /// Fills room/building/teacher from `subject` for fields the timetable shows and that are still empty.
-    public mutating func applySubjectDefaults(_ subject: Subject, visibility: FieldVisibility) {
-        if visibility.isVisible(.room), EditorText.trimmedOrNil(room) == nil { room = subject.defaultRoom ?? "" }
-        if visibility.isVisible(.building), EditorText.trimmedOrNil(building) == nil { building = subject.defaultBuilding ?? "" }
-        if visibility.isVisible(.teacher), EditorText.trimmedOrNil(teacher) == nil { teacher = subject.defaultTeacher ?? "" }
+    /// Fills room/building/teacher from `subject` where they are still empty (never overwrites what was typed, so a
+    /// subject created from inside the editor keeps the rest of the draft).
+    public mutating func applySubjectDefaults(_ subject: Subject) {
+        if EditorText.trimmedOrNil(room) == nil { room = subject.defaultRoom ?? "" }
+        if EditorText.trimmedOrNil(building) == nil { building = subject.defaultBuilding ?? "" }
+        if EditorText.trimmedOrNil(teacher) == nil { teacher = subject.defaultTeacher ?? "" }
+    }
+
+    /// `true` when "More details" should start expanded (some optional field holds a value).
+    public var hasOptionalDetails: Bool {
+        EditorFieldPolicy.moreDetailsStartsExpanded(texts: [room, building, teacher, notes], lessonType: lessonType,
+                                                    bringList: bringList)
     }
 
     /// Problems that block saving.
@@ -256,11 +264,10 @@ public struct LessonDraft: Equatable, Sendable {
         issues(in: timetable).isEmpty && slotIssues.isEmpty
     }
 
-    /// The lesson to store, or `nil` while required input is missing. Fields hidden by the timetable keep their
-    /// stored value.
+    /// The lesson to store, or `nil` while required input is missing. Every optional field is written (D10: the
+    /// editor offers all of them; the display setting only affects summaries).
     public func makeLesson(in timetable: Timetable) -> Lesson? {
         guard canSave(in: timetable), let subjectID, let slot = slot.slot else { return nil }
-        let visibility = timetable.fieldVisibility
         var lesson = base
         lesson.subjectID = subjectID
         var weeks: Set<Int>?
@@ -277,12 +284,12 @@ public struct LessonDraft: Equatable, Sendable {
         case .range: lesson.validity = .range(LocalDateRange(start: rangeStart, end: rangeEnd))
         case .unknown: break
         }
-        if visibility.isVisible(.room) { lesson.room = EditorText.trimmedOrNil(room) }
-        if visibility.isVisible(.building) { lesson.building = EditorText.trimmedOrNil(building) }
-        if visibility.isVisible(.teacher) { lesson.teacher = EditorText.trimmedOrNil(teacher) }
-        if visibility.isVisible(.lessonType) { lesson.lessonType = lessonType }
-        if visibility.isVisible(.notes) { lesson.notes = EditorText.trimmedOrNil(notes) }
-        if visibility.isVisible(.bringList) { lesson.bringList = EditorText.cleanedList(bringList) }
+        lesson.room = EditorText.trimmedOrNil(room)
+        lesson.building = EditorText.trimmedOrNil(building)
+        lesson.teacher = EditorText.trimmedOrNil(teacher)
+        lesson.lessonType = lessonType
+        lesson.notes = EditorText.trimmedOrNil(notes)
+        lesson.bringList = EditorText.cleanedList(bringList)
         return lesson
     }
 }

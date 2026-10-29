@@ -78,7 +78,7 @@ struct ProfilePresetTests {
         #expect(ProfilePreset.for(.elementary).visibleFields == [.room, .teacher, .bringList])
         #expect(ProfilePreset.for(.secondary).visibleFields == [.room, .teacher, .notes])
         #expect(ProfilePreset.for(.university).visibleFields == [.building, .room, .teacher, .lessonType, .notes])
-        #expect(ProfilePreset.for(.other).visibleFields.isEmpty)
+        #expect(ProfilePreset.for(.other).visibleFields == [.room, .teacher])
     }
 
     @Test func rotationViewExamsTerminologyRows() {

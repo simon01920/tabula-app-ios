@@ -88,7 +88,7 @@ public struct LessonStatusBadge: View {
     private var tint: Color {
         switch model.kind {
         case .modified: return .orange
-        case .cancelled: return .red
+        case .cancelled: return .correction
         case .added: return .green
         }
     }

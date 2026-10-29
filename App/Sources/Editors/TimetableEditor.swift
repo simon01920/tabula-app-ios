@@ -4,34 +4,45 @@
 //
 // Guards (see TimetableDraft): the rotation cannot switch between a day cycle and weekdays while lessons exist, and a
 // cycle cannot be shorter than what lessons already use; both would otherwise be rejected by validation.
+// UX overhaul U5b: identity (name, emoji) and school days are separate sections, and the days are weekday chips in
+// the user's week order (M16); no header repeats a row label (M1); the lesson-details copy says the setting only
+// affects summaries (D10); "Reset Timetable…" lives here too, so the last timetable (which can't be deleted) can be
+// cleared without a hidden menu (M17). The bell schedule and terms editors are pushed in both modes
+// (never stacked sheets).
 // Logic: Packages/TimetableUI/.../Editors/TimetableDraft.swift (Linux-tested).
-// APIs: Picker, Toggle, Stepper (ValueStepper), sheet(isPresented:), Section footers, RotationResolver (core).
+// APIs: Picker, Toggle (.button style through WeekdayChips), Stepper (ValueStepper), sheet(isPresented:),
+//   NavigationLink(destination:label:), Section footers, RotationResolver (core).
 import SwiftUI
 import TimetableCore
 import TimetableUI
 
-/// Opens the timetable settings as sheet content for `timetableID` (default: the active timetable).
+/// Opens the timetable settings for `timetableID` (default: the active timetable): as sheet content, or `embedded` in
+/// a parent navigation stack (Settings, the timetables manager in Settings; no own stack, Back leaves while nothing
+/// is edited).
 struct TimetableEditorView: View {
     var timetableID: Timetable.ID?
+    var embedded = false
     @Environment(AppModel.self) private var model
 
     var body: some View {
         if let timetable = timetableID.flatMap({ id in model.timetables.first { $0.id == id } }) ?? model.activeTimetable {
-            TimetableEditorBody(timetable: timetable)
+            TimetableEditorBody(timetable: timetable, embedded: embedded)
         } else {
-            EditorUnavailableView(messageKey: "editor.timetable.unavailable")
+            EmbeddableUnavailableView(embedded: embedded, messageKey: "editor.timetable.unavailable")
         }
     }
 }
 
 private struct TimetableEditorBody: View {
     let timetable: Timetable
+    let embedded: Bool
     @Environment(AppModel.self) private var model
 
     var body: some View {
         let initial = TimetableDraft(timetable: timetable, today: model.today)
         let lessonCount = (model.database?.lessons ?? []).filter { !$0.isDeleted && $0.timetableID == timetable.id }.count
-        EditorScaffold(
+        EmbeddableEditorScaffold(
+            embedded: embedded,
             titleKey: "editor.timetable.title",
             initial: initial,
             canSave: { $0.canSave },
@@ -61,13 +72,14 @@ private struct TimetableFormContent: View {
     let lessonCount: Int
     let lessons: [Lesson]
     @Environment(AppModel.self) private var model
-    @State private var editingBell = false
-    @State private var editingTerms = false
+    @State private var confirmingReset = false
+    @State private var resetFailed = false
 
     private var weekdays: [Weekday] { Weekday.week(startingAt: model.calendarContext.firstWeekday) }
 
     var body: some View {
-        generalSection
+        identitySection
+        schoolDaysSection
         rotationSection
         switch draft.rotationKind {
         case .none: EmptyView()
@@ -78,34 +90,35 @@ private struct TimetableFormContent: View {
         fieldsSection
         appearanceSection
         termsSection
+        resetSection
     }
 
-    // MARK: General
+    // MARK: Identity and school days (M16: split, chips in week order)
 
-    private var generalSection: some View {
+    private var identitySection: some View {
         Section {
-            LabeledTextField(titleKey: "editor.timetable.name", text: $draft.name)
+            EditorTitleField(promptKey: "editor.timetable.name.prompt", text: $draft.name,
+                             missingHintKey: TimetableDraft.Issue.noName.l10nKey)
             LabeledTextField(titleKey: "editor.timetable.emoji", text: $draft.emoji)
                 .onChange(of: draft.emoji) { _, newValue in
                     if let first = EditorText.firstCharacter(newValue), first != newValue { draft.emoji = first }
                 }
-            ForEach(weekdays, id: \.self) { day in
-                Toggle(isOn: Binding(
-                    get: { draft.enabledDays.contains(day) },
-                    set: { isOn in
-                        if isOn { draft.enabledDays.insert(day) } else { draft.enabledDays.remove(day) }
-                    })) {
-                    Text(verbatim: model.formatter.weekdayName(day))
-                }
-            }
+        }
+    }
+
+    private var schoolDaysSection: some View {
+        Section {
+            WeekdayChips(
+                days: weekdays,
+                isOn: { draft.enabledDays.contains($0) },
+                setOn: { day, isOn in
+                    if isOn { draft.enabledDays.insert(day) } else { draft.enabledDays.remove(day) }
+                })
         } header: {
-            Text("editor.timetable.general")
+            Text("editor.timetable.days")
         } footer: {
-            VStack(alignment: .leading) {
-                Text("editor.timetable.days.footer")
-                ForEach(draft.issues, id: \.self) { issue in
-                    Text(LocalizedStringKey(issue.l10nKey)).foregroundStyle(.red)
-                }
+            ForEach(draft.issues.filter { $0 != .noName }, id: \.self) { issue in
+                ValidationMessage(key: issue.l10nKey)
             }
         }
     }
@@ -134,8 +147,6 @@ private struct TimetableFormContent: View {
             } label: {
                 Text("editor.rotation")
             }
-        } header: {
-            Text("editor.rotation.header")
         } footer: {
             if !TimetableDraft.canChangeRotationFamily(lessonCount: lessonCount) {
                 Text("editor.rotation.locked.footer")
@@ -303,7 +314,10 @@ private struct TimetableFormContent: View {
             switch draft.timeKind {
             case .bellSchedule:
                 if case .bellSchedule = timetable.timeStructure {
-                    Button { editingBell = true } label: {
+                    // Pushed in both modes (the sheet's EditorScaffold has its own stack): never a stacked sheet.
+                    NavigationLink {
+                        BellScheduleEditorView(timetableID: timetable.id, embedded: true)
+                    } label: {
                         Label { Text("editor.time.editBell") } icon: { Image(systemName: "bell") }
                             .frame(minHeight: 44, alignment: .leading)
                     }
@@ -320,7 +334,6 @@ private struct TimetableFormContent: View {
                 Text("editor.time.footer")
             }
         }
-        .sheet(isPresented: $editingBell) { BellScheduleEditorView(timetableID: timetable.id) }
     }
 
     // MARK: Fields
@@ -387,13 +400,50 @@ private struct TimetableFormContent: View {
 
     private var termsSection: some View {
         Section {
-            Button { editingTerms = true } label: {
+            NavigationLink {
+                TermsEditorView(timetableID: timetable.id, embedded: true)
+            } label: {
                 Label { Text("editor.terms.open") } icon: { Image(systemName: "calendar.badge.clock") }
                     .frame(minHeight: 44, alignment: .leading)
             }
         } footer: {
             Text("editor.terms.open.footer")
         }
-        .sheet(isPresented: $editingTerms) { TermsEditorView(timetableID: timetable.id) }
+    }
+
+    // MARK: Reset (applies at once, with an impact confirmation, like Delete Lesson in the lesson editor)
+
+    private var resetSection: some View {
+        Section {
+            Button(role: .destructive) {
+                confirmingReset = true
+            } label: {
+                Text("editor.timetables.reset.action").frame(maxWidth: .infinity, minHeight: 44)
+            }
+            .disabled(lessonCount == 0)
+        } footer: {
+            if resetFailed {
+                Text("editor.error.failed").foregroundStyle(.red)
+            } else if lessonCount == 0 {
+                Text("editor.timetable.reset.empty.footer")
+            }
+        }
+        .sheet(isPresented: $confirmingReset) {
+            if let database = model.database {
+                let impact = TimetableManagement.resetImpact(of: timetable.id, in: database)
+                ImpactConfirmation(
+                    title: "editor.timetables.reset.title", subjectName: timetable.name,
+                    rows: [ImpactRow(id: "lessons", key: "editor.impact.lessons", count: impact.lessons),
+                           ImpactRow(id: "changes", key: "editor.impact.dayChanges", count: impact.changes)],
+                    note: "editor.timetables.reset.note", action: "editor.timetables.reset") {
+                        guard let database = model.database else { return }
+                        if case .applied = model.apply(TimetableManagement.resetMutation(timetable.id, in: database)) {
+                            resetFailed = false
+                        } else {
+                            resetFailed = true
+                        }
+                    }
+            }
+        }
     }
 }
