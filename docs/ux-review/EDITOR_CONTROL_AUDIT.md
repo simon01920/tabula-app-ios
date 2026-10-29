@@ -200,7 +200,7 @@ Settings can present it.)
 
 | # | Control | Observation in code | Suggested decision |
 |---|---|---|---|
-| U2-1 | Title | Right-aligned `LabeledTextField` (axis vertical) | Keep; adopt U1 title style (M6) |
+| U2-1 | Title | Right-aligned `LabeledTextField` (axis vertical) | Keep; uses U1's `EditorTitleField` (M6, done at integration) |
 | U2-2 | Kind picker | No description per kind (D5) | Keep; add one-line descriptions |
 | U2-3 | Subject picker | Existing subjects only; no "Create subject" (Astra §5 expects it, with the parent draft kept) | Decide: add a nested New Subject like the lesson editor (pattern proven there) |
 | U2-4 | Due picker + header "Due" | Header repeats the label (M1) | Keep; drop one |

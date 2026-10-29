@@ -69,19 +69,12 @@ Defaults the orchestrator took (listed for the gate, the human can reverse them)
 - **Screenshots:** update the DEBUG screenshot routes and seeds when screens change. Add routes for new screens (e.g. the quick-entry sheet, the reminder kind detail) to `ui-screenshots.yml`.
 - **Report:** the finding IDs fixed, deferred or rejected (with reasons), the HIG pages cited, the validate line, and a clean xtool build.
 
-## 3. Status / resume point (paused by the human, 2026-10-26)
-**Done and saved on GitHub** (none of it is merged into `main` yet):
-- **`wip/ux-integration`** @ `5bafead`. U1 foundation + U1 QA fixes, U5b editors, U5a settings and U4 timetable are merged here and deduplicated: no local token, highlighter, symbol or touched-flag copies remain. validate: ALL CHECKS PASSED (540 core + 565 UI tests). xtool build: 0 warnings at `8047182`; `5bafead` has only had validate.
-- **`wip/ux-u6-onboarding`** @ `6869aa1`. U6 is finished and validated **on its own** but **not yet merged** into the integration branch.
-- **`wip/ux-u7-widgets`** @ `4b29fa4`. U7 is finished and validated **on its own** but **not yet merged**.
+## 3. Status / resume point (updated 2026-10-29)
+**The integration is complete** on **`wip/ux-integration`**; it is not merged into `main` yet. All seven branches are merged and deduplicated: U1 + QA fixes, U5b, U5a, U4, U6 and U7. See §4. Last checks: validate ALL CHECKS PASSED (540 core + 584 UI tests), and clean xtool builds (base and `--app-intents`) report 0 warnings. The `wip/ux-u6-onboarding` and `wip/ux-u7-widgets` branches are now contained in it.
 
 **Next steps, in order:**
-1. Continue the integration on `wip/ux-integration`:
-   - Merge U6: remove its duplicate `WeekdayChips`, `OnboardingColors` and local AnyLayout stacks, and take U1's choice-row structure.
-   - Merge U7: `NowHighlighterTag` becomes `NowMarker` (needs a widget rendering-mode outline); delete `WidgetInkTokens`, `InkForeground` and `CorrectionForeground`.
-   - Then: `grep "adopt U1"` must be empty; add an integration note here; regenerate the review export; run validate; run clean xtool builds (base and `--app-intents`).
-2. Run one `qa-reviewer` (Opus) on the integrated branch, then merge it to `main` and push.
-3. Run U2 (Tasks + Exams) and U3 (Today) **from the integrated `main`**, because they touch the files U1, U4 and U5b changed. Then U8 (copy and terminology). Then the full screenshot rerun (`scripts/ux-review-index.py`) and a check of every Opus and Astra finding ID. Then the Phase 4U gate report. Then Phase 5 (Watch).
+1. Run one `qa-reviewer` (Opus) on `wip/ux-integration`, then merge it to `main` and push.
+2. Run U2 (Tasks + Exams) and U3 (Today) **from the integrated `main`**, because they touch the files U1, U4 and U5b changed. Then U8 (copy and terminology). Then the full screenshot rerun (`scripts/ux-review-index.py`) and a check of every Opus and Astra finding ID. Then the Phase 4U gate report. Then Phase 5 (Watch).
 
 **Integration decisions for the human to review:**
 - A lesson with several change reasons shows the generic "changed" symbol, and the legend has a "Changed" row. U1's rule replaces U4's "most important reason" symbol.
@@ -90,7 +83,19 @@ Defaults the orchestrator took (listed for the gate, the human can reverse them)
 - D10: hiding a field affects summaries only, never the editors. PRODUCT.md was updated to match (it previously said "hidden everywhere").
 - The "Other" school type now shows Room and Teacher by default (PRODUCT.md previously said all off).
 - The "Lessons are called" setting is removed; it follows the school type.
+- Onboarding uses the editors' `WeekdayChips`: ink capsules, and VoiceOver reads a switch. U6's prominent/bordered buttons with a "Selected" trait are gone. The onboarding choice row keeps U6's empty circle when it is not selected.
+- `NowMarker` has one size in widgets and Live Activities (`.small`, caption heavy). U7's per-context fonts (caption2, or the Live Activity caption font) are gone; check the fit on the device. In the accented and vibrant widget modes it draws an outline.
+- `onboarding.fields.subtitle` is removed: U6 dropped the step and U5b had reworded the key, and nothing uses it.
 
 **Session tooling:**
 - The `ponytail` and `haiku-helper` skills are installed user-wide; follow them, and tell every subagent to load `ponytail`.
 - The local agent worktrees under `.claude/worktrees/` hold the same commits as the `wip/*` branches and can be deleted after the merge.
+
+## 4. Integration (2026-10-26 to 2026-10-29, `wip/ux-integration`)
+Merged in this order: U1, U5b, U5a, U4, U6, U7. After each merge: validate, an xtool build, then a commit. Catalogs went through a three-way, per-key merge written in canonical form; every auto-merge equalled it. The review export was regenerated each time. Append-only docs keep both sides; ENVIRONMENT U4's "33-U4" became §34.
+Deduplicated onto U1 (nothing local remains):
+- **Editors:** the local `touched` flags are gone; the editors use `ValidationMessage(key:severity:)` and `\.editorErrorsVisible`, and Save stays disabled while the draft is invalid. The bell and terms editors do the same. The embedded scaffold sets `\.editorErrorsVisible` too; U1 has no embedded mode, so `EmbeddedEditorScaffold` stays. Weekday chips use ink / onInk.
+- **Settings:** `SettingsNewTimetableSheet` → U5b's internal `NewTimetableSheet`. `SettingsPushedEditor` → the editors' `embedded: true`. The Pro capsule → `ProBadge`. The status red → `correction`. Reminder symbols → `AppSymbol`. `FollowUpRows.labelledByHeader` was removed as unused.
+- **Timetable:** `TimetableColor` and `TimetableMarkerColors` → `Color.*` tokens; U4's extra roles became `DesignTokens.onCorrection` and `.changed`. `HighlighterNowTag` → `NowMarker`, and the gutter's current period uses `HighlighterStroke`. `LessonChangeSymbol` → `AppSymbol`. `timetable.now` was merged into `now.marker`. `Tips.configure()` moved to the app root.
+- **Onboarding:** U6's `WeekdayChips` and `OnboardingColors` (now `pageSurface` / `cardSurface`) are gone, and its local `AnyLayout` stacks became `AdaptiveStack`. The choice row uses U1's structure. The hour-cycle locale was ported to the new times step.
+- **Widgets:** `NowHighlighterTag` → `NowMarker`, which gained the rendering-mode outline. `WidgetInkTokens`, `InkForeground` and `CorrectionForeground` → `Color.ink` / `Color.correction`, and their duplicate contrast tests were removed.
