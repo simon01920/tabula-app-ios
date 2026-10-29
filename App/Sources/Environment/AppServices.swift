@@ -22,6 +22,8 @@ final class AppServices {
     let liveActivities: LiveActivityController
     /// What App Intents run in this process (Phase 4 B3): Mark done, "What's next?", "Add homework".
     let intents: AppIntentHost
+    /// The "Just look around" sample-data record and its Remove banner (Phase 4U U6).
+    let sampleContent: SampleContentController
 
     init(environment: AppEnvironment) {
         let model = AppModel(environment: environment)
@@ -34,6 +36,7 @@ final class AppServices {
                                             offerStore: environment.reminders.offerStore)
         self.model = model
         self.navigation = navigation
+        sampleContent = SampleContentController(localStore: environment.onboardingStore)
         self.reminders = reminders
         notificationDelegate = NotificationResponseDelegate { action, delivered in
             await reminders.handle(action, delivered)   // both live as long as the app (no cycle: the coordinator does not hold the delegate)

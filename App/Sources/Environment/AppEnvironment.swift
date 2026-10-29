@@ -58,6 +58,9 @@ struct AppEnvironment: Sendable {
     let widgetContainer: URL?
     /// Live Activity preferences / ledger store; seed runs never touch ActivityKit (Phase 4 B2).
     let liveActivities: LiveActivityDependencies
+    /// Device-local onboarding state (Phase 4U U6): the sample-data record behind "This is sample data · Remove" and
+    /// the school type kept across an app-language change. App Group UserDefaults; in memory for seed runs.
+    let onboardingStore: any OnboardingLocalStore
 
     /// The environment for this process.
     static func make(launchOptions: LaunchOptions) -> AppEnvironment {
@@ -84,7 +87,7 @@ struct AppEnvironment: Sendable {
                     : .inMemory(),
                 attachments: FileAttachmentStore(root: FileManager.default.temporaryDirectory
                     .appendingPathComponent("TabulaSeedAttachments", isDirectory: true)),
-                widgetContainer: nil, liveActivities: .inMemory())
+                widgetContainer: nil, liveActivities: .inMemory(), onboardingStore: InMemoryOnboardingLocalStore())
         }
         #endif
         // The real store always uses the real clock and the system zone: -TabulaNow/-TabulaTimeZone are honoured only
@@ -99,7 +102,8 @@ struct AppEnvironment: Sendable {
             launchOptions: launchOptions, saveDebounce: .milliseconds(400),
             reminders: .live(defaults: location.defaults),
             attachments: FileAttachmentStore(root: FileAttachmentStore.root(forStoreDirectory: location.directory)),
-            widgetContainer: location.groupContainer, liveActivities: .live(defaults: location.defaults))
+            widgetContainer: location.groupContainer, liveActivities: .live(defaults: location.defaults),
+            onboardingStore: UserDefaultsOnboardingLocalStore(defaults: location.defaults))
     }
 }
 

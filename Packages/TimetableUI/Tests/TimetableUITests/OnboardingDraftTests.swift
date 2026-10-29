@@ -3,120 +3,238 @@ import Testing
 import TimetableCore
 @testable import TimetableUI
 
-private let today = LocalDate(year: 2026, month: 10, day: 13)! // Tuesday
+private let today = LocalDate(year: 2026, month: 10, day: 13)! // Tuesday, ISO week 42 (even)
 private let names = OnboardingNames(timetable: "School", bellSchedule: "Bells", term: "Semester")
 private let reference = Date(timeIntervalSince1970: 1_791_879_600)
 
-private func build(_ draft: OnboardingDraft) -> TabulaDatabase {
+private func build(_ draft: OnboardingDraft, firstWeekday: Weekday = .monday) -> TabulaDatabase {
     var ids = SequentialIDGenerator(namespace: 0xB1)
     var clock = HybridLogicalClock(node: 0xB1)
-    return draft.makeDatabase(names: names, localeFirstWeekday: .monday,
+    return draft.makeDatabase(names: names, localeFirstWeekday: firstWeekday,
                               localize: { $0.key }, ids: &ids, clock: &clock, now: reference)
 }
 
-@Suite("OnboardingDraft presets")
+@Suite("Onboarding steps (U6: 7 → 4)")
+struct OnboardingStepTests {
+    @Test func fourStepsInOrder() {
+        #expect(OnboardingStep.count == 4)
+        #expect(OnboardingStep.allCases == [.schoolType, .start, .week, .times])
+        #expect(OnboardingStep.schoolType.previous == nil)
+        #expect(OnboardingStep.times.next == nil)
+        #expect(OnboardingStep.start.next == .week)
+        #expect(OnboardingStep.allCases.map(\.index) == Array(0..<OnboardingStep.count))
+    }
+
+    @Test func navigationPathsPushEveryStepAfterTheRoot() {
+        #expect(OnboardingStep.schoolType.path.isEmpty)
+        #expect(OnboardingStep.start.path == [.start])
+        #expect(OnboardingStep.times.path == [.start, .week, .times])
+    }
+
+    @Test func onlyRealStartChoicesExist() {
+        // Import from photo / QR is hidden until it works (F09): no such choice exists.
+        #expect(StartChoice.allCases == [.blank, .sample])
+        #expect(OnboardingDraft(today: today).start == .blank)   // never the sample by default (F10)
+    }
+}
+
+@Suite("OnboardingDraft presets and derived answers")
 struct OnboardingDraftPresetTests {
     @Test func secondaryDefaults() {
         let draft = OnboardingDraft(today: today, profile: .secondary)
         #expect(draft.timeKind == .bellSchedule)
-        #expect(draft.visibleFields == [.room, .teacher, .notes])
         #expect(draft.lessonMinutes == 45 && draft.lessonCount == 8 && draft.firstStartMinutes == 480)
         #expect(draft.availableRotations == RotationChoice.allCases)
+        #expect(draft.enabledDays == Weekday.workweek)
         #expect(!draft.termEnabled)
     }
 
-    @Test func elementaryHasLightRotationPromptAndBringList() {
+    @Test func elementaryHasTheShortRotationList() {
         let draft = OnboardingDraft(today: today, profile: .elementary)
-        #expect(draft.availableRotations == [.none, .oddEven, .dayAB])
-        #expect(draft.visibleFields == [.room, .teacher, .bringList])
+        #expect(draft.availableRotations == [.none, .alternatingWeeks, .alternatingDays])
         #expect(draft.lessonCount == 6)
-        #expect(draft.reminderTargets.contains(.packTonight))
     }
 
-    @Test func universityIsFreeFormWithTermOn() {
+    @Test func universityIsIndividualTimesWithTermOn() {
         let draft = OnboardingDraft(today: today, profile: .university)
         #expect(draft.timeKind == .freeForm)
         #expect(draft.freeFormMinutes == 90)
         #expect(draft.termEnabled)
-        #expect(draft.visibleFields == [.building, .room, .teacher, .lessonType, .notes])
         #expect(draft.preset.terminology == .classLecture)
     }
 
-    @Test func otherStartsWithAllFieldsOffAndSecondaryBellFallback() {
+    /// F06/F12: no fields step; school types get room + teacher, university adds building and type.
+    @Test func visibleFieldsAreDerivedFromTheProfile() {
+        for profile in UserProfile.knownValues {
+            let fields = OnboardingDraft(today: today, profile: profile).visibleFields
+            #expect(fields.isSuperset(of: [.room, .teacher]), "\(profile.rawValue)")
+            #expect(fields == ProfilePreset.for(profile).visibleFields)
+        }
+        let university = OnboardingDraft(today: today, profile: .university).visibleFields
+        #expect(university.isSuperset(of: [.building, .lessonType]))
+        #expect(!OnboardingDraft(today: today, profile: .secondary).visibleFields.contains(.building))
+        let database = build(OnboardingDraft(today: today, profile: .other))
+        #expect(database.timetables[0].fieldVisibility.visibleFields == [.room, .teacher])
+    }
+
+    @Test func otherStartsWithTheSecondaryBellFallback() {
         let draft = OnboardingDraft(today: today, profile: .other)
-        #expect(draft.visibleFields.isEmpty)
         #expect(draft.timeKind == .bellSchedule)
         #expect(draft.bellTemplate.count == BellScheduleTemplate.secondary.count)
     }
 
     @Test func reselectingKeepsEditsButChangingProfileResets() {
         var draft = OnboardingDraft(today: today, profile: .secondary)
-        draft.set(.building, visible: true)
+        draft.lessonCount = 4
+        draft.set(.saturday, enabled: true)
         draft.select(.secondary)
-        #expect(draft.visibleFields.contains(.building))
+        #expect(draft.lessonCount == 4 && draft.enabledDays.contains(.saturday))
         draft.select(.university)
-        #expect(!draft.visibleFields.contains(.bringList))
         #expect(draft.timeKind == .freeForm)
+        #expect(draft.enabledDays == Weekday.workweek)
     }
 
-    @Test func noProfileBlocksTheProfileStepOnly() {
+    @Test func schoolTypeIsRequiredFirst() {
         let draft = OnboardingDraft(today: today)
         #expect(draft.profile == nil)
-        #expect(!draft.canAdvance(from: .profile))
-        #expect(draft.canAdvance(from: .welcome))
-        #expect(draft.canAdvance(from: .rotation))
+        #expect(!draft.canAdvance(from: .schoolType))
+        #expect(!draft.canFinish(from: .start))
+        let chosen = OnboardingDraft(today: today, profile: .secondary)
+        #expect(chosen.canAdvance(from: .schoolType) && chosen.canFinish(from: .start))
+    }
+
+    /// Reminders are not a step any more: every preset rule is created with its default switch, so homework and
+    /// exams are on for every profile and nothing ever uses the alarm tier.
+    @Test func reminderRulesKeepThePresetDefaults() {
+        for profile in UserProfile.knownValues {
+            let draft = OnboardingDraft(today: today, profile: profile)
+            #expect(draft.answers(names: names, localeFirstWeekday: .monday).enabledReminderTargets == nil)
+            let rules = build(draft).reminderRules
+            let preset = ProfilePreset.for(profile).reminderRules
+            #expect(rules.map(\.target) == preset.map(\.target), "\(profile.rawValue)")
+            #expect(rules.map(\.isEnabled) == preset.map(\.isEnabled), "\(profile.rawValue)")
+            #expect(rules.first { $0.target == .homework }?.isEnabled == true, "\(profile.rawValue)")
+            #expect(rules.first { $0.target == .exam }?.isEnabled == true, "\(profile.rawValue)")
+            #expect(rules.allSatisfy { $0.tier != .alarm })
+        }
     }
 }
 
-@Suite("OnboardingDraft rotation and terms")
-struct OnboardingDraftRotationTests {
-    @Test func rotationMapping() {
+@Suite("OnboardingDraft week: days, rotation anchor, terms")
+struct OnboardingDraftWeekTests {
+    @Test func weekdayChipsFollowTheWeekStart() {
+        #expect(OnboardingDraft.orderedWeekdays(firstWeekday: .monday).first == .monday)
+        #expect(OnboardingDraft.orderedWeekdays(firstWeekday: .sunday) ==
+                [.sunday, .monday, .tuesday, .wednesday, .thursday, .friday, .saturday])
+    }
+
+    @Test func schoolDaysReachTheTimetableAndAtLeastOneIsRequired() {
         var draft = OnboardingDraft(today: today, profile: .secondary)
-        #expect(draft.rotationScheme == .none)
+        draft.set(.friday, enabled: false)
+        draft.set(.saturday, enabled: true)
+        #expect(build(draft).timetables[0].enabledDays == [.monday, .tuesday, .wednesday, .thursday, .saturday])
+        for day in Weekday.allCases { draft.set(day, enabled: false) }
+        #expect(!draft.canAdvance(from: .week))
+    }
 
-        draft.choose(rotation: .oddEven)
-        guard case .weekCycle(let odd) = draft.rotationScheme else { Issue.record("expected weekCycle"); return }
-        #expect(odd.length == 2)
-        #expect(odd.anchor == .isoWeekParity(policy: .strict, offset: 0))
+    @Test func sameEveryWeekHasNoRotation() {
+        let draft = OnboardingDraft(today: today, profile: .secondary)
+        #expect(draft.rotationScheme(firstWeekday: .monday) == .none)
+    }
 
-        draft.choose(rotation: .cycle)
-        draft.cycleLength = 4
-        guard case .weekCycle(let cycle) = draft.rotationScheme else { Issue.record("expected weekCycle"); return }
-        #expect(cycle.length == 4)
-        #expect(cycle.anchor == .referenceWeek(date: today, cycleWeek: 1))
+    @Test func alternatingWeeksAnchorOnThisWeek() {
+        var draft = OnboardingDraft(today: today, profile: .secondary)
+        draft.rotation = .alternatingWeeks
+        #expect(draft.rotationScheme(firstWeekday: .monday)
+                == .weekCycle(WeekCycle(length: 2, anchor: .referenceWeek(date: today, cycleWeek: 1))))
+        draft.currentCycleWeek = 2
+        let scheme = draft.rotationScheme(firstWeekday: .monday)
+        #expect(scheme == .weekCycle(WeekCycle(length: 2, anchor: .referenceWeek(date: today, cycleWeek: 2))))
+        // The resolver agrees: this week is B, next week A.
+        let resolver = RotationResolver(scheme: scheme, firstWeekday: .monday)
+        #expect(resolver.cycleWeek(on: today) == 2)
+        #expect(resolver.cycleWeek(on: today.adding(days: 7)) == 1)
+    }
 
-        draft.cycleLength = 99
-        guard case .weekCycle(let clamped) = draft.rotationScheme else { Issue.record("expected weekCycle"); return }
+    /// F07: calendar odd/even weeks are an explicit option; this week keeps the chosen letter.
+    @Test func calendarParityGetsTheOffsetThatMakesThisWeekTheChosenOne() {
+        var draft = OnboardingDraft(today: today, profile: .secondary)   // ISO week 42: even
+        draft.rotation = .alternatingWeeks
+        draft.followsCalendarParity = true
+        #expect(draft.currentISOWeek(firstWeekday: .monday).week == 42)
+        for chosen in 1...2 {
+            draft.currentCycleWeek = chosen
+            let scheme = draft.rotationScheme(firstWeekday: .monday)
+            guard case .weekCycle(let cycle) = scheme, case .isoWeekParity(let policy, _) = cycle.anchor else {
+                Issue.record("expected an ISO-parity week cycle"); return
+            }
+            #expect(policy == .strict && cycle.length == 2)
+            let resolver = RotationResolver(scheme: scheme, firstWeekday: .monday)
+            #expect(resolver.cycleWeek(on: today) == chosen)
+            #expect(resolver.cycleWeek(on: today.adding(days: 7)) == 3 - chosen)
+        }
+        draft.currentCycleWeek = 1
+        #expect(!draft.weekAIsOdd(firstWeekday: .monday))   // week 42 is A → A is even
+        draft.currentCycleWeek = 2
+        #expect(draft.weekAIsOdd(firstWeekday: .monday))
+        // The plain odd = A mapping has offset 0.
+        #expect(draft.rotationScheme(firstWeekday: .monday)
+                == .weekCycle(WeekCycle(length: 2, anchor: .isoWeekParity(policy: .strict, offset: 0))))
+    }
+
+    @Test func customCycleUsesTheChosenLengthAndWeek() {
+        var draft = OnboardingDraft(today: today, profile: .secondary)
+        draft.rotation = .customCycle
+        #expect(draft.cycleWeekCount == 3)
+        draft.customCycleLength = 4
+        draft.currentCycleWeek = 3
+        #expect(draft.rotationScheme(firstWeekday: .monday)
+                == .weekCycle(WeekCycle(length: 4, anchor: .referenceWeek(date: today, cycleWeek: 3))))
+        draft.customCycleLength = 99   // clamped
+        guard case .weekCycle(let clamped) = draft.rotationScheme(firstWeekday: .monday) else {
+            Issue.record("expected weekCycle"); return
+        }
         #expect(clamped.length == 6)
-
-        draft.choose(rotation: .dayAB)
-        guard case .dayCycle(let days) = draft.rotationScheme else { Issue.record("expected dayCycle"); return }
-        #expect(days.length == 2 && days.anchorDate == today && days.schoolDays == Weekday.workweek)
+        draft.customCycleLength = 3    // a shorter cycle keeps the chosen week in range
+        draft.currentCycleWeek = 5
+        #expect(draft.effectiveCycleWeek == 3)
+        // Switching back to alternating weeks never keeps an impossible week.
+        draft.rotation = .alternatingWeeks
+        #expect(draft.effectiveCycleWeek == 2)
     }
 
-    @Test func dayCycleAnchorSkipsWeekend() {
+    @Test func alternatingDaysAnchorOnTheNextSchoolDayWithTheChosenDay() {
+        var draft = OnboardingDraft(today: today, profile: .secondary)
+        draft.rotation = .alternatingDays
+        draft.currentCycleDay = 2
+        guard case .dayCycle(let days) = draft.rotationScheme(firstWeekday: .monday) else {
+            Issue.record("expected dayCycle"); return
+        }
+        #expect(days.length == 2 && days.anchorDate == today && days.anchorIndex == 2)
+        #expect(days.schoolDays == Weekday.workweek && days.skipsBreaks)
+
         let saturday = LocalDate(year: 2026, month: 10, day: 17)!
-        var draft = OnboardingDraft(today: saturday, profile: .secondary)
-        draft.choose(rotation: .dayAB)
-        guard case .dayCycle(let days) = draft.rotationScheme else { Issue.record("expected dayCycle"); return }
-        #expect(days.anchorDate.weekday == .monday)
+        var weekend = OnboardingDraft(today: saturday, profile: .secondary)
+        weekend.rotation = .alternatingDays
+        weekend.set(.monday, enabled: false)   // school days are the chosen chips
+        #expect(weekend.dayCycleAnchorDate.weekday == .tuesday)
+        guard case .dayCycle(let cycle) = weekend.rotationScheme(firstWeekday: .monday) else {
+            Issue.record("expected dayCycle"); return
+        }
+        #expect(cycle.anchorDate.weekday == .tuesday && !cycle.schoolDays.contains(.monday))
     }
 
-    @Test func cycleAnchorFollowsTermStart() {
-        var draft = OnboardingDraft(today: today, profile: .secondary)
-        draft.choose(rotation: .cycle)
-        draft.termEnabled = true
-        draft.termStart = LocalDate(year: 2026, month: 9, day: 1)!
+    /// Term dates are independent of the pattern: they combine with alternating weeks (F07 acceptance).
+    @Test func termDatesCombineWithAnyPattern() {
+        var draft = OnboardingDraft(today: today, profile: .university)
+        draft.rotation = .alternatingWeeks
+        draft.termStart = LocalDate(year: 2026, month: 9, day: 21)!
         draft.termEnd = LocalDate(year: 2027, month: 1, day: 31)!
-        guard case .weekCycle(let cycle) = draft.rotationScheme else { Issue.record("expected weekCycle"); return }
-        #expect(cycle.anchor == .referenceWeek(date: draft.termStart, cycleWeek: 1))
-    }
-
-    @Test func perSemesterTurnsTermOnWithoutRotation() {
-        var draft = OnboardingDraft(today: today, profile: .secondary)
-        draft.choose(rotation: .perSemester)
-        #expect(draft.termEnabled)
-        #expect(draft.rotationScheme == .none)
+        let database = build(draft)
+        #expect(database.terms.count == 1)
+        #expect(database.terms[0].name == "Semester")
+        #expect(database.terms[0].range == LocalDateRange(start: draft.termStart, end: draft.termEnd))
+        guard case .weekCycle = database.timetables[0].rotation else { Issue.record("expected weekCycle"); return }
     }
 
     @Test func termValidation() {
@@ -126,13 +244,13 @@ struct OnboardingDraftRotationTests {
         #expect(draft.termIssue == nil)
         draft.termEnd = today.adding(days: -1)
         #expect(draft.termIssue == .endBeforeStart)
-        #expect(!draft.canAdvance(from: .rotation))
+        #expect(!draft.canAdvance(from: .week))
         draft.termEnd = today
         #expect(draft.termIssue == nil) // a single-day term is valid
         draft.termEnd = today.adding(days: OnboardingDraft.maxTermDays)
         #expect(draft.termIssue == .tooLong)
         draft.termEnabled = false // skipping the term clears the problem
-        #expect(draft.termIssue == nil && draft.canAdvance(from: .rotation))
+        #expect(draft.termIssue == nil && draft.canAdvance(from: .week))
     }
 
     @Test func invalidTermIsDroppedFromAnswers() {
@@ -143,7 +261,7 @@ struct OnboardingDraftRotationTests {
     }
 }
 
-@Suite("OnboardingDraft time structure")
+@Suite("OnboardingDraft lesson times")
 struct OnboardingDraftTimeTests {
     @Test func bellPreviewMatchesTemplate() {
         let draft = OnboardingDraft(today: today, profile: .secondary)
@@ -172,60 +290,62 @@ struct OnboardingDraftTimeTests {
         draft.firstStartMinutes = 22 * 60
         draft.lessonCount = 14
         #expect(draft.bellPreview.count < 14)
-        #expect(draft.canAdvance(from: .time))
+        #expect(draft.canAdvance(from: .times))
         draft.firstStartMinutes = 23 * 60 + 59
-        #expect(!draft.canAdvance(from: .time)) // not even one lesson fits
+        #expect(!draft.canAdvance(from: .times)) // not even one lesson fits
+        #expect(!draft.canFinish(from: .times))
     }
 
-    @Test func freeFormStructure() {
+    @Test func individualTimes() {
         var draft = OnboardingDraft(today: today, profile: .university)
         #expect(draft.timeStructure == .freeForm(defaultDurationMinutes: 90))
         draft.freeFormMinutes = 0
-        #expect(!draft.canAdvance(from: .time))
+        #expect(!draft.canAdvance(from: .times))
+    }
+
+    /// "I'll do this later" restores the profile's suggestion (always valid).
+    @Test func suggestedTimesRestoreThePreset() {
+        var draft = OnboardingDraft(today: today, profile: .secondary)
+        draft.firstStartMinutes = 23 * 60 + 59
+        draft.timeKind = .freeForm
+        draft.freeFormMinutes = 0
+        draft.applyPresetTimes()
+        #expect(draft.timeKind == .bellSchedule && draft.firstStartMinutes == 480 && draft.lessonCount == 8)
+        #expect(draft.canFinish(from: .times))
     }
 }
 
 @Suite("OnboardingDraft output")
 struct OnboardingDraftOutputTests {
-    @Test func everyProfileBuildsAValidDatabase() {
+    @Test func everyProfileAndPatternBuildsAValidDatabase() {
         for profile in UserProfile.knownValues {
-            var draft = OnboardingDraft(today: today, profile: profile)
-            draft.choose(rotation: .dayAB)
-            let database = build(draft)
-            #expect(database.validate().filter { $0.severity == .error }.isEmpty, "profile \(profile.rawValue)")
-            #expect(database.settings.onboardingCompletedAt != nil)
-            #expect(database.timetables.count == 1)
+            for rotation in RotationChoice.allCases {
+                var draft = OnboardingDraft(today: today, profile: profile)
+                draft.rotation = rotation
+                draft.followsCalendarParity = rotation == .alternatingWeeks
+                for start in StartChoice.allCases {
+                    draft.start = start
+                    let database = build(draft)
+                    #expect(database.validate().filter { $0.severity == .error }.isEmpty,
+                            "\(profile.rawValue) \(rotation) \(start)")
+                    #expect(database.settings.onboardingCompletedAt != nil)
+                    #expect(database.timetables.count == 1)
+                }
+            }
         }
     }
 
-    @Test func fieldAndTimeAnswersReachTheTimetable() {
+    @Test func timeAnswersReachTheTimetable() {
         var draft = OnboardingDraft(today: today, profile: .secondary)
-        draft.set(.room, visible: false)
-        draft.set(.bringList, visible: true)
         draft.lessonCount = 5
         let database = build(draft)
-        let timetable = database.timetables[0]
-        #expect(timetable.fieldVisibility.visibleFields == [.teacher, .notes, .bringList])
         #expect(database.bellSchedules.first?.lessonPeriods.count == 5)
     }
 
-    @Test func termBecomesATerm() {
-        var draft = OnboardingDraft(today: today, profile: .university)
-        draft.termStart = LocalDate(year: 2026, month: 9, day: 21)!
-        draft.termEnd = LocalDate(year: 2027, month: 1, day: 31)!
-        let database = build(draft)
-        #expect(database.terms.count == 1)
-        #expect(database.terms[0].name == "Semester")
-        #expect(database.terms[0].range == LocalDateRange(start: draft.termStart, end: draft.termEnd))
-    }
-
-    @Test func reminderTogglesDecideEnabledRules() {
+    @Test func rotationWeekStartIsTheLocaleWeekStart() {
         var draft = OnboardingDraft(today: today, profile: .secondary)
-        draft.set(reminder: .exam, enabled: false)
-        let database = build(draft)
-        #expect(database.reminderRules.first { $0.target == .exam }?.isEnabled == false)
-        #expect(database.reminderRules.first { $0.target == .homework }?.isEnabled == true)
-        #expect(database.reminderRules.allSatisfy { $0.tier != .alarm })
+        draft.rotation = .alternatingWeeks
+        #expect(build(draft, firstWeekday: .sunday).timetables[0].rotationWeekStart == .sunday)
     }
 
     @Test func blankStartHasNoContentAndSampleStartDoes() {
@@ -242,19 +362,5 @@ struct OnboardingDraftOutputTests {
         var draft = OnboardingDraft(today: today, profile: .elementary)
         draft.start = .sample
         #expect(build(draft) == build(draft))
-    }
-}
-
-@Suite("Onboarding steps")
-struct OnboardingStepTests {
-    @Test func navigation() {
-        #expect(OnboardingStep.welcome.previous == nil)
-        #expect(OnboardingStep.start.next == nil)
-        #expect(OnboardingStep.profile.next == .rotation)
-        #expect(OnboardingStep.allCases.map(\.index) == Array(0..<OnboardingStep.count))
-    }
-
-    @Test func importChoicesAreNotSelectable() {
-        #expect(StartChoice.allCases.filter(\.isAvailable) == [.blank, .sample])
     }
 }

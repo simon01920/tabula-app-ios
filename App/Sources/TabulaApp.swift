@@ -47,6 +47,7 @@ struct TabulaRootApp: App {
                 .environment(services.navigation)
                 .environment(services.reminders)
                 .environment(services.liveActivities)
+                .environment(services.sampleContent)
                 .task { await services.model.load() }
                 // TipKit once per launch (the Timetable symbol legend, U4); its screenshot route shows every tip.
                 .task {

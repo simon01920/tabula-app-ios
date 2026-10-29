@@ -14,13 +14,14 @@ import sys
 
 # route id -> (section, title, what it is / how to reach it)
 SCREENS = {
-    "onboarding": ("1 Onboarding", "Welcome", "First launch, step 1 of 7: welcome + language (uses the iPhone language, link to per-app language)."),
-    "onboarding.start": ("1 Onboarding", "Start", "Last onboarding step: import from photo / QR (coming soon), start blank, sample data."),
-    "onboarding.profile": ("1 Onboarding", "Who are you?", "Profile: elementary / secondary / university / other; drives presets."),
-    "onboarding.rotation": ("1 Onboarding", "Rotation", "Does the schedule change between weeks (A/B, odd/even, N-week cycle)?"),
-    "onboarding.time": ("1 Onboarding", "Time structure", "Bell schedule vs free-form times."),
-    "onboarding.fields": ("1 Onboarding", "Fields to show", "Room, building, teacher, type, notes, bring list."),
-    "onboarding.reminders": ("1 Onboarding", "Reminders", "Which reminder kinds to turn on; delivery tiers explained."),
+    "onboarding": ("1 Onboarding", "Welcome · School type", "First launch, step 1 of 4: product line, four school-type cards, compact 'App language · Change' row (opens iOS Settings)."),
+    "onboarding.school-type": ("1 Onboarding", "School type (selected)", "Step 1 with Secondary selected; Continue enabled."),
+    "onboarding.start": ("1 Onboarding", "How do you want to start?", "Step 2: 'Set up my timetable' (default) or 'Just look around' (sample data, removable). Imports hidden until they work."),
+    "onboarding.week": ("1 Onboarding", "Your week", "Step 3: school-day chips, repeat pattern; here alternating weeks with 'Which week is this week?', calendar odd/even and term dates."),
+    "onboarding.week-days": ("1 Onboarding", "Your week — alternating days", "Step 3 (elementary): Day A / Day B anchored on today or the next school day."),
+    "onboarding.times": ("1 Onboarding", "Lesson times", "Step 4: fixed lesson periods (generator + preview), steppers + direct minute entry, 'I'll Do This Later', 'Start Using Tabula'."),
+    "onboarding.times-individual": ("1 Onboarding", "Lesson times — individual", "Step 4 (university): individual start and end times with a default length."),
+    "onboarding.sample-banner": ("1 Onboarding", "Sample-data banner", "After 'Just look around': 'This is sample data · Remove' above Today; Remove deletes only the sample."),
     "today": ("2 Today", "Today", "Tab 1. Now/next lesson with time left, today's lessons, due tasks, next exam."),
     "timetable": ("3 Timetable", "Timetable (default view)", "Tab 2, in the profile's default view."),
     "timetable.grid": ("3 Timetable", "Grid view", "Week grid (periods x days): room always on line 2, one badge slot (cancelled > exam > tasks > change), highlighter on the current period, quiet free slots."),
