@@ -58,7 +58,7 @@ private struct TodayLessonsColumn: View {
                     .lineLimit(1)
             }
             ForEach(shown.rows) { row in
-                TodayLessonRow(row: row)
+                TodayLessonRow(row: row, nowText: display.nowText)
             }
             if shown.hidden > 0 {
                 Text(verbatim: display.moreText(shown.hidden))
@@ -89,6 +89,8 @@ private struct TodayLessonsColumn: View {
 /// One lesson of the day.
 struct TodayLessonRow: View {
     let row: TodayDisplay.Row
+    /// "Now" (the catalog word, the presenter's current-row caption), shown upper-case on the marker.
+    var nowText: String = ""
     /// Time column and badge scale with Dynamic Type instead of being fixed widths.
     @ScaledMetric(relativeTo: .caption) private var timeWidth: CGFloat = 42
     @ScaledMetric(relativeTo: .caption) private var markSize: CGFloat = 16
@@ -109,6 +111,10 @@ struct TodayLessonRow: View {
                     .strikethrough(row.isCancelled)
                     .lineLimit(1)
                 Spacer(minLength: 2)
+                if row.isCurrent {
+                    // The highlighter "NOW" marker replaces the grey plate with its accent bar (U7, plan D1).
+                    NowMarker(size: .small, label: nowText).accessibilityHidden(true)
+                }
                 if let symbol = row.badgeSymbol {
                     Image(systemName: symbol)
                         .font(.caption2.weight(.bold))
@@ -131,16 +137,6 @@ struct TodayLessonRow: View {
             }
         }
         .padding(.vertical, 1)
-        .padding(.horizontal, row.isCurrent ? 4 : 0)
-        .background {
-            if row.isCurrent {
-                RoundedRectangle(cornerRadius: 6, style: .continuous)
-                    .fill(Color.primary.opacity(0.12))
-                    .overlay(alignment: .leading) {
-                        Capsule().frame(width: 3).padding(.vertical, 2).widgetAccentable()
-                    }
-            }
-        }
         .opacity(row.isPast && !row.isCurrent ? 0.5 : 1)
     }
 }
@@ -157,7 +153,7 @@ private struct TodayStatusColumn: View {
         VStack(alignment: .leading, spacing: 4) {
             Image(systemName: symbol)
                 .font(.title3)
-                .foregroundStyle(.tint)
+                .foregroundStyle(Color.ink)
                 .widgetAccentable()
             Text(verbatim: title)
                 .font(.headline)
@@ -196,7 +192,7 @@ private struct TodayUnavailableColumn: View {
         VStack(alignment: .leading, spacing: 4) {
             Image(AppSymbol.date)
                 .font(.title3)
-                .foregroundStyle(.tint)
+                .foregroundStyle(Color.ink)
                 .widgetAccentable()
             Text(verbatim: title)
                 .font(.headline)

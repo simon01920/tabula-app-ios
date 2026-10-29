@@ -131,11 +131,9 @@ struct HomeworkEntryView: View {
     /// target (HIG minimum; final QA m3) whose circle sits at the leading edge; VoiceOver: "Mark “Essay” as done", button.
     static func checkbox(for line: HomeworkDisplay.TaskLine) -> some View {
         Button(intent: MarkTaskDoneIntent(taskID: line.id.uuidString)) {
-            Image(systemName: "circle")
-                .font(.body.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .frame(width: 44, height: 44, alignment: .leading)
-                .contentShape(Rectangle())
+            // M31 (U7): the shared mark keeps the 44 pt target but puts the circle on the leading edge and leaves an
+            // 11 pt gap to the badge (the previous 44 pt leading-aligned frame left ~28 pt).
+            HomeworkCheckboxMark()
         }
         .buttonStyle(.plain)
         .widgetAccentable()

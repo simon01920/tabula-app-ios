@@ -31,6 +31,9 @@ public struct NowNextDisplay: Equatable, Sendable {
         public var start: Date
         /// End instant (≥ start).
         public var end: Date
+        /// Short subject name for the Lock Screen: the subject's short name, else letters derived from its name
+        /// ("SJL"), see `SubjectAbbreviation` (U7, M29).
+        public var shortName: String = ""
 
         /// Subject name.
         public var name: String { subject.name }
@@ -76,6 +79,13 @@ public struct NowNextDisplay: Equatable, Sendable {
     public var link: ItemLink
     /// Caption of the medium family's list: "Next" after a current lesson, else "Later".
     public var laterCaption: String = ""
+    /// The live countdown with its unit word (lesson kinds only; U7 H2): "left" while a lesson runs, "until start" before.
+    public var countdown: WidgetCountdown?
+    /// "Next: BIO, 10:55" with the short subject name: the Lock Screen's rectangular family (U7, M29).
+    public var nextCompact: String?
+    /// "8:00": the start of the next lesson when the status has one (circular family, L9: tomorrow's first start instead
+    /// of a check mark).
+    public var nextStartText: String?
 
     /// Fraction of the current lesson elapsed at `instant` (0…1), for static (paused) progress views.
     public func progress(at instant: Date) -> Double {
@@ -110,6 +120,14 @@ public struct NowNextPresenter: Sendable {
     /// The display of `entry`.
     public func display(_ entry: NowNextTimelineEntry) -> NowNextDisplay {
         var result = content(entry)
+        result.nextCompact = result.next.map(nextCompact)
+        result.nextStartText = result.next?.startText
+        if let timer = result.timer {
+            var kind = WidgetCountdown.Kind.untilStart
+            if case .current = result.kind { kind = .left }
+            result.countdown = WidgetCountdownBuilder(renderer: renderer)
+                .make(interval: timer, now: entry.date, kind: kind, allowsSeconds: true)
+        }
         switch result.kind {
         case .current: result.laterCaption = renderer.string(forKey: "today.header.next")
         case .upcoming, .status: result.laterCaption = renderer.string(forKey: "widget.nowNext.later")
@@ -140,7 +158,7 @@ public struct NowNextPresenter: Sendable {
                 timerCaption: renderer.string(forKey: "today.header.timeLeft"), timer: main.start...main.end,
                 next: nextLine, nextCaption: nextLine == nil ? nil : renderer.string(forKey: "today.header.next"),
                 nextShort: nextLine.map(nextShort), nothingAhead: nil, later: later,
-                inlineText: main.name, accessibilityLabel: spoken.joined(separator: separator), link: .today)
+                inlineText: main.shortName, accessibilityLabel: spoken.joined(separator: separator), link: .today)
         case let .upcoming(lesson, isFirst):
             let main = line(lesson, today: today)
             let captionKey = isFirst ? "today.header.first" : "today.header.next"
@@ -152,7 +170,9 @@ public struct NowNextPresenter: Sendable {
                 date: entry.date, kind: .upcoming(main), caption: caption,
                 timerCaption: renderer.string(forKey: "today.header.startsIn"), timer: min(entry.date, start)...start,
                 next: nil, nextCaption: nil, nextShort: nil, nothingAhead: nil, later: later,
-                inlineText: nextShort(main), accessibilityLabel: spoken.joined(separator: separator), link: .today)
+                inlineText: renderer.format(key: "widget.nowNext.inline.next",
+                                            arguments: [.text(main.startText), .text(main.shortName)]),
+                accessibilityLabel: spoken.joined(separator: separator), link: .today)
         case .dayOver, .free, .holiday, .dayCancelled:
             let (symbol, title, detail) = status(entry.state)
             let nextLine = entry.state.next.map { line($0, today: today) }
@@ -165,7 +185,7 @@ public struct NowNextPresenter: Sendable {
                 timerCaption: nil, timer: nil, next: nextLine,
                 nextCaption: nextLine == nil ? nil : renderer.string(forKey: "today.header.nextLesson"),
                 nextShort: nextLine.map(nextShort), nothingAhead: nothing, later: later,
-                inlineText: nextLine.map(nextShort) ?? title, accessibilityLabel: spoken.joined(separator: separator),
+                inlineText: inlineStatus(entry.state, title: title, next: nextLine), accessibilityLabel: spoken.joined(separator: separator),
                 link: .today)
         case .unavailable(let reason):
             let title = renderer.string(forKey: "widget.open.title")
@@ -200,7 +220,19 @@ public struct NowNextPresenter: Sendable {
         return NowNextDisplay.LessonLine(
             id: lesson.id, subject: lesson.subject, timeRange: formatter.timeRange(lesson.startTime, lesson.endTime),
             startText: start, whenText: when, room: lesson.room, badgeText: badge.map { renderer.string(forKey: $0.titleKey) },
-            start: lesson.start(in: context), end: lesson.end(in: context))
+            start: lesson.start(in: context), end: lesson.end(in: context),
+            shortName: SubjectAbbreviation.short(for: lesson.subject))
+    }
+
+    /// "Next: BIO, 9:50": `nextShort` with the short subject name (rectangular Lock Screen family, M29).
+    func nextCompact(_ line: NowNextDisplay.LessonLine) -> String {
+        renderer.format(key: "widget.nowNext.nextShort", arguments: [.text(line.shortName), .text(line.whenText)])
+    }
+
+    /// The accessoryInline text of a status: "Done for today" after school (M29), else the next lesson in short form.
+    func inlineStatus(_ state: NowNextState, title: String, next: NowNextDisplay.LessonLine?) -> String {
+        if case .dayOver = state { return title }
+        return next.map(nextCompact) ?? title
     }
 
     /// "Next: Biology 9:50".
@@ -240,7 +272,7 @@ public struct NowNextPresenter: Sendable {
     func status(_ state: NowNextState) -> (symbol: String, title: String, detail: String?) {
         switch state {
         case .dayOver:
-            return ("checkmark.circle", renderer.string(forKey: "today.header.dayOver"), nil)
+            return ("checkmark.circle", renderer.string(forKey: "widget.dayOver"), nil)
         case let .holiday(name, _):
             let holiday = renderer.string(forKey: "today.header.holiday")
             return ("beach.umbrella", name ?? holiday, name == nil ? nil : holiday)

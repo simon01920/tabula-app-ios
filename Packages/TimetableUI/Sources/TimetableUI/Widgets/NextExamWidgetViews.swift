@@ -37,19 +37,7 @@ public struct NextExamWidgetView: View {
     }
 }
 
-/// Live or paused remaining time of an exam's `timer`.
-struct ExamTimerText: View {
-    let timer: ClosedRange<Date>
-    let pauseTime: Date?
-
-    var body: some View {
-        if let pauseTime {
-            Text(verbatim: CountdownFormat.string(remaining: timer.upperBound.timeIntervalSince(max(pauseTime, timer.lowerBound))))
-        } else {
-            Text(timerInterval: timer, countsDown: true, showsHours: true)
-        }
-    }
-}
+// Exam countdowns are minutes only with a unit word, never seconds (U7, H2): see `WidgetCountdown`.
 
 // MARK: - systemSmall
 
@@ -83,13 +71,14 @@ struct ExamSmallView: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
                 Spacer(minLength: 0)
-                if let timer = info.timer {
-                    Text(verbatim: info.whenLine)
+                if let countdown = info.countdown {
+                    // "Today, 10:00" over "1 h 30 min / until start"; never seconds.
+                    Text(verbatim: info.whenText)
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
-                    ExamTimerText(timer: timer, pauseTime: pauseTime)
+                    WidgetCountdownText(countdown: countdown, pauseTime: pauseTime)
                         .font(.system(.title2, design: .rounded).weight(.bold))
                         .monospacedDigit()
                         .lineLimit(1)
@@ -111,7 +100,7 @@ struct ExamSmallView: View {
             case let .empty(title, detail):
                 Image(AppSymbol.exam)
                     .font(.title2)
-                    .foregroundStyle(.tint)
+                    .foregroundStyle(Color.ink)
                     .widgetAccentable()
                 Text(verbatim: title)
                     .font(.headline)
@@ -125,7 +114,7 @@ struct ExamSmallView: View {
             case let .unavailable(title, detail):
                 Image(AppSymbol.date)
                     .font(.title3)
-                    .foregroundStyle(.tint)
+                    .foregroundStyle(Color.ink)
                     .widgetAccentable()
                 Text(verbatim: title)
                     .font(.headline)
@@ -157,8 +146,8 @@ struct ExamRectangularView: View {
                     .lineLimit(1)
                 HStack(spacing: 4) {
                     Image(systemName: info.symbol)
-                    if let timer = info.timer {
-                        ExamTimerText(timer: timer, pauseTime: pauseTime)
+                    if let countdown = info.countdown {
+                        WidgetCountdownText(countdown: countdown, pauseTime: pauseTime, layout: .inline)
                             .monospacedDigit()
                             .multilineTextAlignment(.leading)
                             .frame(maxWidth: .infinity, alignment: .leading)

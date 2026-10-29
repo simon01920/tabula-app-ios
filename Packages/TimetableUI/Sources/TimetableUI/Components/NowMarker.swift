@@ -9,13 +9,16 @@
 //   and VoiceOver reads the same key without the case change ("Now", never spelled out letter by letter).
 // - Text scales with Dynamic Type (`.caption.bold()` small, `.subheadline.bold()` regular) and never truncates.
 // - iOS + watchOS + widgets: plain Text + Shape, no iOS-only modifiers (scripts/watch-typecheck.sh).
-// - Widgets in accented / vibrant rendering: WidgetKit may desaturate the fill; the word stays readable because it
-//   is the text that carries the meaning (U7 checks the rendering modes on the device).
+// - Widgets in accented / vibrant rendering (HIG widgets.md › Rendering modes): the system recolours everything, so the
+//   yellow fill would swallow the word; there the marker is an outlined shape in the primary colour (from U7).
 //
 // APIs: Shape, Path (addCurve, closeSubpath), Text.textCase(_:) (iOS 14, watchOS 7), accessibilityLabel(_:),
 //   accessibilityAddTraits(.isStaticText), fixedSize(horizontal:vertical:).
 #if canImport(SwiftUI)
 import SwiftUI
+#if canImport(WidgetKit)
+import WidgetKit
+#endif
 
 /// The highlighter "Now" marker.
 public struct NowMarker: View {
@@ -30,6 +33,12 @@ public struct NowMarker: View {
     private let size: Size
     private let text: Text
     private let accessibilityText: Text
+    #if canImport(WidgetKit)
+    @Environment(\.widgetRenderingMode) private var renderingMode
+    private var isFullColor: Bool { renderingMode == .fullColor }
+    #else
+    private let isFullColor = true
+    #endif
 
     /// The standard marker: the catalog word `now.marker` ("Now", shown uppercase).
     public init(size: Size = .regular) {
@@ -51,12 +60,18 @@ public struct NowMarker: View {
             .font(size == .small ? .caption.weight(.heavy) : .subheadline.weight(.heavy))
             .textCase(.uppercase)
             .tracking(0.5)
-            .foregroundStyle(Color.onHighlighter)
+            .foregroundStyle(isFullColor ? Color.onHighlighter : Color.primary)
             .lineLimit(1)
             .fixedSize()
             .padding(.horizontal, size == .small ? 6 : 9)
             .padding(.vertical, size == .small ? 1 : 3)
-            .background(HighlighterStroke().fill(Color.highlighter))
+            .background {
+                if isFullColor {
+                    HighlighterStroke().fill(Color.highlighter)
+                } else {
+                    HighlighterStroke().stroke(Color.primary, lineWidth: 1)
+                }
+            }
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(accessibilityText)
             .accessibilityAddTraits(.isStaticText)
