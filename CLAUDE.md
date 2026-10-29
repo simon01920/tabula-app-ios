@@ -19,6 +19,11 @@ The orchestrator stays on **Opus 5.5**. For each delegated task it picks the age
 
 When in doubt, use Opus. Each gate report lists which tier did each task, so the split can be reviewed.
 
+### Save the limit (human decision, 2026-10-26)
+- Hand quick, mechanical work to the `haiku-helper` subagent (user-level agent, Claude Haiku). That means finding files, grep searches, reading logs, listing folders, renames, one-line edits, and running a command to report its output.
+- Batch several small lookups into one `haiku-helper` call.
+- Keep planning, debugging, architecture and multi-file changes for yourself.
+
 ## Environment rules (hard)
 1. Pure logic lives in `TimetableCore` (no Apple-only imports) so `swift test` runs on WSL/Linux.
 2. Apple-framework code lives in thin targets: `TimetableUI`, `App`, `WidgetExtension`, `WatchApp`.

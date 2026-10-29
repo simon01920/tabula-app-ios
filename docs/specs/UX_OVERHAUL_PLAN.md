@@ -68,3 +68,29 @@ Defaults the orchestrator took (listed for the gate, the human can reverse them)
 - **Strings:** new or changed English strings go through `scripts/l10n-add.py` and `l10n-translate-missing.py` in WSL. Plural forms come from catalog variations; never concatenate fragments. Regenerate the review export.
 - **Screenshots:** update the DEBUG screenshot routes and seeds when screens change. Add routes for new screens (e.g. the quick-entry sheet, the reminder kind detail) to `ui-screenshots.yml`.
 - **Report:** the finding IDs fixed, deferred or rejected (with reasons), the HIG pages cited, the validate line, and a clean xtool build.
+
+## 3. Status / resume point (paused by the human, 2026-10-26)
+**Done and saved on GitHub** (none of it is merged into `main` yet):
+- **`wip/ux-integration`** @ `5bafead`. U1 foundation + U1 QA fixes, U5b editors, U5a settings and U4 timetable are merged here and deduplicated: no local token, highlighter, symbol or touched-flag copies remain. validate: ALL CHECKS PASSED (540 core + 565 UI tests). xtool build: 0 warnings at `8047182`; `5bafead` has only had validate.
+- **`wip/ux-u6-onboarding`** @ `6869aa1`. U6 is finished and validated **on its own** but **not yet merged** into the integration branch.
+- **`wip/ux-u7-widgets`** @ `4b29fa4`. U7 is finished and validated **on its own** but **not yet merged**.
+
+**Next steps, in order:**
+1. Continue the integration on `wip/ux-integration`:
+   - Merge U6: remove its duplicate `WeekdayChips`, `OnboardingColors` and local AnyLayout stacks, and take U1's choice-row structure.
+   - Merge U7: `NowHighlighterTag` becomes `NowMarker` (needs a widget rendering-mode outline); delete `WidgetInkTokens`, `InkForeground` and `CorrectionForeground`.
+   - Then: `grep "adopt U1"` must be empty; add an integration note here; regenerate the review export; run validate; run clean xtool builds (base and `--app-intents`).
+2. Run one `qa-reviewer` (Opus) on the integrated branch, then merge it to `main` and push.
+3. Run U2 (Tasks + Exams) and U3 (Today) **from the integrated `main`**, because they touch the files U1, U4 and U5b changed. Then U8 (copy and terminology). Then the full screenshot rerun (`scripts/ux-review-index.py`) and a check of every Opus and Astra finding ID. Then the Phase 4U gate report. Then Phase 5 (Watch).
+
+**Integration decisions for the human to review:**
+- A lesson with several change reasons shows the generic "changed" symbol, and the legend has a "Changed" row. U1's rule replaces U4's "most important reason" symbol.
+- New tokens: `onCorrection` (the now-line time label) and `changed` (a moved time in lesson detail; 4.2:1 on the grey page, so it may only be used on cards).
+- The now line stays correction-red. This bends D1's "red only for overdue, cancelled, destructive" rule; decide whether to keep it.
+- D10: hiding a field affects summaries only, never the editors. PRODUCT.md was updated to match (it previously said "hidden everywhere").
+- The "Other" school type now shows Room and Teacher by default (PRODUCT.md previously said all off).
+- The "Lessons are called" setting is removed; it follows the school type.
+
+**Session tooling:**
+- The `ponytail` and `haiku-helper` skills are installed user-wide; follow them, and tell every subagent to load `ponytail`.
+- The local agent worktrees under `.claude/worktrees/` hold the same commits as the `wip/*` branches and can be deleted after the merge.
