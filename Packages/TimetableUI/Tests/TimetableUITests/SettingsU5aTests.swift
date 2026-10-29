@@ -141,6 +141,38 @@ struct PaletteRemapTests {
         }
     }
 
+    @Test func undoRestoresOnlyTheColourOntoLiveSubjectsAndSkipsDeletedOnes() throws {
+        let (database, timetableID) = scenario()
+        let before = TimetableManagement.subjects(of: timetableID, in: database, locale: english)
+        let changed = PaletteRemap.remapped(in: database, to: .ocean, locale: english)
+        let originals = changed.compactMap { new in before.first { $0.id == new.id } }
+        #expect(originals.count >= 2)
+        var clock = HybridLogicalClock(node: 0xA6)
+        var applied = try apply(try #require(PaletteRemap.mutation(for: changed)), to: database, clock: &clock)
+        // After the remap the user renames one subject and deletes another.
+        let renamedID = originals[0].id, deletedID = originals[1].id
+        var renamed = try #require(applied.subjects.first { $0.id == renamedID })
+        renamed.name = "Renamed after apply"
+        applied = try apply(.batch([.upsert(renamed), .delete(deletedID)], label: "user edits"), to: applied, clock: &clock)
+
+        let restored = PaletteRemap.restored(originals, in: applied)
+        #expect(!restored.contains { $0.id == deletedID })
+        let undone = try apply(try #require(PaletteRemap.mutation(for: restored, label: "undo palette")), to: applied,
+                               clock: &clock)
+        let kept = try #require(undone.subjects.first { $0.id == renamedID })
+        #expect(kept.name == "Renamed after apply")                // the later rename survives the undo
+        #expect(kept.color == originals[0].color && kept.colorName == originals[0].colorName)
+        #expect(undone.subjects.first { $0.id == deletedID }?.isDeleted == true)   // not resurrected
+    }
+
+    @Test func timetablesWithTheirOwnPaletteAreLeftAlone() throws {
+        let (base, timetableID) = scenario()
+        var database = base
+        let index = try #require(database.timetables.firstIndex { $0.id == timetableID })
+        database.timetables[index].palettePackID = .pastel
+        #expect(!PaletteRemap.remapped(in: database, to: .ocean, locale: english).contains { $0.timetableID == timetableID })
+    }
+
     @Test func applyingTheCurrentPaletteChangesNothing() {
         let (database, _) = scenario()
         let first = PaletteRemap.remapped(in: database, to: .classic, locale: english)

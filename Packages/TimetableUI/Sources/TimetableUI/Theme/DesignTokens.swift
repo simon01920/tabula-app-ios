@@ -4,7 +4,7 @@
 // Roles (one meaning each, HIG color.md "Avoid using the same color to mean different things"):
 // - ink         app tint: buttons, links, selection, progress. Royal-blue fountain-pen ink.
 // - onInk       text/symbols drawn ON an ink fill (prominent buttons, selected chips).
-// - correction  overdue, cancelled, destructive ONLY. The teacher's red pen.
+// - correction  overdue, cancelled, destructive ONLY, plus the timetable's now line (iOS Calendar). The teacher's red pen.
 // - highlighter the "Now" marker ONLY (NowMarker), always with black text (`onHighlighter`).
 // - pencil      secondary text that carries data and must reach 4.5:1 on cards (system `.secondary` is only
 //               3.44:1 on white, measured: Opus review §13 "Step 1 of 7" #8A8A8E on #FFFFFF). Plain labels may keep

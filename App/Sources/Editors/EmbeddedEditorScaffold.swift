@@ -79,6 +79,9 @@ private struct EmbeddedEditorScaffold<Draft: Equatable, Content: View>: View {
         .navigationTitle(titleKey)
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(isDirty)
+        // Re-tapping the Settings tab pops its stack to the root without asking (system behaviour, no API to veto it):
+        // while there are edits the tab bar is hidden, so only Cancel (with the discard confirmation) or Save leave.
+        .toolbar(isDirty ? .hidden : .automatic, for: .tabBar)
         .toolbar {
             if isDirty {
                 ToolbarItem(placement: .cancellationAction) {

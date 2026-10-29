@@ -2,8 +2,9 @@
 // time-zone override inside a collapsed `DisclosureGroup("Advanced")` (students rarely need it).
 // Stored-value semantics: `hourCycle` defaults to `.auto` = "System" (follows iOS 24-Hour Time, D4); an explicit 12-/24-hour
 // value written by an older build is kept and shown as chosen; an unknown stored value behaves as System
-// (`HourCycleChoice`). `weekStartOverride == nil` = "System" (the locale's first weekday). The root locale that makes
-// DatePickers follow the same hour cycle is U1's (D4); this screen only edits the stored values.
+// (`HourCycleChoice`). `weekStartOverride == nil` = "System" (the locale's first weekday). The time pickers follow the
+// same hour cycle through U1's `.hourCycleLocale(_:)` on each picker (D4; no root locale, RISKS #87); this screen only
+// edits the stored values.
 // Writes only via `model.apply(.settings { … })`; AppModel rebuilds the calendar context and formatters.
 // APIs: Picker (menu style in Form), LabeledContent, NavigationLink, List + View.searchable(text:),
 //       TimeZone.knownTimeZoneIdentifiers, DismissAction (EnvironmentValues.dismiss).

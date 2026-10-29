@@ -125,7 +125,7 @@ The hour-cycle locale is applied to the time pickers only (not the whole app).
 ### Not verifiable without a device
 Actual resolved colours of the dynamic tokens (trait resolution in sheets, widgets and Live Activities), whether
 `Button(role: .close)` renders the system ×, whether the time pickers honour the locale's hour-cycle keyword, whether a disabled row dims the ProBadge, the AX layouts, VoiceOver wording, and the SF
-Symbol names that were not confirmed from an external list (`pencil.circle`, `exclamationmark.circle`, `circle`,
+Symbol names that were not confirmed from an external list (`exclamationmark.circle`, `circle`,
 `list.bullet.indent`).
 
 ## State matrix (U2 to U7)
@@ -327,7 +327,7 @@ is "Week B" (the sample's own A/B labels); university seed: this week is "Even w
 - [ ] Badge slot priority: DEJ Mon P5 (exam) shows the graduation cap; cells with tasks show ☑ + count; changed cells
       show their own symbol: FYZ Thu P1 / CHE Thu P3 clock (time changed), MAT Thu P2 → arrow-right-square (room) or
       person-gear (substitute) — compare with the lesson detail's "Changes on this day" symbols; INF Thu P7 ⊕ filled.
-      Integration (U1 rule): a cell with several change reasons shows the generic pencil-circle ("Changed"), which the
+      Integration (U1 rule): a cell with several change reasons shows the generic asterisk-circle ("Changed"), which the
       legend lists too; one reason shows its own symbol.
 - [ ] Cancelled ANJ Thu P4: dimmed (clearly weaker than its neighbours), name and room struck through, red ⊗ badge at
       full strength. VoiceOver ends with "cancelled".
@@ -485,3 +485,15 @@ Lock Screen rectangular / circular) and start a lesson Live Activity (Settings �
 
 Not testable on device yet: nothing in U7 depends on a missing feature. Open design questions are in the stage report
 (M30 Free/Pro gate is untouched; it needs a human decision).
+
+## Integration QA fixes (2026-10-29)
+
+| # | Steps | Expected | Observed | ✔/✘/? |
+|---|---|---|---|---|
+| IQ.1 | "Just look around", rename a sample subject, then banner → Remove | The dialog no longer says "Everything you created yourself stays"; it says your changes to 1 sample entry are removed too. Without any edit or addition the "stays" sentence is back | | |
+| IQ.2 | Timetable tab → ⋯ → Edit Timetable → Edit Bell Schedule / Terms & Holidays; Subjects → a subject | Each opens as a **pushed** page inside the same sheet (Back chevron), never a second sheet on top | | |
+| IQ.3 | Settings → Timetable settings, change the name (do not save), then tap the Settings tab | While there are edits the tab bar is hidden (no tab re-tap pops the page); only Cancel (with "Discard your changes?") or Save leave. After Save / Cancel the tab bar returns. VERIFY the tab bar really hides on iOS 26 | | |
+| IQ.4 | Onboarding step 1 with no school type chosen, light and dark | The disabled "Continue" label is grey secondary text on the grey disabled fill (readable), not white; enabled it is white (light) / black (dark) on ink | | |
+| IQ.5 | Grid with a cancelled lesson on a dark and on a yellow subject colour | The red ⊗ badge sits on a solid white (light) / dark-grey (dark) capsule and stays clearly red | | |
+| IQ.6 | A lesson with two changes (e.g. room and teacher) | Its badge is the asterisk-in-circle "Changed" symbol (not a pencil); the legend shows the same | | |
+| IQ.7 | Settings → Colors → Apply to All Subjects → Undo, after renaming one subject in between | Undo restores the colours only; the rename stays. A timetable with its own palette is not recoloured | | |

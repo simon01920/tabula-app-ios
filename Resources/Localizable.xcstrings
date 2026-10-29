@@ -79927,6 +79927,300 @@
         }
       }
     },
+    "sample.remove.changedByUser" : {
+      "comment" : "Remove-sample-data confirmation: how many sample items (subjects, lessons, the sample task …) the user edited; the edits go with them. Full sentence.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Odstraní se také vaše změny %lld ukázkových záznamů."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Odstraní se také vaše změny %lld ukázkového záznamu."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Odstraní se také vaše změny %lld ukázkového záznamu."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Odstraní se také vaše změny %lld ukázkových záznamů."
+                }
+              }
+            }
+          }
+        },
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Deine Änderungen an %lld Beispieleintrag werden ebenfalls entfernt."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Deine Änderungen an %lld Beispieleinträgen werden ebenfalls entfernt."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your changes to %lld sample entry are removed too."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your changes to %lld sample entries are removed too."
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Vos modifications de %lld entrée d’exemple sont aussi supprimées."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Vos modifications de %lld entrées d’exemple sont aussi supprimées."
+                }
+              }
+            }
+          }
+        },
+        "hu" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "A(z) %lld mintabejegyzésen végzett módosításaid is törlődnek."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "A(z) %lld mintabejegyzésen végzett módosításaid is törlődnek."
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "サンプルの%lld件の項目に加えた変更も削除されます。"
+                }
+              }
+            }
+          }
+        },
+        "pl" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Zostaną też usunięte Twoje zmiany w %lld przykładowych wpisach."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Zostaną też usunięte Twoje zmiany w %lld przykładowych wpisach."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Zostaną też usunięte Twoje zmiany w %lld przykładowym wpisie."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Zostaną też usunięte Twoje zmiany w %lld przykładowego wpisu."
+                }
+              }
+            }
+          }
+        },
+        "ro" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Vor fi eliminate și modificările tale la %lld intrări exemplu."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Vor fi eliminate și modificările tale la %lld intrare exemplu."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Vor fi eliminate și modificările tale la %lld de intrări exemplu."
+                }
+              }
+            }
+          }
+        },
+        "sk" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Odstránia sa aj vaše zmeny %lld ukážkových záznamov."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Odstránia sa aj vaše zmeny %lld ukážkového záznamu."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Odstránia sa aj vaše zmeny %lld ukážkového záznamu."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Odstránia sa aj vaše zmeny %lld ukážkových záznamov."
+                }
+              }
+            }
+          }
+        },
+        "sr" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Биће уклоњене и ваше измене у %lld примера уноса."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Биће уклоњене и ваше измене у %lld примеру уноса."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Биће уклоњене и ваше измене у %lld примера уноса."
+                }
+              }
+            }
+          }
+        },
+        "sr-Latn" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Biće uklonjene i vaše izmene u %lld primera unosa."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Biće uklonjene i vaše izmene u %lld primeru unosa."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Biće uklonjene i vaše izmene u %lld primera unosa."
+                }
+              }
+            }
+          }
+        },
+        "uk" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Також буде видалено ваші зміни в %lld зразкових записах."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Також буде видалено ваші зміни в %lld зразкових записах."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Також буде видалено ваші зміни в %lld зразковому записі."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Також буде видалено ваші зміни в %lld зразкового запису."
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "你对 %lld 个示例条目所做的更改也会被移除。"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "sample.remove.confirm" : {
       "comment" : "Destructive button in the confirmation: removes the sample timetable. Button (Title Case).",
       "extractionState" : "manual",
@@ -80175,6 +80469,90 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "将移除示例课程表及其科目和课程，以及示例任务和考试。你自己创建的内容都会保留。"
+          }
+        }
+      }
+    },
+    "sample.remove.message.scope" : {
+      "comment" : "Remove-sample-data confirmation, first sentence when the user added or edited something in the sample (the next sentences say what). Same scope as sample.remove.message, without its last sentence.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Odstraní se ukázkový rozvrh s jeho předměty a hodinami a ukázkový úkol a zkouška."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Der Beispielstundenplan mit seinen Fächern und Stunden sowie die Beispielaufgabe und -prüfung werden entfernt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The sample timetable with its subjects and lessons, and the sample task and exam, will be removed."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "L’emploi du temps d’exemple avec ses matières et ses cours, ainsi que la tâche et l’examen d’exemple, seront supprimés."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A mintaórarend a tantárgyaival és óráival, valamint a mintafeladat és -vizsga törlődik."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "サンプル時間割とその科目・授業、サンプルのタスクと試験が削除されます。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zostanie usunięty przykładowy plan z jego przedmiotami i lekcjami oraz przykładowe zadanie i egzamin."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vor fi eliminate orarul exemplu cu materiile și lecțiile sale, precum și sarcina și examenul exemplu."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Odstráni sa ukážkový rozvrh s jeho predmetmi a hodinami a ukážková úloha a skúška."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Биће уклоњени пример распореда са својим предметима и часовима, као и пример задатка и испита."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Biće uklonjeni primer rasporeda sa svojim predmetima i časovima, kao i primer zadatka i ispita."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Буде видалено зразок розкладу з його предметами й уроками, а також зразкове завдання та іспит."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "将移除示例课程表及其科目和课程，以及示例任务和考试。"
           }
         }
       }

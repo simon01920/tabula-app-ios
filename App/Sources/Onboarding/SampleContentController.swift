@@ -121,17 +121,21 @@ struct SampleDataBanner: View {
     /// Full sentences only (no fragments): the scope, plus what happens to the user's own additions when there are any.
     private func message(for record: SampleContentRecord) -> String {
         let renderer = model.renderer
-        var sentences = [renderer.string(forKey: "sample.remove.message")]
-        if let database = model.database {
-            let impact = SampleContent.impact(of: record, in: database)
-            if impact.addedByUser > 0 {
-                sentences.append(renderer.format(key: "sample.remove.addedByUser",
-                                                 arguments: [.integer(Int64(impact.addedByUser))]))
-            }
-            if impact.unlinkedItems > 0 {
-                sentences.append(renderer.format(key: "sample.remove.unlinked",
-                                                 arguments: [.integer(Int64(impact.unlinkedItems))]))
-            }
+        let impact = model.database.map { SampleContent.impact(of: record, in: $0) } ?? .init()
+        // "Everything you created yourself stays" only while removing deletes no user addition or edit.
+        var sentences = [renderer.string(forKey: impact.keepsAllUserWork ? "sample.remove.message"
+                                                                          : "sample.remove.message.scope")]
+        if impact.addedByUser > 0 {
+            sentences.append(renderer.format(key: "sample.remove.addedByUser",
+                                             arguments: [.integer(Int64(impact.addedByUser))]))
+        }
+        if impact.changedByUser > 0 {
+            sentences.append(renderer.format(key: "sample.remove.changedByUser",
+                                             arguments: [.integer(Int64(impact.changedByUser))]))
+        }
+        if impact.unlinkedItems > 0 {
+            sentences.append(renderer.format(key: "sample.remove.unlinked",
+                                             arguments: [.integer(Int64(impact.unlinkedItems))]))
         }
         return sentences.joined(separator: "\n\n")
     }

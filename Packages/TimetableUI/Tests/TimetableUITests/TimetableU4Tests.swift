@@ -51,6 +51,7 @@ struct CellBadgeTests {
                 == AppSymbol.changed.name)
         #expect(LessonStatusBadgeModel.make(status: .cancelled, reasons: [])?.symbolName == AppSymbol.cancelled.name)
         #expect(AppSymbol.change(for: [.buildingChanged]) == .roomChanged)
+        #expect(!AppSymbol.changed.name.contains("pencil") && AppSymbol.changed != AppSymbol.edit)   // not "Edit"
     }
 
     @Test func roomUsesTheMapPin() {

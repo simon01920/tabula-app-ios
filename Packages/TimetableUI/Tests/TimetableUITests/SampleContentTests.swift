@@ -49,6 +49,30 @@ struct SampleContentTests {
         #expect(SampleContent.impact(of: fixture.record, in: database) == .init())
     }
 
+    @Test func editsToSampleItemsAreCountedSoTheDialogNeverPromisesTheyStay() throws {
+        var fixture = try lookAround(on: nil)
+        #expect(SampleContent.impact(of: fixture.record, in: fixture.database).keepsAllUserWork)
+        // The user renames a sample subject and edits the sample task.
+        var subject = try #require(fixture.database.subjects.first { !$0.isDeleted })
+        subject.name = "My Maths"
+        var task = try #require(fixture.database.tasks.first { !$0.isDeleted })
+        task.title = "Bring the compass"
+        try fixture.apply(.batch([.upsert(subject), .upsert(task)], label: "user edits"))
+        let impact = SampleContent.impact(of: fixture.record, in: fixture.database)
+        #expect(impact.changedByUser == 2 && impact.addedByUser == 0)
+        #expect(!impact.keepsAllUserWork)
+        // A record from before the stamps existed counts no edits (it cannot tell them apart).
+        var old = fixture.record
+        old.stamps = nil
+        #expect(SampleContent.impact(of: old, in: fixture.database).changedByUser == 0)
+        // The stored record round-trips with its stamps.
+        let store = InMemoryOnboardingLocalStore()
+        let data = try JSONEncoder().encode(fixture.record)
+        #expect(try JSONDecoder().decode(SampleContentRecord.self, from: data) == fixture.record)
+        store.saveSample(fixture.record)
+        #expect(store.loadSample() == fixture.record)
+    }
+
     @Test func removalOnAFreshInstallDeletesEverythingSampleAndKeepsSettingsAndRules() throws {
         var fixture = try lookAround(on: nil)
         let rules = fixture.database.reminderRules

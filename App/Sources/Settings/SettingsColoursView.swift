@@ -105,7 +105,9 @@ struct SettingsColoursView: View {
     }
 
     private func undo(_ state: AppliedPalette) {
-        guard let mutation = PaletteRemap.mutation(for: state.originals, label: "undo palette") else { return }
+        guard let database = model.database,
+              let mutation = PaletteRemap.mutation(for: PaletteRemap.restored(state.originals, in: database),
+                                                   label: "undo palette") else { applied = nil; return }
         if case .applied = model.apply(mutation) { applied = nil }
     }
 }

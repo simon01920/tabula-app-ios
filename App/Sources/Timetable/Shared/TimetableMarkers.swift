@@ -39,7 +39,9 @@ struct HighlighterOutline: View {
 
 // MARK: Cell badge
 
-/// The one badge slot of a grid cell (`LessonCellBadge`): a symbol on a material disc in the bottom-trailing corner;
+/// The one badge slot of a grid cell (`LessonCellBadge`): a symbol on a solid card-colour capsule in the bottom-trailing
+/// corner (a material over the subject colour would not guarantee the red cancelled symbol 3:1; the card is a tested
+/// `DesignTokens.Reference` surface);
 /// tasks add their count when it fits. Decorative: the cell's VoiceOver sentence names the state.
 struct CellBadgeView: View {
     let badge: LessonCellBadge
@@ -52,7 +54,7 @@ struct CellBadgeView: View {
         }
         .padding(.horizontal, 3)
         .padding(.vertical, 2.5)
-        .background(Capsule().fill(.regularMaterial))
+        .background(Capsule().fill(DesignTokens.Surface.card))
         .padding(1.5)
         .accessibilityHidden(true)
     }

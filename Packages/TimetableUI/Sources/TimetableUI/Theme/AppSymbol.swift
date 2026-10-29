@@ -47,8 +47,9 @@ public enum AppSymbol: String, CaseIterable, Sendable {
     case substitute = "person.2.badge.gearshape"
     /// Substitute subject (a different subject in this slot).
     case subjectChanged = "arrow.left.arrow.right"
-    /// Changed in another way, or in several ways.
-    case changed = "pencil.circle"
+    /// Changed in another way, or in several ways. Not a pencil (that reads as Edit, QA 2026-10-29): the asterisk
+    /// "modified" mark, SF Symbols 1 / iOS 13 (SFSafeSymbols `SFSymbol+1.0.swift`, checked 2026-10-29).
+    case changed = "asterisk.circle"
     /// Cancelled lesson.
     case cancelled = "xmark.circle.fill"
     /// Extra (added) lesson.

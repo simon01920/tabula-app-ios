@@ -104,10 +104,11 @@ public enum PaletteRemap {
 
     /// The subjects whose colour changes when every live subject takes `pack`'s colour at the same index (a subject
     /// with a custom colour uses its position in the timetable's display order). Returns the NEW versions only.
+    /// Only timetables that follow the app's palette: one with its own palette (`Timetable.palettePackID`) keeps it.
     public static func remapped(in database: TabulaDatabase, to pack: PalettePack, locale: Locale) -> [Subject] {
         guard !pack.colors.isEmpty else { return [] }
         var changed: [Subject] = []
-        for timetable in database.timetables where !timetable.isDeleted {
+        for timetable in database.timetables where !timetable.isDeleted && timetable.palettePackID == nil {
             let ordered = SubjectOrder.live(database, timetableID: timetable.id, locale: locale)
             for (position, subject) in ordered.enumerated() {
                 let index = (packIndex(of: subject) ?? position) % pack.colors.count
@@ -123,6 +124,18 @@ public enum PaletteRemap {
             }
         }
         return changed
+    }
+
+    /// Undo of a remap: the CURRENT live subjects with only `color` and `colorName` set back from `originals`
+    /// (edits made since, e.g. a rename, are kept; subjects deleted since are skipped). Unchanged ones are left out.
+    public static func restored(_ originals: [Subject], in database: TabulaDatabase) -> [Subject] {
+        originals.compactMap { original in
+            guard var current = database.subjects.first(where: { $0.id == original.id && !$0.isDeleted }),
+                  current.color != original.color || current.colorName != original.colorName else { return nil }
+            current.color = original.color
+            current.colorName = original.colorName
+            return current
+        }
     }
 
     /// One batch of stamped upserts (the app's normal write path); `nil` when nothing changes.

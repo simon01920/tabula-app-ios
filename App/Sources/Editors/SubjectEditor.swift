@@ -21,20 +21,22 @@ import SwiftUI
 import TimetableCore
 import TimetableUI
 
-/// Opens the subject editor as sheet content. `subjectID == nil` creates a subject in `timetableID` (default: the
-/// active timetable); `onSaved` receives the ID of the saved subject (the lesson editor selects it).
+/// Opens the subject editor as sheet content, or `embedded` in a parent navigation stack (the subjects list pushes it:
+/// no stacked sheets). `subjectID == nil` creates a subject in `timetableID` (default: the active timetable);
+/// `onSaved` receives the ID of the saved subject (the lesson editor selects it).
 struct SubjectEditorView: View {
     let subjectID: Subject.ID?
     var timetableID: Timetable.ID?
+    var embedded = false
     var onSaved: ((Subject.ID) -> Void)?
     @Environment(AppModel.self) private var model
     @State private var newID = Subject.ID(UUID())
 
     var body: some View {
         if let draft = initialDraft(), let timetable = timetable(for: draft) {
-            SubjectEditorBody(timetable: timetable, initial: draft, onSaved: onSaved)
+            SubjectEditorBody(timetable: timetable, initial: draft, embedded: embedded, onSaved: onSaved)
         } else {
-            EditorUnavailableView(messageKey: "editor.subject.unavailable")
+            EmbeddableUnavailableView(embedded: embedded, messageKey: "editor.subject.unavailable")
         }
     }
 
@@ -59,11 +61,13 @@ struct SubjectEditorView: View {
 private struct SubjectEditorBody: View {
     let timetable: Timetable
     let initial: SubjectDraft
+    let embedded: Bool
     let onSaved: ((Subject.ID) -> Void)?
     @Environment(AppModel.self) private var model
 
     var body: some View {
-        EditorScaffold(
+        EmbeddableEditorScaffold(
+            embedded: embedded,
             titleKey: initial.isNew ? "editor.subject.title.new" : "editor.subject.title.edit",
             initial: initial,
             canSave: { $0.canSave },
@@ -383,7 +387,7 @@ struct SubjectDeleteConfirmation: View {
 // MARK: - List
 
 /// What the subjects list edits: `subjectID == nil` creates a new subject.
-private struct SubjectEditTarget: Identifiable {
+private struct SubjectEditTarget: Identifiable, Hashable {
     let id = UUID()
     let subjectID: Subject.ID?
 }
@@ -392,7 +396,7 @@ private struct SubjectEditTarget: Identifiable {
 struct SubjectsListView: View {
     var timetableID: Timetable.ID?
     /// `true` inside a parent navigation stack (Settings): no own stack and no Done; Back leaves (changes here apply
-    /// at once). The subject editor stays a sheet (a Save/Cancel form).
+    /// at once). The subject editor is pushed (embedded) in both modes, never a stacked sheet.
     var embedded = false
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
@@ -474,8 +478,8 @@ struct SubjectsListView: View {
                 .disabled(timetable == nil)
             }
         }
-        .sheet(item: $editing) { target in
-            SubjectEditorView(subjectID: target.subjectID, timetableID: timetable?.id)
+        .navigationDestination(item: $editing) { target in
+            SubjectEditorView(subjectID: target.subjectID, timetableID: timetable?.id, embedded: true)
         }
         .sheet(item: $deleting) { subject in
             SubjectDeleteConfirmation(subjectID: subject.id, name: subject.name) {}

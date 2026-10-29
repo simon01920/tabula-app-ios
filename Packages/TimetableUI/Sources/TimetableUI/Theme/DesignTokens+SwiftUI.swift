@@ -42,11 +42,11 @@ extension Color {
     public static let ink = DesignTokens.ink.color
     /// Text / symbols on an ink fill (prominent buttons, selected chips).
     public static let onInk = DesignTokens.onInk.color
-    /// Overdue, cancelled, destructive only.
+    /// Overdue, cancelled, destructive only (and the timetable now line).
     public static let correction = DesignTokens.correction.color
     /// Text on a correction fill (the now-line time label).
     public static let onCorrection = DesignTokens.onCorrection.color
-    /// A changed value (the moved time in the lesson detail).
+    /// A changed value (the moved time in the lesson detail). Cards / list cells only: 4.2:1 on the grey grouped page.
     public static let changed = DesignTokens.changed.color
     /// The "Now" highlighter fill (NowMarker only).
     public static let highlighter = DesignTokens.highlighter.color
@@ -127,8 +127,18 @@ extension View {
 
     /// Label of a prominent (ink-filled) control: `Color.onInk`, so the dark-mode ink fill keeps 8.8:1 instead of the
     /// 2.4:1 of white text. Apply inside the label of `.borderedProminent` buttons and selected chips.
+    /// Disabled (`\.isEnabled == false`), the system draws a grey fill instead of the ink, so the label falls back to
+    /// the secondary label colour (white on that grey would be unreadable).
     public func onInkLabel() -> some View {
-        foregroundStyle(Color.onInk)
+        modifier(OnInkLabel())
+    }
+}
+
+private struct OnInkLabel: ViewModifier {
+    @Environment(\.isEnabled) private var isEnabled
+
+    func body(content: Content) -> some View {
+        content.foregroundStyle(isEnabled ? AnyShapeStyle(Color.onInk) : AnyShapeStyle(.secondary))
     }
 }
 #endif

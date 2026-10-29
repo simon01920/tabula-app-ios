@@ -20,7 +20,7 @@ Defaults the orchestrator took (listed for the gate, the human can reverse them)
 
 | # | Decision |
 |---|---|
-| D1 | **Adopt the "Exercise book" identity** (Opus §9). Root tint `ink` (#2541B2 light / #8EA2FF dark; Increase Contrast #1A2F85). `correction` red is used only for overdue, cancelled and destructive. The `highlighter` "Now" marker is the single signature element. Times and countdowns use rounded monospaced digits. Everything else stays native. |
+| D1 | **Adopt the "Exercise book" identity** (Opus §9). Root tint `ink` (#2541B2 light / #8EA2FF dark; Increase Contrast #1A2F85). `correction` red is used only for overdue, cancelled and destructive, plus the timetable's current-time line (the iOS Calendar convention; its time label uses `onCorrection`). The `highlighter` "Now" marker is the single signature element. Times and countdowns use rounded monospaced digits. Everything else stays native. |
 | D2 | **Base English is US English** (Color, Acknowledgments). Opus Q8 / L7. |
 | D3 | **Remove the in-app Light/Dark override** (HIG dark-mode: "Avoid offering an app-specific appearance setting"). Palettes stay. |
 | D4 | **Time format defaults to "System"** (follows iOS 24-Hour Time); the override stays. One `Locale` with the effective hour cycle is injected at the root, so every `DatePicker` matches the text (H1, F22). |
@@ -79,7 +79,7 @@ Defaults the orchestrator took (listed for the gate, the human can reverse them)
 **Integration decisions for the human to review:**
 - A lesson with several change reasons shows the generic "changed" symbol, and the legend has a "Changed" row. U1's rule replaces U4's "most important reason" symbol.
 - New tokens: `onCorrection` (the now-line time label) and `changed` (a moved time in lesson detail; 4.2:1 on the grey page, so it may only be used on cards).
-- The now line stays correction-red. This bends D1's "red only for overdue, cancelled, destructive" rule; decide whether to keep it.
+- The now line stays correction-red; D1 now allows it explicitly (iOS Calendar convention).
 - D10: hiding a field affects summaries only, never the editors. PRODUCT.md was updated to match (it previously said "hidden everywhere").
 - The "Other" school type now shows Room and Teacher by default (PRODUCT.md previously said all off).
 - The "Lessons are called" setting is removed; it follows the school type.

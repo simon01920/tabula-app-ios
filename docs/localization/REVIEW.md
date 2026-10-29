@@ -221,3 +221,9 @@ Reviewer: "Week A / Week B" and "Day A / Day B" are full phrases (no concatenati
 calendar (ISO) week number; `onboarding.action.start` keeps the brand undeclined ("aplikáciu Tabula", "aplikaci Tabula",
 "aplikacji Tabula"); `onboarding.unit.minutes` is the unit after a number field; `sample.remove.addedByUser|unlinked` are
 plural sentences appended to the confirmation message.
+
+### Phase 4U integration QA additions (2026-10-29)
+2 new keys, model-authored for 11 languages (`sr-Latn` derived), all `needs_review`: `sample.remove.message.scope`
+(the first sentence of `sample.remove.message` without "Everything you created yourself stays"; shown when the user
+added or edited something in the sample) and `sample.remove.changedByUser` (plural: "Your changes to %lld sample
+entries are removed too.").

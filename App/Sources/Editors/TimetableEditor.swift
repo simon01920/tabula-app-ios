@@ -7,8 +7,8 @@
 // UX overhaul U5b: identity (name, emoji) and school days are separate sections, and the days are weekday chips in
 // the user's week order (M16); no header repeats a row label (M1); the lesson-details copy says the setting only
 // affects summaries (D10); "Reset Timetable…" lives here too, so the last timetable (which can't be deleted) can be
-// cleared without a hidden menu (M17). Embedded mode (Settings) pushes the bell schedule and terms editors instead of
-// stacking sheets.
+// cleared without a hidden menu (M17). The bell schedule and terms editors are pushed in both modes
+// (never stacked sheets).
 // Logic: Packages/TimetableUI/.../Editors/TimetableDraft.swift (Linux-tested).
 // APIs: Picker, Toggle (.button style through WeekdayChips), Stepper (ValueStepper), sheet(isPresented:),
 //   NavigationLink(destination:label:), Section footers, RotationResolver (core).
@@ -60,7 +60,7 @@ private struct TimetableEditorBody: View {
             },
             content: { draft in
                 TimetableFormContent(draft: draft, timetable: timetable, originalKind: initial.rotationKind,
-                                     lessonCount: lessonCount, lessons: model.database?.lessons ?? [], embedded: embedded)
+                                     lessonCount: lessonCount, lessons: model.database?.lessons ?? [])
             })
     }
 }
@@ -71,10 +71,7 @@ private struct TimetableFormContent: View {
     let originalKind: TimetableDraft.RotationKind
     let lessonCount: Int
     let lessons: [Lesson]
-    let embedded: Bool
     @Environment(AppModel.self) private var model
-    @State private var editingBell = false
-    @State private var editingTerms = false
     @State private var confirmingReset = false
     @State private var resetFailed = false
 
@@ -317,18 +314,12 @@ private struct TimetableFormContent: View {
             switch draft.timeKind {
             case .bellSchedule:
                 if case .bellSchedule = timetable.timeStructure {
-                    if embedded {
-                        NavigationLink {
-                            BellScheduleEditorView(timetableID: timetable.id, embedded: true)
-                        } label: {
-                            Label { Text("editor.time.editBell") } icon: { Image(systemName: "bell") }
-                                .frame(minHeight: 44, alignment: .leading)
-                        }
-                    } else {
-                        Button { editingBell = true } label: {
-                            Label { Text("editor.time.editBell") } icon: { Image(systemName: "bell") }
-                                .frame(minHeight: 44, alignment: .leading)
-                        }
+                    // Pushed in both modes (the sheet's EditorScaffold has its own stack): never a stacked sheet.
+                    NavigationLink {
+                        BellScheduleEditorView(timetableID: timetable.id, embedded: true)
+                    } label: {
+                        Label { Text("editor.time.editBell") } icon: { Image(systemName: "bell") }
+                            .frame(minHeight: 44, alignment: .leading)
                     }
                 }
             case .freeForm:
@@ -343,7 +334,6 @@ private struct TimetableFormContent: View {
                 Text("editor.time.footer")
             }
         }
-        .sheet(isPresented: $editingBell) { BellScheduleEditorView(timetableID: timetable.id) }
     }
 
     // MARK: Fields
@@ -410,23 +400,15 @@ private struct TimetableFormContent: View {
 
     private var termsSection: some View {
         Section {
-            if embedded {
-                NavigationLink {
-                    TermsEditorView(timetableID: timetable.id, embedded: true)
-                } label: {
-                    Label { Text("editor.terms.open") } icon: { Image(systemName: "calendar.badge.clock") }
-                        .frame(minHeight: 44, alignment: .leading)
-                }
-            } else {
-                Button { editingTerms = true } label: {
-                    Label { Text("editor.terms.open") } icon: { Image(systemName: "calendar.badge.clock") }
-                        .frame(minHeight: 44, alignment: .leading)
-                }
+            NavigationLink {
+                TermsEditorView(timetableID: timetable.id, embedded: true)
+            } label: {
+                Label { Text("editor.terms.open") } icon: { Image(systemName: "calendar.badge.clock") }
+                    .frame(minHeight: 44, alignment: .leading)
             }
         } footer: {
             Text("editor.terms.open.footer")
         }
-        .sheet(isPresented: $editingTerms) { TermsEditorView(timetableID: timetable.id) }
     }
 
     // MARK: Reset (applies at once, with an impact confirmation, like Delete Lesson in the lesson editor)

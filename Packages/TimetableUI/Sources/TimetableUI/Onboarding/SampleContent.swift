@@ -9,8 +9,10 @@
 // What it never deletes: other timetables and their children, global holidays (no timetable), reminder rules, the
 // settings, and every task / exam the user created. A user task or exam that points at the sample timetable, one of
 // its subjects or lessons keeps existing and only loses that link (the same rule as deleting a timetable in the
-// timetables manager). Content the user added INSIDE the sample timetable is one of its children; the confirmation
-// names how much of it there is (`RemovalImpact.addedByUser`) before anything is removed.
+// timetables manager). Content the user added INSIDE the sample timetable is one of its children, and edits to sample
+// items (a renamed subject, a fixed room) go with them; the confirmation names how much of both there is
+// (`RemovalImpact.addedByUser` / `.changedByUser`, from the last-change stamps recorded at creation) before anything
+// is removed, and only promises "everything you created stays" when there is neither.
 // When the sample timetable was the last one, the app shows onboarding again (ShellPhase), whose finish ADDS the new
 // timetable (OnboardingFinish): nothing else is lost.
 import Foundation
@@ -26,12 +28,17 @@ public struct SampleContentRecord: Codable, Equatable, Sendable {
     public var taskIDs: Set<UUID>
     /// The sample exams (removed by ID).
     public var examIDs: Set<UUID>
+    /// Last-change stamp (`meta.updatedAt`) of every child, task and exam at creation, to tell user edits apart.
+    /// `nil` in records written before the stamps existed (then edits cannot be told apart and none are counted).
+    public var stamps: [UUID: HLCTimestamp]?
 
-    public init(timetableID: UUID, childIDs: Set<UUID>, taskIDs: Set<UUID>, examIDs: Set<UUID>) {
+    public init(timetableID: UUID, childIDs: Set<UUID>, taskIDs: Set<UUID>, examIDs: Set<UUID>,
+                stamps: [UUID: HLCTimestamp]? = nil) {
         self.timetableID = timetableID
         self.childIDs = childIDs
         self.taskIDs = taskIDs
         self.examIDs = examIDs
+        self.stamps = stamps
     }
 }
 
@@ -108,24 +115,33 @@ public enum SampleContent {
     public struct RemovalImpact: Equatable, Sendable {
         /// Children of the sample timetable the user added (lessons, subjects, changes …): removed with it.
         public var addedByUser = 0
+        /// Sample children, tasks and exams the user edited since creation: removed with their edits.
+        public var changedByUser = 0
         /// The user's own tasks and exams linked to the sample: kept, but they lose the link.
         public var unlinkedItems = 0
 
-        public init(addedByUser: Int = 0, unlinkedItems: Int = 0) {
+        public init(addedByUser: Int = 0, changedByUser: Int = 0, unlinkedItems: Int = 0) {
             self.addedByUser = addedByUser
+            self.changedByUser = changedByUser
             self.unlinkedItems = unlinkedItems
         }
+
+        /// `true` when removing deletes nothing the user made or edited ("everything you created stays").
+        public var keepsAllUserWork: Bool { addedByUser == 0 && changedByUser == 0 }
     }
 
     /// The record for the sample timetable `timetableID` right after onboarding created it: every live entity
     /// that belongs to the brand-new timetable is sample content.
     public static func record(for timetableID: Timetable.ID, in database: TabulaDatabase) -> SampleContentRecord {
         let scope = Scope(timetableID: timetableID, database: database)
-        return SampleContentRecord(
-            timetableID: timetableID.uuid,
-            childIDs: scope.childIDs,
-            taskIDs: Set(database.tasks.filter { !$0.isDeleted && scope.touches(task: $0) }.map(\.id.uuid)),
-            examIDs: Set(database.exams.filter { !$0.isDeleted && scope.touches(exam: $0) }.map(\.id.uuid)))
+        let tasks = database.tasks.filter { !$0.isDeleted && scope.touches(task: $0) }
+        let exams = database.exams.filter { !$0.isDeleted && scope.touches(exam: $0) }
+        var stamps = scope.stamps
+        for task in tasks { stamps[task.id.uuid] = task.meta.updatedAt }
+        for exam in exams { stamps[exam.id.uuid] = exam.meta.updatedAt }
+        return SampleContentRecord(timetableID: timetableID.uuid, childIDs: scope.childIDs,
+                                   taskIDs: Set(tasks.map(\.id.uuid)), examIDs: Set(exams.map(\.id.uuid)),
+                                   stamps: stamps)
     }
 
     /// `true` while the sample timetable is still live (else the record is stale and can be forgotten).
@@ -138,6 +154,16 @@ public enum SampleContent {
         let scope = Scope(timetableID: Timetable.ID(record.timetableID), database: database)
         var impact = RemovalImpact()
         impact.addedByUser = scope.childIDs.subtracting(record.childIDs).count
+        if let recorded = record.stamps {
+            var current = scope.stamps
+            for task in database.tasks where !task.isDeleted && record.taskIDs.contains(task.id.uuid) {
+                current[task.id.uuid] = task.meta.updatedAt
+            }
+            for exam in database.exams where !exam.isDeleted && record.examIDs.contains(exam.id.uuid) {
+                current[exam.id.uuid] = exam.meta.updatedAt
+            }
+            impact.changedByUser = current.filter { id, stamp in recorded[id].map { $0 != stamp } ?? false }.count
+        }
         impact.unlinkedItems = database.tasks.filter {
             !$0.isDeleted && !record.taskIDs.contains($0.id.uuid) && scope.touches(task: $0)
         }.count + database.exams.filter {
@@ -212,9 +238,18 @@ public enum SampleContent {
             subjectIDs = Set(subjects.map(\.id))
         }
 
-        var childIDs: Set<UUID> {
-            Set(lessons.map(\.id.uuid) + subjects.map(\.id.uuid) + bellSchedules.map(\.id.uuid) + terms.map(\.id.uuid)
-                + breaks.map(\.id.uuid) + overrides.map(\.id.uuid))
+        var childIDs: Set<UUID> { Set(stamps.keys) }
+
+        /// `meta.updatedAt` of every live child.
+        var stamps: [UUID: HLCTimestamp] {
+            var result: [UUID: HLCTimestamp] = [:]
+            for item in lessons { result[item.id.uuid] = item.meta.updatedAt }
+            for item in subjects { result[item.id.uuid] = item.meta.updatedAt }
+            for item in bellSchedules { result[item.id.uuid] = item.meta.updatedAt }
+            for item in terms { result[item.id.uuid] = item.meta.updatedAt }
+            for item in breaks { result[item.id.uuid] = item.meta.updatedAt }
+            for item in overrides { result[item.id.uuid] = item.meta.updatedAt }
+            return result
         }
 
         func touches(task: TaskItem) -> Bool {
