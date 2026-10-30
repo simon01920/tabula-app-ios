@@ -58,6 +58,7 @@ public enum DynamicL10nKeys {
         keys += ReminderTarget.knownValues.map(reminderTarget)
         keys += ExamKind.knownValues.map(examKind)
         keys += ExamWhen.allKeys
+        keys += ExamCompletionAction.allKeys + ExamTimeMode.allCases.map(\.l10nKey)
         keys += ExamDraft.Issue.allCases.map(\.l10nKey)
         for base in termBases {
             keys += ProfilePreset.Terminology.allCases.map { term(base, $0) }
@@ -79,6 +80,7 @@ public enum DynamicL10nKeys {
         keys += CycleLabel.allCatalogKeys
         keys += QuickAddScope.allCatalogKeys   // Phase 4U U4
         keys += TimetableSubtitle.catalogKeys
+        keys += TodayHeroText.catalogKeys   // Phase 4U U3
         keys += ReminderUIKeys.allKeys
         keys += ReminderRuleDefaults.targets.map { ReminderKindList.titleKey($0, terminology: .classLecture) }
         keys += IntentL10nKeys.allKeys   // Phase 4 B3: App Intent titles / parameters, checkbox + alarm "Done"

@@ -52,6 +52,14 @@ public enum SampleScenarios {
     /// Tue 2026-10-13 10:20 in `timeZone`.
     public static var referenceNow: Date { bootstrapContext.date(today, t(10, 20)) }
 
+    /// Fixed clocks of the Today state routes (`today.before-school`, …; Phase 4U U3): one hero moment each in the
+    /// secondary scenario (tested in TodayHeroTests). Tue 7:20, Tue 8:53 (between Math and Chemistry), Tue 16:00,
+    /// Thu 2026-10-29 9:00 (autumn holidays).
+    public static var todayMomentClocks: (beforeSchool: Date, breakTime: Date, afterSchool: Date, holiday: Date) {
+        (bootstrapContext.date(today, t(7, 20)), bootstrapContext.date(today, t(8, 53)),
+         bootstrapContext.date(today, t(16)), bootstrapContext.date(d(2026, 10, 29), t(9)))
+    }
+
     /// Builds the scenario for `kind`.
     public static func make(_ kind: SeedKind) -> SampleScenario {
         let database: TabulaDatabase?

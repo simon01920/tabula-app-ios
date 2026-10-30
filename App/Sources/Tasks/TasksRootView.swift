@@ -1,12 +1,22 @@
-// The Tasks tab (route `tasks`, plus `tasks.upcoming|overdue|completed` for screenshots): segment chips with counts
-// (Overdue highlighted), a subject filter and sort menu, a quick-add section (title + optional subject; the due date is
-// the subject's next lesson, else tomorrow), the task rows with swipe actions (complete / reopen, delete with
-// confirmation) and empty states. Logic lives in TimetableUI/Tasks (TaskListModel, TaskRowModel, TaskQuickAdd,
-// NextLessonResolver; Linux-tested). Keep the type name `TasksRootView` and its no-argument init: the app shell uses it.
-// Writes go through `model.apply` only (`.completeTask`, `.upsert`, `.delete`); the reminder coordinator re-plans by itself.
-// APIs: NavigationStack, List, Section, swipeActions(edge:allowsFullSwipe:), confirmationDialog(_:isPresented:titleVisibility:),
-//       sheet(item:), Menu, Picker, ContentUnavailableView (iOS 17), task(priority:_:), Task.sleep(for:),
-//       accessibilityAction(named:), onChange(of:) (two-parameter form, iOS 17), onSubmit(of:_:).
+// The Tasks tab (Phase 4U U2, Opus review R2 / C3 / H6 / H7 / M10 / M23, Astra F15): ONE grouped list instead of
+// filter chips and an inline form. Sections: Overdue, Today, Tomorrow, This week, Later, No date (undated tasks have
+// their own last section), each with its count in the header; completed tasks sit behind a "Show N completed tasks"
+// button at the end (also a switch in the filter menu). The toolbar has a filter/sort menu (subject, type, show
+// completed, sort) and "+", which opens the quick-entry sheet (TaskQuickEntrySheet).
+// The routes `tasks.upcoming|overdue|completed` and `AppNavigation.showTasks(_:)` map a `TaskSegment` to a scroll
+// anchor (`TaskListModel.anchor(for:in:)`): Overdue / Today to their section, Upcoming to the first later section,
+// Completed opens the completed tasks and scrolls to them.
+// Completing a task shows "Marked as done · Undo" for a few seconds (F15). Logic lives in TimetableUI/Tasks
+// (TaskListModel, TaskRowModel, TaskQuickEntry, NextLessonResolver; Linux-tested). Keep the type name `TasksRootView`
+// and its no-argument init: the app shell uses it. Writes go through `model.apply` only (`.completeTask`, `.upsert`,
+// `.delete`); the reminder coordinator re-plans by itself.
+// HIG (apple-design references): lists-and-tables.md (grouped list, swipe actions, one background), toolbars.md
+// (a menu for the filter, "+" for the action), sheets.md (see TaskQuickEntrySheet), segmented-controls.md (the chips
+// that C3 flagged are gone).
+// APIs: NavigationStack, List, Section, ScrollViewReader, swipeActions(edge:allowsFullSwipe:),
+//       confirmationDialog(_:isPresented:titleVisibility:), sheet(item:), Menu, Picker, Toggle, ContentUnavailableView,
+//       safeAreaInset(edge:), task(id:priority:_:), Task.sleep(for:), accessibilityAction(named:),
+//       AccessibilityNotification.Announcement (iOS 17), onChange(of:) (two-parameter form, iOS 17).
 import SwiftUI
 import TimetableCore
 import TimetableUI
@@ -25,26 +35,27 @@ private enum TasksSheet: Identifiable {
 }
 
 struct TasksRootView: View {
-    private let initialSegment: TaskSegment
+    private let initialSegment: TaskSegment?
 
-    init(initialSegment: TaskSegment = .today) {
+    /// `initialSegment`: where to scroll on appearing (screenshots, Today's overdue link); `nil` = the top.
+    init(initialSegment: TaskSegment? = nil) {
         self.initialSegment = initialSegment
     }
 
     @Environment(AppModel.self) private var model
-    @State private var chosenSegment: TaskSegment?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var subjectFilter: Subject.ID?
+    @State private var kindFilter: TaskKind?
     @State private var sort: TaskSort = .due
+    /// `nil` = not chosen by the user yet, so the route decides (no `State(initialValue:)` in initialisers).
+    @State private var chosenShowCompleted: Bool?
     @State private var sheet: TasksSheet?
     @State private var pendingDelete: TaskItem.ID?
-    @State private var quickTitle = ""
-    @State private var quickSubjectID: Subject.ID?
-    @State private var quickNextLesson: NextLesson?
-    @Environment(\.scenePhase) private var scenePhase
-    @State private var quickResult: ApplyResult?
+    @State private var undoTaskID: TaskItem.ID?
+    @State private var didScroll = false
     @State private var minuteTick = 0
 
-    private var segment: TaskSegment { chosenSegment ?? initialSegment }
+    private var showCompleted: Bool { chosenShowCompleted ?? (initialSegment == .completed) }
 
     var body: some View {
         NavigationStack {
@@ -56,15 +67,16 @@ struct TasksRootView: View {
                         Button {
                             sheet = .new(TaskItem.ID(UUID()))
                         } label: {
-                            Label { Text("tasks.add") } icon: { Image(systemName: "plus") }
+                            Label { Text("tasks.add") } icon: { Image(AppSymbol.add) }
                         }
                     }
                 }
+                .taskUndoToast($undoTaskID)
         }
         .sheet(item: $sheet) { sheet in
             switch sheet {
             case .detail(let id): TaskDetailView(taskID: id)
-            case .new(let id): TaskEditorView(mode: .new(id))
+            case .new(let id): TaskQuickEntrySheet(id: id)
             }
         }
         .closesForDeepLink { sheet = nil }   // QA fix Q6: a notification tap needs the screen
@@ -77,11 +89,6 @@ struct TasksRootView: View {
         } message: {
             Text(verbatim: deleteMessage)
         }
-        // The quick-add "Due" row must not show a lesson that has already passed.
-        .onAppear { resolveQuickNextLesson() }
-        .onChange(of: model.today) { _, _ in resolveQuickNextLesson() }
-        .onChange(of: minuteTick) { _, _ in resolveQuickNextLesson() }
-        .onChange(of: scenePhase) { _, phase in if phase == .active { resolveQuickNextLesson() } }
         // Overdue-by-time and "today" change while the app is open: re-evaluate once a minute (not in screenshot mode).
         .task {
             while !Task.isCancelled {
@@ -105,12 +112,6 @@ struct TasksRootView: View {
         return model.calendarContext.local(from: model.now)
     }
 
-    /// Subjects the quick-add menu offers: the active timetable's.
-    private var quickSubjects: [Subject] {
-        guard let timetableID = model.activeTimetable?.id else { return [] }
-        return model.database.map { SubjectOrder.live($0, timetableID: timetableID, locale: model.formatter.locale) } ?? []
-    }
-
     private var deleteDialogBinding: Binding<Bool> {
         Binding(get: { pendingDelete != nil }, set: { if !$0 { pendingDelete = nil } })
     }
@@ -126,78 +127,113 @@ struct TasksRootView: View {
     private var content: some View {
         let nowValue = now
         let tasks = liveTasks
-        let counts = TaskListModel.counts(of: tasks, now: nowValue, subjectFilter: subjectFilter)
+        let lastDay = TaskListModel.lastDayOfWeek(containing: nowValue.date, context: model.calendarContext)
+        let groups = TaskListModel.sections(of: tasks, now: nowValue, lastDayOfWeek: lastDay, subjectFilter: subjectFilter,
+                                            kindFilter: kindFilter, sort: sort)
+        let completed = TaskListModel.completedTasks(of: tasks, now: nowValue, subjectFilter: subjectFilter, kindFilter: kindFilter)
         let subjects = subjectsByID
-        let rows = TaskListModel.tasks(in: segment, from: tasks, now: nowValue, subjectFilter: subjectFilter, sort: sort)
-            .map { TaskRowModel(task: $0, subjects: subjects, now: nowValue) }
-        VStack(spacing: 0) {
-            TaskSegmentBar(counts: counts, selection: Binding(get: { segment }, set: { chosenSegment = $0 }))
+        ScrollViewReader { proxy in
             List {
-                if segment != .completed {
-                    quickAddSection
-                    if let quickResult {
-                        ApplyResultSection(result: quickResult)
-                    }
-                }
-                if rows.isEmpty {
-                    Section { emptyState(totalOpenOrDone: tasks.count) }
+                if groups.isEmpty && !(showCompleted && !completed.isEmpty) {
+                    Section { emptyState(hasTasks: !tasks.isEmpty, hasCompleted: !completed.isEmpty) }
                         .listRowBackground(Color.clear)
-                } else {
+                }
+                ForEach(groups) { group in
                     Section {
-                        ForEach(rows) { row in
-                            TaskRowView(row: row, onOpen: { sheet = .detail(row.id) }, onToggle: { toggle(row) })
-                                .accessibilityElement(children: .ignore)
-                                .accessibilityLabel(Text(verbatim: row.accessibilityLabel(renderer: model.renderer)))
-                                .accessibilityAddTraits(.isButton)
-                                .accessibilityAction { sheet = .detail(row.id) }
-                                .accessibilityAction(named: Text(catalogKey: row.isCompleted ? "tasks.action.reopen" : "tasks.action.complete")) {
-                                    toggle(row)
-                                }
-                                .accessibilityAction(named: Text("tasks.action.delete")) { pendingDelete = row.id }
-                                .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                                    Button { toggle(row) } label: {
-                                        Label {
-                                            Text(catalogKey: row.isCompleted ? "tasks.action.reopen" : "tasks.action.complete")
-                                        } icon: {
-                                            Image(systemName: row.isCompleted ? "arrow.uturn.backward.circle" : "checkmark.circle")
-                                        }
-                                    }
-                                    .tint(.green)
-                                }
-                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                    Button(role: .destructive) { pendingDelete = row.id } label: {
-                                        Label { Text("tasks.action.delete") } icon: { Image(systemName: "trash") }
-                                    }
-                                }
+                        ForEach(group.tasks) { task in
+                            taskRow(task, section: group.section, subjects: subjects, now: nowValue)
+                        }
+                    } header: {
+                        TaskSectionHeader(section: group.section, count: group.tasks.count)
+                    }
+                    .id(TaskListAnchor.section(group.section))
+                }
+                if !completed.isEmpty {
+                    Section {
+                        if showCompleted {
+                            ForEach(completed) { task in
+                                taskRow(task, section: nil, subjects: subjects, now: nowValue)
+                            }
+                        }
+                        Button { chosenShowCompleted = !showCompleted } label: {
+                            Text(verbatim: completedButtonTitle(count: completed.count))
+                                .frame(maxWidth: .infinity, minHeight: 44, alignment: .center)
+                        }
+                    } header: {
+                        if showCompleted {
+                            Text("tasks.section.completed")
+                                .font(.subheadline.weight(.semibold))
+                                .textCase(nil)
                         }
                     }
+                    .id(TaskListAnchor.completed)
                 }
             }
-            .listStyle(.insetGrouped)
+            .listStyle(.insetGrouped)   // one grouped background from the title to the last row (M23)
+            .task {
+                // Once: scroll to the section the route or link asked for, after the first layout.
+                guard !didScroll, let initialSegment else { return }
+                didScroll = true
+                guard let anchor = TaskListModel.anchor(for: initialSegment, in: groups) else { return }
+                await Task.yield()
+                proxy.scrollTo(anchor, anchor: .top)
+            }
         }
     }
 
+    private func completedButtonTitle(count: Int) -> String {
+        showCompleted
+            ? model.renderer.string(forKey: "tasks.completed.hide")
+            : model.renderer.format(key: "tasks.completed.show", arguments: [.integer(Int64(count))])
+    }
+
+    private func taskRow(_ task: TaskItem, section: TaskSection?, subjects: [Subject.ID: Subject], now: LocalDateTime) -> some View {
+        let row = TaskRowModel(task: task, subjects: subjects, now: now)
+        return TaskRowView(row: row, section: section, onOpen: { sheet = .detail(row.id) }, onToggle: { toggle(row) })
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text(verbatim: row.accessibilityLabel(renderer: model.renderer)))
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAction { sheet = .detail(row.id) }
+            .accessibilityAction(named: Text(catalogKey: row.isCompleted ? "tasks.action.reopen" : "tasks.action.complete")) {
+                toggle(row)
+            }
+            .accessibilityAction(named: Text("tasks.action.delete")) { pendingDelete = row.id }
+            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                Button { toggle(row) } label: {
+                    Label {
+                        Text(catalogKey: row.isCompleted ? "tasks.action.reopen" : "tasks.action.complete")
+                    } icon: {
+                        Image(row.isCompleted ? AppSymbol.notCompleted : AppSymbol.completed)
+                    }
+                }
+                .tint(Color.ink)
+            }
+            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                Button(role: .destructive) { pendingDelete = row.id } label: {
+                    Label { Text("tasks.action.delete") } icon: { Image(AppSymbol.delete) }
+                }
+            }
+    }
+
     @ViewBuilder
-    private func emptyState(totalOpenOrDone: Int) -> some View {
-        if totalOpenOrDone == 0 {
+    private func emptyState(hasTasks: Bool, hasCompleted: Bool) -> some View {
+        if !hasTasks {
             ContentUnavailableView {
-                Label { Text("tasks.empty.title") } icon: { Image(systemName: "checklist") }
+                Label { Text("tasks.empty.title") } icon: { Image(AppSymbol.task) }
             } description: {
                 Text("tasks.empty.detail")
             }
-        } else if subjectFilter != nil {
+        } else if subjectFilter != nil || kindFilter != nil {
             ContentUnavailableView {
-                Label { Text("tasks.empty.filtered.title") } icon: { Image(systemName: segment.symbolName) }
+                Label { Text("tasks.empty.filtered.title") } icon: { Image(AppSymbol.task) }
             } description: {
                 Text("tasks.empty.filtered.detail")
             }
         } else {
             ContentUnavailableView {
-                Label { Text(LocalizedStringKey(TaskL10nKeys.emptyTitle(segment))) } icon: {
-                    Image(systemName: segment.symbolName)
-                }
+                Label { Text("tasks.empty.allDone.title") } icon: { Image(AppSymbol.completed) }
             } description: {
-                Text(LocalizedStringKey(TaskL10nKeys.emptyDetail(segment)))
+                Text("tasks.empty.allDone.detail")
             }
         }
     }
@@ -208,17 +244,19 @@ struct TasksRootView: View {
         if row.isCompleted {
             if let task = liveTasks.first(where: { $0.id == row.id }) {
                 model.apply(.upsert(TaskEdits.reopened(task)))
+                TaskSupport.announce("tasks.action.reopen", model: model)
             }
         } else {
-            model.apply(.completeTask(row.id, at: model.now))
+            TaskSupport.complete(row.id, at: model.now, model: model, undo: $undoTaskID)
         }
     }
 
-    // MARK: Options menu
+    // MARK: Filter menu
 
     private var optionsMenu: some View {
         let subjects = TaskListModel.filterSubjects(tasks: liveTasks, subjects: model.database?.subjects ?? [],
                                                     timetableOrder: model.timetables.map(\.id), locale: model.formatter.locale)
+        let isFiltered = subjectFilter != nil || kindFilter != nil
         return Menu {
             Picker(selection: $sort) {
                 ForEach(TaskSort.allCases, id: \.self) { option in
@@ -235,69 +273,23 @@ struct TasksRootView: View {
             } label: {
                 Text("tasks.filter.title")
             }
+            Picker(selection: $kindFilter) {
+                Text("tasks.filter.type.all").tag(TaskKind?.none)
+                ForEach(TaskQuickEntry.kinds, id: \.rawValue) { kind in
+                    if let key = TaskL10nKeys.kind(kind) { Text(LocalizedStringKey(key)).tag(TaskKind?.some(kind)) }
+                }
+            } label: {
+                Text("tasks.filter.type")
+            }
+            Toggle(isOn: Binding(get: { showCompleted }, set: { chosenShowCompleted = $0 })) {
+                Text("tasks.filter.showCompleted")
+            }
         } label: {
             Label {
                 Text("tasks.options")
             } icon: {
-                Image(systemName: subjectFilter == nil ? "line.3.horizontal.decrease.circle"
-                      : "line.3.horizontal.decrease.circle.fill")
+                Image(systemName: isFiltered ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
             }
-        }
-    }
-
-    // MARK: Quick add
-
-    private var quickAddSection: some View {
-        Section {
-            LabeledTextField(titleKey: "tasks.quickAdd.title", text: $quickTitle)
-                .onSubmit(addQuick)
-                .submitLabel(.done)
-            Picker(selection: $quickSubjectID) {
-                Text("tasks.subject.none").tag(Subject.ID?.none)
-                ForEach(quickSubjects, id: \.id) { subject in
-                    Text(verbatim: subject.name).tag(Subject.ID?.some(subject.id))
-                }
-            } label: {
-                Text("tasks.field.subject")
-            }
-            .onChange(of: quickSubjectID) { _, _ in resolveQuickNextLesson() }
-            LabeledContent {
-                Text(verbatim: quickDueText).multilineTextAlignment(.trailing)
-            } label: {
-                Text("tasks.field.due")
-            }
-            Button(action: addQuick) {
-                Label { Text("tasks.quickAdd.add") } icon: { Image(systemName: "plus.circle.fill") }
-                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-            }
-            .disabled(EditorText.trimmedOrNil(quickTitle) == nil)
-        }
-    }
-
-    private var quickDueText: String {
-        if let nextLesson = quickNextLesson, quickSubjectID != nil {
-            return model.renderer.format(key: "tasks.quickAdd.due.nextLesson", arguments: [
-                .text(model.formatter.date(nextLesson.date, style: .weekdayDayMonth)),
-            ])
-        }
-        return model.renderer.string(forKey: "tasks.quickAdd.due.tomorrow")
-    }
-
-    private func resolveQuickNextLesson() {
-        quickNextLesson = TaskSupport.nextLesson(subjectID: quickSubjectID, model: model)
-    }
-
-    private func addQuick() {
-        let subject = quickSubjectID.flatMap { id in quickSubjects.first { $0.id == id } }
-        let next = TaskSupport.nextLesson(subjectID: subject?.id, model: model)
-        guard let task = TaskQuickAdd.makeTask(id: TaskItem.ID(UUID()), title: quickTitle, subject: subject,
-                                               nextLesson: next, today: model.today,
-                                               fallbackTimetableID: model.activeTimetable?.id) else { return }
-        let result = model.apply(.upsert(task), origin: .userSave)   // may offer the notification explainer (Q1)
-        quickResult = result
-        if case .applied = result {
-            quickTitle = ""
-            quickResult = nil
         }
     }
 }
@@ -311,5 +303,13 @@ enum TaskSupport {
               let subject = model.database?.subjects.first(where: { $0.id == subjectID && !$0.isDeleted }),
               let resolver = model.resolver(for: subject.timetableID) else { return nil }
         return NextLessonResolver.find(subjectID: subjectID, resolver: resolver, now: model.now)
+    }
+
+    /// The subject of the lesson that is on now, else of the next one, in the active timetable (the quick-entry
+    /// default, M21). Nil when there is no lesson in the horizon.
+    static func currentOrNextSubject(model: AppModel) -> Subject.ID? {
+        guard let timetableID = model.activeTimetable?.id, let resolver = model.resolver(for: timetableID) else { return nil }
+        let nowNext = resolver.nowAndNext(at: model.now)
+        return (nowNext.current ?? nowNext.next)?.subject.id
     }
 }

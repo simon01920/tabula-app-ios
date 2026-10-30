@@ -53,6 +53,17 @@ struct ExamDetailContent: View {
                 Button { editor = .existing(examID) } label: { Text("exams.action.edit") }
                     .disabled(exam == nil)
             }
+            if let exam, !exam.isCompleted, !ExamActions.completion(of: exam, model: model).isPrimaryButton {
+                ToolbarItem(placement: .primaryAction) {
+                    Menu {
+                        Button { ExamActions.markDone(exam.id, model: model) } label: {
+                            Label { Text("exams.action.moveToHistory") } icon: { Image(AppSymbol.completed) }
+                        }
+                    } label: {
+                        Label { Text("exams.action.more") } icon: { Image(systemName: "ellipsis.circle") }
+                    }
+                }
+            }
         }
         .sheet(item: $editor) { target in
             ExamEditorView(target: target)
@@ -75,7 +86,7 @@ struct ExamDetailContent: View {
         let row = ExamRow(exam: exam, subject: subject, today: model.today)
         List {
             Section {
-                HStack(alignment: .top, spacing: 12) {
+                AdaptiveStack(horizontalAlignment: .top, spacing: 12) {
                     ExamBadge(subject: subject, size: 44)
                     VStack(alignment: .leading, spacing: 4) {
                         Text(verbatim: exam.title).font(.title2.weight(.semibold))
@@ -85,7 +96,7 @@ struct ExamDetailContent: View {
                                 .font(.headline)
                         } icon: {
                             Image(systemName: exam.isCompleted ? "checkmark.circle.fill" : row.urgency.symbolName)
-                                .foregroundStyle(exam.isCompleted ? Color.green : row.urgency.tint)
+                                .foregroundStyle(exam.isCompleted ? Color.secondary : row.urgency.tint)
                         }
                     }
                 }
@@ -118,14 +129,17 @@ struct ExamDetailContent: View {
                     Text("exams.detail.notes")
                 }
             }
-            Section {
-                if exam.isCompleted {
+            // H15 / D6: "I've Taken This Exam" only from the exam date on; before that "Move to History" is in the ⋯ menu.
+            if exam.isCompleted {
+                Section {
                     Button { ExamActions.reopen(exam.id, model: model) } label: {
                         Text("exams.action.markNotDone").frame(maxWidth: .infinity, minHeight: 44)
                     }
-                } else {
+                }
+            } else if ExamActions.completion(of: exam, model: model).isPrimaryButton {
+                Section {
                     Button { ExamActions.markDone(exam.id, model: model) } label: {
-                        Text("exams.action.markDone").frame(maxWidth: .infinity, minHeight: 44)
+                        Text("exams.action.takenIt").frame(maxWidth: .infinity, minHeight: 44)
                     }
                 }
             }

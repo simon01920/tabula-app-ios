@@ -1,11 +1,12 @@
-// Shared building blocks of the Tasks screens: the neutral completion control, the priority badge, the
-// segment chips and the row. State and meaning come from the Linux-tested models in TimetableUI/Tasks
-// (TaskRowModel, TaskSegmentCounts); these views only draw them.
+// Shared building blocks of the Tasks screens: the neutral completion control, the priority badge, the row, the
+// grouped-list section header and the undo message. State and meaning come from the Linux-tested models in
+// TimetableUI/Tasks (TaskRowModel, TaskListModel); these views only draw them.
 // Rules: meaning is never carried by colour alone (checkmark shape, strikethrough, icon + text badges), every control
-// is at least 44 pt, texts wrap at accessibility Dynamic Type sizes.
-// APIs: Button, ZStack, Circle().strokeBorder, @ScaledMetric (property wrapper), ScrollView(.horizontal),
-//       buttonStyle(.bordered/.borderedProminent), buttonBorderShape(.capsule), controlSize(.large), Label,
-//       Capsule().fill(.regularMaterial), accessibilityAddTraits(.isSelected).
+// is at least 44 pt, texts wrap at accessibility Dynamic Type sizes. Correction red marks overdue only (D1).
+// HIG (apple-design references): lists-and-tables.md (a row is one selectable unit; secondary info is subordinate),
+// toggles.md (a state is not shown by colour alone), buttons.md (44 pt targets).
+// APIs: Button, ZStack, Circle().strokeBorder, @ScaledMetric (property wrapper), Label, Capsule().fill(.regularMaterial),
+//       accessibilityAddTraits(.isHeader), accessibilityValue(_:).
 import SwiftUI
 import TimetableCore
 import TimetableUI
@@ -20,8 +21,8 @@ extension Text {
 
 /// The round completion control (Phase 4U U1, Opus review H7 / C2): a neutral ring in the secondary-label colour when
 /// open (≥ 3:1 non-text contrast on white and dark cards, DesignTokensTests), a filled disc with a checkmark in the
-/// tint (ink) when done. The subject is no longer drawn on the ring: a red, green or yellow ring read as "overdue",
-/// "done" or nothing (yellow measured 1.74:1); the row names the subject. `subject` is kept for callers and VoiceOver.
+/// tint (ink) when done. The subject is not drawn on the ring: a red, green or yellow ring read as "overdue",
+/// "done" or nothing (yellow measured 1.74:1); the row shows the subject as its own tile. `subject` is kept for callers.
 struct TaskCompletionControl: View {
     let isCompleted: Bool
     let subject: SubjectSummary?
@@ -49,7 +50,8 @@ struct TaskCompletionControl: View {
     }
 }
 
-/// "High" / "Urgent": icon + text in a capsule (shape and words carry the meaning, the tint is secondary).
+/// "High" / "Urgent": icon + text in a capsule (shape and words carry the meaning; the outline is ink for urgent, grey
+/// for high, because red is reserved for overdue).
 struct TaskPriorityBadge: View {
     let row: TaskRowModel
 
@@ -64,15 +66,33 @@ struct TaskPriorityBadge: View {
             .padding(.horizontal, 8)
             .padding(.vertical, 3)
             .background(Capsule().fill(.regularMaterial))
-            .overlay(Capsule().strokeBorder(row.priority == .urgent ? Color.red : Color.orange, lineWidth: 1.5))
+            .overlay(Capsule().strokeBorder(row.priority == .urgent ? Color.ink : Color.secondary, lineWidth: 1.5))
             .foregroundStyle(.primary)
         }
     }
 }
 
-/// The text part of a task row (title, subject, relative due, indicators). Hidden fields are absent, not dashed.
+/// The subject as the small tile of the widgets plus its name (H7). The tile scales with text up to a cap.
+private struct TaskSubjectLine: View {
+    let subject: SubjectSummary
+    @ScaledMetric(relativeTo: .subheadline) private var tile: CGFloat = 20
+
+    var body: some View {
+        HStack(spacing: 6) {
+            SubjectBadge(subject: subject, size: min(tile, 28))
+            Text(verbatim: subject.name)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+
+/// The text part of a task row (title, subject, due, indicators). Hidden fields are absent, not dashed. `section`:
+/// the list section the row sits in; a due label that equals it ("Today" under Today) is left out (M10).
 struct TaskRowText: View {
     let row: TaskRowModel
+    var section: TaskSection?
     @Environment(AppModel.self) private var model
 
     var body: some View {
@@ -84,22 +104,35 @@ struct TaskRowText: View {
                 .multilineTextAlignment(.leading)
                 .fixedSize(horizontal: false, vertical: true)
             if let subject = row.subject {
-                Text(verbatim: subject.name)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+                TaskSubjectLine(subject: subject)
             }
-            if let due = row.due {
-                Label {
-                    Text(verbatim: due.text(renderer: model.renderer))
-                } icon: {
-                    Image(systemName: row.isOverdue ? "exclamationmark.triangle.fill" : "calendar")
-                }
-                .font(.subheadline)
-                .foregroundStyle(row.isOverdue ? Color.red : Color.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-            }
+            dueLine
             indicators
+        }
+    }
+
+    @ViewBuilder
+    private var dueLine: some View {
+        switch row.dueLine(in: section) {
+        case .full(let due)?:
+            Label {
+                Text(verbatim: due.text(renderer: model.renderer))
+            } icon: {
+                Image(row.isOverdue ? AppSymbol.overdue : AppSymbol.date)
+            }
+            .font(.subheadline)
+            .foregroundStyle(row.isOverdue ? Color.correction : Color.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+        case .timeOnly(let time)?:
+            Label {
+                Text(verbatim: model.formatter.time(time))
+            } icon: {
+                Image(AppSymbol.time)
+            }
+            .font(.subheadline)
+            .foregroundStyle(Color.secondary)
+        case nil:
+            EmptyView()
         }
     }
 
@@ -130,19 +163,28 @@ struct TaskRowText: View {
     }
 }
 
-/// One list row: completion control + the text (tapping the text opens the detail). VoiceOver reads the whole row as
-/// one sentence; the list adds the custom actions (open, complete / reopen, delete).
+/// One list row: completion control + the text. The control completes the task, the rest of the row opens the detail
+/// (two sibling buttons, never nested: F15). VoiceOver reads the whole row as one sentence; the list adds the custom
+/// actions (open, complete / reopen, delete).
 struct TaskRowView: View {
     let row: TaskRowModel
+    var section: TaskSection?
     let onOpen: () -> Void
     let onToggle: () -> Void
+
+    init(row: TaskRowModel, section: TaskSection? = nil, onOpen: @escaping () -> Void, onToggle: @escaping () -> Void) {
+        self.row = row
+        self.section = section
+        self.onOpen = onOpen
+        self.onToggle = onToggle
+    }
 
     var body: some View {
         HStack(alignment: .top, spacing: 4) {
             TaskCompletionControl(isCompleted: row.isCompleted, subject: row.subject, action: onToggle)
                 .accessibilityHidden(true)
             Button(action: onOpen) {
-                TaskRowText(row: row)
+                TaskRowText(row: row, section: section)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.vertical, 10)
                     .contentShape(Rectangle())
@@ -153,55 +195,109 @@ struct TaskRowView: View {
     }
 }
 
-/// Today / Upcoming / Overdue / Completed as capsule buttons with counts; Overdue gets a red warning icon
-/// while it has tasks. Scrolls horizontally when the labels do not fit (long languages, large Dynamic Type).
-struct TaskSegmentBar: View {
-    let counts: TaskSegmentCounts
-    @Binding var selection: TaskSegment
+/// Header of a list section: the title and the count (the count is a number in its own `Text`, never glued to the
+/// translated word). Overdue is the only one in correction red, with its triangle so colour is not the only cue.
+struct TaskSectionHeader: View {
+    let section: TaskSection
+    let count: Int
     @Environment(AppModel.self) private var model
 
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(TaskSegment.allCases, id: \.self) { segment in
-                    chip(segment)
+        let isOverdue = section == .overdue
+        HStack(spacing: 6) {
+            if isOverdue { Image(AppSymbol.overdue) }
+            Text(LocalizedStringKey(section.titleKey))
+            Text(verbatim: count.formatted())
+        }
+        .font(.subheadline.weight(.semibold))
+        .foregroundStyle(isOverdue ? Color.correction : Color.secondary)
+        .textCase(nil)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(LocalizedStringKey(section.titleKey)))
+        .accessibilityValue(Text(verbatim: model.renderer.format(key: "tasks.section.count", arguments: [.integer(Int64(count))])))
+        .accessibilityAddTraits(.isHeader)
+    }
+}
+
+/// "Marked as done · Undo" at the bottom of the list after a completion (F15: undo for an accidental tap).
+struct TaskUndoToast: View {
+    let onUndo: () -> Void
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Text("tasks.toast.completed")
+                .font(.subheadline)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 8)
+            Button(action: onUndo) {
+                Text("tasks.toast.undo")
+                    .fontWeight(.semibold)
+                    .frame(minWidth: 44, minHeight: 44)
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(Color.ink)
+        }
+        .padding(.leading, 16)
+        .padding(.trailing, 8)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .padding(.horizontal, 16)
+        .padding(.bottom, 8)
+        .accessibilityElement(children: .contain)
+    }
+}
+
+/// Shared by Tasks and Today: the "Marked as done · Undo" toast at the bottom, the 8 s auto-dismiss (off while
+/// VoiceOver runs, so Undo stays reachable) and the VoiceOver announcements. `undoTaskID` is the completed task.
+private struct TaskUndoModifier: ViewModifier {
+    @Binding var undoTaskID: TaskItem.ID?
+    @Environment(AppModel.self) private var model
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOver
+
+    func body(content: Content) -> some View {
+        content
+            .safeAreaInset(edge: .bottom) {
+                if undoTaskID != nil {
+                    TaskUndoToast(onUndo: undo)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 6)
-        }
-        .scrollClipDisabled()
+            // Restarts for every new completion (the id changes).
+            .task(id: undoTaskID) {
+                guard undoTaskID != nil, !voiceOver else { return }
+                try? await Task.sleep(for: .seconds(8))
+                if !Task.isCancelled { set(nil) }
+            }
     }
 
-    @ViewBuilder
-    private func chip(_ segment: TaskSegment) -> some View {
-        let isSelected = segment == selection
-        let isAlert = segment == .overdue && counts.overdue > 0
-        let title = model.renderer.format(key: segment.countedTitleKey, arguments: [.integer(Int64(counts[segment]))])
-        // C2 (Phase 4U U1): unselected chips had ink-blue text on a grey fill (2.90:1); now primary text, and the
-        // selected chip is ink with `onInk` text (8.5:1 light / 8.8:1 dark). The overdue warning keeps its icon in
-        // the correction red, so the unselected Overdue chip no longer outshouts the selected one (C3).
-        let textColor = isSelected ? Color.onInk : Color.primary
-        let button = Button {
-            selection = segment
-        } label: {
-            if isAlert {
-                Label {
-                    Text(verbatim: title).foregroundStyle(textColor)
-                } icon: {
-                    Image(AppSymbol.overdue).foregroundStyle(isSelected ? Color.onInk : Color.correction)
-                }
-            } else {
-                Text(verbatim: title).foregroundStyle(textColor)
-            }
+    private func set(_ id: TaskItem.ID?) {
+        withAnimation(reduceMotion ? nil : .default) { undoTaskID = id }
+    }
+
+    private func undo() {
+        if let id = undoTaskID, let task = model.database?.tasks.first(where: { $0.id == id && !$0.isDeleted }) {
+            model.apply(.upsert(TaskEdits.reopened(task)))
+            TaskSupport.announce("tasks.action.reopen", model: model)
         }
-        .buttonBorderShape(.capsule)
-        .controlSize(.large)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
-        if isSelected {
-            button.buttonStyle(.borderedProminent)
-        } else {
-            button.buttonStyle(.bordered)
-        }
+        set(nil)
+    }
+}
+
+extension View {
+    func taskUndoToast(_ undoTaskID: Binding<TaskItem.ID?>) -> some View {
+        modifier(TaskUndoModifier(undoTaskID: undoTaskID))
+    }
+}
+
+extension TaskSupport {
+    static func announce(_ key: String, model: AppModel) {
+        AccessibilityNotification.Announcement(model.renderer.string(forKey: key)).post()
+    }
+
+    /// Completes `id`; on success arms the undo toast and announces it.
+    static func complete(_ id: TaskItem.ID, at date: Date, model: AppModel, undo: Binding<TaskItem.ID?>) {
+        guard case .applied = model.apply(.completeTask(id, at: date)) else { return }
+        undo.wrappedValue = id
+        announce("tasks.toast.completed", model: model)
     }
 }
