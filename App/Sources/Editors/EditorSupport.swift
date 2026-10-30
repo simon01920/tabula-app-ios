@@ -32,6 +32,8 @@ struct EditorScaffold<Draft: Equatable, Content: View>: View {
     let save: (Draft) -> ApplyResult?
     /// Work outside the draft is still running (e.g. an attachment copy): Save and swipe-to-dismiss are disabled.
     var isBusy = false
+    /// The initial draft already holds typed input (a quick-entry draft handed over): treat it as edited.
+    var startsDirty = false
     /// The confirmation button's label: "Save", or "Add" for the quick-entry sheet.
     var confirmKey: LocalizedStringKey = "editor.common.save"
     @ViewBuilder let content: (Binding<Draft>) -> Content
@@ -45,7 +47,7 @@ struct EditorScaffold<Draft: Equatable, Content: View>: View {
     @Environment(AppModel.self) private var model
 
     private var current: Draft { edited ?? initial }
-    private var isDirty: Bool { edited != nil && edited != initial }
+    private var isDirty: Bool { startsDirty || (edited != nil && edited != initial) }
     /// M5 (Phase 4U U1; HIG entering-data.md "Dynamically validate field values"): hints (what is missing) show from
     /// the start next to the disabled Save; errors (a wrong value) only after the first edit (`ValidationVisibility`).
     private var errorsVisible: Bool { ValidationVisibility.errorsVisible(hasEdited: edited != nil) }

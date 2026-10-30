@@ -140,6 +140,63 @@ Reduce Transparency / Reduce Motion · German (`de`) and Slovak (`sk`) lengths �
 
 Launch routes: `-TabulaScreen <route> -TabulaSeed secondary` (DEBUG), or the Debug screen.
 
+## U3
+
+Today (Opus R1 / H2 / H3 / M10 / L2, Astra F02 / F14 / F16). Routes (fixed clocks, seed `secondary`): `today` (Tue
+10:20, in a lesson), `today.before-school` (7:20), `today.break` (8:53), `today.after-school` (16:00),
+`today.holiday` (Thu Oct 29, autumn holidays). Also `today` with `-TabulaSeed elementary` and `university`, and with
+`-TabulaNow live` for the real clock. Run the state matrix on each.
+
+**Order and structure (every profile)**
+- T-1 Sections top to bottom: hero, Due today, Rest of today (with "Earlier today" collapsed at its end), Next exam.
+  Same order with `elementary`, `secondary`, `university`; a section with nothing to show is absent (no empty header).
+- T-2 The navigation bar shows the large title "Today" with the subtitle "Tue, Oct 13 · Week B" (no year). No date
+  header anywhere in the list. Slovak: the subtitle uses the rotation phrase, never "Week Párny".
+- T-3 VoiceOver rotor › Headings reaches Due today, Rest of today, Next exam.
+
+**Hero**
+- T-4 In a lesson (`today`): yellow highlighter NOW + "until 10:45" on the first line; subject in title-2 semibold;
+  room (map pin) and teacher in the primary colour; an ink progress bar (never the subject colour: check with a red
+  subject); "25 min left" in rounded digits; a divider and "Next  10:55 · Biológia · 214".
+- T-5 With `-TabulaNow live` during a lesson, the minutes go down once a minute, never show seconds, never "25:00";
+  with 20 s to go it reads "1 min left"; at the end the hero switches to the break state within a minute.
+- T-6 Before school: "First lesson · in 40 min", subject, room, "8:00 – 8:45", and "What to bring: …" when a
+  lesson today has a bring list (elementary seed) and the field is shown.
+- T-7 Break: "Next · in 2 min", Chemistry, its room, "8:55 – 9:40".
+- T-8 After school: check mark, "Done for today", a divider, "Next lesson  Tomorrow, 8:00 · …", and tomorrow's bring
+  list when present.
+- T-9 Holiday: umbrella, "Jesenné prázdniny", "until Fri, Oct 30", "Next lesson  Mon, Nov 2, 8:00 · …". Saturday
+  (`-TabulaNow 2026-10-17T11:00:00+02:00`): "No lessons today" and Monday's first lesson.
+- T-10 VoiceOver reads the hero as one sentence: "Now, Slovenský jazyk…, room 214, 25 min left, ends at 10:45, Next,
+  10:55 · Biológia · 214, teacher …". The hero is not a button.
+- T-11 AX-XXXL: subject, room, time left and the next lesson follow each other without the teacher in between (the
+  teacher is in the lesson detail and the VoiceOver sentence); NOW and "until" may wrap; no word-internal breaks.
+
+**Due today**
+- T-12 Task rows show no "Today" label; a task due at a time shows only the time.
+- T-13 Swipe right on a task completes it; VoiceOver actions "Complete" and the default action (open) work; tapping
+  the circle completes, tapping the text opens the detail.
+- T-14 "1 overdue task ›" is a plain row (icon and title in correction red on the white cell, no pale-red fill, at least
+  44 pt high); tapping it opens Tasks on Overdue. Dark mode and Increase Contrast stay legible.
+
+**Rest of today**
+- T-15 At 10:20 the list starts with the 10:55 lesson; the current lesson is not repeated. "Earlier today" is
+  collapsed and expands to the 8:00 and 8:55 lessons. Rows are "10:55  [badge] Biológia / 214"; tapping opens the
+  lesson detail sheet.
+- T-16 After school there is no Rest of today header; "Earlier today" holds the whole day, then a "Tomorrow" section.
+  On a Friday evening the header shows Monday's date instead.
+- T-17 AX-XXXL: rows stack (time above the name), the subject badge is hidden, nothing truncates.
+
+**Next exam**
+- T-18 The row shows the exam title first (headline), then "Tue, Oct 20 · in 7 days" in subheadline; it is never the
+  largest text on the screen (compare with the hero subject at AX-XXXL). Same row in all three profiles. Tapping
+  opens the exam detail. No exam more than 14 days ahead.
+
+### Not verifiable without a device
+`navigationSubtitle` rendering under the large title, the List row highlight on lesson and exam buttons, the
+DisclosureGroup animation with Reduce Motion, how the hero's `ProgressView` tint resolves in Increase Contrast, the
+swipe action colour, and whether VoiceOver reads "min" as "minutes" in every language.
+
 ## U5b Editors
 
 Routes: `editor.bell`, `editor.bell-period`, `editor.lesson`, `editor.lesson-new`, `editor.subject`, `editor.subjects`,

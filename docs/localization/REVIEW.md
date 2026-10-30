@@ -241,3 +241,13 @@ English only ("done" to "complete", the translations are unchanged and still cor
 (`tasks.segment.*.count`, `tasks.empty.{today,upcoming,overdue,completed}.*`, `tasks.quickAdd.title`,
 `tasks.quickAdd.due.nextLesson`, `tasks.editor.subtask.reorder`, `tasks.repeat.onDays`, `exams.action.markDone`,
 `exams.editor.hasStart`).
+
+### Phase 4U U3 Today (2026-10-30)
+11 new keys, model-authored for 11 languages (`sr-Latn` derived), all `needs_review`: `today.hero.until` (a time) and
+`today.hero.untilDate` (a date; separate keys because some languages use different prepositions, e.g. French
+"jusqu'à 10 h 45" / "jusqu'au ven. 30 oct."), `today.hero.lesson|lessonPlace` (one lesson on one line, " · "
+separators), `today.hero.bring`, `today.subtitle.withCycle`, `today.exam.when`, `today.tasks.overdueRow` (plural, a
+full row "1 overdue task" that opens Tasks › Overdue), `today.section.restOfToday|earlier|nextExam`. Removed:
+`today.tasks.overdue` (the chip) and `today.section.nextSchoolDay` (the header now shows the date).
+Reviewer: `today.section.earlier` labels a collapsed disclosure of the lessons that are already over; the hero's
+durations reuse `widget.duration.*` and `widget.countdown.*`.

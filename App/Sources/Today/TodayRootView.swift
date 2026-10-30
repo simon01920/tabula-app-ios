@@ -1,16 +1,23 @@
-// The Today tab (route `today`): the Now & Next header with a live countdown (always first), then — Phase 3 C1 — the
-// "Due today" tasks (complete inline; an "N overdue" chip opens the Tasks tab on Overdue) and the next exam when it is
-// at most 14 days away, then today's lessons as tiles with status and task / exam badges and break separators, and —
-// once today has nothing left (evening, weekend, holiday, cancelled day) — the next school day's lessons.
-// State comes from `TodayState` and `TodayWork` (TimetableUI, Linux-tested); this view re-builds them once a minute
-// with a TimelineView (countdowns tick on their own via `Text(timerInterval:)`), or once with a fixed clock in
-// screenshot mode (`model.isClockFixed`: countdowns paused at `model.now`).
-// Taps open sheets in place (Today stays selected): a lesson → `LessonDetailView`, a task → `TaskDetailView` (what
-// the `tasks.detail` route shows), the exam card → `ExamDetailSheet` (what `exams.detail` shows).
+// The Today tab (route `today`; Phase 4U U3, Opus review R1 "one job, one order, every profile", Astra §4 "Today
+// content order"). One inset-grouped List, in the same order for every school type (the content inside adapts through
+// the timetable's field visibility: bring lists for elementary, buildings for university):
+//   1. Hero (`TodayHeroView`): before school / break / lesson / after school / day off.
+//   2. Due today: open tasks due today (no repeated "Today" label, M10; swipe or VoiceOver action to complete) and a
+//      plain "1 overdue task ›" row that opens Tasks › Overdue (F15 / H3.6).
+//   3. Rest of today: compact rows of the lessons still to come (the current lesson is in the hero, never repeated,
+//      H3.2 / F14), then a collapsed "Earlier today" disclosure with the lessons that are over. Once today has nothing
+//      left: the next school day's lessons ("Tomorrow" or its date).
+//   4. Next exam (at most 14 days ahead): title first, then "Thu, Oct 22 · in 9 days" in subheadline, never the largest
+//      text on screen, the same row in every profile (H3.1 / H3.4 / F16).
+// The date and rotation week are the iOS 26 navigation subtitle ("Tue, Oct 13 · Week B", L2), so there is no date
+// header. State comes from `TodayState`, `TodayWork` and `TodayHeroText` (TimetableUI, Linux-tested); the view rebuilds
+// them once a minute with a TimelineView, or once with a fixed clock (screenshot mode, or a `today.*` state route).
+// Taps open sheets in place (Today stays selected): a lesson → `LessonDetailView`, a task → `TaskDetailView`, the exam
+// → `ExamDetailSheet`.
 // Keep the type name `TodayRootView` and its no-argument init: the app shell uses it.
-// APIs: NavigationStack, ScrollView, LazyVStack, TimelineView(.everyMinute) (iOS 15), sheet(item:),
-//       ContentUnavailableView (iOS 17), ViewThatFits(in:) (iOS 16), accessibilityAddTraits(.isHeader / .isButton),
-//       accessibilityAction(named:_:), accessibilityHint(_:), buttonBorderShape(.capsule), controlSize(.large).
+// APIs: NavigationStack, navigationSubtitle(_:) (iOS 26, as in TimetableRootView), List, Section(content:header:),
+//       listStyle(.insetGrouped), DisclosureGroup(isExpanded:content:label:), swipeActions(edge:allowsFullSwipe:),
+//       TimelineView(.everyMinute), sheet(item:), ContentUnavailableView (iOS 17), accessibilityAction(named:_:).
 import SwiftUI
 import TimetableCore
 import TimetableUI
@@ -31,6 +38,8 @@ private enum TodaySheet: Identifiable {
 }
 
 struct TodayRootView: View {
+    /// A fixed "now" for the DEBUG state routes (`today.before-school`, …); `nil` = the app's clock.
+    var fixedNow: Date?
     @Environment(AppModel.self) private var model
     @Environment(AppNavigation.self) private var navigation
     @State private var sheet: TodaySheet?
@@ -54,11 +63,11 @@ struct TodayRootView: View {
     private var content: some View {
         if let timetable = model.activeTimetable, let resolver = model.resolver(for: timetable.id),
            let database = model.database {
-            if model.isClockFixed {
-                todayContent(timetable: timetable, resolver: resolver, database: database)
+            if model.isClockFixed || fixedNow != nil {
+                todayContent(timetable: timetable, resolver: resolver, database: database, now: fixedNow ?? model.now)
             } else {
                 TimelineView(.everyMinute) { _ in
-                    todayContent(timetable: timetable, resolver: resolver, database: database)
+                    todayContent(timetable: timetable, resolver: resolver, database: database, now: model.now)
                 }
             }
         } else {
@@ -72,19 +81,22 @@ struct TodayRootView: View {
         }
     }
 
-    private func todayContent(timetable: Timetable, resolver: ScheduleResolver, database: TabulaDatabase) -> some View {
-        let state = TodayState.make(now: model.now, resolver: resolver, database: database)
-        let work = TodayWork.make(database: database, now: model.calendarContext.local(from: model.now),
+    private func todayContent(timetable: Timetable, resolver: ScheduleResolver, database: TabulaDatabase,
+                              now: Date) -> some View {
+        let state = TodayState.make(now: now, resolver: resolver, database: database)
+        let work = TodayWork.make(database: database, now: model.calendarContext.local(from: now),
                                   context: model.calendarContext)
         let dates = [state.date] + [state.upcomingDay?.date, state.header.next?.date].compactMap { $0 }
-        return TodayContent(state: state, work: work, timetable: timetable,
+        let subtitle = TodayHeroText(renderer: model.renderer, visibility: timetable.fieldVisibility).subtitle(state)
+        return TodayContent(state: state, work: work, timetable: timetable, now: now,
                             hasLessons: hasLessons(database, timetable),
                             actions: TodayActions(openLesson: { sheet = .lesson(LessonDetailTarget($0)) },
                                                   openTask: { sheet = .task($0) },
-                                                  completeTask: complete,
+                                                  completeTask: { model.apply(.completeTask($0, at: now)) },
                                                   openExam: { sheet = .exam($0) },
                                                   showOverdue: { navigation.showTasks(.overdue) }))
             .environment(\.lessonWork, LessonWorkSupport.index(dates: dates, resolver: resolver, database: database))
+            .navigationSubtitle(Text(verbatim: subtitle))
     }
 
     private func hasLessons(_ database: TabulaDatabase, _ timetable: Timetable) -> Bool {
@@ -94,10 +106,6 @@ struct TodayRootView: View {
                       case .addLesson = override.change else { return false }
                 return true
             }
-    }
-
-    private func complete(_ id: TaskItem.ID) {
-        model.apply(.completeTask(id, at: model.now))
     }
 }
 
@@ -110,14 +118,16 @@ private struct TodayActions {
     let showOverdue: () -> Void
 }
 
-/// The scrolling content of Today.
+/// The list of Today.
 private struct TodayContent: View {
     let state: TodayState
     let work: TodayWork
     let timetable: Timetable
+    let now: Date
     let hasLessons: Bool
     let actions: TodayActions
     @Environment(AppModel.self) private var model
+    @State private var showsEarlier = false
 
     var body: some View {
         if !hasLessons && !work.showsTasks && work.nextExam == nil {
@@ -129,146 +139,195 @@ private struct TodayContent: View {
                 EmptyView()
             }
         } else {
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 10) {
-                    if hasLessons {
-                        NowNextHeaderView(header: state.header, today: state.date, visibility: timetable.fieldVisibility,
-                                          reasons: state.reasonsByOccurrence)
-                            .padding(.bottom, 8)
-                    }
-                    if work.showsTasks {
-                        DueTodaySection(work: work, actions: actions)
-                            .padding(.bottom, 8)
-                    }
-                    if let exam = work.nextExam {
-                        NextExamCard(row: exam, onOpen: actions.openExam)
-                            .padding(.bottom, 8)
-                    }
-                    if !state.items.isEmpty {
-                        SectionTitle(text: model.formatter.date(state.date, style: .full))
-                        TimelineItemsView(items: state.items, visibility: timetable.fieldVisibility,
-                                          density: timetable.density, onOpen: actions.openLesson)
-                    }
-                    if let next = state.upcomingDay, !state.upcomingItems.isEmpty {
-                        SectionTitle(text: nextDayTitle(next.date), caption: model.formatter.date(next.date, style: .full))
-                            .padding(.top, 12)
-                        TimelineItemsView(items: state.upcomingItems, visibility: timetable.fieldVisibility,
-                                          density: timetable.density, onOpen: actions.openLesson)
+            List {
+                if hasLessons {
+                    Section {
+                        TodayHeroView(state: state, now: now, visibility: timetable.fieldVisibility)
                     }
                 }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 24)
+                if work.showsTasks {
+                    DueTodaySection(work: work, now: now, actions: actions)
+                }
+                lessonSections
+                if let exam = work.nextExam {
+                    Section {
+                        Button { actions.openExam(exam.id) } label: { TodayExamRow(row: exam) }
+                    } header: {
+                        Text("today.section.nextExam")
+                    }
+                }
+            }
+            .listStyle(.insetGrouped)
+        }
+    }
+
+    @ViewBuilder
+    private var lessonSections: some View {
+        let remaining = state.remainingItems
+        let earlier = state.earlierItems
+        if !remaining.isEmpty || !earlier.isEmpty {
+            Section {
+                ForEach(remaining) { lessonRow($0) }
+                if !earlier.isEmpty {
+                    DisclosureGroup(isExpanded: $showsEarlier) {
+                        ForEach(earlier) { lessonRow($0) }
+                    } label: {
+                        Text("today.section.earlier")
+                    }
+                }
+            } header: {
+                if !remaining.isEmpty { Text("today.section.restOfToday") }
+            }
+        }
+        if let day = state.upcomingDay, !state.upcomingItems.isEmpty {
+            Section {
+                ForEach(state.upcomingItems) { lessonRow($0) }
+            } header: {
+                Text(verbatim: day.date == state.date.adding(days: 1)
+                     ? model.renderer.string(forKey: "today.section.tomorrow")
+                     : model.formatter.contextualDate(day.date, today: state.date))
             }
         }
     }
 
-    private func nextDayTitle(_ date: LocalDate) -> String {
-        date == state.date.adding(days: 1)
-            ? model.renderer.string(forKey: "today.section.tomorrow")
-            : model.renderer.string(forKey: "today.section.nextSchoolDay")
+    @ViewBuilder
+    private func lessonRow(_ item: TodayItem) -> some View {
+        if case let .lesson(lesson, reasons, _) = item {
+            Button { actions.openLesson(lesson) } label: {
+                TodayLessonRow(lesson: lesson, reasons: reasons, visibility: timetable.fieldVisibility)
+            }
+            .accessibilityHint(Text("timetable.a11y.openHint"))
+        }
     }
 }
 
-/// "Due today": the open tasks due today (rows as in the Tasks tab, completable inline) and the overdue chip.
+/// "Due today": the open tasks due today (completable by swipe or VoiceOver action) and the overdue row.
 private struct DueTodaySection: View {
     let work: TodayWork
+    let now: Date
     let actions: TodayActions
     @Environment(AppModel.self) private var model
 
     var body: some View {
-        let now = model.calendarContext.local(from: model.now)
+        let local = model.calendarContext.local(from: now)
         let subjects = Dictionary((model.database?.subjects ?? []).filter { !$0.isDeleted }.map { ($0.id, $0) },
                                   uniquingKeysWith: { first, _ in first })
-        VStack(alignment: .leading, spacing: 8) {
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .center, spacing: 12) {
-                    SectionTitle(text: model.renderer.string(forKey: "today.section.dueToday"))
-                    Spacer(minLength: 0)
-                    overdueChip
-                }
-                VStack(alignment: .leading, spacing: 6) {
-                    SectionTitle(text: model.renderer.string(forKey: "today.section.dueToday"))
-                    overdueChip
-                }
-            }
-            if !work.dueToday.isEmpty {
-                VStack(spacing: 0) {
-                    ForEach(Array(work.dueToday.enumerated()), id: \.element.id) { index, task in
-                        if index > 0 { Divider().padding(.leading, 48) }
-                        row(TaskRowModel(task: task, subjects: subjects, now: now))
+        Section {
+            ForEach(work.dueToday) { task in
+                let row = TaskRowModel(task: task, subjects: subjects, now: local)
+                TaskRowView(row: row, section: .today, onOpen: { actions.openTask(row.id) },
+                            onToggle: { actions.completeTask(row.id) })
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(Text(verbatim: row.accessibilityLabel(renderer: model.renderer)))
+                    .accessibilityAddTraits(.isButton)
+                    .accessibilityAction { actions.openTask(row.id) }
+                    .accessibilityAction(named: Text("tasks.action.complete")) { actions.completeTask(row.id) }
+                    .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                        Button { actions.completeTask(row.id) } label: {
+                            Label { Text("tasks.action.complete") } icon: { Image(systemName: "checkmark.circle") }
+                        }
+                        .tint(.green)
                     }
-                }
-                .padding(.horizontal, 8)
-                .background(RoundedRectangle(cornerRadius: 18, style: .continuous).fill(Color.secondary.opacity(0.12)))
             }
-        }
-    }
-
-    private func row(_ row: TaskRowModel) -> some View {
-        TaskRowView(row: row, onOpen: { actions.openTask(row.id) }, onToggle: { actions.completeTask(row.id) })
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel(Text(verbatim: row.accessibilityLabel(renderer: model.renderer)))
-            .accessibilityAddTraits(.isButton)
-            .accessibilityAction { actions.openTask(row.id) }
-            .accessibilityAction(named: Text("tasks.action.complete")) { actions.completeTask(row.id) }
-    }
-
-    @ViewBuilder
-    private var overdueChip: some View {
-        if work.overdueCount > 0 {
-            Button(action: actions.showOverdue) {
-                Label {
-                    Text(verbatim: model.renderer.format(key: "today.tasks.overdue",
-                                                         arguments: [.integer(Int64(work.overdueCount))]))
-                } icon: {
-                    Image(systemName: "exclamationmark.triangle.fill")
+            if work.overdueCount > 0 {
+                Button(action: actions.showOverdue) {
+                    HStack(spacing: 12) {
+                        // Correction red on the plain cell (no pale-red fill, Astra F04): icon and title only.
+                        Label {
+                            Text(verbatim: TodayHeroText(renderer: model.renderer, visibility: .all)
+                                .overdue(work.overdueCount))
+                        } icon: {
+                            Image(AppSymbol.overdue)
+                        }
+                        .foregroundStyle(Color.correction)
+                        Spacer(minLength: 0)
+                        Image(systemName: "chevron.right")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                            .accessibilityHidden(true)
+                    }
+                    .frame(minHeight: 44)
+                    .contentShape(Rectangle())
                 }
+                .accessibilityHint(Text("today.tasks.overdue.hint"))
             }
-            .buttonStyle(.bordered)
-            .buttonBorderShape(.capsule)
-            .controlSize(.large)
-            .tint(.red)
-            .accessibilityHint(Text("today.tasks.overdue.hint"))
+        } header: {
+            Text("today.section.dueToday")
         }
     }
 }
 
-/// The Exams tab's featured card for the next exam, as a button that opens its detail.
-private struct NextExamCard: View {
+/// One compact lesson row: "10:55  [badge] Biology / 214" (badge left out at accessibility sizes, the text stacks).
+private struct TodayLessonRow: View {
+    let lesson: ResolvedLesson
+    let reasons: [ModificationReason]
+    let visibility: FieldVisibility
+    @Environment(AppModel.self) private var model
+    @Environment(\.lessonWork) private var work
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @ScaledMetric(relativeTo: .body) private var timeWidth: CGFloat = 48
+
+    var body: some View {
+        let badges = work.badges(for: lesson.id)
+        let isStacked = AdaptiveLayout.isStacked(dynamicTypeSize)
+        AdaptiveStack(horizontalAlignment: .firstTextBaseline, spacing: 12) {
+            Text(verbatim: model.formatter.time(lesson.startTime))
+                .font(TypeScale.detail)
+                .timeStyle()
+                .frame(minWidth: isStacked ? nil : timeWidth, alignment: .leading)
+            HStack(alignment: .center, spacing: 10) {
+                if !isStacked { SubjectBadge(subject: lesson.subject, size: 28) }
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(verbatim: lesson.subject.name)
+                        .font(TypeScale.detail)
+                        .strikethrough(lesson.status == .cancelled)
+                        .fixedSize(horizontal: false, vertical: true)
+                    LessonFieldLinesView(lines: LessonFieldLines.make(lesson: lesson, visibility: visibility,
+                                                                      only: [.room, .building]),
+                                         font: .subheadline, quietIcons: true)
+                    if let badge = LessonStatusBadgeModel.make(status: lesson.status, reasons: reasons) {
+                        LessonStatusBadge(badge)
+                    }
+                    if let badges { LessonWorkBadgeRow(badges: badges) }
+                }
+            }
+        }
+        .foregroundStyle(.primary)
+        .opacity(lesson.status == .cancelled ? 0.6 : 1)
+        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+        .contentShape(Rectangle())
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(verbatim: LessonAccessibilityLabel.make(lesson: lesson, visibility: visibility,
+                                                                         reasons: reasons, badges: badges,
+                                                                         renderer: model.renderer)))
+    }
+}
+
+/// The next exam: title first (headline), then "Thu, Oct 22 · in 9 days" (subheadline). Never larger than the hero.
+private struct TodayExamRow: View {
     let row: ExamRow
-    let onOpen: (Exam.ID) -> Void
     @Environment(AppModel.self) private var model
 
     var body: some View {
         let visibility = model.database.map { ExamFacts.visibility(for: row.exam, in: $0) } ?? .all
-        Button { onOpen(row.id) } label: {
-            ExamFeaturedCard(row: row, facts: ExamFacts(exam: row.exam, visibility: visibility),
-                             texts: ExamTexts(renderer: model.renderer))
-                .contentShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-        }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(.isButton)
-    }
-}
-
-/// A section heading inside the scroll view.
-private struct SectionTitle: View {
-    let text: String
-    var caption: String?
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(verbatim: text)
-                .font(.title3.weight(.semibold))
-                .fixedSize(horizontal: false, vertical: true)
-            if let caption {
-                Text(verbatim: caption)
+        let texts = ExamTexts(renderer: model.renderer)
+        AdaptiveStack(horizontalAlignment: .center, spacing: 12) {
+            ExamBadge(subject: row.subject, size: 32)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(verbatim: row.exam.title)
+                    .font(TypeScale.rowTitle)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text(verbatim: TodayHeroText(renderer: model.renderer, visibility: .all).examWhen(row))
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
             }
         }
-        .padding(.top, 4)
-        .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(.isHeader)
+        .foregroundStyle(.primary)
+        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+        .contentShape(Rectangle())
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(verbatim: texts.accessibilityLabel(row, facts: ExamFacts(exam: row.exam,
+                                                                                            visibility: visibility))))
+        .accessibilityAddTraits(.isButton)
     }
 }

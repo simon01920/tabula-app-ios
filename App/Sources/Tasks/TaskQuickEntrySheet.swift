@@ -25,7 +25,7 @@ struct TaskQuickEntrySheet: View {
     var body: some View {
         Group {
             if let expanded {
-                TaskEditorBody(initial: expanded)
+                TaskEditorBody(initial: expanded, startsDirty: !expanded.title.isEmpty)
             } else if model.database != nil {
                 let initial = initialDraft()
                 EditorScaffold(

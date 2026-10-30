@@ -54,6 +54,7 @@ struct TaskEditorView: View {
 
 struct TaskEditorBody: View {
     let initial: TaskDraft
+    var startsDirty = false
     @Environment(AppModel.self) private var model
     /// Attachment presenters, store protection and in-flight copies for this editor (B3). While a copy runs, Save and
     /// swipe-to-dismiss are disabled so the attachment cannot be dropped.
@@ -75,6 +76,7 @@ struct TaskEditorBody: View {
                 }
             },
             isBusy: attachmentSession.importingCount > 0,
+            startsDirty: startsDirty,
             content: { draft in TaskFormContent(draft: draft) })
         .attachmentsHost(attachmentSession, initial: initial.attachments)
     }
