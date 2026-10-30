@@ -70,6 +70,8 @@ final class AppModel {
     /// Developer diagnostics (debug screen).
     private(set) var lastSaveOutcome: SaveOutcome?
     private(set) var lastMutationLabel: String?
+    /// What the one-time stranded-data migration did this launch (`nil` when it did not run; RISKS #47).
+    private(set) var strandedMigration: StrandedStoreMigration.Outcome?
 
     // MARK: Derived state (rebuilt on every change of data, settings, time zone or locale)
 
@@ -146,6 +148,10 @@ final class AppModel {
     }
 
     private func performLoad() async {
+        if let stranded = environment.strandedStore {
+            strandedMigration = await StrandedStoreMigration.run(fallbackDirectory: stranded.fallback,
+                                                                 groupDirectory: stranded.group, now: now)
+        }
         let outcome = await environment.persistence.load()
         switch outcome {
         case let .loaded(database, banners, isReadOnly):

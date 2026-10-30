@@ -34,6 +34,11 @@ struct SettingsRootView: View {
                 generalSection
                 proSection
                 Section {
+                    NavigationLink { SettingsBackupView() } label: {
+                        SettingsRowLabel("settings.backup.title", symbol: "externaldrive.fill", color: .green)
+                    }
+                }
+                Section {
                     NavigationLink { SettingsAboutView() } label: {
                         SettingsRowLabel("settings.aboutfeedback.title", symbol: "info.circle.fill", color: .gray)
                     }

@@ -67,6 +67,7 @@ SCREENS = {
     "settings.reminder-rule": ("7 Settings", "Reminder kind page", "Remind me switch, times, follow-up, delivery (Standard / Loud alarm; Time Sensitive only where supported), quiet hours."),
     "settings.reminder-health": ("7 Settings", "Reminder check", "Summary of user-fixable problems, checks with Open Settings buttons, collapsed Technical details, test buttons."),
     "settings.live-activities": ("7 Settings", "Live Activities", "Lesson / exam-day Live Activity switches, Start automatically."),
+    "settings.backup": ("7 Settings", "Backup", "Export Backup (share sheet), Restore from Backup… (Merge / Replace with confirmation), automatic copies; footer: attachments not included."),
     "reminders.permission": ("7 Settings", "Notification permission explainer", "Shown in context before iOS asks for notification permission."),
     "widgets.gallery": ("8 Widgets & Live Activities", "Now & Next widget", "DEBUG gallery: Home Screen small/medium + Lock Screen families (during a lesson, in a break)."),
     "widgets.gallery-evening": ("8 Widgets & Live Activities", "Now & Next — evening/holiday", "After school and holiday states."),

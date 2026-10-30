@@ -292,3 +292,8 @@ uses the "label: N" form in sk, cs, pl, uk and sr to avoid number agreement; "Cu
 2 new keys, model-authored for 11 languages (`sr-Latn` derived), all `needs_review`: `watch.open.title` ("Open Tabula
 on your iPhone", the Apple Watch empty state; titles follow `widget.open.title`: infinitive, "aplikáciu Tabula") and
 `watch.open.noSnapshot` (the line under it before the iPhone has sent the timetable).
+### Phase 6 S2 additions (2026-10-30)
+24 new `settings.backup.*` keys (Settings › Backup: export, restore modes, Replace confirmation, plain-word errors),
+model-authored for 11 languages (`sr-Latn` derived), all `needs_review`. Check: the path "Settings › Backup › Automatic
+copies" in `settings.backup.replace.message` must use the translated tab name, `settings.backup.title` and
+`settings.backup.automatic.header`; "Merge" / "Replace" in `settings.backup.mode.message` must match the button names.
