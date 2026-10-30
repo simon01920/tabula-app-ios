@@ -30,6 +30,10 @@ struct ReminderOverrideSection: View {
 
     private var custom: ReminderOverride { override ?? ReminderOverride() }
 
+    private var timeSensitiveAvailable: Bool {
+        TimeSensitiveAvailability.isAvailable(reminders.health?.notifications.timeSensitive)
+    }
+
     var body: some View {
         Section {
             Toggle(isOn: Binding(get: { override == nil }, set: { useDefault in
@@ -69,9 +73,12 @@ struct ReminderOverrideSection: View {
                 ReminderOffsetsRows(offsets: Binding(get: { value.offsets ?? [] },
                                                       set: { newValue in update { $0.offsets = newValue } }))
             }
-            Picker(selection: Binding(get: { value.tier.map(ReminderTierInfo.displayed) }, set: { setTier($0) })) {
+            // U2-12 / D7: Time Sensitive is offered only where the build has it (U5a's detection); a stored one shows as
+            // Standard there and is not rewritten until the user picks something.
+            Picker(selection: Binding(get: { value.tier.map { TimeSensitiveAvailability.displayedTier($0, timeSensitiveAvailable: timeSensitiveAvailable) } },
+                                      set: { setTier($0) })) {
                 Text("reminders.override.tier.inherit").tag(DeliveryTier?.none)
-                ForEach(ReminderTierInfo.choices, id: \.self) { tier in
+                ForEach(TimeSensitiveAvailability.offeredTiers(timeSensitiveAvailable: timeSensitiveAvailable), id: \.self) { tier in
                     Text(LocalizedStringKey(ReminderTierInfo.titleKey(tier))).tag(Optional(tier))
                 }
             } label: {

@@ -41,6 +41,8 @@ struct ExamsRootView: View {
     /// `nil` = not chosen by the user yet → `initialSegment` (no `State(initialValue:)` in initialisers).
     @State private var chosenSegment: ExamSegment?
     @State private var editor: ExamEditorTarget?
+    /// The pushed details (the featured card pushes by appending its id; rows use value links).
+    @State private var path: [Exam.ID] = []
 
     init(initialSegment: ExamSegment = .upcoming) {
         self.initialSegment = initialSegment
@@ -56,7 +58,7 @@ struct ExamsRootView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             content
                 .navigationTitle(Text("exams.title"))
                 .toolbar {
@@ -114,12 +116,18 @@ struct ExamsRootView: View {
         let texts = ExamTexts(renderer: model.renderer)
         if let next = list.next {
             Section {
-                NavigationLink(value: next.id) {
+                // M24: the whole card is the control, with the chevron inside it. A List's own NavigationLink would put
+                // its disclosure chevron outside the card, so the card is a button that pushes the detail.
+                Button { path.append(next.id) } label: {
                     ExamFeaturedCard(row: next, facts: facts(for: next.exam), texts: texts)
                 }
+                .buttonStyle(.plain)
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
+                .accessibilityAddTraits(.isLink)
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) { doneAction(next) }
+            } header: {
+                Text("exams.next.title")
             }
             ForEach(list.periods) { period in
                 Section {
@@ -156,9 +164,11 @@ struct ExamsRootView: View {
 
     private func doneAction(_ row: ExamRow) -> some View {
         Button { ExamActions.markDone(row.id, model: model) } label: {
-            Label { Text("exams.action.markDone") } icon: { Image(systemName: "checkmark") }
+            Label { Text(LocalizedStringKey(ExamActions.completion(of: row.exam, model: model).l10nKey)) } icon: {
+                Image(AppSymbol.completed)
+            }
         }
-        .tint(.green)
+        .tint(Color.ink)
     }
 
     // MARK: History
@@ -186,7 +196,7 @@ struct ExamsRootView: View {
                             Button { ExamActions.reopen(row.id, model: model) } label: {
                                 Label { Text("exams.action.markNotDone") } icon: { Image(systemName: "arrow.uturn.backward") }
                             }
-                            .tint(.orange)
+                            .tint(Color.secondary)
                         } else {
                             doneAction(row)
                         }

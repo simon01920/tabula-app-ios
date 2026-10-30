@@ -227,3 +227,17 @@ plural sentences appended to the confirmation message.
 (the first sentence of `sample.remove.message` without "Everything you created yourself stays"; shown when the user
 added or edited something in the sample) and `sample.remove.changedByUser` (plural: "Your changes to %lld sample
 entries are removed too.").
+
+### Phase 4U Stage U2 additions (2026-10-30, swiftui-engineer-sonnet)
+36 new keys, model-authored for 11 languages (`sr-Latn` derived), all `needs_review`; 11 of them reuse the reviewed wording
+of an existing key (Overdue, Today, Tomorrow, This week, Later, Completed, Type, Undo, More details, Lesson, When).
+Tasks: `tasks.section.*` (list headers, sentence case; `count` is the VoiceOver value, plural), `tasks.completed.show|hide`,
+`tasks.filter.type|type.all|showCompleted`, `tasks.empty.allDone.*`, `tasks.toast.*`, `tasks.quick.*` (quick-entry sheet),
+`tasks.kind.*.hint` (one line per task type), `tasks.repeat.summary.weeklyOn|everyWeeksOn` (the repeat rule on one line;
+the weekday list follows a colon in every language except English "on" and Japanese, so no case ending is needed).
+Exams: `exams.action.takenIt|moveToHistory|more`, `exams.editor.when*`, `exams.editor.moreDetails`.
+Reviewer: `exams.action.takenIt` avoids the grammatical gender of the speaker in sk, cs, pl, uk. `a11y.task.subtasks` changed in
+English only ("done" to "complete", the translations are unchanged and still correct). 18 dead keys removed
+(`tasks.segment.*.count`, `tasks.empty.{today,upcoming,overdue,completed}.*`, `tasks.quickAdd.title`,
+`tasks.quickAdd.due.nextLesson`, `tasks.editor.subtask.reorder`, `tasks.repeat.onDays`, `exams.action.markDone`,
+`exams.editor.hasStart`).
