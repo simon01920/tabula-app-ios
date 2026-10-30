@@ -272,7 +272,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "cancelled"
+            "value" : "canceled"
           }
         },
         "fr" : {
@@ -15392,7 +15392,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancelled: %@"
+            "value" : "Canceled: %@"
           }
         },
         "fr" : {
@@ -17744,7 +17744,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No lessons take place on this date, so lessons can't be cancelled or changed."
+            "value" : "No lessons take place on this date, so lessons can't be canceled or changed."
           }
         },
         "fr" : {
@@ -21431,25 +21431,25 @@
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Ztratí předmět: %lld domácí úkoly a zkoušky"
+                  "value" : "Ztratí předmět: %lld úkoly a zkoušky"
                 }
               },
               "many" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Ztratí předmět: %lld domácího úkolu a zkoušky"
+                  "value" : "Ztratí předmět: %lld úkolu a zkoušky"
                 }
               },
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Ztratí předmět: %lld domácí úkol nebo zkouška"
+                  "value" : "Ztratí předmět: %lld úkol nebo zkouška"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Ztratí předmět: %lld domácích úkolů a zkoušek"
+                  "value" : "Ztratí předmět: %lld úkolů a zkoušek"
                 }
               }
             }
@@ -21461,13 +21461,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Verliert sein Fach: %lld Hausaufgabe oder Prüfung"
+                  "value" : "%lld Aufgabe oder Prüfung verliert ihr Fach"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Verlieren ihr Fach: %lld Hausaufgaben und Prüfungen"
+                  "value" : "%lld Aufgaben und Prüfungen verlieren ihr Fach"
                 }
               }
             }
@@ -21479,13 +21479,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%lld homework or exam will lose its subject"
+                  "value" : "%lld task or exam will lose its subject"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%lld homework items and exams will lose their subject"
+                  "value" : "%lld tasks and exams will lose their subject"
                 }
               }
             }
@@ -21497,13 +21497,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Perd sa matière : %lld devoir ou examen"
+                  "value" : "%lld tâche ou examen perdra sa matière"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Perdent leur matière : %lld devoirs et examens"
+                  "value" : "%lld tâches et examens perdront leur matière"
                 }
               }
             }
@@ -21515,13 +21515,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Elveszíti a tantárgyát: %lld házi feladat vagy vizsga"
+                  "value" : "Elveszíti a tantárgyát: %lld feladat vagy vizsga"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Elveszítik a tantárgyukat: %lld házi feladat és vizsga"
+                  "value" : "Elveszítik a tantárgyukat: %lld feladat és vizsga"
                 }
               }
             }
@@ -21533,7 +21533,7 @@
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "科目との関連付けが外れる宿題・試験: %lld件"
+                  "value" : "科目の関連付けが外れるタスクと試験: %lld件"
                 }
               }
             }
@@ -21545,25 +21545,25 @@
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Stracą przedmiot: %lld prace domowe i egzaminy"
+                  "value" : "Stracą przedmiot: %lld zadania i egzaminy"
                 }
               },
               "many" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Stracą przedmiot: %lld prac domowych i egzaminów"
+                  "value" : "Straci przedmiot: %lld zadań i egzaminów"
                 }
               },
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Straci przedmiot: %lld praca domowa lub egzamin"
+                  "value" : "Straci przedmiot: %lld zadanie lub egzamin"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Stracą przedmiot: %lld pracy domowej i egzaminu"
+                  "value" : "Straci przedmiot: %lld zadania i egzaminu"
                 }
               }
             }
@@ -21575,19 +21575,19 @@
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Își pierd materia: %lld teme și examene"
+                  "value" : "%lld sarcini și examene își vor pierde materia"
                 }
               },
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Își pierde materia: %lld temă sau examen"
+                  "value" : "%lld sarcină sau examen își va pierde materia"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Își pierd materia: %lld de teme și examene"
+                  "value" : "%lld de sarcini și examene își vor pierde materia"
                 }
               }
             }
@@ -21599,25 +21599,25 @@
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Stratia predmet: %lld domáce úlohy a skúšky"
+                  "value" : "Stratia predmet: %lld úlohy a skúšky"
                 }
               },
               "many" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Stratia predmet: %lld domácej úlohy a skúšky"
+                  "value" : "Stratí predmet: %lld úlohy a skúšky"
                 }
               },
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Stratí predmet: %lld domáca úloha alebo skúška"
+                  "value" : "Stratí predmet: %lld úloha alebo skúška"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Stratí predmet: %lld domácich úloh a skúšok"
+                  "value" : "Stratí predmet: %lld úloh a skúšok"
                 }
               }
             }
@@ -21629,19 +21629,19 @@
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Губе предмет: %lld домаћа задатка и испита"
+                  "value" : "Губе предмет: %lld задатка и испита"
                 }
               },
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Губи предмет: %lld домаћи задатак или испит"
+                  "value" : "Губи предмет: %lld задатак или испит"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Губи предмет: %lld домаћих задатака и испита"
+                  "value" : "Губи предмет: %lld задатака и испита"
                 }
               }
             }
@@ -21653,19 +21653,19 @@
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Gube predmet: %lld domaća zadatka i ispita"
+                  "value" : "Gube predmet: %lld zadatka i ispita"
                 }
               },
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Gubi predmet: %lld domaći zadatak ili ispit"
+                  "value" : "Gubi predmet: %lld zadatak ili ispit"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Gubi predmet: %lld domaćih zadataka i ispita"
+                  "value" : "Gubi predmet: %lld zadataka i ispita"
                 }
               }
             }
@@ -21677,25 +21677,25 @@
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Втратять предмет: %lld домашні завдання та іспити"
+                  "value" : "Втратять предмет: %lld завдання та іспити"
                 }
               },
               "many" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Втратять предмет: %lld домашніх завдань та іспитів"
+                  "value" : "Втратять предмет: %lld завдань та іспитів"
                 }
               },
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Втратить предмет: %lld домашнє завдання чи іспит"
+                  "value" : "Втратить предмет: %lld завдання або іспит"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Втратять предмет: %lld домашнього завдання та іспиту"
+                  "value" : "Втратять предмет: %lld завдання та іспиту"
                 }
               }
             }
@@ -21707,7 +21707,7 @@
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "将失去科目的作业和考试：%lld项"
+                  "value" : "将失去科目的任务和考试：%lld项"
                 }
               }
             }
@@ -21725,25 +21725,25 @@
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Zůstanou bez propojení: %lld domácí úkoly"
+                  "value" : "Zůstanou bez propojení: %lld úkoly"
                 }
               },
               "many" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Zůstanou bez propojení: %lld domácího úkolu"
+                  "value" : "Zůstane bez propojení: %lld úkolu"
                 }
               },
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Zůstane bez propojení: %lld domácí úkol"
+                  "value" : "Zůstane bez propojení: %lld úkol"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Zůstane bez propojení: %lld domácích úkolů"
+                  "value" : "Zůstane bez propojení: %lld úkolů"
                 }
               }
             }
@@ -21755,13 +21755,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Bleibt erhalten, aber ohne Verknüpfung: %lld Hausaufgabe"
+                  "value" : "Bleibt erhalten, aber ohne Verknüpfung: %lld Aufgabe"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Bleiben erhalten, aber ohne Verknüpfung: %lld Hausaufgaben"
+                  "value" : "Bleiben erhalten, aber ohne Verknüpfung: %lld Aufgaben"
                 }
               }
             }
@@ -21773,13 +21773,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%lld homework item will be kept but unlinked"
+                  "value" : "%lld task will be kept but unlinked"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%lld homework items will be kept but unlinked"
+                  "value" : "%lld tasks will be kept but unlinked"
                 }
               }
             }
@@ -21791,13 +21791,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Conservé mais sans lien : %lld devoir"
+                  "value" : "Conservée mais sans lien : %lld tâche"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Conservés mais sans lien : %lld devoirs"
+                  "value" : "Conservées mais sans lien : %lld tâches"
                 }
               }
             }
@@ -21809,13 +21809,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Megmarad, de megszűnik a kapcsolata: %lld házi feladat"
+                  "value" : "Megmarad, de megszűnik a kapcsolata: %lld feladat"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Megmarad, de megszűnik a kapcsolata: %lld házi feladat"
+                  "value" : "Megmarad, de megszűnik a kapcsolata: %lld feladat"
                 }
               }
             }
@@ -21827,7 +21827,7 @@
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "残るが関連付けが外れる宿題: %lld件"
+                  "value" : "残るが関連付けが外れるタスク: %lld件"
                 }
               }
             }
@@ -21839,25 +21839,25 @@
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Zostaną bez powiązania: %lld prace domowe"
+                  "value" : "Zostaną bez powiązania: %lld zadania"
                 }
               },
               "many" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Zostanie bez powiązania: %lld prac domowych"
+                  "value" : "Zostanie bez powiązania: %lld zadań"
                 }
               },
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Zostanie bez powiązania: %lld praca domowa"
+                  "value" : "Zostanie bez powiązania: %lld zadanie"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Zostanie bez powiązania: %lld pracy domowej"
+                  "value" : "Zostanie bez powiązania: %lld zadania"
                 }
               }
             }
@@ -21869,19 +21869,19 @@
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Se păstrează, dar fără legătură: %lld teme"
+                  "value" : "Se păstrează, dar fără legătură: %lld sarcini"
                 }
               },
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Se păstrează, dar fără legătură: %lld temă"
+                  "value" : "Se păstrează, dar fără legătură: %lld sarcină"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Se păstrează, dar fără legătură: %lld de teme"
+                  "value" : "Se păstrează, dar fără legătură: %lld de sarcini"
                 }
               }
             }
@@ -21893,25 +21893,25 @@
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Zostanú bez prepojenia: %lld domáce úlohy"
+                  "value" : "Zostanú bez prepojenia: %lld úlohy"
                 }
               },
               "many" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Zostanú bez prepojenia: %lld domácej úlohy"
+                  "value" : "Zostane bez prepojenia: %lld úlohy"
                 }
               },
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Zostane bez prepojenia: %lld domáca úloha"
+                  "value" : "Zostane bez prepojenia: %lld úloha"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Zostane bez prepojenia: %lld domácich úloh"
+                  "value" : "Zostane bez prepojenia: %lld úloh"
                 }
               }
             }
@@ -21923,19 +21923,19 @@
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Остају без везе: %lld домаћа задатка"
+                  "value" : "Остају без везе: %lld задатка"
                 }
               },
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Остаје без везе: %lld домаћи задатак"
+                  "value" : "Остаје без везе: %lld задатак"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Остаје без везе: %lld домаћих задатака"
+                  "value" : "Остаје без везе: %lld задатака"
                 }
               }
             }
@@ -21947,19 +21947,19 @@
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Ostaju bez veze: %lld domaća zadatka"
+                  "value" : "Ostaju bez veze: %lld zadatka"
                 }
               },
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Ostaje bez veze: %lld domaći zadatak"
+                  "value" : "Ostaje bez veze: %lld zadatak"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Ostaje bez veze: %lld domaćih zadataka"
+                  "value" : "Ostaje bez veze: %lld zadataka"
                 }
               }
             }
@@ -21971,25 +21971,25 @@
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Залишаться без зв’язку: %lld домашні завдання"
+                  "value" : "Залишаться без зв’язку: %lld завдання"
                 }
               },
               "many" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Залишаться без зв’язку: %lld домашніх завдань"
+                  "value" : "Залишаться без зв’язку: %lld завдань"
                 }
               },
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Залишиться без зв’язку: %lld домашнє завдання"
+                  "value" : "Залишиться без зв’язку: %lld завдання"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "Залишаться без зв’язку: %lld домашнього завдання"
+                  "value" : "Залишаться без зв’язку: %lld завдання"
                 }
               }
             }
@@ -22001,7 +22001,7 @@
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "将保留但解除关联的作业：%lld项"
+                  "value" : "将保留但解除关联的任务：%lld项"
                 }
               }
             }
@@ -23276,79 +23276,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Hodina zmizí ze všech dnů. Domácí úkoly k ní zůstanou zachovány."
+            "value" : "Hodina zmizí ze všech dnů. Úkoly, které jsou s ní propojené, zůstanou."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Die Stunde verschwindet von allen Tagen. Verknüpfte Hausaufgaben bleiben erhalten."
+            "value" : "Die Stunde verschwindet an allen Tagen. Damit verknüpfte Aufgaben bleiben erhalten."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The lesson disappears from every day. Homework linked to it is kept."
+            "value" : "The lesson disappears from every day. Tasks linked to it are kept."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Le cours disparaît de tous les jours. Les devoirs liés sont conservés."
+            "value" : "Le cours disparaît de tous les jours. Les tâches qui y sont liées sont conservées."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Az óra minden napról eltűnik. A hozzá kapcsolt házi feladatok megmaradnak."
+            "value" : "Az óra minden napról eltűnik. A hozzá kapcsolt feladatok megmaradnak."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "授業はすべての日から消えます。関連する宿題は残ります。"
+            "value" : "この授業はすべての日から削除されます。関連付けられたタスクは残ります。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Lekcja zniknie ze wszystkich dni. Powiązane prace domowe zostaną zachowane."
+            "value" : "Lekcja zniknie ze wszystkich dni. Powiązane z nią zadania zostaną zachowane."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ora dispare din toate zilele. Temele legate de ea se păstrează."
+            "value" : "Ora dispare din toate zilele. Sarcinile legate de ea se păstrează."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Hodina zmizne zo všetkých dní. Domáce úlohy k nej zostanú zachované."
+            "value" : "Hodina zmizne zo všetkých dní. Úlohy, ktoré sú s ňou prepojené, zostanú."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Час нестаје са свих дана. Повезани домаћи задаци се задржавају."
+            "value" : "Час нестаје из свих дана. Задаци повезани с њим остају."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Čas nestaje sa svih dana. Povezani domaći zadaci se zadržavaju."
+            "value" : "Čas nestaje iz svih dana. Zadaci povezani s njim ostaju."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Урок зникне з усіх днів. Пов’язані домашні завдання збережуться."
+            "value" : "Урок зникне з усіх днів. Пов’язані з ним завдання збережуться."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "这节课会从所有日期中消失。与之关联的作业会保留。"
+            "value" : "这节课将从所有日期中移除。与其关联的任务会保留。"
           }
         }
       }
@@ -26300,79 +26300,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Střídavé týdny použijte pro A/B nebo liché/sudé týdny a cyklus dnů pro školy, které své dny číslují."
+            "value" : "Cyklus týdnů použijte pro týden A / týden B nebo liché/sudé týdny a cyklus dnů pro školy, které dny číslují."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Verwende wechselnde Wochen für A/B- oder ungerade/gerade Wochen und einen Tageszyklus für Schulen, die ihre Tage nummerieren."
+            "value" : "Nutze einen Wochenzyklus für Woche A / Woche B oder ungerade/gerade Wochen und einen Tageszyklus für Schulen, die ihre Tage nummerieren."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use alternating weeks for A/B or odd/even weeks, and a day cycle for schools that number their days."
+            "value" : "Use a week cycle for Week A / Week B or odd/even weeks, and a day cycle for schools that number their days."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Utilisez des semaines alternées pour des semaines A/B ou impaires/paires, et un cycle de jours pour les établissements qui numérotent leurs jours."
+            "value" : "Utilisez un cycle de semaines pour semaine A / semaine B ou les semaines impaires/paires, et un cycle de jours pour les établissements qui numérotent leurs jours."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "A váltakozó heteket A/B vagy páratlan/páros hetekhez használd, a napciklust pedig azoknál az iskoláknál, amelyek számozzák a napjaikat."
+            "value" : "A hétciklust használd az A/B hetekhez vagy a páratlan/páros hetekhez, a napciklust pedig olyan iskoláknál, ahol a napokat számozzák."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "A/B週や奇数/偶数週には週の交替を、日に番号を付ける学校には日のサイクルを使います。"
+            "value" : "A週/B週や奇数週/偶数週には週のサイクルを、日に番号を付ける学校には日のサイクルを使います。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Użyj naprzemiennych tygodni dla A/B lub tygodni nieparzystych/parzystych, a cyklu dni dla szkół, które numerują dni."
+            "value" : "Użyj cyklu tygodni dla tygodnia A / tygodnia B lub tygodni nieparzystych/parzystych, a cyklu dni dla szkół, które numerują dni."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Folosește săptămâni alternante pentru săptămâni A/B sau impare/pare și un ciclu de zile pentru școlile care își numerotează zilele."
+            "value" : "Folosește un ciclu de săptămâni pentru Săptămâna A / Săptămâna B sau săptămâni impare/pare și un ciclu de zile pentru școlile care își numerotează zilele."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Striedavé týždne použite pre A/B alebo nepárne/párne týždne a cyklus dní pre školy, ktoré svoje dni číslujú."
+            "value" : "Cyklus týždňov použite pre týždeň A / týždeň B alebo nepárne/párne týždne a cyklus dní pre školy, ktoré dni číslujú."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Користите смењивање седмица за A/B или непарне/парне седмице, а циклус дана за школе које нумеришу дане."
+            "value" : "Користите циклус седмица за седмицу A / седмицу B или непарне/парне седмице, а циклус дана за школе које нумеришу дане."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Koristite smenjivanje sedmica za A/B ili neparne/parne sedmice, a ciklus dana za škole koje numerišu dane."
+            "value" : "Koristite ciklus sedmica za sedmicu A / sedmicu B ili neparne/parne sedmice, a ciklus dana za škole koje numerišu dane."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Використовуйте чергування тижнів для тижнів A/B чи непарних/парних, а цикл днів — для закладів, що нумерують дні."
+            "value" : "Використовуйте цикл тижнів для тижня A / тижня B або непарних/парних тижнів, а цикл днів — для шкіл, які нумерують дні."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "A/B 周或单双周请使用周轮换；给上课日编号的学校请使用日循环。"
+            "value" : "A 周/B 周或单双周请使用周循环；按编号排日的学校请使用日循环。"
           }
         }
       }
@@ -26546,85 +26546,85 @@
       }
     },
     "editor.rotation.kind.weekCycle" : {
-      "comment" : "Rotation option: weeks repeat in a cycle (A/B weeks, odd/even weeks).",
+      "comment" : "Rotation kind choice: several weeks (Week A / Week B, or more) that take turns. Pairs with 'Day cycle'.",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Střídavé týdny"
+            "value" : "Cyklus týdnů"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wechselnde Wochen"
+            "value" : "Wochenzyklus"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alternating weeks"
+            "value" : "Week cycle"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Semaines alternées"
+            "value" : "Cycle de semaines"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Váltakozó hetek"
+            "value" : "Hétciklus"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "週の交替"
+            "value" : "週のサイクル"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Naprzemienne tygodnie"
+            "value" : "Cykl tygodni"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Săptămâni alternante"
+            "value" : "Ciclu de săptămâni"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Striedavé týždne"
+            "value" : "Cyklus týždňov"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Смењивање седмица"
+            "value" : "Циклус седмица"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Smenjivanje sedmica"
+            "value" : "Ciklus sedmica"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Чергування тижнів"
+            "value" : "Цикл тижнів"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "周轮换"
+            "value" : "周循环"
           }
         }
       }
@@ -26720,79 +26720,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tento rozvrh má hodiny, proto nelze přepínat mezi dny v týdnu a cyklem dnů. Nejprve rozvrh vynulujte."
+            "value" : "Chcete-li přepnout mezi dny v týdnu a cyklem dnů, začněte nový rozvrh, nebo tento vynulujte, čímž se jeho hodiny smažou."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Dieser Stundenplan hat Stunden, daher kann er nicht zwischen Wochentagen und einem Tageszyklus wechseln. Setze den Stundenplan zuerst zurück."
+            "value" : "Um zwischen Wochentagen und einem Tageszyklus zu wechseln, beginne einen neuen Stundenplan oder setze diesen zurück, um seine Stunden zu löschen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This timetable has lessons, so it can't switch between weekdays and a day cycle. Reset the timetable first."
+            "value" : "To switch between weekdays and a day cycle, start a new timetable, or reset this one to clear its lessons."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Cet emploi du temps contient des cours, il ne peut donc pas passer des jours de la semaine à un cycle de jours. Réinitialisez-le d’abord."
+            "value" : "Pour passer des jours de la semaine à un cycle de jours, ou inversement, créez un nouvel emploi du temps, ou réinitialisez celui-ci pour effacer ses cours."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ennek az órarendnek vannak órái, ezért nem váltható át hétköznapok és napciklus között. Előbb állítsd alaphelyzetbe az órarendet."
+            "value" : "A hétköznapok és a napciklus közötti váltáshoz kezdj új órarendet, vagy állítsd alaphelyzetbe ezt, hogy törlődjenek az órái."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "この時間割には授業があるため、曜日方式と日のサイクルを切り替えられません。先に時間割をリセットしてください。"
+            "value" : "曜日方式と日のサイクルを切り替えるには、新しい時間割を作成するか、この時間割をリセットして授業を消去してください。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ten plan ma zajęcia, więc nie można przełączać między dniami tygodnia a cyklem dni. Najpierw zresetuj plan."
+            "value" : "Aby przełączyć między dniami tygodnia a cyklem dni, utwórz nowy plan albo zresetuj ten, aby usunąć jego zajęcia."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Acest orar are ore, deci nu poate trece între zilele săptămânii și un ciclu de zile. Resetează mai întâi orarul."
+            "value" : "Ca să treci între zilele săptămânii și un ciclu de zile, începe un orar nou sau resetează-l pe acesta ca să-i ștergi orele."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tento rozvrh má hodiny, preto sa nedá prepnúť medzi dňami v týždni a cyklom dní. Najprv rozvrh vynulujte."
+            "value" : "Ak chcete prepnúť medzi dňami v týždni a cyklom dní, začnite nový rozvrh alebo tento vynulujte, čím sa jeho hodiny vymažú."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Овај распоред има часове, па не може да се пребацује између дана у седмици и циклуса дана. Прво ресетујте распоред."
+            "value" : "Да бисте прешли између дана у седмици и циклуса дана, направите нови распоред или ресетујте овај да бисте обрисали његове часове."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ovaj raspored ima časove, pa ne može da se prebacuje između dana u sedmici i ciklusa dana. Prvo resetujte raspored."
+            "value" : "Da biste prešli između dana u sedmici i ciklusa dana, napravite novi raspored ili resetujte ovaj da biste obrisali njegove časove."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "У цьому розкладі є уроки, тому його не можна перемикати між днями тижня й циклом днів. Спершу скиньте розклад."
+            "value" : "Щоб перемкнутися між днями тижня й циклом днів, створіть новий розклад або скиньте цей, щоб очистити його уроки."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "此课程表已有课程，因此无法在星期制与日循环之间切换。请先重置课程表。"
+            "value" : "要在星期制与日循环之间切换，请新建一个课程表，或重置此课程表以清除其课程。"
           }
         }
       }
@@ -27302,85 +27302,85 @@
       }
     },
     "editor.rotation.week.header" : {
-      "comment" : "Section header of the week cycle settings.",
+      "comment" : "Section header for the week-cycle settings (number of weeks, week names, counting).",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Střídavé týdny"
+            "value" : "Cyklus týdnů"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wechselnde Wochen"
+            "value" : "Wochenzyklus"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alternating weeks"
+            "value" : "Week cycle"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Semaines alternées"
+            "value" : "Cycle de semaines"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Váltakozó hetek"
+            "value" : "Hétciklus"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "週の交替"
+            "value" : "週のサイクル"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Naprzemienne tygodnie"
+            "value" : "Cykl tygodni"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Săptămâni alternante"
+            "value" : "Ciclu de săptămâni"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Striedavé týždne"
+            "value" : "Cyklus týždňov"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Смењивање седмица"
+            "value" : "Циклус седмица"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Smenjivanje sedmica"
+            "value" : "Ciklus sedmica"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Чергування тижнів"
+            "value" : "Цикл тижнів"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "周轮换"
+            "value" : "周循环"
           }
         }
       }
@@ -28580,7 +28580,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Colour"
+            "value" : "Color"
           }
         },
         "fr" : {
@@ -28664,7 +28664,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Custom colour"
+            "value" : "Custom color"
           }
         },
         "fr" : {
@@ -28736,79 +28736,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tato barva je blízko pozadí, proto budou mít dlaždice obrys."
+            "value" : "Hodiny v této barvě dostanou tenký obrys, aby byly lépe vidět."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Diese Farbe liegt nah am Hintergrund, daher bekommen die Kacheln einen Rand."
+            "value" : "Stunden in dieser Farbe bekommen einen dünnen Rand, damit sie sich abheben."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This colour is close to the background, so its tiles get an outline."
+            "value" : "Lessons in this color get a thin outline so they stand out."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Cette couleur est proche du fond, donc ses tuiles auront un contour."
+            "value" : "Les cours de cette couleur reçoivent un fin contour pour bien ressortir."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ez a szín közel van a háttérhez, ezért a csempék keretet kapnak."
+            "value" : "Az ilyen színű órák vékony keretet kapnak, hogy jól látszódjanak."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "この色は背景に近いため、タイルに枠線が付きます。"
+            "value" : "この色の授業は、見分けやすいように細い枠線が付きます。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ten kolor jest zbliżony do tła, więc kafelki dostaną obramowanie."
+            "value" : "Lekcje w tym kolorze dostaną cienkie obramowanie, żeby się wyróżniały."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Această culoare este apropiată de fundal, așa că plăcile primesc un contur."
+            "value" : "Orele în această culoare primesc un contur subțire, ca să iasă în evidență."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Táto farba je blízko pozadia, preto budú mať dlaždice obrys."
+            "value" : "Hodiny v tejto farbe dostanú tenký obrys, aby boli lepšie vidieť."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ова боја је блиска позадини, па ће плочице добити оквир."
+            "value" : "Часови у овој боји добијају танак оквир да би се истицали."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ova boja je bliska pozadini, pa će pločice dobiti okvir."
+            "value" : "Časovi u ovoj boji dobijaju tanak okvir da bi se isticali."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Цей колір близький до тла, тому плитки матимуть контур."
+            "value" : "Уроки цього кольору отримують тонкий контур, щоб їх було добре видно."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "此颜色接近背景色，因此方块会带有轮廓。"
+            "value" : "此颜色的课程会带有细轮廓，以便更醒目。"
           }
         }
       }
@@ -28832,7 +28832,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The text on this colour is hard to read. Choose a different colour."
+            "value" : "The text on this color is hard to read. Choose a different color."
           }
         },
         "fr" : {
@@ -29156,79 +29156,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Smažou se i jeho hodiny. Domácí úkoly a zkoušky tohoto předmětu zůstanou, ale ztratí propojení."
+            "value" : "Jeho hodiny se také smažou. Úkoly a zkoušky tohoto předmětu zůstanou, ale ztratí propojení."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Seine Stunden werden ebenfalls gelöscht. Hausaufgaben und Prüfungen dieses Fachs bleiben erhalten, verlieren aber die Verknüpfung."
+            "value" : "Seine Stunden werden ebenfalls gelöscht. Aufgaben und Prüfungen dieses Fachs bleiben erhalten, verlieren aber die Verknüpfung."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Its lessons are deleted too. Homework and exams of this subject are kept but lose the link."
+            "value" : "Its lessons are deleted too. Tasks and exams of this subject are kept but lose the link."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ses cours sont aussi supprimés. Les devoirs et examens de cette matière sont conservés mais perdent leur lien."
+            "value" : "Ses cours sont aussi supprimés. Les tâches et examens de cette matière sont conservés mais perdent leur lien."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Az órái is törlődnek. A tantárgy házi feladatai és vizsgái megmaradnak, de megszűnik a kapcsolatuk."
+            "value" : "Az órái is törlődnek. A tantárgy feladatai és vizsgái megmaradnak, de elveszítik a kapcsolatot."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "この科目の授業も削除されます。この科目の宿題と試験は残りますが、関連付けは外れます。"
+            "value" : "この科目の授業も削除されます。この科目のタスクと試験は残りますが、関連付けは外れます。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Jego lekcje też zostaną usunięte. Prace domowe i egzaminy z tego przedmiotu zostaną, ale stracą powiązanie."
+            "value" : "Jego lekcje też zostaną usunięte. Zadania i egzaminy z tego przedmiotu zostaną zachowane, ale stracą powiązanie."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Orele ei se șterg și ele. Temele și examenele acestei materii se păstrează, dar își pierd legătura."
+            "value" : "Și orele sale se șterg. Sarcinile și examenele acestei materii se păstrează, dar își pierd legătura."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Odstránia sa aj jeho hodiny. Domáce úlohy a skúšky tohto predmetu zostanú, ale stratia prepojenie."
+            "value" : "Jeho hodiny sa tiež vymažú. Úlohy a skúšky tohto predmetu zostanú, ale stratia prepojenie."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Његови часови се такође бришу. Домаћи задаци и испити из овог предмета се задржавају, али губе везу."
+            "value" : "Његови часови се такође бришу. Задаци и испити из овог предмета остају, али губе везу."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Njegovi časovi se takođe brišu. Domaći zadaci i ispiti iz ovog predmeta se zadržavaju, ali gube vezu."
+            "value" : "Njegovi časovi se takođe brišu. Zadaci i ispiti iz ovog predmeta ostaju, ali gube vezu."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Його уроки також буде видалено. Домашні завдання та іспити з цього предмета збережуться, але втратять зв’язок."
+            "value" : "Його уроки теж буде видалено. Завдання та іспити з цього предмета збережуться, але втратять зв’язок."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "其课程也会被删除。此科目的作业和考试会保留，但会解除关联。"
+            "value" : "其课程也会被删除。该科目的任务和考试会保留，但会解除关联。"
           }
         }
       }
@@ -31100,7 +31100,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Move down"
+            "value" : "Move Down"
           }
         },
         "fr" : {
@@ -31184,7 +31184,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Move up"
+            "value" : "Move Up"
           }
         },
         "fr" : {
@@ -32276,7 +32276,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Terms & Holidays"
+            "value" : "Terms & holidays"
           }
         },
         "fr" : {
@@ -32936,79 +32936,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Rozvrh zvonění určuje očíslované hodiny. Volné časy se hodí pro univerzity."
+            "value" : "Rozvrh zvonění určuje číslované hodiny. Vlastní časy se hodí pro vysoké školy."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ein Klingelplan liefert nummerierte Stunden. Freie Zeiten passen zu Universitäten."
+            "value" : "Ein Klingelplan gibt nummerierte Stunden vor. Eigene Zeiten passen zu Hochschulen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A bell schedule gives numbered periods. Free times suit universities."
+            "value" : "A bell schedule gives numbered periods. Custom times suit universities."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Des horaires de sonnerie donnent des heures numérotées. Les horaires libres conviennent aux universités."
+            "value" : "Les horaires de sonnerie donnent des heures numérotées. Les horaires personnalisés conviennent aux universités."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "A csengetési rend számozott órákat ad. A szabad időpontok egyetemekhez valók."
+            "value" : "A csengetési rend számozott órákat ad. Az egyéni időpontok egyetemekhez valók."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "時限表では番号付きの時限を使います。大学には自由な時間が向いています。"
+            "value" : "時限表では時限に番号が付きます。カスタム時刻は大学に向いています。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Plan dzwonków daje ponumerowane lekcje. Dowolne godziny pasują do uczelni."
+            "value" : "Plan dzwonków wyznacza numerowane lekcje. Własne godziny pasują do uczelni."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Un program de sonerie oferă ore numerotate. Orele libere se potrivesc universităților."
+            "value" : "Programul de sonerie oferă ore numerotate. Orele personalizate se potrivesc facultăților."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Rozvrh zvonenia určuje očíslované hodiny. Voľné časy sa hodia na univerzity."
+            "value" : "Rozvrh zvonenia určuje číslované hodiny. Vlastné časy sa hodia pre vysoké školy."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Распоред звона даје нумерисане часове. Слободна времена одговарају универзитетима."
+            "value" : "Распоред звона даје нумерисане часове. Сопствена времена одговарају факултетима."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Raspored zvona daje numerisane časove. Slobodna vremena odgovaraju univerzitetima."
+            "value" : "Raspored zvona daje numerisane časove. Sopstvena vremena odgovaraju fakultetima."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Розклад дзвінків дає пронумеровані уроки. Довільний час підходить для університетів."
+            "value" : "Розклад дзвінків задає пронумеровані уроки. Власний час підходить для університетів."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "作息时间表提供带编号的节次。自由时间适合大学。"
+            "value" : "作息时间表提供编号的节次。自定时间适合大学。"
           }
         }
       }
@@ -33020,79 +33020,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Volné časy"
+            "value" : "Vlastní časy"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Freie Zeiten"
+            "value" : "Eigene Zeiten"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Free times"
+            "value" : "Custom times"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Horaires libres"
+            "value" : "Horaires personnalisés"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Szabad időpontok"
+            "value" : "Egyéni időpontok"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "自由な時間"
+            "value" : "カスタム時刻"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Dowolne godziny"
+            "value" : "Własne godziny"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ore libere"
+            "value" : "Ore personalizate"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Voľné časy"
+            "value" : "Vlastné časy"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Слободна времена"
+            "value" : "Сопствена времена"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Slobodna vremena"
+            "value" : "Sopstvena vremena"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Довільний час"
+            "value" : "Власний час"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "自由时间"
+            "value" : "自定时间"
           }
         }
       }
@@ -34532,79 +34532,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Toto nelze vrátit. Domácí úkoly a zkoušky zůstanou, ale ztratí propojení s tímto rozvrhem."
+            "value" : "Tuto akci nelze vrátit zpět. Úkoly a zkoušky zůstanou, ale ztratí propojení s tímto rozvrhem."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Das lässt sich nicht rückgängig machen. Hausaufgaben und Prüfungen bleiben erhalten, verlieren aber ihre Verknüpfung zu diesem Stundenplan."
+            "value" : "Das kann nicht rückgängig gemacht werden. Aufgaben und Prüfungen bleiben erhalten, verlieren aber ihre Verknüpfung mit diesem Stundenplan."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This can't be undone. Homework and exams are kept, but they lose their link to this timetable."
+            "value" : "This can't be undone. Tasks and exams are kept, but they lose their link to this timetable."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Cette action est irréversible. Les devoirs et examens sont conservés, mais perdent leur lien avec cet emploi du temps."
+            "value" : "Cette action est irréversible. Les tâches et examens sont conservés, mais perdent leur lien avec cet emploi du temps."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ez nem vonható vissza. A házi feladatok és vizsgák megmaradnak, de megszűnik a kapcsolatuk ezzel az órarenddel."
+            "value" : "Ez nem vonható vissza. A feladatok és vizsgák megmaradnak, de megszűnik a kapcsolatuk ezzel az órarenddel."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "この操作は取り消せません。宿題と試験は残りますが、この時間割との関連付けは外れます。"
+            "value" : "この操作は取り消せません。タスクと試験は残りますが、この時間割との関連付けは外れます。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tego nie można cofnąć. Prace domowe i egzaminy zostaną, ale stracą powiązanie z tym planem."
+            "value" : "Tego nie można cofnąć. Zadania i egzaminy zostaną zachowane, ale stracą powiązanie z tym planem."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Această acțiune nu poate fi anulată. Temele și examenele se păstrează, dar își pierd legătura cu acest orar."
+            "value" : "Acțiunea nu poate fi anulată. Sarcinile și examenele se păstrează, dar își pierd legătura cu acest orar."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Toto sa nedá vrátiť. Domáce úlohy a skúšky zostanú, ale stratia prepojenie na tento rozvrh."
+            "value" : "Túto akciu nemožno vrátiť späť. Úlohy a skúšky zostanú, ale stratia prepojenie s týmto rozvrhom."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ово не може да се поништи. Домаћи задаци и испити се задржавају, али губе везу са овим распоредом."
+            "value" : "Ово не може да се опозове. Задаци и испити остају, али губе везу са овим распоредом."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ovo ne može da se poništi. Domaći zadaci i ispiti se zadržavaju, ali gube vezu sa ovim rasporedom."
+            "value" : "Ovo ne može da se opozove. Zadaci i ispiti ostaju, ali gube vezu sa ovim rasporedom."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Це неможливо скасувати. Домашні завдання та іспити збережуться, але втратять зв’язок із цим розкладом."
+            "value" : "Цю дію не можна скасувати. Завдання та іспити збережуться, але втратять зв’язок із цим розкладом."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "此操作无法撤销。作业和考试会保留，但会解除与此课程表的关联。"
+            "value" : "此操作无法撤销。任务和考试会保留，但会解除与此课程表的关联。"
           }
         }
       }
@@ -35288,79 +35288,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Volné časy"
+            "value" : "Vlastní časy"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Freie Zeiten"
+            "value" : "Eigene Zeiten"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Free times"
+            "value" : "Custom times"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Horaires libres"
+            "value" : "Horaires personnalisés"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Szabad időpontok"
+            "value" : "Egyéni időpontok"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "自由な時間"
+            "value" : "カスタム時刻"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Dowolne godziny"
+            "value" : "Własne godziny"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ore libere"
+            "value" : "Ore personalizate"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Voľné časy"
+            "value" : "Vlastné časy"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Слободна времена"
+            "value" : "Сопствена времена"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Slobodna vremena"
+            "value" : "Sopstvena vremena"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Довільний час"
+            "value" : "Власний час"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "自由时间"
+            "value" : "自定时间"
           }
         }
       }
@@ -37466,7 +37466,7 @@
       }
     },
     "editor.warning.periodInFreeForm" : {
-      "comment" : "Warning after switching a timetable to free-form times while lessons still use bell-schedule periods (plural on the lesson count, arg 1). Lessons are not placed in the timetable.",
+      "comment" : "Warning after switching a timetable to custom times while lessons still use bell-schedule periods (plural on the lesson count, arg 1). 'Custom times' = each lesson has its own start and end time.",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
@@ -37475,25 +37475,25 @@
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld hodiny používají časy z rozvrhu zvonění, které volné časy nemají. Nezobrazí se, dokud jim nenastavíte začátek a konec nebo se nevrátíte k rozvrhu zvonění."
+                  "value" : "Hodiny nastavené podle rozvrhu zvonění: %lld. Tento rozvrh má vlastní časy, takže se nezobrazí, dokud jim nezadáte začátek a konec nebo se nevrátíte k rozvrhu zvonění."
                 }
               },
               "many" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld hodiny používají časy z rozvrhu zvonění, které volné časy nemají. Nezobrazí se, dokud jim nenastavíte začátek a konec nebo se nevrátíte k rozvrhu zvonění."
+                  "value" : "Hodiny nastavené podle rozvrhu zvonění: %lld. Tento rozvrh má vlastní časy, takže se nezobrazí, dokud jim nezadáte začátek a konec nebo se nevrátíte k rozvrhu zvonění."
                 }
               },
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld hodina používá čas z rozvrhu zvonění, který volné časy nemají. Nezobrazí se, dokud jí nenastavíte začátek a konec nebo se nevrátíte k rozvrhu zvonění."
+                  "value" : "Hodina nastavená podle rozvrhu zvonění: %lld. Tento rozvrh má vlastní časy, takže se nezobrazí, dokud jí nezadáte začátek a konec nebo se nevrátíte k rozvrhu zvonění."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld hodin používá časy z rozvrhu zvonění, které volné časy nemají. Nezobrazí se, dokud jim nenastavíte začátek a konec nebo se nevrátíte k rozvrhu zvonění."
+                  "value" : "Hodiny nastavené podle rozvrhu zvonění: %lld. Tento rozvrh má vlastní časy, takže se nezobrazí, dokud jim nezadáte začátek a konec nebo se nevrátíte k rozvrhu zvonění."
                 }
               }
             }
@@ -37505,13 +37505,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld Stunde ist einer Stunde des Klingelplans zugeordnet, den ein Stundenplan mit freien Zeiten nicht hat. Sie wird nicht angezeigt, bis du ihr Start- und Endzeit gibst oder zum Klingelplan zurückwechselst."
+                  "value" : "%lld Stunde nutzt eine Stunde aus dem Klingelplan, aber dieser Stundenplan hat eigene Zeiten. Sie wird erst angezeigt, wenn du ihr eine Start- und Endzeit gibst oder zum Klingelplan zurückwechselst."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld Stunden sind Stunden des Klingelplans zugeordnet, den ein Stundenplan mit freien Zeiten nicht hat. Sie werden nicht angezeigt, bis du ihnen Start- und Endzeiten gibst oder zum Klingelplan zurückwechselst."
+                  "value" : "%lld Stunden nutzen Stunden aus dem Klingelplan, aber dieser Stundenplan hat eigene Zeiten. Sie werden erst angezeigt, wenn du ihnen eine Start- und Endzeit gibst oder zum Klingelplan zurückwechselst."
                 }
               }
             }
@@ -37523,13 +37523,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%lld lesson is set to a bell-schedule period, which a free-form timetable does not have. It is not shown until you give it a start and end time or switch back to a bell schedule."
+                  "value" : "%lld lesson uses a bell schedule period, but this timetable uses custom times. It isn't shown until you give it a start and end time, or switch back to a bell schedule."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%lld lessons are set to bell-schedule periods, which a free-form timetable does not have. They are not shown until you give them a start and end time or switch back to a bell schedule."
+                  "value" : "%lld lessons use bell schedule periods, but this timetable uses custom times. They aren't shown until you give them a start and end time, or switch back to a bell schedule."
                 }
               }
             }
@@ -37541,13 +37541,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld cours est lié à une plage des horaires de sonnerie, que les horaires libres n’ont pas. Il n’apparaît pas tant que vous ne lui donnez pas une heure de début et de fin ou que vous ne revenez pas aux horaires de sonnerie."
+                  "value" : "%lld cours utilise une heure des horaires de sonnerie, mais cet emploi du temps a des horaires personnalisés. Il n’est pas affiché tant que vous ne lui donnez pas d’heure de début et de fin, ou que vous ne revenez pas aux horaires de sonnerie."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld cours sont liés à des plages des horaires de sonnerie, que les horaires libres n’ont pas. Ils n’apparaissent pas tant que vous ne leur donnez pas une heure de début et de fin ou que vous ne revenez pas aux horaires de sonnerie."
+                  "value" : "%lld cours utilisent des heures des horaires de sonnerie, mais cet emploi du temps a des horaires personnalisés. Ils ne sont pas affichés tant que vous ne leur donnez pas d’heure de début et de fin, ou que vous ne revenez pas aux horaires de sonnerie."
                 }
               }
             }
@@ -37559,13 +37559,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld óra csengetési rend szerinti időszakhoz tartozik, ilyen a szabad időpontos órarendben nincs. Addig nem jelenik meg, amíg nem adsz meg neki kezdő és záró időpontot, vagy nem váltasz vissza csengetési rendre."
+                  "value" : "%lld óra a csengetési rend egyik órájához van rendelve, de ez az órarend egyéni időpontokat használ. Nem jelenik meg, amíg meg nem adod a kezdését és a végét, vagy vissza nem váltasz a csengetési rendre."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld óra csengetési rend szerinti időszakhoz tartozik, ilyen a szabad időpontos órarendben nincs. Addig nem jelennek meg, amíg nem adsz meg nekik kezdő és záró időpontot, vagy nem váltasz vissza csengetési rendre."
+                  "value" : "%lld óra a csengetési rend óráihoz van rendelve, de ez az órarend egyéni időpontokat használ. Ezek nem jelennek meg, amíg meg nem adod a kezdésüket és a végüket, vagy vissza nem váltasz a csengetési rendre."
                 }
               }
             }
@@ -37577,7 +37577,7 @@
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld件の授業が時限表の時限に設定されていますが、自由な時間の時間割には時限がありません。開始と終了の時刻を設定するか時限表に戻すまで、表示されません。"
+                  "value" : "時限表の時限が設定された授業が%lld件ありますが、この時間割はカスタム時刻を使います。開始・終了時刻を設定するか、時限表に戻すまで表示されません。"
                 }
               }
             }
@@ -37589,25 +37589,25 @@
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld lekcje korzystają z godzin z planu dzwonków, których nie ma w planie z dowolnymi godzinami. Nie będą widoczne, dopóki nie ustawisz ich początku i końca lub nie wrócisz do planu dzwonków."
+                  "value" : "Lekcje przypisane do numerów z planu dzwonków: %lld. Ten plan ma własne godziny, więc nie będą widoczne, dopóki nie podasz im godzin rozpoczęcia i zakończenia albo nie wrócisz do planu dzwonków."
                 }
               },
               "many" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld lekcji korzysta z godzin z planu dzwonków, których nie ma w planie z dowolnymi godzinami. Nie będą widoczne, dopóki nie ustawisz ich początku i końca lub nie wrócisz do planu dzwonków."
+                  "value" : "Lekcje przypisane do numerów z planu dzwonków: %lld. Ten plan ma własne godziny, więc nie będą widoczne, dopóki nie podasz im godzin rozpoczęcia i zakończenia albo nie wrócisz do planu dzwonków."
                 }
               },
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld lekcja korzysta z godziny z planu dzwonków, której nie ma w planie z dowolnymi godzinami. Nie będzie widoczna, dopóki nie ustawisz jej początku i końca lub nie wrócisz do planu dzwonków."
+                  "value" : "Lekcja przypisana do numeru z planu dzwonków: %lld. Ten plan ma własne godziny, więc nie będzie widoczna, dopóki nie podasz jej godziny rozpoczęcia i zakończenia albo nie wrócisz do planu dzwonków."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld lekcji korzysta z godzin z planu dzwonków, których nie ma w planie z dowolnymi godzinami. Nie będą widoczne, dopóki nie ustawisz ich początku i końca lub nie wrócisz do planu dzwonków."
+                  "value" : "Lekcje przypisane do numerów z planu dzwonków: %lld. Ten plan ma własne godziny, więc nie będą widoczne, dopóki nie podasz im godzin rozpoczęcia i zakończenia albo nie wrócisz do planu dzwonków."
                 }
               }
             }
@@ -37619,19 +37619,19 @@
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld ore folosesc ore din programul de sonerie, pe care un orar cu ore libere nu le are. Nu vor fi afișate până nu le setezi începutul și sfârșitul sau nu revii la programul de sonerie."
+                  "value" : "%lld ore folosesc intervale din programul de sonerie, dar acest orar are ore personalizate. Nu apar până nu le dai o oră de început și de sfârșit sau nu revii la programul de sonerie."
                 }
               },
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld oră folosește o oră din programul de sonerie, pe care un orar cu ore libere nu o are. Nu va fi afișată până nu îi setezi începutul și sfârșitul sau nu revii la programul de sonerie."
+                  "value" : "%lld oră folosește un interval din programul de sonerie, dar acest orar are ore personalizate. Nu apare până nu îi dai o oră de început și de sfârșit sau nu revii la programul de sonerie."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld de ore folosesc ore din programul de sonerie, pe care un orar cu ore libere nu le are. Nu vor fi afișate până nu le setezi începutul și sfârșitul sau nu revii la programul de sonerie."
+                  "value" : "%lld de ore folosesc intervale din programul de sonerie, dar acest orar are ore personalizate. Nu apar până nu le dai o oră de început și de sfârșit sau nu revii la programul de sonerie."
                 }
               }
             }
@@ -37643,25 +37643,25 @@
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld hodiny používajú časy z rozvrhu zvonenia, ktoré voľné časy nemajú. Nezobrazia sa, kým im nenastavíte začiatok a koniec alebo sa nevrátite k rozvrhu zvonenia."
+                  "value" : "Hodiny nastavené podľa rozvrhu zvonenia: %lld. Tento rozvrh má vlastné časy, takže sa nezobrazia, kým im nezadáte začiatok a koniec alebo sa nevrátite k rozvrhu zvonenia."
                 }
               },
               "many" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld hodiny používajú časy z rozvrhu zvonenia, ktoré voľné časy nemajú. Nezobrazia sa, kým im nenastavíte začiatok a koniec alebo sa nevrátite k rozvrhu zvonenia."
+                  "value" : "Hodiny nastavené podľa rozvrhu zvonenia: %lld. Tento rozvrh má vlastné časy, takže sa nezobrazia, kým im nezadáte začiatok a koniec alebo sa nevrátite k rozvrhu zvonenia."
                 }
               },
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld hodina používa čas z rozvrhu zvonenia, ktorý voľné časy nemajú. Nezobrazí sa, kým jej nenastavíte začiatok a koniec alebo sa nevrátite k rozvrhu zvonenia."
+                  "value" : "Hodina nastavená podľa rozvrhu zvonenia: %lld. Tento rozvrh má vlastné časy, takže sa nezobrazí, kým jej nezadáte začiatok a koniec alebo sa nevrátite k rozvrhu zvonenia."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld hodín používa časy z rozvrhu zvonenia, ktoré voľné časy nemajú. Nezobrazia sa, kým im nenastavíte začiatok a koniec alebo sa nevrátite k rozvrhu zvonenia."
+                  "value" : "Hodiny nastavené podľa rozvrhu zvonenia: %lld. Tento rozvrh má vlastné časy, takže sa nezobrazia, kým im nezadáte začiatok a koniec alebo sa nevrátite k rozvrhu zvonenia."
                 }
               }
             }
@@ -37673,19 +37673,19 @@
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld часа су везана за термине из распореда звона, а слободна времена их немају. Неће бити приказани док им не поставите почетак и крај или се не вратите на распоред звона."
+                  "value" : "Часови везани за распоред звона: %lld. Овај распоред има сопствена времена, па се не приказују док им не задате почетак и крај или се не вратите на распоред звона."
                 }
               },
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld час је везан за термин из распореда звона, а слободна времена га немају. Неће бити приказан док му не поставите почетак и крај или се не вратите на распоред звона."
+                  "value" : "Час везан за распоред звона: %lld. Овај распоред има сопствена времена, па се час не приказује док му не задате почетак и крај или се не вратите на распоред звона."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld часова је везано за термине из распореда звона, а слободна времена их немају. Неће бити приказани док им не поставите почетак и крај или се не вратите на распоред звона."
+                  "value" : "Часови везани за распоред звона: %lld. Овај распоред има сопствена времена, па се не приказују док им не задате почетак и крај или се не вратите на распоред звона."
                 }
               }
             }
@@ -37697,19 +37697,19 @@
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld časa su vezana za termine iz rasporeda zvona, a slobodna vremena ih nemaju. Neće biti prikazani dok im ne postavite početak i kraj ili se ne vratite na raspored zvona."
+                  "value" : "Časovi vezani za raspored zvona: %lld. Ovaj raspored ima sopstvena vremena, pa se ne prikazuju dok im ne zadate početak i kraj ili se ne vratite na raspored zvona."
                 }
               },
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld čas je vezan za termin iz rasporeda zvona, a slobodna vremena ga nemaju. Neće biti prikazan dok mu ne postavite početak i kraj ili se ne vratite na raspored zvona."
+                  "value" : "Čas vezan za raspored zvona: %lld. Ovaj raspored ima sopstvena vremena, pa se čas ne prikazuje dok mu ne zadate početak i kraj ili se ne vratite na raspored zvona."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld časova je vezano za termine iz rasporeda zvona, a slobodna vremena ih nemaju. Neće biti prikazani dok im ne postavite početak i kraj ili se ne vratite na raspored zvona."
+                  "value" : "Časovi vezani za raspored zvona: %lld. Ovaj raspored ima sopstvena vremena, pa se ne prikazuju dok im ne zadate početak i kraj ili se ne vratite na raspored zvona."
                 }
               }
             }
@@ -37721,25 +37721,25 @@
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld уроки прив’язані до проміжків з розкладу дзвінків, яких немає в довільному часі. Вони не показуються, доки ви не вкажете їм початок і кінець або не повернетеся до розкладу дзвінків."
+                  "value" : "Уроки, прив’язані до розкладу дзвінків: %lld. Цей розклад має власний час, тому вони не показуються, доки ви не задасте їм час початку й кінця або не повернетеся до розкладу дзвінків."
                 }
               },
               "many" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld уроків прив’язані до проміжків з розкладу дзвінків, яких немає в довільному часі. Вони не показуються, доки ви не вкажете їм початок і кінець або не повернетеся до розкладу дзвінків."
+                  "value" : "Уроки, прив’язані до розкладу дзвінків: %lld. Цей розклад має власний час, тому вони не показуються, доки ви не задасте їм час початку й кінця або не повернетеся до розкладу дзвінків."
                 }
               },
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld урок прив’язаний до проміжку з розкладу дзвінків, якого немає в довільному часі. Він не показується, доки ви не вкажете йому початок і кінець або не повернетеся до розкладу дзвінків."
+                  "value" : "Урок, прив’язаний до розкладу дзвінків: %lld. Цей розклад має власний час, тому урок не показується, доки ви не задасте йому час початку й кінця або не повернетеся до розкладу дзвінків."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "%lld уроку прив’язані до проміжків з розкладу дзвінків, яких немає в довільному часі. Вони не показуються, доки ви не вкажете їм початок і кінець або не повернетеся до розкладу дзвінків."
+                  "value" : "Уроки, прив’язані до розкладу дзвінків: %lld. Цей розклад має власний час, тому вони не показуються, доки ви не задасте їм час початку й кінця або не повернетеся до розкладу дзвінків."
                 }
               }
             }
@@ -37751,7 +37751,7 @@
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "有 %lld 节课设置为作息时间表中的节次，而自由时间的课表没有节次。在为它们设置开始和结束时间或切换回作息时间表之前，这些课程不会显示。"
+                  "value" : "%lld节课设置为作息时间表的节次，但此课程表使用自定时间。在为其设置开始和结束时间或改回作息时间表之前，这些课程不会显示。"
                 }
               }
             }
@@ -43238,7 +43238,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No Past Exams"
+            "value" : "No past exams"
           }
         },
         "fr" : {
@@ -43322,7 +43322,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No Exams Yet"
+            "value" : "No exams yet"
           }
         },
         "fr" : {
@@ -43490,7 +43490,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No Upcoming Exams"
+            "value" : "No upcoming exams"
           }
         },
         "fr" : {
@@ -44162,7 +44162,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Next Exam"
+            "value" : "Next exam"
           }
         },
         "fr" : {
@@ -53066,7 +53066,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancelled"
+            "value" : "Canceled"
           }
         },
         "fr" : {
@@ -58478,43 +58478,43 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Individuelle Start- und Endzeiten"
+            "value" : "Eigene Zeiten"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Individual start and end times"
+            "value" : "Custom times"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Horaires de début et de fin individuels"
+            "value" : "Horaires personnalisés"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Egyéni kezdési és befejezési időpontok"
+            "value" : "Egyéni időpontok"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "個別の開始・終了時刻"
+            "value" : "カスタム時刻"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Własne godziny rozpoczęcia i zakończenia"
+            "value" : "Własne godziny"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ore individuale de început și sfârșit"
+            "value" : "Ore personalizate"
           }
         },
         "sk" : {
@@ -58526,25 +58526,25 @@
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Посебна времена почетка и краја"
+            "value" : "Сопствена времена"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Posebna vremena početka i kraja"
+            "value" : "Sopstvena vremena"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Окремий час початку й кінця"
+            "value" : "Власний час"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "单独设置开始和结束时间"
+            "value" : "自定时间"
           }
         }
       }
@@ -60902,337 +60902,337 @@
       }
     },
     "onboarding.week.repeat.alternatingDays" : {
-      "comment" : "Onboarding repeat pattern: Day A and Day B alternate on school days. Keep the letters A/B.",
+      "comment" : "Onboarding choice: the timetable alternates between Day A and Day B on school days. Full phrase, no concatenation.",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Střídavé dny (A/B)"
+            "value" : "Den A / Den B"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wechselnde Tage (A/B)"
+            "value" : "Tag A / Tag B"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alternating days (A/B)"
+            "value" : "Day A / Day B"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Jours alternés (A/B)"
+            "value" : "Jour A / Jour B"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Váltakozó napok (A/B)"
+            "value" : "A nap / B nap"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "隔日（A/B）"
+            "value" : "A日/B日"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Naprzemienne dni (A/B)"
+            "value" : "Dzień A / Dzień B"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Zile alternante (A/B)"
+            "value" : "Ziua A / Ziua B"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Striedavé dni (A/B)"
+            "value" : "Deň A / Deň B"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Смењивање дана (A/B)"
+            "value" : "Дан A / Дан B"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Smenjivanje dana (A/B)"
+            "value" : "Dan A / Dan B"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Чергування днів (A/B)"
+            "value" : "День A / День B"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "单双日轮换（A/B）"
+            "value" : "A 日 / B 日"
           }
         }
       }
     },
     "onboarding.week.repeat.alternatingDays.detail" : {
-      "comment" : "Detail under 'Alternating days (A/B)'. No final period.",
+      "comment" : "Detail under 'Day A / Day B': two different timetables alternate on school days. No final period.",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Den A a den B se střídají ve školní dny"
+            "value" : "Dva rozvrhy, které se střídají každý školní den"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tag A und Tag B wechseln sich an Schultagen ab"
+            "value" : "Zwei Stundenpläne, die sich jeden Schultag abwechseln"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Day A and Day B take turns on school days"
+            "value" : "Two timetables that take turns every school day"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Le jour A et le jour B alternent les jours de cours"
+            "value" : "Deux emplois du temps qui alternent chaque jour de classe"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Az A és a B nap felváltva követi egymást az iskolai napokon"
+            "value" : "Két órarend, amely minden tanítási napon váltja egymást"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "登校日ごとにA日とB日が交互に来ます"
+            "value" : "登校日ごとに交互に使う2つの時間割"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Dzień A i dzień B na zmianę w dni nauki"
+            "value" : "Dwa plany, które zmieniają się co dzień szkolny"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ziua A și ziua B alternează în zilele de școală"
+            "value" : "Două orare care alternează în fiecare zi de școală"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Deň A a deň B sa striedajú v školské dni"
+            "value" : "Dva rozvrhy, ktoré sa striedajú každý školský deň"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Дан A и дан B се смењују школским данима"
+            "value" : "Два распореда која се смењују сваког школског дана"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Dan A i dan B se smenjuju školskim danima"
+            "value" : "Dva rasporeda koja se smenjuju svakog školskog dana"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "День A і день B чергуються в навчальні дні"
+            "value" : "Два розклади, які чергуються кожного навчального дня"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "A 日和 B 日在上课日交替"
+            "value" : "每个上学日交替使用的两套课程表"
           }
         }
       }
     },
     "onboarding.week.repeat.alternatingWeeks" : {
-      "comment" : "Onboarding repeat pattern: Week A and Week B alternate. Keep the letters A/B.",
+      "comment" : "Onboarding choice: the timetable alternates between Week A and Week B. Full phrase, no concatenation.",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Střídavé týdny (A/B)"
+            "value" : "Týden A / Týden B"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wechselnde Wochen (A/B)"
+            "value" : "Woche A / Woche B"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alternating weeks (A/B)"
+            "value" : "Week A / Week B"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Semaines alternées (A/B)"
+            "value" : "Semaine A / Semaine B"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Váltakozó hetek (A/B)"
+            "value" : "A hét / B hét"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "隔週（A/B）"
+            "value" : "A週/B週"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Naprzemienne tygodnie (A/B)"
+            "value" : "Tydzień A / Tydzień B"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Săptămâni alternante (A/B)"
+            "value" : "Săptămâna A / Săptămâna B"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Striedavé týždne (A/B)"
+            "value" : "Týždeň A / Týždeň B"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Смењивање седмица (A/B)"
+            "value" : "Седмица A / Седмица B"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Smenjivanje sedmica (A/B)"
+            "value" : "Sedmica A / Sedmica B"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Чергування тижнів (A/B)"
+            "value" : "Тиждень A / Тиждень B"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "单双周轮换（A/B）"
+            "value" : "A 周 / B 周"
           }
         }
       }
     },
     "onboarding.week.repeat.alternatingWeeks.detail" : {
-      "comment" : "Detail under 'Alternating weeks (A/B)'. No final period.",
+      "comment" : "Detail under 'Week A / Week B': two different timetables alternate week by week. No final period.",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Týden A a týden B se střídají"
+            "value" : "Dva rozvrhy, které se střídají každý týden"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Woche A und Woche B wechseln sich ab"
+            "value" : "Zwei Stundenpläne, die sich jede Woche abwechseln"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Week A and Week B take turns"
+            "value" : "Two timetables that take turns every week"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "La semaine A et la semaine B alternent"
+            "value" : "Deux emplois du temps qui alternent chaque semaine"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Az A és a B hét felváltva követi egymást"
+            "value" : "Két órarend, amely hetente váltja egymást"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "A週とB週が交互に来ます"
+            "value" : "1週間ごとに交互に使う2つの時間割"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tydzień A i tydzień B na zmianę"
+            "value" : "Dwa plany, które zmieniają się co tydzień"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Săptămâna A și săptămâna B alternează"
+            "value" : "Două orare care alternează în fiecare săptămână"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Týždeň A a týždeň B sa striedajú"
+            "value" : "Dva rozvrhy, ktoré sa striedajú každý týždeň"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Седмица A и седмица B се смењују"
+            "value" : "Два распореда која се смењују сваке седмице"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Sedmica A i sedmica B se smenjuju"
+            "value" : "Dva rasporeda koja se smenjuju svake sedmice"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Тиждень A і тиждень B чергуються"
+            "value" : "Два розклади, які чергуються щотижня"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "A 周和 B 周交替"
+            "value" : "每周交替使用的两套课程表"
           }
         }
       }
@@ -62180,7 +62180,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Grey"
+            "value" : "Gray"
           }
         },
         "fr" : {
@@ -63356,7 +63356,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Harbour"
+            "value" : "Harbor"
           }
         },
         "fr" : {
@@ -84902,7 +84902,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Acknowledgements"
+            "value" : "Acknowledgments"
           }
         },
         "fr" : {
@@ -87881,13 +87881,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%lld subject will change color. You can undo this afterwards."
+                  "value" : "%lld subject will change color. You can undo this afterward."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%lld subjects will change color. You can undo this afterwards."
+                  "value" : "%lld subjects will change color. You can undo this afterward."
                 }
               }
             }
@@ -90236,7 +90236,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Primary school"
+            "value" : "Elementary school"
           }
         },
         "fr" : {
@@ -90302,85 +90302,85 @@
       }
     },
     "settings.profile.footer" : {
-      "comment" : "Footer under the profile settings.",
+      "comment" : "Footer under the school type choice in Settings.",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Změna profilu nemění existující rozvrhy ani hodiny. Ovlivní jen návrhy a formulace u nových."
+            "value" : "Změna typu školy nemění stávající rozvrhy ani hodiny. Ovlivní jen návrhy a pojmenování u nových."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Eine Profiländerung ändert keine bestehenden Stundenpläne oder Stunden. Sie betrifft nur Vorschläge und Formulierungen für neue."
+            "value" : "Das Ändern des Schultyps ändert keine vorhandenen Stundenpläne oder Stunden. Es wirkt sich nur auf Vorschläge und Bezeichnungen für neue aus."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Changing your profile does not change existing timetables or lessons. It only affects suggestions and wording for new ones."
+            "value" : "Changing your school type doesn't change existing timetables or lessons. It only affects suggestions and wording for new ones."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Changer de profil ne modifie ni les emplois du temps ni les cours existants. Cela n’affecte que les suggestions et la formulation des nouveaux."
+            "value" : "Changer de type d’établissement ne modifie pas les emplois du temps ni les cours existants. Cela ne concerne que les suggestions et la formulation des nouveaux."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "A profil módosítása nem változtatja meg a meglévő órarendeket és órákat. Csak az újak javaslataira és megfogalmazására hat."
+            "value" : "Az iskolatípus módosítása nem változtatja meg a meglévő órarendeket és órákat. Csak az újak javaslataira és szóhasználatára hat."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "プロフィールを変更しても、既存の時間割や授業は変わりません。新しく作るものの提案と表現にだけ影響します。"
+            "value" : "学校の種類を変更しても、既存の時間割や授業は変わりません。新しく作成するものの提案と表記にだけ反映されます。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Zmiana profilu nie zmienia istniejących planów ani lekcji. Wpływa tylko na propozycje i sformułowania w nowych."
+            "value" : "Zmiana typu szkoły nie zmienia istniejących planów ani lekcji. Wpływa tylko na podpowiedzi i nazewnictwo nowych."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Schimbarea profilului nu modifică orarele sau orele existente. Afectează doar sugestiile și formulările pentru cele noi."
+            "value" : "Schimbarea tipului de școală nu modifică orarele sau orele existente. Afectează doar sugestiile și denumirile pentru cele noi."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Zmena profilu nemení existujúce rozvrhy ani hodiny. Ovplyvní iba návrhy a formulácie pri nových."
+            "value" : "Zmena typu školy nemení existujúce rozvrhy ani hodiny. Ovplyvní len návrhy a pomenovania pri nových."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Промена профила не мења постојеће распореде и часове. Утиче само на предлоге и формулације за нове."
+            "value" : "Промена типа школе не мења постојеће распореде ни часове. Утиче само на предлоге и називе за нове."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Promena profila ne menja postojeće rasporede i časove. Utiče samo na predloge i formulacije za nove."
+            "value" : "Promena tipa škole ne menja postojeće rasporede ni časove. Utiče samo na predloge i nazive za nove."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Зміна профілю не змінює наявні розклади й уроки. Вона впливає лише на пропозиції та формулювання для нових."
+            "value" : "Зміна типу школи не змінює наявні розклади чи уроки. Вона впливає лише на пропозиції та назви для нових."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "更改身份不会改变已有的课程表或课程，只影响新建内容的建议和措辞。"
+            "value" : "更改学校类型不会改变现有的课程表或课程，只会影响新建内容的建议和用语。"
           }
         }
       }
@@ -90476,19 +90476,19 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Střední škola"
+            "value" : "Střední škola / gymnázium"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Weiterführende Schule"
+            "value" : "Weiterführende Schule / Gymnasium"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Secondary school"
+            "value" : "Secondary / high school"
           }
         },
         "fr" : {
@@ -90500,7 +90500,7 @@
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Középiskola"
+            "value" : "Középiskola / gimnázium"
           }
         },
         "ja" : {
@@ -90512,7 +90512,7 @@
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Szkoła średnia"
+            "value" : "Szkoła średnia / liceum"
           }
         },
         "ro" : {
@@ -90524,31 +90524,31 @@
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Stredná škola"
+            "value" : "Stredná škola / gymnázium"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Средња школа"
+            "value" : "Средња школа / гимназија"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Srednja škola"
+            "value" : "Srednja škola / gimnazija"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Середня школа"
+            "value" : "Середня школа / ліцей"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "中学"
+            "value" : "初中／高中"
           }
         }
       }
@@ -90560,79 +90560,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Univerzita"
+            "value" : "Univerzita / vysoká škola"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Universität"
+            "value" : "Universität / Hochschule"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "University"
+            "value" : "University / college"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Université"
+            "value" : "Université / enseignement supérieur"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Egyetem"
+            "value" : "Egyetem / főiskola"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "大学"
+            "value" : "大学・専門学校"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Uniwersytet"
+            "value" : "Uniwersytet / uczelnia"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Universitate"
+            "value" : "Universitate / facultate"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Univerzita"
+            "value" : "Univerzita / vysoká škola"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Универзитет"
+            "value" : "Универзитет / факултет"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Univerzitet"
+            "value" : "Univerzitet / fakultet"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Університет"
+            "value" : "Університет / коледж"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "大学"
+            "value" : "大学／学院"
           }
         }
       }
@@ -98258,7 +98258,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Some colour names aren't available in this version."
+            "value" : "Some color names aren't available in this version."
           }
         },
         "fr" : {
@@ -99212,79 +99212,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tato změna by uvedla váš rozvrh do nekonzistentního stavu, proto se nic nezměnilo."
+            "value" : "Tato změna by poškodila váš rozvrh, proto se nic nezměnilo."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Diese Änderung hätte deinen Stundenplan in einen inkonsistenten Zustand versetzt, daher wurde nichts geändert."
+            "value" : "Diese Änderung hätte deinen Stundenplan beschädigt, daher wurde nichts geändert."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "That change would have left your timetable in an inconsistent state, so nothing was changed."
+            "value" : "That change would have broken your timetable, so nothing was changed."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Cette modification aurait laissé votre emploi du temps dans un état incohérent, rien n’a donc été modifié."
+            "value" : "Cette modification aurait endommagé votre emploi du temps, rien n’a donc été modifié."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ez a módosítás következetlen állapotban hagyta volna az órarendet, ezért semmi sem változott."
+            "value" : "Ez a módosítás elrontotta volna az órarendet, ezért semmi sem változott."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "この変更を行うと時間割のデータに矛盾が生じるため、何も変更されませんでした。"
+            "value" : "この変更を行うと時間割が壊れるため、何も変更されませんでした。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ta zmiana pozostawiłaby Twój plan w niespójnym stanie, więc nic nie zostało zmienione."
+            "value" : "Ta zmiana uszkodziłaby Twój plan, więc nic nie zostało zmienione."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Modificarea ar fi lăsat orarul într-o stare inconsecventă, așa că nu s-a schimbat nimic."
+            "value" : "Modificarea ți-ar fi stricat orarul, așa că nu s-a schimbat nimic."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Táto zmena by váš rozvrh uviedla do nekonzistentného stavu, preto sa nič nezmenilo."
+            "value" : "Táto zmena by poškodila váš rozvrh, preto sa nič nezmenilo."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ова измена би оставила ваш распоред у недоследном стању, па ништа није промењено."
+            "value" : "Ова измена би оштетила ваш распоред, па ништа није промењено."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ova izmena bi ostavila vaš raspored u nedoslednom stanju, pa ništa nije promenjeno."
+            "value" : "Ova izmena bi oštetila vaš raspored, pa ništa nije promenjeno."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ця зміна залишила б ваш розклад у неузгодженому стані, тому нічого не змінено."
+            "value" : "Ця зміна пошкодила б ваш розклад, тому нічого не змінено."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "此更改会使你的课程表处于不一致的状态，因此未做任何更改。"
+            "value" : "此更改会损坏你的课程表，因此未做任何更改。"
           }
         }
       }
@@ -100820,7 +100820,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mark as done"
+            "value" : "Mark as Done"
           }
         },
         "fr" : {
@@ -101072,7 +101072,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mark as not done"
+            "value" : "Mark as Not Done"
           }
         },
         "fr" : {
@@ -101324,7 +101324,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add task"
+            "value" : "Add Task"
           }
         },
         "fr" : {
@@ -101408,7 +101408,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hide completed tasks"
+            "value" : "Hide Completed Tasks"
           }
         },
         "fr" : {
@@ -101531,13 +101531,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Show %lld completed task"
+                  "value" : "Show %lld Completed Task"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Show %lld completed tasks"
+                  "value" : "Show %lld Completed Tasks"
                 }
               }
             }
@@ -105650,7 +105650,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add subtask"
+            "value" : "Add Subtask"
           }
         },
         "fr" : {
@@ -106658,7 +106658,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No Tasks Yet"
+            "value" : "No tasks yet"
           }
         },
         "fr" : {
@@ -107582,7 +107582,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "All subjects"
+            "value" : "All Subjects"
           }
         },
         "fr" : {
@@ -107666,7 +107666,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show completed"
+            "value" : "Show Completed"
           }
         },
         "fr" : {
@@ -107918,7 +107918,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "All types"
+            "value" : "All Types"
           }
         },
         "fr" : {
@@ -108506,7 +108506,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Filter and sort"
+            "value" : "Filter and Sort"
           }
         },
         "fr" : {
@@ -109094,7 +109094,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "More options"
+            "value" : "More Options"
           }
         },
         "fr" : {
@@ -111992,7 +111992,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Due date"
+            "value" : "Due Date"
           }
         },
         "fr" : {
@@ -114008,7 +114008,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lessons cancelled"
+            "value" : "Lessons canceled"
           }
         },
         "fr" : {
@@ -114662,85 +114662,85 @@
       }
     },
     "timetable.detail.addHomework" : {
-      "comment" : "Lesson detail: button that opens the new-task editor prefilled with this lesson's subject and date.",
+      "comment" : "Button in the lesson detail: adds a homework task linked to this lesson.",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Přidat domácí úkol k této hodině"
+            "value" : "Přidat domácí úkol"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Hausaufgabe für diese Stunde hinzufügen"
+            "value" : "Hausaufgabe hinzufügen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add homework for this lesson"
+            "value" : "Add Homework"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ajouter un devoir pour ce cours"
+            "value" : "Ajouter un devoir"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Házi feladat hozzáadása ehhez az órához"
+            "value" : "Házi feladat hozzáadása"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "この授業の宿題を追加"
+            "value" : "宿題を追加"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Dodaj pracę domową na tę lekcję"
+            "value" : "Dodaj pracę domową"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Adaugă o temă pentru această oră"
+            "value" : "Adaugă temă"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Pridať domácu úlohu na túto hodinu"
+            "value" : "Pridať domácu úlohu"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Додај домаћи за овај час"
+            "value" : "Додај домаћи"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Dodaj domaći za ovaj čas"
+            "value" : "Dodaj domaći"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Додати домашнє завдання до цього уроку"
+            "value" : "Додати домашнє завдання"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "为这节课添加作业"
+            "value" : "添加作业"
           }
         }
       }
@@ -115838,85 +115838,85 @@
       }
     },
     "timetable.detail.tasks" : {
-      "comment" : "Lesson detail: section heading listing the homework and tasks due in (or linked to) this lesson.",
+      "comment" : "Lesson detail: section heading listing the tasks (homework, assignments, to-dos) due in or linked to this lesson.",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Domácí úkoly a úkoly"
+            "value" : "Úkoly"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Hausaufgaben & Aufgaben"
+            "value" : "Aufgaben"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Homework & tasks"
+            "value" : "Tasks"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Devoirs et tâches"
+            "value" : "Tâches"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Házi feladatok és teendők"
+            "value" : "Feladatok"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "宿題とタスク"
+            "value" : "タスク"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Prace domowe i zadania"
+            "value" : "Zadania"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Teme și sarcini"
+            "value" : "Sarcini"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Domáce úlohy a úlohy"
+            "value" : "Úlohy"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Домаћи и задаци"
+            "value" : "Задаци"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Domaći i zadaci"
+            "value" : "Zadaci"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Домашні та інші завдання"
+            "value" : "Завдання"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "作业和任务"
+            "value" : "任务"
           }
         }
       }
@@ -117685,90 +117685,6 @@
         }
       }
     },
-    "timetable.quickAdd.cycleWeekFooter" : {
-      "comment" : "Footer of the quick-add subject picker for alternating weeks. %@ = the shown cycle week, e.g. 'Week B'.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Hodina se přidá jen do týdne %@. Další týdny můžete vybrat v editoru hodiny."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Die Stunde wird nur zu %@ hinzugefügt. Weitere Wochen kannst du im Stundeneditor wählen."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The lesson is added to %@ only. You can choose more weeks in the lesson editor."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Le cours est ajouté uniquement à %@. Vous pouvez choisir d’autres semaines dans l’éditeur de cours."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Az óra csak ehhez kerül hozzáadásra: %@. Több hetet az óraszerkesztőben választhatsz."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "授業は%@にのみ追加されます。ほかの週は授業エディタで選べます。"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Lekcja zostanie dodana tylko do: %@. Więcej tygodni możesz wybrać w edytorze lekcji."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Ora este adăugată doar în: %@. Poți alege mai multe săptămâni în editorul orei."
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Hodina sa pridá len do týždňa %@. Ďalšie týždne môžete vybrať v editore hodiny."
-          }
-        },
-        "sr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Час се додаје само у: %@. Више седмица можете изабрати у уређивачу часа."
-          }
-        },
-        "sr-Latn" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Čas se dodaje samo u: %@. Više sedmica možete izabrati u uređivaču časa."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Урок буде додано лише до: %@. Більше тижнів можна вибрати в редакторі уроку."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "这节课只会添加到%@。更多周可在课程编辑器中选择。"
-          }
-        }
-      }
-    },
     "timetable.quickAdd.cycleWeekOnlyFooter" : {
       "comment" : "Quick-add sheet footer for timetables with A/B (or odd/even) weeks; the header already names the week.",
       "extractionState" : "manual",
@@ -118945,90 +118861,6 @@
         }
       }
     },
-    "timetable.quickAdd.period" : {
-      "comment" : "Quick-add sheet header: the tapped empty slot. %1$lld = lesson number, %2$@ = time range such as '9:50 – 10:35'.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Hodina %1$lld · %2$@"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Stunde %1$lld · %2$@"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Period %1$lld · %2$@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Heure %1$lld · %2$@"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$lld. óra · %2$@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%1$lld限 · %2$@"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Lekcja %1$lld · %2$@"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Ora %1$lld · %2$@"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Hodina %1$lld · %2$@"
-          }
-        },
-        "sr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Час %1$lld · %2$@"
-          }
-        },
-        "sr-Latn" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Čas %1$lld · %2$@"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Урок %1$lld · %2$@"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "第%1$lld节 · %2$@"
-          }
-        }
-      }
-    },
     "timetable.quickAdd.scope.three" : {
       "comment" : "Quick-add sheet header joining three phrases: 'Every Monday · Week B · Period 7 (13:40–14:25)'.",
       "extractionState" : "manual",
@@ -119846,7 +119678,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "day cancelled"
+            "value" : "day canceled"
           }
         },
         "fr" : {
@@ -122324,7 +122156,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lessons are cancelled today"
+            "value" : "Lessons are canceled today"
           }
         },
         "fr" : {
@@ -127262,85 +127094,85 @@
       }
     },
     "widget.homework.description" : {
-      "comment" : "Description of the Homework widget in the widget gallery.",
+      "comment" : "Description of the tasks widget in the iOS widget gallery.",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Otevřené domácí úkoly a úkoly: nejdřív po termínu, potom podle termínu."
+            "value" : "Vaše otevřené úkoly, nejdřív ty po termínu, pak podle termínu."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Offene Hausaufgaben und Aufgaben: zuerst überfällige, dann nach Fälligkeit."
+            "value" : "Deine offenen Aufgaben, Überfälliges zuerst, dann nach Fälligkeit."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open homework and tasks, overdue first, then by due date."
+            "value" : "Your open tasks, overdue first, then by due date."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Devoirs et tâches en cours : d’abord ceux en retard, puis par échéance."
+            "value" : "Vos tâches en cours, en retard d’abord, puis par échéance."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Nyitott házi feladatok és teendők: először a lejártak, utána határidő szerint."
+            "value" : "A nyitott feladataid: először a lejártak, aztán határidő szerint."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "未完了の宿題とタスク。期限切れが先、その後は期限順。"
+            "value" : "未完了のタスク。期限切れを先に、その後は期限順に表示します。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Otwarte prace domowe i zadania: najpierw zaległe, potem według terminu."
+            "value" : "Twoje otwarte zadania: najpierw zaległe, potem według terminu."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Teme și sarcini deschise: mai întâi cele întârziate, apoi după termen."
+            "value" : "Sarcinile tale deschise: întâi cele restante, apoi după termen."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Otvorené domáce úlohy a úlohy: najprv po termíne, potom podľa termínu."
+            "value" : "Vaše otvorené úlohy, najprv tie po termíne, potom podľa termínu."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Отворени домаћи задаци и задаци: прво закаснели, затим по року."
+            "value" : "Ваши отворени задаци, прво они са истеклим роком, па по року."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Otvoreni domaći zadaci i zadaci: prvo zakasneli, zatim po roku."
+            "value" : "Vaši otvoreni zadaci, prvo oni sa isteklim rokom, pa po roku."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Відкриті домашні завдання та справи: спершу прострочені, потім за терміном."
+            "value" : "Ваші відкриті завдання: спершу прострочені, потім за терміном."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "未完成的作业和任务:先显示已逾期的,再按截止日期排序。"
+            "value" : "你的未完成任务，逾期的优先，然后按截止日期排列。"
           }
         }
       }
@@ -127430,85 +127262,85 @@
       }
     },
     "widget.homework.name" : {
-      "comment" : "Name of the Homework widget in the widget gallery and its header (open homework and tasks).",
+      "comment" : "Name of the tasks widget in the iOS widget gallery and its title inside the widget. Shows open tasks of every type.",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Domácí úkoly"
+            "value" : "Úkoly"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Hausaufgaben"
+            "value" : "Aufgaben"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Homework"
+            "value" : "Tasks"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Devoirs"
+            "value" : "Tâches"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Házi feladatok"
+            "value" : "Feladatok"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "宿題"
+            "value" : "タスク"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Prace domowe"
+            "value" : "Zadania"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Teme"
+            "value" : "Sarcini"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Domáce úlohy"
+            "value" : "Úlohy"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Домаћи задаци"
+            "value" : "Задаци"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Domaći zadaci"
+            "value" : "Zadaci"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Домашні завдання"
+            "value" : "Завдання"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "作业"
+            "value" : "任务"
           }
         }
       }

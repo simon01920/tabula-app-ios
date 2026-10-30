@@ -251,3 +251,40 @@ full row "1 overdue task" that opens Tasks › Overdue), `today.section.restOfTo
 `today.tasks.overdue` (the chip) and `today.section.nextSchoolDay` (the header now shows the date).
 Reviewer: `today.section.earlier` labels a collapsed disclosure of the lessons that are already over; the hero's
 durations reuse `widget.duration.*` and `widget.countdown.*`.
+
+### Phase 4U U8 copy and terminology (2026-10-30, localization-engineer)
+English base is now US English (D2), one word per concept (D11) and Title Case / sentence case per element (D12).
+**Re-authored (English meaning changed; old translations dropped, model-authored for 11 languages, `sr-Latn` derived,
+all `needs_review`), 25 keys:**
+- Task (glossary, was "homework"): `editor.impact.linkedItems`, `editor.impact.linkedTasks`, `editor.lesson.delete.note`,
+  `editor.subject.delete.note`, `editor.timetables.delete.note`, `timetable.detail.tasks` ("Tasks", was "Homework & tasks"),
+  `widget.homework.name` ("Tasks", widget gallery name and in-widget title), `widget.homework.description`;
+  `timetable.detail.addHomework` ("Add Homework", was "Add homework for this lesson").
+- Custom times (was "Free times" / "free-form" / "Individual start and end times"): `editor.time.free`,
+  `editor.timetables.new.free`, `editor.time.footer`, `onboarding.time.kind.individual` (sk keeps Astra's "Vlastné časy hodín"),
+  `editor.warning.periodInFreeForm`. Translation: sk "Vlastné časy", cs "Vlastní časy", de "Eigene Zeiten", fr "Horaires personnalisés".
+- Week A / Week B (was "Alternating weeks"): `editor.rotation.kind.weekCycle` and `editor.rotation.week.header` ("Week cycle",
+  pairs with "Day cycle"; sk "Cyklus týždňov", de "Wochenzyklus"), `editor.rotation.footer`,
+  `onboarding.week.repeat.alternatingWeeks|alternatingDays` ("Week A / Week B", "Day A / Day B") and their `.detail` lines.
+- School type (was "profile"): `settings.profile.footer`.
+- Developer language (M4): `editor.rotation.locked.footer` (a plain choice: start a new timetable or reset this one),
+  `editor.subject.contrast.blends` (no "background"/"tiles" explanation), `store.banner.changeRejected.message` (no "inconsistent state").
+
+**English value only, translations kept (they already follow their own rules):**
+- Capitalisation (20): sentence case for empty states and headers `exams.empty.title|upcoming.title|history.title`,
+  `tasks.empty.title`, `exams.next.title`, `editor.terms.open` (row label); Title Case for buttons and menu items
+  `tasks.add`, `tasks.options`, `tasks.filter.all|type.all|showCompleted`, `tasks.sort.due`, `tasks.completed.show|hide`,
+  `tasks.action.complete|reopen`, `tasks.editor.subtask.add`, `tasks.quick.more`, `editor.subjects.moveUp|moveDown`.
+- US spelling (15): Color (`editor.subject.color`, `.color.custom`, `.contrast.low`, `share.warning.unknownColorName`),
+  Gray, Harbor (palette names), Acknowledgments, "afterward" (`settings.colors.apply.confirm.message`), canceled
+  (`a11y.lesson.cancelled`, `lesson.status.cancelled`, `timetable.day.cancelled`, `timetable.strip.dayCancelled`,
+  `today.header.dayCancelled`, `editor.dayChange.existing.cancelLesson`, `editor.dayChange.noLessons`).
+- School type names: `settings.profile.elementary|secondary|university` now use the onboarding names (Elementary school,
+  Secondary / high school, University / college); their translations were copied from `onboarding.profile.*` (`needs_review`).
+
+Removed as unused (U4 left them for U8): `timetable.quickAdd.period`, `timetable.quickAdd.cycleWeekFooter`.
+Kept on purpose: `intent.addHomework.*` and the App Shortcut phrase "Add homework in ${applicationName}" (Siri phrases; a
+change needs new phrases in `AppShortcuts.xcstrings`), "Change for This Day" (editor title and menu item, already paired
+with the sentence-case "Changes on this day" header), alert titles (not covered by D12).
+Reviewer: "Week cycle" must read as the counterpart of the existing "Day cycle" wording; `editor.warning.periodInFreeForm`
+uses the "label: N" form in sk, cs, pl, uk and sr to avoid number agreement; "Custom times" must not read as "spare time".
