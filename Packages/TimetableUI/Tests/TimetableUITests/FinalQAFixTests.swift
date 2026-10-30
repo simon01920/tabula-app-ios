@@ -137,6 +137,21 @@ struct EditorSaveMergeTests {
         #expect(database.tasks.filter { !$0.isDeleted && !$0.isCompleted }.count == 1)   // only the successor is open
     }
 
+    @Test func completeReopenCompleteAgainKeepsOneSuccessor() throws {
+        var clock = HybridLogicalClock(node: 0x35)
+        var database = try database(tasks: [Fixture.weekly])
+        func complete() throws {
+            database = try DatabaseMutation.completeTask(Fixture.weekly.id, at: doneAt).apply(to: database, clock: &clock, now: now)
+        }
+        try complete()
+        let done = try #require(database.tasks.first { $0.id == Fixture.weekly.id })
+        database = try DatabaseMutation.upsert(TaskEdits.reopened(done)).apply(to: database, clock: &clock, now: now)
+        let reopened = try #require(database.tasks.first { $0.id == Fixture.weekly.id })
+        #expect(!reopened.isCompleted)                                       // the original is open again
+        try complete()
+        #expect(database.tasks.filter { !$0.isDeleted }.count == 2)          // original + exactly one successor
+    }
+
     @Test func deletedWhileEditingIsNeverResurrected() throws {
         var clock = HybridLogicalClock(node: 0x25)
         var database = try database(tasks: [Fixture.homework], exams: [Fixture.exam])

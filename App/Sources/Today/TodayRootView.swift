@@ -43,11 +43,13 @@ struct TodayRootView: View {
     @Environment(AppModel.self) private var model
     @Environment(AppNavigation.self) private var navigation
     @State private var sheet: TodaySheet?
+    @State private var undoTaskID: TaskItem.ID?
 
     var body: some View {
         NavigationStack {
             content
                 .navigationTitle(Text("shell.tab.today"))
+                .taskUndoToast($undoTaskID)
         }
         .sheet(item: $sheet) { sheet in
             switch sheet {
@@ -92,7 +94,7 @@ struct TodayRootView: View {
                             hasLessons: hasLessons(database, timetable),
                             actions: TodayActions(openLesson: { sheet = .lesson(LessonDetailTarget($0)) },
                                                   openTask: { sheet = .task($0) },
-                                                  completeTask: { model.apply(.completeTask($0, at: now)) },
+                                                  completeTask: { TaskSupport.complete($0, at: now, model: model, undo: $undoTaskID) },
                                                   openExam: { sheet = .exam($0) },
                                                   showOverdue: { navigation.showTasks(.overdue) }))
             .environment(\.lessonWork, LessonWorkSupport.index(dates: dates, resolver: resolver, database: database))
@@ -224,9 +226,9 @@ private struct DueTodaySection: View {
                     .accessibilityAction(named: Text("tasks.action.complete")) { actions.completeTask(row.id) }
                     .swipeActions(edge: .leading, allowsFullSwipe: true) {
                         Button { actions.completeTask(row.id) } label: {
-                            Label { Text("tasks.action.complete") } icon: { Image(systemName: "checkmark.circle") }
+                            Label { Text("tasks.action.complete") } icon: { Image(AppSymbol.completed) }
                         }
-                        .tint(.green)
+                        .tint(Color.ink)
                     }
             }
             if work.overdueCount > 0 {

@@ -25,14 +25,22 @@ struct ExamEditorView: View {
         }
     }
 
+    /// The draft with its "When" mode already matched to the lessons of the date, so opening the editor is not an edit
+    /// (an appear-time write would switch validation errors on, M5).
     private func makeDraft() -> ExamDraft? {
+        var draft: ExamDraft
         switch target {
         case .existing(let id):
-            return model.database?.exams.first { $0.id == id && !$0.isDeleted }.map(ExamDraft.init(exam:))
+            guard let exam = model.database?.exams.first(where: { $0.id == id && !$0.isDeleted }) else { return nil }
+            draft = ExamDraft(exam: exam)
         case .new:
             guard model.database != nil else { return nil }
-            return ExamDraft(newOn: model.today, timetableID: model.activeTimetable?.id, id: newID)
+            draft = ExamDraft(newOn: model.today, timetableID: model.activeTimetable?.id, id: newID)
         }
+        if let timetableID = draft.timetableID ?? model.activeTimetable?.id, let resolver = model.resolver(for: timetableID) {
+            draft.syncTimeMode(choices: ExamLessonChoice.choices(from: resolver.day(draft.date).entries))
+        }
+        return draft
     }
 }
 
@@ -99,7 +107,6 @@ private struct ExamFormContent: View {
             ReminderOverrideSection(override: $draft.reminderOverride, target: .exam)
             if !draft.isNew { deleteSection }
         }
-        .onAppear(perform: syncTimeMode)
         .onChange(of: draft.date) { _, _ in syncTimeMode() }
     }
 

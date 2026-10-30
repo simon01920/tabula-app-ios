@@ -245,3 +245,59 @@ struct TaskUndoToast: View {
         .accessibilityElement(children: .contain)
     }
 }
+
+/// Shared by Tasks and Today: the "Marked as done · Undo" toast at the bottom, the 8 s auto-dismiss (off while
+/// VoiceOver runs, so Undo stays reachable) and the VoiceOver announcements. `undoTaskID` is the completed task.
+private struct TaskUndoModifier: ViewModifier {
+    @Binding var undoTaskID: TaskItem.ID?
+    @Environment(AppModel.self) private var model
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOver
+
+    func body(content: Content) -> some View {
+        content
+            .safeAreaInset(edge: .bottom) {
+                if undoTaskID != nil {
+                    TaskUndoToast(onUndo: undo)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            }
+            // Restarts for every new completion (the id changes).
+            .task(id: undoTaskID) {
+                guard undoTaskID != nil, !voiceOver else { return }
+                try? await Task.sleep(for: .seconds(8))
+                if !Task.isCancelled { set(nil) }
+            }
+    }
+
+    private func set(_ id: TaskItem.ID?) {
+        withAnimation(reduceMotion ? nil : .default) { undoTaskID = id }
+    }
+
+    private func undo() {
+        if let id = undoTaskID, let task = model.database?.tasks.first(where: { $0.id == id && !$0.isDeleted }) {
+            model.apply(.upsert(TaskEdits.reopened(task)))
+            TaskSupport.announce("tasks.action.reopen", model: model)
+        }
+        set(nil)
+    }
+}
+
+extension View {
+    func taskUndoToast(_ undoTaskID: Binding<TaskItem.ID?>) -> some View {
+        modifier(TaskUndoModifier(undoTaskID: undoTaskID))
+    }
+}
+
+extension TaskSupport {
+    static func announce(_ key: String, model: AppModel) {
+        AccessibilityNotification.Announcement(model.renderer.string(forKey: key)).post()
+    }
+
+    /// Completes `id`; on success arms the undo toast and announces it.
+    static func complete(_ id: TaskItem.ID, at date: Date, model: AppModel, undo: Binding<TaskItem.ID?>) {
+        guard case .applied = model.apply(.completeTask(id, at: date)) else { return }
+        undo.wrappedValue = id
+        announce("tasks.toast.completed", model: model)
+    }
+}

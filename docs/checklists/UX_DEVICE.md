@@ -71,7 +71,8 @@ The hour-cycle locale is applied to the time pickers only (not the whole app).
 - [ ] Onboarding: the **Back** button has a visible thin outline in light and dark mode.
 - [ ] Tasks: open checkboxes are **neutral grey rings** for every subject (no red/green/yellow rings); a checked task
       shows an ink disc with a tick. Yellow-subject tasks have a visible ring.
-- [ ] Tasks filter chips: unselected chip text is black (white in dark mode); the Overdue chip only has a red icon.
+- [ ] Tasks options menu (top left): Sort, Subject, Type and "Show completed" work; the icon is filled while a filter is on.
+- [ ] Complete a task on Tasks and on Today: "Marked as done · Undo" appears; Undo reopens it. With VoiceOver on, the toast stays until you act and is announced.
 - [ ] Timetable grid: empty slots have a thin solid grey outline with a small grey +, visible on white and black.
 
 ### U1.7 Standard close button (M7)

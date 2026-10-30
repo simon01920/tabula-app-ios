@@ -52,7 +52,6 @@ struct TasksRootView: View {
     @State private var sheet: TasksSheet?
     @State private var pendingDelete: TaskItem.ID?
     @State private var undoTaskID: TaskItem.ID?
-    @State private var undoToken = 0
     @State private var didScroll = false
     @State private var minuteTick = 0
 
@@ -72,12 +71,7 @@ struct TasksRootView: View {
                         }
                     }
                 }
-                .safeAreaInset(edge: .bottom) {
-                    if undoTaskID != nil {
-                        TaskUndoToast(onUndo: undo)
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
-                    }
-                }
+                .taskUndoToast($undoTaskID)
         }
         .sheet(item: $sheet) { sheet in
             switch sheet {
@@ -94,12 +88,6 @@ struct TasksRootView: View {
             Button("editor.common.cancel", role: .cancel) { pendingDelete = nil }
         } message: {
             Text(verbatim: deleteMessage)
-        }
-        // The message disappears by itself; a new completion restarts the timer (`undoToken`).
-        .task(id: undoToken) {
-            guard undoTaskID != nil else { return }
-            try? await Task.sleep(for: .seconds(8))
-            if !Task.isCancelled { setUndo(nil) }
         }
         // Overdue-by-time and "today" change while the app is open: re-evaluate once a minute (not in screenshot mode).
         .task {
@@ -256,23 +244,11 @@ struct TasksRootView: View {
         if row.isCompleted {
             if let task = liveTasks.first(where: { $0.id == row.id }) {
                 model.apply(.upsert(TaskEdits.reopened(task)))
+                TaskSupport.announce("tasks.action.reopen", model: model)
             }
-        } else if case .applied = model.apply(.completeTask(row.id, at: model.now)) {
-            setUndo(row.id)
-            AccessibilityNotification.Announcement(model.renderer.string(forKey: "tasks.toast.completed")).post()
+        } else {
+            TaskSupport.complete(row.id, at: model.now, model: model, undo: $undoTaskID)
         }
-    }
-
-    private func setUndo(_ id: TaskItem.ID?) {
-        withAnimation(reduceMotion ? nil : .default) { undoTaskID = id }
-        if id != nil { undoToken &+= 1 }
-    }
-
-    private func undo() {
-        if let id = undoTaskID, let task = liveTasks.first(where: { $0.id == id }) {
-            model.apply(.upsert(TaskEdits.reopened(task)))
-        }
-        setUndo(nil)
     }
 
     // MARK: Filter menu

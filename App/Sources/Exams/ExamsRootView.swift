@@ -124,7 +124,6 @@ struct ExamsRootView: View {
                 .buttonStyle(.plain)
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
-                .accessibilityAddTraits(.isLink)
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) { doneAction(next) }
             } header: {
                 Text("exams.next.title")

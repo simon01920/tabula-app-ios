@@ -149,6 +149,10 @@ public struct TodayHeroText: Sendable {
         func lessonParts(_ lesson: ResolvedLesson) {
             parts.append(lesson.subject.name)
             if let place = place(lesson) { parts.append(renderer.format(key: "a11y.lesson.room", arguments: [.text(place)])) }
+            let reasons = state.reasonsByOccurrence[lesson.id] ?? []
+            if let badge = LessonStatusBadgeModel.make(status: lesson.status, reasons: reasons) {
+                parts.append(renderer.string(forKey: badge.titleKey))
+            }
         }
         func nextParts(_ lesson: ResolvedLesson?, captionKey: String) {
             if let lesson {

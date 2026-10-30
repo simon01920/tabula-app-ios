@@ -21,13 +21,14 @@ struct TaskQuickEntrySheet: View {
     /// Set by "More options": the current draft, now shown in the full editor.
     @State private var expanded: TaskDraft?
     @State private var detent: PresentationDetent = .medium
+    @State private var initial: TaskDraft?
 
     var body: some View {
         Group {
             if let expanded {
                 TaskEditorBody(initial: expanded, startsDirty: !expanded.title.isEmpty)
             } else if model.database != nil {
-                let initial = initialDraft()
+                if let initial {
                 EditorScaffold(
                     titleKey: "tasks.editor.title.new",
                     initial: initial,
@@ -46,10 +47,13 @@ struct TaskQuickEntrySheet: View {
                             detent = .large
                         }
                     })
+                }
             } else {
                 EditorUnavailableView(messageKey: "tasks.editor.unavailable")
             }
         }
+        // Computed once: `body` re-runs (the clock, the model), and a new draft would replace the user's baseline.
+        .onAppear { if initial == nil { initial = initialDraft() } }
         .presentationDetents([.medium, .large], selection: $detent)
         .presentationDragIndicator(.visible)
     }
@@ -88,7 +92,7 @@ private struct TaskQuickEntryForm: View {
             Section {
                 subjectPicker(nextLesson)
                 duePicker(nextLesson)
-                if (pickedDue ?? TaskQuickEntry.choice(of: draft, today: model.today)) == .date {
+                if shownDue(nextLesson) == .date {
                     DateRow(titleKey: "tasks.field.date", date: $draft.dueDate)
                 }
             }
@@ -123,8 +127,14 @@ private struct TaskQuickEntryForm: View {
         }
     }
 
+    /// The picked option, or what the draft represents when the pick is no longer offered (the subject changed).
+    private func shownDue(_ nextLesson: NextLesson?) -> QuickDue {
+        pickedDue.flatMap { TaskQuickEntry.options(nextLesson: nextLesson).contains($0) ? $0 : nil }
+            ?? TaskQuickEntry.choice(of: draft, today: model.today)
+    }
+
     private func duePicker(_ nextLesson: NextLesson?) -> some View {
-        Picker(selection: Binding(get: { pickedDue ?? TaskQuickEntry.choice(of: draft, today: model.today) }, set: { choice in
+        Picker(selection: Binding(get: { shownDue(nextLesson) }, set: { choice in
             followDue = false
             pickedDue = choice
             draft.quickApply(choice, nextLesson: nextLesson, today: model.today)
