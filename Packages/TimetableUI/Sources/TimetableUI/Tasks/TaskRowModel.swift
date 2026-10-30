@@ -74,6 +74,21 @@ public struct TaskDueDescription: Equatable, Sendable {
         renderer.format(key: catalogKey, arguments: arguments(formatter: renderer.formatter))
     }
 
+    /// What a row shows for the due date under a list section (M10): the header already says "Today" / "Tomorrow", so a
+    /// date-only due of that day shows nothing and a timed one only the time. Everything else keeps the full phrase.
+    public enum Line: Equatable, Sendable {
+        case full(TaskDueDescription)
+        case timeOnly(LocalTime)
+    }
+
+    /// The line to show under `section` (`nil` section = no grouping: always the full phrase); `nil` = show nothing.
+    public func line(in section: TaskSection?) -> Line? {
+        switch (section, kind) {
+        case (.today?, .today), (.tomorrow?, .tomorrow): return time.map(Line.timeOnly)
+        default: return .full(self)
+        }
+    }
+
     /// Every catalog key `catalogKey` can return.
     public static let allKeys: [String] = [
         "tasks.due.today", "tasks.due.todayAt", "tasks.due.tomorrow", "tasks.due.tomorrowAt", "tasks.due.inDays",
@@ -120,6 +135,9 @@ public struct TaskRowModel: Identifiable, Equatable, Sendable {
         attachmentCount = task.attachments.filter { !$0.meta.isDeleted }.count
         repeats = task.repeatRule != nil
     }
+
+    /// The due line under `section`; `nil` when the section header already says it (M10).
+    public func dueLine(in section: TaskSection?) -> TaskDueDescription.Line? { due?.line(in: section) }
 
     /// `true` for High and Urgent (Low and Normal show no badge).
     public var showsPriorityBadge: Bool { priority >= .high }

@@ -1,5 +1,8 @@
 // The Tasks tab's list logic (Phase 3 B1): which task belongs to which segment (Today / Upcoming / Overdue /
 // Completed), the subject filter, the sort orders and the segment counts. Pure value logic, Linux-tested.
+// Phase 4U U2 (R2): the tab is ONE grouped list. `TaskSection` (Overdue, Today, Tomorrow, This week, Later, No date)
+// groups the open tasks; completed tasks sit behind a button. `TaskSegment` stays as the "where to look" vocabulary of
+// the routes and of `AppNavigation.showTasks` (it maps to a scroll anchor, `TaskListModel.anchor(for:in:)`).
 //
 // Classification (all in the user's wall clock, `now` = `CalendarContext.local(from:)`):
 //   - completed (`completedAt` set)                        -> Completed
@@ -15,17 +18,34 @@ import TimetableCore
 public enum TaskSegment: String, CaseIterable, Sendable, Equatable {
     case today, upcoming, overdue, completed
 
-    /// Catalog key of the segment label with its count (`%lld`), shown in the segmented control.
-    public var countedTitleKey: String { "tasks.segment." + rawValue + ".count" }
-    /// SF Symbol of the segment (empty states).
-    public var symbolName: String {
-        switch self {
-        case .today: return AppSymbol.today.rawValue
-        case .upcoming: return AppSymbol.date.rawValue
-        case .overdue: return AppSymbol.overdue.rawValue
-        case .completed: return AppSymbol.completed.rawValue
-        }
+}
+
+/// The sections of the grouped Tasks list, in display order (R2). Undated tasks get their own "No date" section, last:
+/// they are neither late nor planned, and a "Later" section full of undated items would hide the dated ones.
+public enum TaskSection: String, CaseIterable, Sendable, Equatable, Hashable {
+    case overdue, today, tomorrow, thisWeek, later, noDate
+
+    /// Catalog key of the section header.
+    public var titleKey: String { "tasks.section." + rawValue }
+}
+
+/// One non-empty section with its tasks (sorted).
+public struct TaskSectionGroup: Equatable, Sendable, Identifiable {
+    public let section: TaskSection
+    public let tasks: [TaskItem]
+    public var id: TaskSection { section }
+
+    public init(section: TaskSection, tasks: [TaskItem]) {
+        self.section = section
+        self.tasks = tasks
     }
+}
+
+/// A place in the grouped list a route or an in-app link can scroll to.
+public enum TaskListAnchor: Hashable, Sendable {
+    case section(TaskSection)
+    /// The "Show N completed tasks" button; also opens the completed tasks.
+    case completed
 }
 
 /// How a segment is sorted.
@@ -79,6 +99,59 @@ public enum TaskListModel {
         if date > now.date { return .upcoming }
         if let time = due.time, time < now.time { return .overdue }
         return .today
+    }
+
+    /// The last day of the calendar week that contains `today` (honours the first weekday).
+    public static func lastDayOfWeek(containing today: LocalDate, context: CalendarContext) -> LocalDate {
+        context.startOfWeek(containing: today).adding(days: 6)
+    }
+
+    /// The grouped-list section of an OPEN task; `nil` for completed and deleted tasks. Overdue = before today, or today
+    /// with a time that has passed (`segment(of:)`); "This week" = after tomorrow until `lastDayOfWeek`; later weeks
+    /// are "Later"; undated and unknown due kinds are "No date". Dates are calendar days (`LocalDate`), so DST changes
+    /// cannot move a task between sections.
+    public static func section(of task: TaskItem, now: LocalDateTime, lastDayOfWeek: LocalDate) -> TaskSection? {
+        switch segment(of: task, now: now) {
+        case nil, .completed?: return nil
+        case .overdue?: return .overdue
+        case .today?: return .today
+        case .upcoming?:
+            guard let date = task.due?.date else { return .noDate }
+            let ahead = now.date.days(to: date)
+            if ahead == 1 { return .tomorrow }
+            return date <= lastDayOfWeek ? .thisWeek : .later
+        }
+    }
+
+    /// The non-empty sections of the open tasks in display order, each sorted by `sort`. Filters: one subject, one kind.
+    public static func sections(of tasks: [TaskItem], now: LocalDateTime, lastDayOfWeek: LocalDate,
+                                subjectFilter: Subject.ID? = nil, kindFilter: TaskKind? = nil,
+                                sort: TaskSort = .due) -> [TaskSectionGroup] {
+        let shown = tasks.filter { matches($0, subjectFilter) && (kindFilter == nil || $0.kind == kindFilter) }
+        return TaskSection.allCases.compactMap { section in
+            let inSection = shown.filter { Self.section(of: $0, now: now, lastDayOfWeek: lastDayOfWeek) == section }
+            return inSection.isEmpty ? nil : TaskSectionGroup(section: section, tasks: inSection.sorted { precedes($0, $1, sort: sort) })
+        }
+    }
+
+    /// The completed tasks (same filters), newest completed first.
+    public static func completedTasks(of tasks: [TaskItem], now: LocalDateTime, subjectFilter: Subject.ID? = nil,
+                                      kindFilter: TaskKind? = nil) -> [TaskItem] {
+        self.tasks(in: .completed, from: tasks.filter { kindFilter == nil || $0.kind == kindFilter }, now: now,
+                   subjectFilter: subjectFilter)
+    }
+
+    /// Where `segment` points in the grouped list: Overdue and Today to their sections (`nil` when empty), Upcoming to
+    /// the first non-empty section after today, Completed to the completed button. `nil` = stay at the top.
+    public static func anchor(for segment: TaskSegment, in groups: [TaskSectionGroup]) -> TaskListAnchor? {
+        let present = Set(groups.map(\.section))
+        switch segment {
+        case .completed: return .completed
+        case .overdue: return present.contains(.overdue) ? .section(.overdue) : nil
+        case .today: return present.contains(.today) ? .section(.today) : nil
+        case .upcoming:
+            return [TaskSection.tomorrow, .thisWeek, .later, .noDate].first(where: present.contains).map { .section($0) }
+        }
     }
 
     /// Counts per segment. `subjectFilter` limits to one subject (`nil` = all).

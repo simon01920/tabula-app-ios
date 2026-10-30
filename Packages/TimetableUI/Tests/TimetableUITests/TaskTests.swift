@@ -245,24 +245,7 @@ struct TaskNextLessonTests {
         #expect(NextLessonResolver.find(subjectID: Subject.ID(UUID()), resolver: resolver, now: SampleScenarios.referenceNow) == nil)
     }
 
-    @Test func quickAddUsesTheLessonElseTomorrow() {
-        let id = TaskItem.ID(UUID())
-        #expect(TaskQuickAdd.makeTask(id: id, title: "  ", subject: nil, nextLesson: nil, today: today, fallbackTimetableID: nil) == nil)
-        let plain = TaskQuickAdd.makeTask(id: id, title: " Buy pens ", subject: nil, nextLesson: nil, today: today,
-                                          fallbackTimetableID: nil)
-        #expect(plain?.title == "Buy pens" && plain?.due == .date(date(2026, 10, 14)) && plain?.kind == .todo)
-        let subject = Subject(id: Subject.ID(UUID()), meta: EditorEntities.placeholderMeta, timetableID: Timetable.ID(UUID()),
-                              name: "Maths", color: .white)
-        let lessonID = Lesson.ID(UUID())
-        let next = NextLesson(date: date(2026, 10, 16), startTime: time(9), lessonID: lessonID)
-        let linked = TaskQuickAdd.makeTask(id: id, title: "Ex. 4", subject: subject, nextLesson: next, today: today,
-                                           fallbackTimetableID: nil)
-        #expect(linked?.due == .date(date(2026, 10, 16)) && linked?.linkedLesson?.lessonID == lessonID
-                && linked?.kind == .homework && linked?.timetableID == subject.timetableID)
-        // A lesson without a subject is ignored.
-        #expect(TaskQuickAdd.makeTask(id: id, title: "x", subject: nil, nextLesson: next, today: today, fallbackTimetableID: nil)?.due
-                == .date(date(2026, 10, 14)))
-    }
+    // The quick-entry defaults moved with the sheet: see TasksExamsU2Tests (TaskQuickEntryTests).
 
     @Test func subtaskToggleAndRepeatSummary() {
         let sub = Subtask(id: Subtask.ID(UUID()), meta: EditorEntities.placeholderMeta, title: "s")
@@ -274,7 +257,8 @@ struct TaskNextLessonTests {
         #expect(TaskEdits.togglingSubtask(Subtask.ID(UUID()), in: base, now: at) == nil)
         let summary = TaskRepeatSummary(rule: RepeatRule(frequency: .weekly, interval: 2, weekdays: [.wednesday, .monday],
                                                           until: date(2027, 1, 31)))
-        #expect(summary?.lines(renderer: renderer) == ["Every 2 weeks", "On Mon and Wed", "Until 31 Jan 2027"])
+        #expect(summary?.line(renderer: renderer) == "Every 2 weeks on Monday and Wednesday")
+        #expect(summary?.untilText(renderer: renderer) == "Until 31 Jan 2027")
         #expect(TaskRepeatSummary(rule: RepeatRule(frequency: RepeatFrequency(rawValue: "yearly"))) == nil)
         #expect(TaskRepeatSummary(rule: nil) == nil)
     }

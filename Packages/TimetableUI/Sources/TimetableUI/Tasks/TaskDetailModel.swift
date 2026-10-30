@@ -26,18 +26,20 @@ public struct TaskRepeatSummary: Equatable, Sendable {
         return renderer.format(key: key, arguments: interval == 1 ? [] : [.integer(Int64(interval))])
     }
 
-    /// The display lines, each one complete catalog phrase.
-    public func lines(renderer: LocalizedTextRenderer) -> [String] {
-        var lines = [Self.everyText(frequency: frequency, interval: interval, renderer: renderer) ?? ""]
-        if !weekdays.isEmpty {
-            let names = weekdays.map { renderer.formatter.weekdayName($0, width: .abbreviated) }
-            lines.append(renderer.format(key: "tasks.repeat.onDays", arguments: [.text(renderer.formatter.list(names))]))
+    /// The rule on ONE line (M22): "Weekly on Tuesday", "Every 2 weeks on Monday and Wednesday", "Every day". Each variant
+    /// is one complete catalog phrase; the weekday list comes from the formatter (no concatenated fragments).
+    public func line(renderer: LocalizedTextRenderer) -> String {
+        guard frequency == .weekly, !weekdays.isEmpty else {
+            return Self.everyText(frequency: frequency, interval: interval, renderer: renderer) ?? ""
         }
-        if let until {
-            lines.append(renderer.format(key: "tasks.repeat.until",
-                                         arguments: [.text(renderer.formatter.date(until, style: .abbreviated))]))
-        }
-        return lines
+        let days = renderer.formatter.list(weekdays.map { renderer.formatter.weekdayName($0, width: .wide) })
+        if interval == 1 { return renderer.format(key: "tasks.repeat.summary.weeklyOn", arguments: [.text(days)]) }
+        return renderer.format(key: "tasks.repeat.summary.everyWeeksOn", arguments: [.integer(Int64(interval)), .text(days)])
+    }
+
+    /// "Until Jan 31, 2027" (`nil` without an end date).
+    public func untilText(renderer: LocalizedTextRenderer) -> String? {
+        until.map { renderer.format(key: "tasks.repeat.until", arguments: [.text(renderer.formatter.date($0, style: .abbreviated))]) }
     }
 }
 

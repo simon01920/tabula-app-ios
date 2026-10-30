@@ -58,6 +58,7 @@ public enum DynamicL10nKeys {
         keys += ReminderTarget.knownValues.map(reminderTarget)
         keys += ExamKind.knownValues.map(examKind)
         keys += ExamWhen.allKeys
+        keys += ExamCompletionAction.allKeys + ExamTimeMode.allCases.map(\.l10nKey)
         keys += ExamDraft.Issue.allCases.map(\.l10nKey)
         for base in termBases {
             keys += ProfilePreset.Terminology.allCases.map { term(base, $0) }

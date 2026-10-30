@@ -2,9 +2,13 @@
 // reorder), notes and the reminder override. Pure, Linux-tested.
 //
 // Rules: title is required; an end needs a start and must be after it (same rule as `Validation`); blank room /
-// building / notes are stored as absent; blank topics are dropped. Fields the timetable hides (`FieldVisibility`:
-// room, building, notes) keep their stored value when the exam is saved. Everything the editor does not show
+// building / notes are stored as absent; blank topics are dropped. The editor offers room, building and notes whatever
+// the timetable's field visibility says (D10: visibility shapes summaries only). Everything the editor does not show
 // (completion, unknown fields, sync metadata) is preserved from the exam being edited.
+//
+// "When" (M25): `timeMode` is a view over the existing start / end fields, with no schema change. During a lesson =
+// the times of one lesson of that day (copied into start / end), Custom time = start and optional end, All day = no
+// start. Only the times are stored.
 import Foundation
 import TimetableCore
 
@@ -43,6 +47,10 @@ public struct ExamDraft: Equatable, Sendable {
     public var topics: [Topic]
     public var notes: String
     public var reminderOverride: ReminderOverride?
+    /// How the time is chosen (M25). Derived from the fields on opening; never stored.
+    public private(set) var timeMode: ExamTimeMode
+    /// The lesson chosen while `timeMode == .lesson`.
+    public private(set) var chosenLessonID: OccurrenceID?
     private var nextTopicID: Int
     private let base: Exam?
 
@@ -66,6 +74,7 @@ public struct ExamDraft: Equatable, Sendable {
         nextTopicID = exam.topics.count
         notes = exam.notes ?? ""
         reminderOverride = exam.reminderOverride
+        timeMode = exam.start == nil ? .allDay : .custom
     }
 
     /// A new exam on `date` (default: a week from `today`), linked to `timetableID`.
@@ -89,6 +98,7 @@ public struct ExamDraft: Equatable, Sendable {
         nextTopicID = 0
         notes = ""
         reminderOverride = nil
+        timeMode = .allDay
     }
 
     static let defaultStart = LocalTime(hour: 8, minute: 0) ?? .midnight
@@ -128,6 +138,63 @@ public struct ExamDraft: Equatable, Sendable {
         if on, end <= start { end = start.adding(minutes: Self.defaultLength) ?? start }
     }
 
+    // MARK: When (M25)
+
+    /// The modes to offer for the lessons of the chosen date: "During a lesson" only when there is a lesson (or it is
+    /// the current mode, so it never vanishes under the user).
+    public func availableTimeModes(choices: [ExamLessonChoice]) -> [ExamTimeMode] {
+        ExamTimeMode.allCases.filter { $0 != .lesson || !choices.isEmpty || timeMode == .lesson }
+    }
+
+    /// Switches the mode. Lesson: the lesson already chosen, else the one with the current times, else the first;
+    /// Custom: keeps the current times (a start of 8:00 when there was none); All day: no start, no end.
+    public mutating func setTimeMode(_ mode: ExamTimeMode, choices: [ExamLessonChoice]) {
+        switch mode {
+        case .allDay:
+            setHasStart(false)
+            chosenLessonID = nil
+            timeMode = .allDay
+        case .custom:
+            setHasStart(true)
+            chosenLessonID = nil
+            timeMode = .custom
+        case .lesson:
+            let keep = choices.first { $0.id == chosenLessonID }
+                ?? choices.first { hasStart && $0.start == start && hasEnd && $0.end == end } ?? choices.first
+            if let keep { chooseLesson(keep) }
+        }
+    }
+
+    /// Chooses a lesson: its times become the exam's start and end; an exam without a subject gets the lesson's.
+    public mutating func chooseLesson(_ choice: ExamLessonChoice) {
+        timeMode = .lesson
+        chosenLessonID = choice.id
+        hasStart = true
+        start = choice.start
+        hasEnd = true
+        end = choice.end
+        if subjectID == nil { subjectID = choice.subject.id }
+    }
+
+    /// Re-reads the mode against the lessons of the (possibly changed) date: a stored exam whose times are exactly one
+    /// lesson's opens as "During a lesson"; a chosen lesson that is no longer on the date turns into Custom time.
+    public mutating func syncTimeMode(choices: [ExamLessonChoice]) {
+        switch timeMode {
+        case .lesson:
+            if let id = chosenLessonID, !choices.contains(where: { $0.id == id }) {
+                chosenLessonID = nil
+                timeMode = .custom
+            }
+        case .custom:
+            if hasEnd, let match = choices.first(where: { $0.start == start && $0.end == end }) {
+                chosenLessonID = match.id
+                timeMode = .lesson
+            }
+        case .allDay:
+            break
+        }
+    }
+
     public mutating func addTopic() {
         topics.append(Topic(id: nextTopicID, text: ""))
         nextTopicID += 1
@@ -158,8 +225,9 @@ public struct ExamDraft: Equatable, Sendable {
     /// `completedAt` of the exam when the editor opened (the editor never changes it; `EditorStoreMerge`).
     public var openedCompletedAt: Date? { base?.completedAt }
 
-    /// The exam to store (`AppModel.apply(.upsert(_:))` stamps the metadata).
-    public func makeExam(visibility: FieldVisibility) -> Exam? {
+    /// The exam to store (`AppModel.apply(.upsert(_:))` stamps the metadata). Room, building and notes are always
+    /// saved: field visibility only shapes summaries, the editor offers every field (D10, U2-15).
+    public func makeExam() -> Exam? {
         guard canSave, let cleanTitle = EditorText.trimmedOrNil(title) else { return nil }
         var exam = base ?? Exam(id: examID, meta: EditorEntities.placeholderMeta, title: cleanTitle, date: date)
         exam.timetableID = timetableID
@@ -169,9 +237,9 @@ public struct ExamDraft: Equatable, Sendable {
         exam.date = date
         exam.start = hasStart ? start : nil
         exam.end = hasStart && hasEnd ? end : nil
-        if visibility.isVisible(.room) { exam.room = EditorText.trimmedOrNil(room) }
-        if visibility.isVisible(.building) { exam.building = EditorText.trimmedOrNil(building) }
-        if visibility.isVisible(.notes) { exam.notes = EditorText.trimmedOrNil(notes) }
+        exam.room = EditorText.trimmedOrNil(room)
+        exam.building = EditorText.trimmedOrNil(building)
+        exam.notes = EditorText.trimmedOrNil(notes)
         exam.topics = EditorText.cleanedList(topics.map(\.text))
         exam.reminderOverride = reminderOverride
         return exam

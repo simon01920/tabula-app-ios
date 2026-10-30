@@ -2270,7 +2270,7 @@
       }
     },
     "a11y.task.subtasks" : {
-      "comment" : "VoiceOver phrase in a task row. Arg 1 = completed subtasks, arg 2 = all subtasks.",
+      "comment" : "VoiceOver phrase for subtask progress of a task (row and detail). Arg 1 = completed subtasks, arg 2 = all subtasks.",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
@@ -2288,7 +2288,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$lld of %2$lld subtasks done"
+            "value" : "%1$lld of %2$lld subtasks complete"
           }
         },
         "fr" : {
@@ -39439,6 +39439,42 @@
         }
       }
     },
+    "exams.action.more" : {
+      "comment" : "VoiceOver label of the ellipsis menu button in the exam detail toolbar.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More"
+          }
+        }
+      }
+    },
+    "exams.action.moveToHistory" : {
+      "comment" : "Exam detail menu and list swipe action before the exam date: moves the exam to History.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move to History"
+          }
+        }
+      }
+    },
+    "exams.action.takenIt" : {
+      "comment" : "Exam detail and list swipe action, shown from the exam date on: moves the exam to History.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I've Taken This Exam"
+          }
+        }
+      }
+    },
     "exams.add" : {
       "comment" : "Toolbar button on the Exams tab that opens the new-exam editor.",
       "extractionState" : "manual",
@@ -41287,6 +41323,18 @@
         }
       }
     },
+    "exams.editor.moreDetails" : {
+      "comment" : "Exam editor: disclosure row that reveals room, building and notes.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More details"
+          }
+        }
+      }
+    },
     "exams.editor.name.prompt" : {
       "comment" : "Hint text inside the empty title field of the exam editor (disappears when typing); also its VoiceOver label.",
       "extractionState" : "manual",
@@ -42375,6 +42423,78 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "此考试已不存在，无法编辑。"
+          }
+        }
+      }
+    },
+    "exams.editor.when" : {
+      "comment" : "Exam editor: picker for how the exam time is given.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When"
+          }
+        }
+      }
+    },
+    "exams.editor.when.allDay" : {
+      "comment" : "Exam editor 'When' option: the exam has no time of day.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All day"
+          }
+        }
+      }
+    },
+    "exams.editor.when.custom" : {
+      "comment" : "Exam editor 'When' option: the user enters a start and optional end time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom time"
+          }
+        }
+      }
+    },
+    "exams.editor.when.lesson" : {
+      "comment" : "Exam editor 'When' option: the exam takes place during one of that day's lessons; its times are copied from the lesson.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "During a lesson"
+          }
+        }
+      }
+    },
+    "exams.editor.when.lessonPick" : {
+      "comment" : "Exam editor: picker that chooses which lesson of the day the exam is held in.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesson"
+          }
+        }
+      }
+    },
+    "exams.editor.when.noLessons" : {
+      "comment" : "Exam editor footer under 'When' when the chosen date has no lessons to pick from.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No lessons are scheduled on this date."
           }
         }
       }
@@ -100717,6 +100837,42 @@
         }
       }
     },
+    "tasks.completed.hide" : {
+      "comment" : "Tasks list: button that hides the completed tasks again.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide completed tasks"
+          }
+        }
+      }
+    },
+    "tasks.completed.show" : {
+      "comment" : "Tasks list: button at the end of the list that reveals the completed tasks (plural on arg 1).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Show %lld completed task"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Show %lld completed tasks"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "tasks.delete.confirm" : {
       "comment" : "Destructive button of the delete-task confirmation dialog.",
       "extractionState" : "manual",
@@ -105253,6 +105409,30 @@
         }
       }
     },
+    "tasks.empty.allDone.detail" : {
+      "comment" : "Tasks list empty state description under 'All caught up'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing is open. Tap the plus button to add a task."
+          }
+        }
+      }
+    },
+    "tasks.empty.allDone.title" : {
+      "comment" : "Tasks list empty state: every task is completed, none is open.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All caught up"
+          }
+        }
+      }
+    },
     "tasks.empty.completed.detail" : {
       "comment" : "Empty state text of the Completed segment of the Tasks tab.",
       "extractionState" : "manual",
@@ -107185,6 +107365,18 @@
         }
       }
     },
+    "tasks.filter.showCompleted" : {
+      "comment" : "Tasks filter menu: switch that shows or hides completed tasks at the end of the list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show completed"
+          }
+        }
+      }
+    },
     "tasks.filter.title" : {
       "comment" : "Label of the subject filter in the Tasks tab options menu.",
       "extractionState" : "manual",
@@ -107265,6 +107457,30 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "科目"
+          }
+        }
+      }
+    },
+    "tasks.filter.type" : {
+      "comment" : "Tasks filter menu: picker that filters by task type (Homework, To-do, Assignment).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type"
+          }
+        }
+      }
+    },
+    "tasks.filter.type.all" : {
+      "comment" : "Tasks filter menu: the choice that shows every task type.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All types"
           }
         }
       }
@@ -107353,6 +107569,18 @@
         }
       }
     },
+    "tasks.kind.assignment.hint" : {
+      "comment" : "One-line description under the task type picker for Assignment.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A larger piece of work with a deadline"
+          }
+        }
+      }
+    },
     "tasks.kind.homework" : {
       "comment" : "Task type.",
       "extractionState" : "manual",
@@ -107437,6 +107665,18 @@
         }
       }
     },
+    "tasks.kind.homework.hint" : {
+      "comment" : "One-line description under the task type picker for Homework.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Work for a lesson"
+          }
+        }
+      }
+    },
     "tasks.kind.todo" : {
       "comment" : "Task type: a general to-do item.",
       "extractionState" : "manual",
@@ -107517,6 +107757,18 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "待办"
+          }
+        }
+      }
+    },
+    "tasks.kind.todo.hint" : {
+      "comment" : "One-line description under the task type picker for To-do.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A personal reminder"
           }
         }
       }
@@ -107937,6 +108189,54 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "紧急"
+          }
+        }
+      }
+    },
+    "tasks.quick.due.nextLesson" : {
+      "comment" : "Quick-entry sheet: due choice that uses the subject's next lesson. Arg 1 = its date, e.g. 'Tue, Oct 20'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next lesson (%@)"
+          }
+        }
+      }
+    },
+    "tasks.quick.due.pick" : {
+      "comment" : "Quick-entry sheet: due choice that reveals a date picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick a date…"
+          }
+        }
+      }
+    },
+    "tasks.quick.more" : {
+      "comment" : "Quick-entry sheet: button that opens the full task editor with the same draft (priority, notes, subtasks, repeat, reminder, attachments).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More options"
+          }
+        }
+      }
+    },
+    "tasks.quick.prompt" : {
+      "comment" : "Quick-entry sheet for a new task: prompt of the focused title field.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What do you need to do?"
           }
         }
       }
@@ -109495,6 +109795,42 @@
         }
       }
     },
+    "tasks.repeat.summary.everyWeeksOn" : {
+      "comment" : "Task detail: repeat rule on one line for a weekly repeat every N weeks (plural on arg 1). Arg 2 = the weekdays, e.g. 'Monday and Wednesday'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Every %1$lld week on %2$@"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Every %1$lld weeks on %2$@"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "tasks.repeat.summary.weeklyOn" : {
+      "comment" : "Task detail: repeat rule on one line for a weekly repeat every week. Arg 1 = the weekdays, e.g. 'Tuesday' or 'Monday and Wednesday'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weekly on %@"
+          }
+        }
+      }
+    },
     "tasks.repeat.until" : {
       "comment" : "Repeat summary line. Arg 1 = formatted end date.",
       "extractionState" : "manual",
@@ -109659,6 +109995,114 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "%1$lld/%2$lld"
+          }
+        }
+      }
+    },
+    "tasks.section.completed" : {
+      "comment" : "Tasks list: header of the section that lists completed tasks after the user chose to show them.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completed"
+          }
+        }
+      }
+    },
+    "tasks.section.count" : {
+      "comment" : "VoiceOver value of a Tasks list section header: how many tasks the section has (plural on arg 1).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld task"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld tasks"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "tasks.section.later" : {
+      "comment" : "Tasks list: header of the section with tasks due after this week.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Later"
+          }
+        }
+      }
+    },
+    "tasks.section.noDate" : {
+      "comment" : "Tasks list: header of the section with tasks that have no due date.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No date"
+          }
+        }
+      }
+    },
+    "tasks.section.overdue" : {
+      "comment" : "Tasks list: header of the section with open tasks that are past their due date. Sentence case. The count is shown next to it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overdue"
+          }
+        }
+      }
+    },
+    "tasks.section.thisWeek" : {
+      "comment" : "Tasks list: header of the section with tasks due after tomorrow but before the end of this calendar week.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This week"
+          }
+        }
+      }
+    },
+    "tasks.section.today" : {
+      "comment" : "Tasks list: header of the section with tasks due today.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today"
+          }
+        }
+      }
+    },
+    "tasks.section.tomorrow" : {
+      "comment" : "Tasks list: header of the section with tasks due tomorrow.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tomorrow"
           }
         }
       }
@@ -110415,6 +110859,30 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "任务"
+          }
+        }
+      }
+    },
+    "tasks.toast.completed" : {
+      "comment" : "Short message at the bottom of the Tasks list after the user completes a task, next to the Undo button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Marked as done"
+          }
+        }
+      }
+    },
+    "tasks.toast.undo" : {
+      "comment" : "Button in the 'Marked as done' message that reopens the task the user just completed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo"
           }
         }
       }
