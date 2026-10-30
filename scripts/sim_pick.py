@@ -22,6 +22,7 @@ import json
 import re
 import sys
 
+MULTI_DISPLAY = re.compile(r"Duo|Fold")
 FAMILY = {"iOS": "iPhone", "watchOS": "Apple Watch"}
 PREFIX = {"iOS": "SIM", "watchOS": "WATCH"}
 
@@ -45,16 +46,25 @@ def pick(data, platform, device=""):
     if not runtimes:
         raise SystemExit(f"error: no available {platform} simulator runtime "
                          f"({len(data['runtimes'])} runtimes listed in total)")
-    runtime = max(runtimes, key=lambda r: version_tuple(r.get("version")))
     family = FAMILY[platform]
-    types = runtime.get("supportedDeviceTypes")
-    if not types:
-        v = version_tuple(runtime.get("version"))
-        types = [t for t in data["devicetypes"]
-                 if (t.get("productFamily") == family or t["name"].startswith(family))
-                 and version_tuple(t.get("minRuntimeVersionString", "0")) <= v
-                 <= version_tuple(t.get("maxRuntimeVersionString", "999"))]
-    candidates = [t for t in types if t.get("productFamily", family) == family and t["name"].startswith(family)]
+
+    def candidates_of(runtime):
+        types = runtime.get("supportedDeviceTypes")
+        if not types:
+            v = version_tuple(runtime.get("version"))
+            types = [t for t in data["devicetypes"]
+                     if (t.get("productFamily") == family or t["name"].startswith(family))
+                     and version_tuple(t.get("minRuntimeVersionString", "0")) <= v
+                     <= version_tuple(t.get("maxRuntimeVersionString", "999"))]
+        return [t for t in types if t.get("productFamily", family) == family and t["name"].startswith(family)]
+
+    # Newest runtime first. iOS without an explicit device: skip a newer runtime that only offers multi-display
+    # devices (iOS 27.1 on the runner image offered only "iPhone Duo"); `simctl io screenshot` fails on those.
+    runtimes.sort(key=lambda r: version_tuple(r.get("version")), reverse=True)
+    runtime = runtimes[0]
+    if platform == "iOS" and not device:
+        runtime = next((r for r in runtimes if any(not MULTI_DISPLAY.search(t["name"]) for t in candidates_of(r))), runtime)
+    candidates = candidates_of(runtime)
     if not candidates:
         raise SystemExit(f"error: {runtime['name']} supports no {family} device types")
     if device:
@@ -63,7 +73,9 @@ def pick(data, platform, device=""):
             raise SystemExit(f"error: device type {device!r} not supported by {runtime['name']}: "
                              f"{sorted(t['name'] for t in candidates)}")
     elif platform == "iOS":
-        chosen = max(candidates, key=lambda t: ("Pro Max" in t["name"], numbers(t["name"])[0], t["name"]))
+        # Multi-display devices (Duo, Fold) break `simctl io screenshot` ("Cannot choose between 2 displays"): last resort only.
+        chosen = max(candidates, key=lambda t: (not MULTI_DISPLAY.search(t["name"]), "Pro Max" in t["name"],
+                                                numbers(t["name"])[0], t["name"]))
     else:
         chosen = max(candidates, key=lambda t: (numbers(t["name"]), t["name"]))
     p = PREFIX[platform]
@@ -154,6 +166,18 @@ def self_test():
         r.pop("supportedDeviceTypes")
     expect("fallback without supportedDeviceTypes respects minRuntimeVersion", lambda: pick(no_supported, "iOS")["SIM_NAME"],
            "iPhone 17 Pro Max")
+    multi = json.loads(json.dumps(sample))
+    duo, fold = _dt("iPhone Duo", "iPhone"), _dt("iPhone 18 Duo", "iPhone")
+    by = {t["name"]: t for t in sample["devicetypes"]}
+    multi["runtimes"] = [_rt("iOS", "27.1", "24B1", [duo, fold, by["iPhone 17"], by["iPhone 17 Pro Max"]])]
+    expect("multi-display Duo ignored, iPhone 17 Pro Max chosen", lambda: pick(multi, "iOS")["SIM_NAME"], "iPhone 17 Pro Max")
+    multi["runtimes"] = [_rt("iOS", "27.1", "24B1", [fold, by["iPhone 17"]])]
+    expect("Duo ignored even without a Pro Max", lambda: pick(multi, "iOS")["SIM_NAME"], "iPhone 17")
+    multi["runtimes"] = [_rt("iOS", "27.1", "24B1", [duo])]
+    expect("Duo only as last resort", lambda: pick(multi, "iOS")["SIM_NAME"], "iPhone Duo")
+    multi["runtimes"] = [_rt("iOS", "27.0", "24A4", [by["iPhone 17 Pro Max"]]), _rt("iOS", "27.1", "24B1", [duo])]
+    expect("newer Duo-only runtime skipped for older runtime with a normal iPhone",
+           lambda: (pick(multi, "iOS")["SIM_RUNTIME_NAME"], pick(multi, "iOS")["SIM_NAME"]), ("iOS 27.0", "iPhone 17 Pro Max"))
     print(f"sim_pick self-test: {'all passed' if not failures else f'{failures} FAILED'}")
     return failures
 
