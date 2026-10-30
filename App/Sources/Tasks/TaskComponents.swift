@@ -73,6 +73,7 @@ struct TaskPriorityBadge: View {
 /// The text part of a task row (title, subject, relative due, indicators). Hidden fields are absent, not dashed.
 struct TaskRowText: View {
     let row: TaskRowModel
+    var hidesDueToday = false
     @Environment(AppModel.self) private var model
 
     var body: some View {
@@ -89,9 +90,9 @@ struct TaskRowText: View {
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            if let due = row.due {
+            if let due = row.due, let dueText = dueText(due) {
                 Label {
-                    Text(verbatim: due.text(renderer: model.renderer))
+                    Text(verbatim: dueText)
                 } icon: {
                     Image(systemName: row.isOverdue ? "exclamationmark.triangle.fill" : "calendar")
                 }
@@ -101,6 +102,12 @@ struct TaskRowText: View {
             }
             indicators
         }
+    }
+
+    /// The due phrase; under "Due today" only the due time (or nothing).
+    private func dueText(_ due: TaskDueDescription) -> String? {
+        guard hidesDueToday, due.kind == .today else { return due.text(renderer: model.renderer) }
+        return due.time.map(model.formatter.time)
     }
 
     @ViewBuilder
@@ -134,6 +141,8 @@ struct TaskRowText: View {
 /// one sentence; the list adds the custom actions (open, complete / reopen, delete).
 struct TaskRowView: View {
     let row: TaskRowModel
+    /// Under a "Due today" header: no "Today" label (Opus M10), only a due time.
+    var hidesDueToday = false
     let onOpen: () -> Void
     let onToggle: () -> Void
 
@@ -142,7 +151,7 @@ struct TaskRowView: View {
             TaskCompletionControl(isCompleted: row.isCompleted, subject: row.subject, action: onToggle)
                 .accessibilityHidden(true)
             Button(action: onOpen) {
-                TaskRowText(row: row)
+                TaskRowText(row: row, hidesDueToday: hidesDueToday)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.vertical, 10)
                     .contentShape(Rectangle())

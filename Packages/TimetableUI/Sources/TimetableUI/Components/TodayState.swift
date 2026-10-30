@@ -30,6 +30,12 @@ public enum TodayItem: Equatable, Sendable, Identifiable {
         }
     }
 
+    /// The timing of a lesson (`nil` for gaps).
+    public var timing: Timing? {
+        if case let .lesson(_, _, timing) = self { return timing }
+        return nil
+    }
+
     /// Minutes of a gap (0 for lessons).
     public var gapMinutes: Int {
         if case let .gap(start, end, _) = self { return start.minutes(to: end) }
@@ -72,6 +78,30 @@ public struct TodayState: Equatable, Sendable {
     public var upcomingDay: DaySchedule?
     /// Its timeline (all upcoming).
     public var upcomingItems: [TodayItem]
+    /// The last day of the holiday shown by a `.holiday` header ("until Fri, Oct 30"; U3).
+    public var holidayEnd: LocalDate?
+    /// Today's rotation position ("Week B"), for the navigation subtitle (U3, Opus L2).
+    public var cycle: CycleLabel?
+
+    /// "Rest of today" (U3, Opus H3.2 / Astra F14): today's lessons that have not started yet. The current lesson is
+    /// in the hero and never repeated; earlier lessons are in `earlierItems`. Gaps are dropped (the rows show times).
+    public var remainingItems: [TodayItem] { items.filter { $0.timing == .upcoming } }
+    /// "Earlier today": the lessons that are over (a collapsed disclosure on Today).
+    public var earlierItems: [TodayItem] { items.filter { $0.timing == .past } }
+
+    /// What to bring for `items` (a day's timeline): the visible bring lists of the lessons that take place, in
+    /// lesson order, without repeats (case-insensitive). Empty when the field is hidden or nothing is listed.
+    public static func bringList(_ items: [TodayItem], visibility: FieldVisibility) -> [String] {
+        var seen: Set<String> = []
+        var result: [String] = []
+        for case let .lesson(lesson, _, _) in items where lesson.status != .cancelled {
+            for item in VisibleLessonFields(lesson: lesson, visibility: visibility).bringList
+            where seen.insert(item.lowercased()).inserted {
+                result.append(item)
+            }
+        }
+        return result
+    }
 
     /// Modification reasons of every listed occurrence (for the header's badge and VoiceOver sentence).
     public var reasonsByOccurrence: [OccurrenceID: [ModificationReason]] {
@@ -90,6 +120,7 @@ public struct TodayState: Equatable, Sendable {
         let schedule = resolution.schedule
         let nowNext = resolver.nowAndNext(at: now)
         let header: Header
+        var holidayID = schedule.activeBreakID
         switch nowNext.state {
         case .inLesson:
             header = nowNext.current.map { .current($0, next: nowNext.next) } ?? .dayOver(next: nowNext.next)
@@ -102,6 +133,7 @@ public struct TodayState: Equatable, Sendable {
         case .afterLastLesson:
             header = .dayOver(next: nowNext.next)
         case .inBreak(let id):
+            holidayID = id
             header = .holiday(name: breakName(id, database), next: nowNext.next)
         case .noLessonsToday:
             if let id = schedule.cancellingOverrideID {
@@ -128,7 +160,12 @@ public struct TodayState: Equatable, Sendable {
                                          bell: bellSchedule(nextResolution.schedule.bellScheduleID, database), now: now)
             }
         }
-        return TodayState(date: today, header: header, items: items, upcomingDay: upcomingDay, upcomingItems: upcomingItems)
+        var holidayEnd: LocalDate?
+        if case .holiday = header, let holidayID {
+            holidayEnd = database.breaks.first { $0.id == holidayID }?.range.end
+        }
+        return TodayState(date: today, header: header, items: items, upcomingDay: upcomingDay, upcomingItems: upcomingItems,
+                          holidayEnd: holidayEnd, cycle: CycleLabel.of(schedule, scheme: resolver.timetable.rotation))
     }
 
     /// Lessons in wall-clock order with a gap item wherever time passes between the end of everything so far and the
