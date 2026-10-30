@@ -497,3 +497,90 @@ Not testable on device yet: nothing in U7 depends on a missing feature. Open des
 | IQ.5 | Grid with a cancelled lesson on a dark and on a yellow subject colour | The red ⊗ badge sits on a solid white (light) / dark-grey (dark) capsule and stays clearly red | | |
 | IQ.6 | A lesson with two changes (e.g. room and teacher) | Its badge is the asterisk-in-circle "Changed" symbol (not a pencil); the legend shows the same | | |
 | IQ.7 | Settings → Colors → Apply to All Subjects → Undo, after renaming one subject in between | Undo restores the colours only; the rename stays. A timetable with its own palette is not recoloured | | |
+
+## U2 — Tasks and Exams
+
+Routes (CI screenshots and `-TabulaScreen`): `tasks`, `tasks.upcoming`, `tasks.overdue`, `tasks.completed`,
+`tasks.quick-add`, `tasks.detail`, `tasks.editor`, `tasks.editor-new`, `exams`, `exams.history`, `exams.detail`,
+`exams.editor`. Nothing here was run on a device: the screens were written and compiled, not seen.
+State matrix for every screen below: empty / normal / long titles / Dynamic Type XXL and AX-XXXL / dark mode / German and
+Slovak strings / Japanese / VoiceOver.
+
+### U2.1 Tasks grouped list (R2, C3, M23)
+- [ ] Open Tasks: one list, sections in the order Overdue, Today, Tomorrow, This week, Later, No date; empty sections are
+      absent; each header shows its count. No chips, no inline form, no grey/white seam under the title.
+- [ ] Only the Overdue header and overdue due labels are red (with the triangle). Nothing else on the screen is red.
+- [ ] With seed data `secondary`: an undated task is in "No date"; a task due Sunday is "This week" on Monday and "Tomorrow"
+      on Saturday.
+- [ ] AX-XXXL: headers and rows wrap, nothing is cut off, the list scrolls (no screen filled by one block).
+- [ ] VoiceOver: a header reads "Overdue, 2 tasks, heading"; the rotor "Headings" jumps between sections.
+- [ ] Empty states: no tasks at all; everything completed ("All caught up"); a filter with no match.
+
+### U2.2 Toolbar menu and completed tasks
+- [ ] The filter menu has Sort by, Subject, Type, Show completed. Choosing a subject or type fills the icon; the list filters.
+- [ ] "Show N completed tasks" is the last row (plural: 1 task, 2 tasks, 5 tasks in Slovak); tapping it shows them under
+      "Completed"; "Hide completed tasks" hides them; the menu switch does the same.
+
+### U2.3 Rows and completion (H7, F15, M10)
+- [ ] The circle is a neutral ring, ink and a checkmark when done. The subject is a small emoji tile before its name.
+- [ ] Tap the circle: the task completes and "Marked as done, Undo" appears for about 8 s; Undo reopens it. Tapping the
+      circle never opens the detail; tapping the title never completes.
+- [ ] A repeating task: complete, Undo. The next occurrence stays (expected); it is not duplicated by completing again.
+- [ ] Under Today a task due today shows no "Today" label (a timed one shows only the time); under Tomorrow likewise.
+- [ ] Swipe right completes, swipe left deletes with a confirmation. VoiceOver actions: Open (default), Mark as done, Delete.
+- [ ] Reduce Motion: the message appears without sliding. VoiceOver announces "Marked as done".
+
+### U2.4 Deep links and routes
+- [ ] Today's "N overdue" link opens Tasks scrolled to Overdue. `tasks.upcoming` scrolls to the first later section;
+      `tasks.completed` shows the completed tasks and scrolls to them. (Section scrolling is the least certain part: report
+      it if the header stops half-hidden.)
+
+### U2.5 Quick-entry sheet (H6, M21, D5)
+- [ ] "+" opens a sheet at the medium height with the keyboard up and the title focused ("What do you need to do?").
+      Add is disabled until there is a title; the hint "Enter a title to save." is visible from the start.
+- [ ] During a lesson: Subject is that lesson's subject; Type is Homework; Due is "Next lesson (Tue, Oct 20)". Between lessons
+      or after school: the next lesson's subject.
+- [ ] Choose "No subject": Type becomes To-do and Due becomes Tomorrow. Choose a type yourself, then change the subject: the
+      type stays. "Pick a date…" shows a date picker.
+- [ ] Type is a segmented control with one line of explanation under it; at AX sizes it is a menu.
+- [ ] "More options" grows the sheet to large and shows the full editor with the same title, subject, due and type. Save
+      there creates one task.
+- [ ] Add creates the task and closes the sheet; it appears in the right section. Swipe down with a typed title asks first.
+
+### U2.6 Task detail and editor (M22, U2-*)
+- [ ] Detail: every value has the same grey style; the repeat is one line ("Weekly on Tuesday"; in German and Slovak too);
+      an overdue due is red with a triangle. VoiceOver reads the subtask header as "Subtasks, 2 of 5 subtasks complete".
+- [ ] Editor: under the type picker a one-line description of the type. The Notes field is not labelled twice. Subtasks
+      header says "Edit" (not "Reorder"). Weekly repeat uses the ink day chips.
+- [ ] Reminder section, "Use custom" on: on a TestFlight-less (xtool) build the delivery picker offers Standard and Loud
+      alarm only, no Time Sensitive.
+
+### U2.7 Exams list (M24, F16, H13)
+- [ ] Next exam: title and subject first, then the date (one calendar icon), then "in 5 days" (not larger than the title).
+      The whole card taps (also on the chevron); the chevron is inside the card at every size. VoiceOver reads one sentence
+      and "link".
+- [ ] An exam 20+ days away shows its date and no "in 20 days"; one 14 days away shows it.
+- [ ] Today / tomorrow exams: ink border and an icon; nothing red. Completed rows show "Completed", not green.
+- [ ] University seed: the exam period is a tinted banner (name, "In progress", range, count), not plain lines.
+- [ ] AX-XXXL: the subject tile stays at most about 70 pt and sits above the text; the card does not fill the screen.
+
+### U2.8 Exam detail actions (H15, D6)
+- [ ] Exam in the future: no big button; the ⋯ menu has "Move to History". Choosing it moves the exam to History.
+- [ ] Exam today or in the past, not completed: a full-width "I've Taken This Exam"; the swipe action says the same. History
+      rows can be reopened ("Mark as Not Done").
+
+### U2.9 Exam editor (M25, U2-15 to U2-17)
+- [ ] "When": During a lesson / Custom time / All day. During a lesson lists that day's lessons ("Maths · 8:00 – 8:45");
+      choosing one fills the times (shown when you switch to Custom time) and sets the subject if it was empty.
+- [ ] A date with no lessons: no "During a lesson" option, the note "No lessons are scheduled on this date." Change the date
+      of a lesson exam to a day without it: the mode becomes Custom time and keeps the times.
+- [ ] Opening an exam whose times equal one lesson shows "During a lesson".
+- [ ] More details (room, building, notes) is always there, even if the timetable hides those fields; it opens by itself when
+      one has content. Saved values appear in the exam detail only when the field is enabled for the timetable.
+- [ ] The "Enter a title…" hint is under the title. Topics: swipe to delete, "Edit" shows the drag handles.
+- [ ] Hour cycle: the start and end pickers follow the clock setting (24-hour and 12-hour).
+
+### Not verifiable without a device (U2)
+List section scrolling, the undo message timing with VoiceOver, the segmented control at large sizes, the hero card button
+inside a `List` (tap target, highlight), `AccessibilityNotification.Announcement`, keyboard focus on a sheet at the medium
+detent, and everything visual.
