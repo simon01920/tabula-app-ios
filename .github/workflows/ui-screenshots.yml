@@ -142,7 +142,10 @@ jobs:
                 --predicate "process == \"TabulaApp\"" > "logs/crash-$name-$variant.log" 2>&1 || true
               return 1
             fi
-            xcrun simctl io "$SIM_UDID" screenshot --type=png "$OUT/$name-$variant.png"
+            if ! xcrun simctl io "$SIM_UDID" screenshot --type=png "$OUT/$name-$variant.png" || [ ! -s "$OUT/$name-$variant.png" ]; then
+              echo "::error::screenshot failed for $entry ($variant)"
+              return 1
+            fi
             echo "captured $OUT/$name-$variant.png"
           }
 
@@ -169,6 +172,7 @@ jobs:
             echo; echo "Download: this run → **Artifacts** → \`ui-screenshots-${GITHUB_RUN_NUMBER}\`"; echo
             for f in "$OUT"/*.png; do echo "- \`$(basename "$f")\` ($(sips -g pixelWidth -g pixelHeight "$f" | awk '/pixel/{printf "%s ", $2}')px)"; done
           } >> "$GITHUB_STEP_SUMMARY"
+          [ -n "$(ls -A "$OUT"/*.png 2>/dev/null)" ] || { echo "::error::no screenshots captured"; failed=1; }
           exit "$failed"
 
       - name: Watch app screenshot (optional)
@@ -188,7 +192,13 @@ jobs:
           WBUNDLE="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Watch/TabulaWatch.app/Info.plist")"
           xcrun simctl launch "$WUDID" "$WBUNDLE"
           sleep 10
-          xcrun simctl io "$WUDID" screenshot --type=png "$OUT/watch-$WNAME.png"
+          # host_support can race right after boot: retry.
+          ok=0
+          for i in 1 2 3; do
+            if xcrun simctl io "$WUDID" screenshot --type=png "$OUT/watch-$WNAME.png" && [ -s "$OUT/watch-$WNAME.png" ]; then ok=1; break; fi
+            echo "watch screenshot attempt $i failed; retrying"; sleep 10
+          done
+          [ "$ok" = 1 ] || { echo "::error::watch screenshot failed after 3 attempts"; exit 1; }
           echo "- \`watch-$WNAME.png\`" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Zip the simulator .app (for a hosted simulator such as Appetize later; research only, no account)

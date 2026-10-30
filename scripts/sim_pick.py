@@ -63,7 +63,9 @@ def pick(data, platform, device=""):
             raise SystemExit(f"error: device type {device!r} not supported by {runtime['name']}: "
                              f"{sorted(t['name'] for t in candidates)}")
     elif platform == "iOS":
-        chosen = max(candidates, key=lambda t: ("Pro Max" in t["name"], numbers(t["name"])[0], t["name"]))
+        # Multi-display devices (Duo, Fold) break `simctl io screenshot` ("Cannot choose between 2 displays"): last resort only.
+        chosen = max(candidates, key=lambda t: (not re.search(r"Duo|Fold", t["name"]), "Pro Max" in t["name"],
+                                                numbers(t["name"])[0], t["name"]))
     else:
         chosen = max(candidates, key=lambda t: (numbers(t["name"]), t["name"]))
     p = PREFIX[platform]
@@ -154,6 +156,15 @@ def self_test():
         r.pop("supportedDeviceTypes")
     expect("fallback without supportedDeviceTypes respects minRuntimeVersion", lambda: pick(no_supported, "iOS")["SIM_NAME"],
            "iPhone 17 Pro Max")
+    multi = json.loads(json.dumps(sample))
+    duo, fold = _dt("iPhone Duo", "iPhone"), _dt("iPhone 18 Duo", "iPhone")
+    by = {t["name"]: t for t in sample["devicetypes"]}
+    multi["runtimes"] = [_rt("iOS", "27.1", "24B1", [duo, fold, by["iPhone 17"], by["iPhone 17 Pro Max"]])]
+    expect("multi-display Duo ignored, iPhone 17 Pro Max chosen", lambda: pick(multi, "iOS")["SIM_NAME"], "iPhone 17 Pro Max")
+    multi["runtimes"] = [_rt("iOS", "27.1", "24B1", [fold, by["iPhone 17"]])]
+    expect("Duo ignored even without a Pro Max", lambda: pick(multi, "iOS")["SIM_NAME"], "iPhone 17")
+    multi["runtimes"] = [_rt("iOS", "27.1", "24B1", [duo])]
+    expect("Duo only as last resort", lambda: pick(multi, "iOS")["SIM_NAME"], "iPhone Duo")
     print(f"sim_pick self-test: {'all passed' if not failures else f'{failures} FAILED'}")
     return failures
 
