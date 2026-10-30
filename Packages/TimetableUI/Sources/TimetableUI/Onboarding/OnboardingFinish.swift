@@ -15,15 +15,7 @@ extension TabulaDatabase {
         timetables.isEmpty && subjects.isEmpty && bellSchedules.isEmpty && lessons.isEmpty && terms.isEmpty
             && breaks.isEmpty && overrides.isEmpty && tasks.isEmpty && exams.isEmpty && reminderRules.isEmpty
     }
-
-    /// `true` when any entity (other than the settings singleton) is not deleted.
-    public var hasLiveContent: Bool {
-        timetables.contains { !$0.isDeleted } || subjects.contains { !$0.isDeleted }
-            || bellSchedules.contains { !$0.isDeleted } || lessons.contains { !$0.isDeleted }
-            || terms.contains { !$0.isDeleted } || breaks.contains { !$0.isDeleted }
-            || overrides.contains { !$0.isDeleted } || tasks.contains { !$0.isDeleted }
-            || exams.contains { !$0.isDeleted } || reminderRules.contains { !$0.isDeleted }
-    }
+    // `hasLiveContent` moved to TimetableCore (Sync/CloudSync.swift, Phase 6 S1: the first-sync check needs it).
 }
 
 extension OnboardingDraft {
