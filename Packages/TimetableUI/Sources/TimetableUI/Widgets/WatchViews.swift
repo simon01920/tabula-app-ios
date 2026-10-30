@@ -22,6 +22,12 @@ public struct WatchHomeView: View {
     }
 
     public var body: some View {
+        NavigationStack {   // PHASE5_PLAN decision 3; the title is the app name, not translated
+            list.navigationTitle(Text(verbatim: "Tabula"))
+        }
+    }
+
+    private var list: some View {
         List {
             switch display.kind {
             case let .openPhone(title, detail):

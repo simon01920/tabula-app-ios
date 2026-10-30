@@ -20,8 +20,6 @@ import WatchConnectivity
 final class WatchSnapshotSender: NSObject, WCSessionDelegate {
     private let container: URL
     private var pending: Data?
-    /// Developer diagnostics: the last send or why nothing was sent.
-    private(set) var lastResult = "not sent yet"
 
     /// `nil` where WatchConnectivity is unsupported (e.g. iPad).
     init?(container: URL) {
@@ -40,22 +38,18 @@ final class WatchSnapshotSender: NSObject, WCSessionDelegate {
 
     private func flush() {
         let session = WCSession.default
-        guard let data = pending, session.activationState == .activated else { return }
-        guard session.isPaired, session.isWatchAppInstalled else {
-            lastResult = "no paired watch with Tabula"
-            return
-        }
-        pending = nil
-        guard (session.applicationContext[WatchSnapshotTransfer.key] as? Data) != data else { return }
-        guard let context = WatchSnapshotTransfer.context(for: data) else {
-            lastResult = "not sent: \(data.count) bytes over the cap"
+        guard let data = pending, session.activationState == .activated,
+              session.isPaired, session.isWatchAppInstalled else { return }   // kept in `pending` until then
+        guard (session.applicationContext[WatchSnapshotTransfer.key] as? Data) != data,
+              let context = WatchSnapshotTransfer.context(for: data) else {
+            pending = nil   // already sent, or over the cap (never sendable)
             return
         }
         do {
             try session.updateApplicationContext(context)
-            lastResult = "sent \(data.count) bytes at \(Date().ISO8601Format())"
+            pending = nil
         } catch {
-            lastResult = "send failed: \(error)"
+            // Kept in `pending`: the next snapshot write, activation or watch-state change retries it.
         }
     }
 

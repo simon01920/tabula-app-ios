@@ -23,6 +23,8 @@ public enum WatchSnapshotTransfer {
     }
 
     /// The snapshot bytes in a received context, only when they decode as a snapshot this version can read.
+    /// Above the 19 000 B send cap but within `WidgetSnapshotStore.maxFileBytes` (512 KB) is accepted by design: the cap
+    /// is the sender's, a later iPhone build may raise it, and the widgets' file limit already guards the watch's memory.
     public static func snapshotData(in context: [String: Any]) -> Data? {
         guard let data = context[key] as? Data, WidgetSnapshotStore.decode(data) != nil else { return nil }
         return data

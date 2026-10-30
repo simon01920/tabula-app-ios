@@ -20,7 +20,7 @@ Setup: Pro tier (the current tier is all-access), a timetable with lessons today
 |---|---|---|---|---|
 | W1.1 | **Pairing / install.** Install the TestFlight build on the iPhone. Watch app on iPhone → Available Apps → Tabula → Install (or automatic install) | Tabula appears on the watch Home Screen with the app icon; launching it shows no crash | | |
 | W1.2 | Before opening Tabula on the iPhone (fresh install), open Tabula on the watch | "Open Tabula on your iPhone" with "Your timetable appears here after your iPhone sends it." No invented data | | |
-| W1.3 | Open Tabula on the iPhone (finish onboarding or keep the existing timetable), wait ≤ 30 s, look at the watch app | The watch shows Now & Next. Developer screen (iPhone, if exposed) / log: sender "sent N bytes" | | |
+| W1.3 | Open Tabula on the iPhone (finish onboarding or keep the existing timetable), wait ≤ 30 s, look at the watch app | The watch shows Now & Next (no iPhone-side diagnostics: the watch screen is the proof) | | |
 | W1.4 | During a lesson: watch app | Top block: subject badge, **NOW** highlighter marker, subject name, room, **large** live countdown with "left" under it (mm:ss under 60 min, never a bare "25:00"), progress bar, "Next …" line. Then "Today · <date>" with the lessons still to come (current and past ones not listed), then "Tomorrow · <date>" | | |
 | W1.5 | A lesson longer than 60 min (or edit one to 90 min): watch app at the start | Countdown shows minutes only ("1 hr, 29 min" style, no seconds) with "left"; switches to mm:ss below 60 min | | |
 | W1.6 | Watch the screen across a lesson boundary (keep the app open, wrist up) | Within a minute the block flips to the break / next lesson ("Next", countdown "until start"); the Today list drops the ended lesson | | |

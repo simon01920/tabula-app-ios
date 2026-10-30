@@ -48,6 +48,20 @@ struct WatchPresentationTests {
         #expect(WatchSnapshotTransfer.snapshotData(in: [WatchSnapshotTransfer.key: newerData]) == nil)
     }
 
+    @Test func receivedSizeIsBoundedByTheFileLimitNotTheSendCap() throws {
+        func padded(_ lessons: Int) throws -> Data {
+            var big = snapshot()
+            big.days[0].lessons = (0..<lessons).map { lesson(String(repeating: "x", count: 200) + "\($0)", day1, 8, 9) }
+            return try WidgetSnapshotStore.encode(big)
+        }
+        let over = try padded(150)   // above 19 000 B, below 512 KB: accepted by design (see snapshotData)
+        #expect(over.count > WidgetSnapshotBuilder.maxEncodedBytes && over.count < WidgetSnapshotStore.maxFileBytes)
+        #expect(WatchSnapshotTransfer.snapshotData(in: [WatchSnapshotTransfer.key: over]) == over)
+        let huge = try padded(3_000)   // above the 512 KB file limit: rejected
+        #expect(huge.count > WidgetSnapshotStore.maxFileBytes)
+        #expect(WatchSnapshotTransfer.snapshotData(in: [WatchSnapshotTransfer.key: huge]) == nil)
+    }
+
     @Test func noSnapshotAsksToOpenThePhoneAndFreeTierIsGated() {
         #expect(show(nil, at: 9) == .openPhone(title: "Open Tabula on your iPhone",
                                                detail: "Your timetable appears here after your iPhone sends it."))

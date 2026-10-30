@@ -15,9 +15,11 @@
 //   (the documented replacement of WKWatchConnectivityRefreshBackgroundTask: "defer … until after you've activated
 //   your session and received all the pending data. Use the hasContentPending property",
 //   https://developer.apple.com/documentation/watchkit/wkwatchconnectivityrefreshbackgroundtask);
-//   WidgetCenter.shared.reloadAllTimelines() (watchOS 9); TimelineView(.everyMinute) (watchOS 8).
+//   WidgetCenter.shared.reloadAllTimelines() (watchOS 9; a plain class, not main-actor isolated in the SDK);
+//   TimelineView(.everyMinute) (watchOS 8); Synchronization.Mutex (watchOS 11).
 import Combine
 import SwiftUI
+import Synchronization
 import TimetableCore
 import TimetableUI
 import WatchConnectivity
@@ -70,6 +72,8 @@ struct WatchRootView: View {
 /// Receives the iPhone's snapshot. Delegate calls arrive on a WatchConnectivity queue, not the main thread.
 final class WatchSessionReceiver: NSObject, WCSessionDelegate, Sendable {
     private let model: WatchModel
+    /// Deliveries being stored right now.
+    private let receiving = Mutex(0)
 
     init(model: WatchModel) {
         self.model = model
@@ -92,19 +96,23 @@ final class WatchSessionReceiver: NSObject, WCSessionDelegate, Sendable {
         receive(applicationContext)
     }
 
+    /// Stores and reloads synchronously on the delegate queue, so a background launch never ends between the write and
+    /// the complication reload; `receiving` tells `waitForPendingContent` that a delivery is still being handled.
     private func receive(_ context: [String: Any]) {
+        receiving.withLock { $0 += 1 }
+        defer { receiving.withLock { $0 -= 1 } }
         guard let data = WatchSnapshotTransfer.snapshotData(in: context), (try? WatchCache.store(data)) == true else { return }
-        Task { @MainActor [model] in
-            model.reload()
-            WidgetCenter.shared.reloadAllTimelines()
-        }
+        WidgetCenter.shared.reloadAllTimelines()
+        Task { @MainActor [model] in model.reload() }   // the screen only; the cache is already written
     }
 
-    /// Keeps a background launch alive until WatchConnectivity has delivered what is pending.
+    /// Keeps a background launch alive until the session is active, nothing is pending and the last delivery is stored.
     func waitForPendingContent() async {
-        // shortcut: polls for at most 10 s; if a device shows late complications, wait for the delegate call instead.
+        // shortcut: polls for at most 10 s; a delivery still running after that is lost until the next launch (RISKS #89).
+        let session = WCSession.default
         var polls = 0
-        while WCSession.default.hasContentPending, polls < 20 {
+        while polls < 20, session.activationState != .activated || session.hasContentPending
+                || receiving.withLock({ $0 }) > 0 {
             polls += 1
             try? await Task.sleep(for: .milliseconds(500))
         }
