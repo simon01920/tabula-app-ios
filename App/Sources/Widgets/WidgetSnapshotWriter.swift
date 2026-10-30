@@ -8,7 +8,8 @@
 //                 time-zone change, locale change (AppModel.refreshEnvironment)
 //   flushNow()    the scene leaves `active` (TabulaApp), so a change made just before going home is not lost
 // Debounced (`debounce`), built on the main actor from the model's current state (pure `WidgetSnapshotBuilder`),
-// written atomically off the main actor (`WidgetSnapshotStore.write`), then `WidgetCenter.shared.reloadAllTimelines()`.
+// written atomically off the main actor (`WidgetSnapshotStore.write`), then `WidgetCenter.shared.reloadAllTimelines()`
+// and, since Phase 5 W1, sent to the Apple Watch (`WatchSnapshotSender`, WatchConnectivity application context).
 // Unchanged content (ignoring `generatedAt`) is neither written nor reloaded, so foregrounding does not spend the
 // widgets' reload budget (reloads while the app is in the foreground do not count anyway: WidgetKit docs). The
 // comparison starts from the file already in the App Group, so a cold or background launch with unchanged data writes
@@ -51,6 +52,8 @@ final class WidgetSnapshotWriter {
     private var pending: Task<Void, Never>?
     private var lastWritten: WidgetSnapshot?
     private var writeChain: Task<Void, Never>?
+    /// Phase 5 W1: every written snapshot also goes to the Apple Watch.
+    let watch: WatchSnapshotSender?
     /// Developer diagnostics: the last write (time, size) or failure.
     private(set) var lastResult: String = "not written yet"
 
@@ -58,6 +61,7 @@ final class WidgetSnapshotWriter {
         self.model = model
         self.container = container
         self.debounce = debounce
+        watch = container.flatMap { WatchSnapshotSender(container: $0) }
         // What the widgets already have (a cold or background launch with unchanged data then writes and reloads
         // nothing). A small file (< 20 KB), read once at launch.
         lastWritten = container.flatMap { WidgetSnapshotStore.read(container: $0) }
@@ -140,6 +144,7 @@ final class WidgetSnapshotWriter {
             } else {
                 self.lastResult = "wrote \(data.count) bytes at \(Date().ISO8601Format())"
                 WidgetCenter.shared.reloadAllTimelines()
+                self.watch?.send(data)
             }
         }
     }
