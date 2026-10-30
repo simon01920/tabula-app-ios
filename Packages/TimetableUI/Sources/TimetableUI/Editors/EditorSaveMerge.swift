@@ -65,8 +65,8 @@ extension TaskDraft {
 extension ExamDraft {
     /// The exam to save, merged with `stored` (the exam with this id in the database now); `nil` while `issues` is not
     /// empty.
-    public func examForSave(visibility: FieldVisibility, stored: Exam?) -> EditorSaveMerge<Exam>? {
-        guard let exam = makeExam(visibility: visibility) else { return nil }
+    public func examForSave(stored: Exam?) -> EditorSaveMerge<Exam>? {
+        guard let exam = makeExam() else { return nil }
         return EditorStoreMerge.exam(exam, openedCompletedAt: openedCompletedAt, stored: stored, isNew: isNew)
     }
 }

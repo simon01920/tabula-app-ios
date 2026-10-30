@@ -52,7 +52,7 @@ struct TaskEditorView: View {
     }
 }
 
-private struct TaskEditorBody: View {
+struct TaskEditorBody: View {
     let initial: TaskDraft
     @Environment(AppModel.self) private var model
     /// Attachment presenters, store protection and in-flight copies for this editor (B3). While a copy runs, Save and
@@ -146,6 +146,9 @@ private struct TaskFormContent: View {
             } label: {
                 Text("tasks.field.kind")
             }
+            if let key = TaskL10nKeys.kindHint(draft.kind) {   // D5 / U2-2: what the type means, in one line
+                Text(LocalizedStringKey(key)).font(.footnote).foregroundStyle(.secondary)
+            }
             Picker(selection: Binding(get: { draft.subjectID }, set: chooseSubject)) {
                 Text("tasks.subject.none").tag(Subject.ID?.none)
                 ForEach(subjects, id: \.id) { subject in
@@ -235,6 +238,7 @@ private struct TaskFormContent: View {
             }
             .lineLimit(3...8)
             .frame(minHeight: 44, alignment: .topLeading)
+            .labelledBySectionHeader()   // M1 / U2-7: the header already says "Notes"
         } header: {
             Text("tasks.field.notes")
         }
@@ -279,7 +283,8 @@ private struct TaskFormContent: View {
                     Button {
                         editMode = editMode.isEditing ? .inactive : .active
                     } label: {
-                        Text(catalogKey: editMode.isEditing ? "tasks.editor.subtask.doneReordering" : "tasks.editor.subtask.reorder")
+                        // M18 / U2-9: "Edit", like the other lists (it also reveals the drag handles).
+                        Text(catalogKey: editMode.isEditing ? "tasks.editor.subtask.doneReordering" : "editor.common.edit")
                             .frame(minHeight: 44)
                     }
                     .textCase(nil)
@@ -329,40 +334,11 @@ private struct TaskFormContent: View {
         }
     }
 
+    /// U2-11: the shared weekday chips (ink when on, an outline when off, a switch for VoiceOver).
     private var weekdayGrid: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 64), spacing: 8)], spacing: 8) {
-            ForEach(Weekday.week(startingAt: model.calendarContext.firstWeekday), id: \.self) { day in
-                WeekdayToggle(name: model.formatter.weekdayName(day, width: .abbreviated),
-                              isSelected: draft.repeatWeekdays.contains(day)) {
-                    draft.toggleWeekday(day)
-                }
-            }
-        }
-        .padding(.vertical, 4)
-    }
-}
-
-/// One weekday button of the weekly repeat: a checkmark and the filled style show the selection (not colour alone).
-private struct WeekdayToggle: View {
-    let name: String
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        let button = Button(action: action) {
-            HStack(spacing: 4) {
-                if isSelected { Image(systemName: "checkmark") }
-                Text(verbatim: name).lineLimit(1).minimumScaleFactor(0.7)
-            }
-            .frame(maxWidth: .infinity, minHeight: 44)
-            .foregroundStyle(isSelected ? Color.onInk : Color.ink)   // onInk on the prominent fill (RISKS #86)
-        }
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
-        if isSelected {
-            button.buttonStyle(.borderedProminent)
-        } else {
-            button.buttonStyle(.bordered)
-        }
+        WeekdayChips(days: Weekday.week(startingAt: model.calendarContext.firstWeekday),
+                     isOn: { draft.repeatWeekdays.contains($0) },
+                     setOn: { day, on in if on != draft.repeatWeekdays.contains(day) { draft.toggleWeekday(day) } })
     }
 }
 

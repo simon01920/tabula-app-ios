@@ -115,7 +115,20 @@ struct TaskDetailView: View {
                         SubtaskCheckRow(subtask: subtask) { toggleSubtask(subtask.id, in: task) }
                     }
                 } header: {
-                    Text("tasks.field.subtasks")
+                    // "2 of 5 subtasks complete" for VoiceOver (the visible "2/5" is the short form of the same fact).
+                    HStack {
+                        Text("tasks.field.subtasks")
+                        Spacer()
+                        Text(verbatim: model.renderer.format(key: "tasks.row.subtasks", arguments: [
+                            .integer(Int64(row.subtasksDone)), .integer(Int64(row.subtasksTotal)),
+                        ]))
+                    }
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(Text("tasks.field.subtasks"))
+                    .accessibilityValue(Text(verbatim: model.renderer.format(key: "a11y.task.subtasks", arguments: [
+                        .integer(Int64(row.subtasksDone)), .integer(Int64(row.subtasksTotal)),
+                    ])))
+                    .accessibilityAddTraits(.isHeader)
                 }
             }
             Section {
@@ -149,18 +162,19 @@ struct TaskDetailView: View {
                 LabeledContent {
                     // Only an overdue task gets an icon: a Label whose icon closure can be empty lays out with a
                     // stretched, blank icon slot, so the plain Text is used otherwise.
+                    // M22: every value is secondary text; only an overdue due is correction red (with its icon).
                     Group {
                         if row.isOverdue {
                             Label {
                                 Text(verbatim: due.text(renderer: model.renderer))
                             } icon: {
-                                Image(systemName: "exclamationmark.triangle.fill")
+                                Image(AppSymbol.overdue)
                             }
+                            .foregroundStyle(Color.correction)
                         } else {
                             Text(verbatim: due.text(renderer: model.renderer))
                         }
                     }
-                    .foregroundStyle(row.isOverdue ? Color.red : Color.primary)
                     .multilineTextAlignment(.trailing)
                 } label: {
                     Text("tasks.field.due")
@@ -183,15 +197,14 @@ struct TaskDetailView: View {
                 }
             }
             if let summary = detail.repeatSummary {
+                // M22: the rule on one line ("Weekly on Tuesday"), same label and value style as the other rows.
                 LabeledContent {
-                    VStack(alignment: .trailing, spacing: 2) {
-                        ForEach(summary.lines(renderer: model.renderer), id: \.self) { line in
-                            Text(verbatim: line)
-                        }
-                    }
-                    .multilineTextAlignment(.trailing)
+                    Text(verbatim: summary.line(renderer: model.renderer)).multilineTextAlignment(.trailing)
                 } label: {
-                    Label { Text("tasks.field.repeat") } icon: { Image(systemName: "repeat") }
+                    Text("tasks.field.repeat")
+                }
+                if let until = summary.untilText(renderer: model.renderer) {
+                    Text(verbatim: until)
                 }
             }
             if row.attachmentCount > 0 {

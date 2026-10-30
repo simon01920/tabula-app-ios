@@ -216,9 +216,9 @@ struct ExamDraftTests {
         var draft = ExamDraft(newOn: today, timetableID: nil)
         #expect(draft.date == d(2026, 10, 21))
         #expect(draft.issues == [.noTitle])
-        #expect(!draft.canSave && draft.makeExam(visibility: .all) == nil)
+        #expect(!draft.canSave && draft.makeExam() == nil)
         draft.title = "  Chemistry  "
-        #expect(draft.makeExam(visibility: .all)?.title == "Chemistry")
+        #expect(draft.makeExam()?.title == "Chemistry")
     }
 
     @Test func endMustBeAfterStartAndNeedsStart() {
@@ -233,14 +233,14 @@ struct ExamDraftTests {
         draft.end = t(9)
         #expect(draft.issues == [.endNotAfterStart])
         draft.end = t(11)
-        let saved = draft.makeExam(visibility: .all)
+        let saved = draft.makeExam()
         #expect(saved?.start == t(10) && saved?.end == t(11))
         draft.setHasStart(false)
-        let cleared = draft.makeExam(visibility: .all)
+        let cleared = draft.makeExam()
         #expect(cleared?.start == nil && cleared?.end == nil)
     }
 
-    @Test func blankOptionalsAreAbsentAndHiddenFieldsKeepValues() {
+    @Test func blankOptionalsAreAbsentAndEveryFieldIsEditable() {
         var original = exam("Orig", today)
         original.room = "A1"
         original.building = "Main"
@@ -250,10 +250,9 @@ struct ExamDraftTests {
         draft.room = ""
         draft.building = ""
         draft.notes = ""
-        let hidden = draft.makeExam(visibility: FieldVisibility([.room]))!
-        #expect(hidden.room == nil)           // visible + blank -> absent
-        #expect(hidden.building == "Main")    // hidden -> untouched
-        #expect(hidden.notes == "N")
+        let hidden = draft.makeExam()!
+        // D10 (U2-15): field visibility only shapes summaries, so blank room, building and notes are saved as absent.
+        #expect(hidden.room == nil && hidden.building == nil && hidden.notes == nil)
         #expect(hidden.completedAt == Date(timeIntervalSince1970: 5))
         #expect(hidden.id == original.id && hidden.meta == original.meta)
     }
@@ -270,7 +269,7 @@ struct ExamDraftTests {
         draft.moveTopics(from: IndexSet(integer: 3), to: 0)
         #expect(draft.topics.map(\.text) == ["", "b", "c", "a"])
         draft.removeTopics(at: IndexSet(integer: 1))
-        #expect(draft.makeExam(visibility: .all)?.topics == ["c", "a"])
+        #expect(draft.makeExam()?.topics == ["c", "a"])
     }
 
     @Test func dirtyComparisonIgnoresTopicIdsAndCounter() {
@@ -288,14 +287,14 @@ struct ExamDraftTests {
         e.kind = ExamKind(rawValue: "viva")
         let draft = ExamDraft(exam: e)
         #expect(draft.kindChoices.last?.rawValue == "viva")
-        #expect(draft.makeExam(visibility: .all)?.kind.rawValue == "viva")
+        #expect(draft.makeExam()?.kind.rawValue == "viva")
     }
 
     @Test func overrideIsKept() {
         var draft = ExamDraft(newOn: today, timetableID: nil)
         draft.title = "R"
         draft.reminderOverride = ReminderOverride(isEnabled: false)
-        #expect(draft.makeExam(visibility: .all)?.reminderOverride?.isEnabled == false)
+        #expect(draft.makeExam()?.reminderOverride?.isEnabled == false)
     }
 
     @Test func completeExamMutationMarksDone() throws {

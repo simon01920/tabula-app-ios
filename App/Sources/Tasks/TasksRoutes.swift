@@ -1,9 +1,11 @@
 // Launch routes of the Tasks feature (stage B1 owns this file). Id prefix `tasks.`. Add entries here only; see
 // Routing/RouteRegistry.swift.
-//   tasks               → the Tasks tab (Today segment)
-//   tasks.upcoming      → the tab with the Upcoming segment selected
-//   tasks.overdue       → the tab with the Overdue segment selected
-//   tasks.completed     → the tab with the Completed segment selected
+// Phase 4U U2 (R2): the tab is ONE grouped list; the segment routes keep their ids and scroll to a place in it.
+//   tasks               → the Tasks tab (top of the list)
+//   tasks.upcoming      → the list scrolled to the first section after today
+//   tasks.overdue       → the list scrolled to Overdue
+//   tasks.completed     → the list with the completed tasks shown and scrolled to
+//   tasks.quick-add     → sheet: the quick-entry sheet of the "+" button
 //   tasks.editor        → sheet: the editor of a task from the `-TabulaSeed` data (the first open task by due date)
 //   tasks.editor-new    → sheet: the editor for a new task; opened by the lesson detail ("Add homework for this
 //                         lesson", Phase 3 C1) with `EditorContext(.newTask(TaskPrefill))` in the environment, which
@@ -22,6 +24,7 @@ enum TasksRoutes: RouteProvider {
             AppRoute("tasks.upcoming", .tabRoot(.tasks)) { TasksRootView(initialSegment: .upcoming) },
             AppRoute("tasks.overdue", .tabRoot(.tasks)) { TasksRootView(initialSegment: .overdue) },
             AppRoute("tasks.completed", .tabRoot(.tasks)) { TasksRootView(initialSegment: .completed) },
+            AppRoute("tasks.quick-add", .sheet(over: .tasks)) { TaskQuickEntryRouteView() },
             AppRoute("tasks.editor", .sheet(over: .tasks)) { TaskEditorRouteView() },
             AppRoute("tasks.editor-new", .sheet(over: .tasks)) { TaskEditorNewRouteView() },
             AppRoute("tasks.detail", .sheet(over: .tasks)) { TaskDetailRouteView() },
@@ -58,6 +61,15 @@ private struct TaskDetailRouteView: View {
                 EmptyView()
             }
         }
+    }
+}
+
+/// `tasks.quick-add`: the quick-entry sheet (the ID is generated once per presentation).
+private struct TaskQuickEntryRouteView: View {
+    @State private var newID = TaskItem.ID(UUID())
+
+    var body: some View {
+        TaskQuickEntrySheet(id: newID)
     }
 }
 

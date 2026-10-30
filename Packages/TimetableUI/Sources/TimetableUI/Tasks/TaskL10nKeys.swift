@@ -24,9 +24,10 @@ public enum TaskL10nKeys {
         (interval == 1 ? "tasks.repeat.every1." : "tasks.repeat.every.") + frequency.rawValue
     }
 
-    /// Empty-state title / detail of a segment ("tasks.empty.today.title").
-    public static func emptyTitle(_ segment: TaskSegment) -> String { "tasks.empty." + segment.rawValue + ".title" }
-    public static func emptyDetail(_ segment: TaskSegment) -> String { "tasks.empty." + segment.rawValue + ".detail" }
+    /// One-line description of a known task type, shown under the type picker (D5). Unknown kinds have none.
+    public static func kindHint(_ kind: TaskKind) -> String? {
+        TaskKind.knownValues.contains(kind) ? "tasks.kind." + kind.rawValue + ".hint" : nil
+    }
 
     /// Keys of the relative due phrases.
     public static var dueKeys: [String] { TaskDueDescription.allKeys }
@@ -37,7 +38,9 @@ public enum TaskL10nKeys {
         keys += TaskKind.knownValues.compactMap(kind)
         keys += TaskPriority.allCases.map(priority)
         keys += [TaskPriority.high, .urgent].map(priorityAccessibility)
-        keys += TaskSegment.allCases.map(\.countedTitleKey)
+        keys += ["tasks.repeat.summary.weeklyOn", "tasks.repeat.summary.everyWeeksOn"]
+        keys += TaskKind.knownValues.compactMap(kindHint)
+        keys += TaskSection.allCases.map(\.titleKey)
         keys += TaskSort.allCases.map(\.titleKey)
         keys += TaskDraft.DueMode.allCases.map(dueMode)
         keys += TaskDraft.RepeatMode.allCases.map(repeatMode)
@@ -45,7 +48,6 @@ public enum TaskL10nKeys {
             keys += [repeatEvery(frequency: frequency, interval: 1), repeatEvery(frequency: frequency, interval: 2)]
         }
         keys += TaskDraft.Issue.allCases.map(\.l10nKey)
-        keys += TaskSegment.allCases.flatMap { [emptyTitle($0), emptyDetail($0)] }
         keys += dueKeys
         return Array(Set(keys)).sorted()
     }

@@ -32,6 +32,8 @@ struct EditorScaffold<Draft: Equatable, Content: View>: View {
     let save: (Draft) -> ApplyResult?
     /// Work outside the draft is still running (e.g. an attachment copy): Save and swipe-to-dismiss are disabled.
     var isBusy = false
+    /// The confirmation button's label: "Save", or "Add" for the quick-entry sheet.
+    var confirmKey: LocalizedStringKey = "editor.common.save"
     @ViewBuilder let content: (Binding<Draft>) -> Content
 
     @Environment(\.dismiss) private var dismiss
@@ -76,7 +78,7 @@ struct EditorScaffold<Draft: Equatable, Content: View>: View {
                     Button {
                         commit()
                     } label: {
-                        Text("editor.common.save")
+                        Text(confirmKey)
                     }
                     .disabled(isBusy || !canSave(current))
                 }
@@ -244,17 +246,25 @@ struct EditorTitleField: View {
     var axis: Axis = .horizontal
     /// Catalog key of the hint shown while the title is missing (`nil` = no hint).
     var missingHintKey: String?
+    /// Focus binding of the quick-entry sheet (the title is focused on open); `nil` elsewhere.
+    var focus: FocusState<Bool>.Binding?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            TextField(text: $text, prompt: Text(promptKey), axis: axis) { Text(promptKey) }
-                .font(.title3)
-                .multilineTextAlignment(.leading)
+            field
             if let missingHintKey, EditorText.trimmedOrNil(text) == nil {
                 ValidationMessage(key: missingHintKey, severity: .hint)
             }
         }
         .padding(.vertical, 2)
+    }
+
+    @ViewBuilder
+    private var field: some View {
+        let base = TextField(text: $text, prompt: Text(promptKey), axis: axis) { Text(promptKey) }
+            .font(.title3)
+            .multilineTextAlignment(.leading)
+        if let focus { base.focused(focus) } else { base }
     }
 }
 
