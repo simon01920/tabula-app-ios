@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Watch complication extension (XcodeGen/CI path only), embedded in TabulaWatch.app/PlugIns. Used with
+     GENERATE_INFOPLIST_FILE=YES (Xcode adds the bundle keys). Same languages as Config/Widgets-Info.plist. -->
+<plist version="1.0">
+<dict>
+	<key>CFBundleDisplayName</key>
+	<string>Tabula</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>sk</string>
+		<string>cs</string>
+		<string>pl</string>
+		<string>hu</string>
+		<string>ro</string>
+		<string>de</string>
+		<string>fr</string>
+		<string>uk</string>
+		<string>sr</string>
+		<string>sr-Latn</string>
+		<string>ja</string>
+		<string>zh-Hans</string>
+	</array>
+	<key>NSExtension</key>
+	<dict>
+		<key>NSExtensionPointIdentifier</key>
+		<string>com.apple.widgetkit-extension</string>
+	</dict>
+</dict>
+</plist>

@@ -4,7 +4,7 @@
 # xtool's Darwin SDK defines no watchOS triple and its packer cannot produce watch apps, so the watch app is
 # built only in CI (project.yml / xcodebuild). But the SDK bundle installed by `xtool sdk install` contains the
 # full Xcode.app, including WatchOS.platform/…/WatchOS27.0.sdk. This script compiles the shared packages and
-# type-checks the watch sources against it with plain `swiftc`, so watchOS-only API mistakes (e.g. using an
+# type-checks the watch app and complication sources against it with plain `swiftc`, so watchOS-only API mistakes (e.g. using an
 # iOS-only modifier in TimetableUI) surface in seconds instead of after a CI run.
 #
 # What it proves: Swift sources compile for arm64_32-apple-watchos26.0 (Series 7). What it does NOT prove:
@@ -49,7 +49,12 @@ emit_module() { # emit_module <ModuleName> <source dir>
 
 emit_module TimetableCore Packages/TimetableCore/Sources/TimetableCore
 emit_module TimetableUI Packages/TimetableUI/Sources/TimetableUI
-mapfile -t WATCH_FILES < <(srcs WatchApp/Sources)
-echo "+ swiftc -typecheck TabulaWatch (${#WATCH_FILES[@]} files)"
-swiftc "${COMMON[@]}" -module-name TabulaWatch -typecheck "${WATCH_FILES[@]}"
+typecheck() { # typecheck <ModuleName> <source dir>...  (each watch target = its folder + WatchApp/Shared, project.yml)
+  local name="$1" files=() dir; shift
+  for dir in "$@"; do mapfile -t -O "${#files[@]}" files < <(srcs "$dir"); done
+  echo "+ swiftc -typecheck $name (${#files[@]} files)"
+  swiftc "${COMMON[@]}" -module-name "$name" -typecheck "${files[@]}"
+}
+typecheck TabulaWatch WatchApp/Sources WatchApp/Shared
+typecheck TabulaWatchWidgets WatchApp/Complications WatchApp/Shared
 echo "watchOS type-check OK ($TARGET)"

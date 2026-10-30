@@ -547,4 +547,45 @@ struct NowNextInlineView: View {
         }
     }
 }
+
+// MARK: - accessoryCorner (watch only)
+
+/// Watch corner complication (Phase 5 W1): the short subject name in the corner, the inline line (live minutes + short
+/// name, U7) curved along the bezel as the widget label. `WidgetFamilyKind` has no corner case on purpose (iOS has no
+/// such family); the complication picks this view for `.accessoryCorner`.
+/// APIs (watchOS 27 SDK WidgetKit.swiftinterface): View.widgetLabel(label:) iOS 16 / watchOS 9, AccessoryWidgetBackground.
+public struct NowNextCornerView: View {
+    private let display: NowNextDisplay
+
+    public init(display: NowNextDisplay) {
+        self.display = display
+    }
+
+    public var body: some View {
+        ZStack {
+            AccessoryWidgetBackground()
+            if let name = shortName {
+                Text(verbatim: name)
+                    .font(.system(.body, design: .rounded).weight(.bold))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                    .widgetAccentable()
+            } else {
+                Image(AppSymbol.date).font(.title3).widgetAccentable()
+            }
+        }
+        .widgetLabel {
+            NowNextInlineView(display: display, pauseTime: nil)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(verbatim: display.accessibilityLabel))
+    }
+
+    private var shortName: String? {
+        switch display.kind {
+        case .current(let lesson), .upcoming(let lesson): return lesson.shortName
+        case .status, .unavailable: return display.next?.shortName
+        }
+    }
+}
 #endif

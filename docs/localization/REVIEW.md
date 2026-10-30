@@ -288,3 +288,7 @@ change needs new phrases in `AppShortcuts.xcstrings`), "Change for This Day" (ed
 with the sentence-case "Changes on this day" header), alert titles (not covered by D12).
 Reviewer: "Week cycle" must read as the counterpart of the existing "Day cycle" wording; `editor.warning.periodInFreeForm`
 uses the "label: N" form in sk, cs, pl, uk and sr to avoid number agreement; "Custom times" must not read as "spare time".
+### Phase 5 W1 additions (2026-10-30)
+2 new keys, model-authored for 11 languages (`sr-Latn` derived), all `needs_review`: `watch.open.title` ("Open Tabula
+on your iPhone", the Apple Watch empty state; titles follow `widget.open.title`: infinitive, "aplikáciu Tabula") and
+`watch.open.noSnapshot` (the line under it before the iPhone has sent the timetable).
