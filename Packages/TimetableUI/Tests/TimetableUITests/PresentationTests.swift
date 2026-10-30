@@ -53,7 +53,7 @@ struct LessonPresentationTests {
     @Test func voiceOverSentenceHonoursTheFieldRule() {
         let label = LessonAccessibilityLabel.make(lesson: lesson(status: .cancelled, period: nil), visibility: FieldVisibility(),
                                                   reasons: [], renderer: renderer)
-        #expect(label == "Matematika, 8:55 to 9:40, cancelled")
+        #expect(label == "Matematika, 8:55 to 9:40, canceled")
         let lecture = LessonAccessibilityLabel.parts(lesson: lesson(type: .lecture), visibility: FieldVisibility([.lessonType]),
                                                      reasons: [], renderer: renderer)
         #expect(lecture.last == "Lecture")

@@ -228,7 +228,7 @@ struct HomeworkPresentationTests {
         let urgent = task("urgent", today.adding(days: 1), priority: .urgent)
         let snap = snapshot(tasks: [urgent, task("later", today.adding(days: 2))], overdue: nil, overdueCount: 0)
         let shown = homeworkDisplay(snap, at: instant(today, 9))
-        #expect(shown.kind == .tasks && shown.countText == "2 tasks to do" && shown.title == "Homework")
+        #expect(shown.kind == .tasks && shown.countText == "2 tasks to do" && shown.title == "Tasks")
         #expect(shown.lines[0].isHighPriority && shown.lines[0].accessibilityLabel.contains("urgent priority"))
         #expect(shown.link == .task(TaskItem.ID(urgent.id)))
         #expect(ItemLinkURL.url(for: shown.lines[0].link).absoluteString == "tabula://open/task/\(urgent.id.uuidString)")
@@ -415,7 +415,7 @@ struct ExamPresentationTests {
 
     @Test func emptyAndUnavailableStates() {
         let none = examDisplay(snapshot(), at: instant(today, 9))
-        #expect(none.kind == .empty(title: "No Upcoming Exams", detail: "Add an exam in the app to see its countdown here."))
+        #expect(none.kind == .empty(title: "No upcoming exams", detail: "Add an exam in the app to see its countdown here."))
         #expect(none.link == .today)
         let stale = examDisplay(snapshot(exam: exam(on: date(2026, 10, 10))), at: instant(today.adding(days: 3), 9))
         #expect(stale.kind == .unavailable(title: "Open Tabula", detail: "Open the app to update your timetable."))
