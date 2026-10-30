@@ -227,3 +227,8 @@ plural sentences appended to the confirmation message.
 (the first sentence of `sample.remove.message` without "Everything you created yourself stays"; shown when the user
 added or edited something in the sample) and `sample.remove.changedByUser` (plural: "Your changes to %lld sample
 entries are removed too.").
+
+### Phase 5 W1 additions (2026-10-30)
+2 new keys, model-authored for 11 languages (`sr-Latn` derived), all `needs_review`: `watch.open.title` ("Open Tabula
+on your iPhone", the Apple Watch empty state; titles follow `widget.open.title`: infinitive, "aplikáciu Tabula") and
+`watch.open.noSnapshot` (the line under it before the iPhone has sent the timetable).

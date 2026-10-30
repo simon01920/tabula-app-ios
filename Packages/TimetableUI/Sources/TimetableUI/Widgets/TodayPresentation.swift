@@ -161,6 +161,17 @@ public struct TodayPresenter: Sendable {
         }
     }
 
+    /// The lesson list of `date` alone, whatever the entry's state (Phase 5: the watch lists today and tomorrow
+    /// together), or `nil` when the snapshot does not cover `date`. Rows are past / current relative to `entry`.
+    public func day(snapshot: WidgetSnapshot, date: LocalDate, entry: NowNextTimelineEntry) -> TodayDisplay.Day? {
+        let isTomorrow = date != context.localDate(of: entry.date)
+        let shown = list(snapshot: snapshot, date: date, isTomorrow: isTomorrow, entry: entry) { kind, spoken in
+            TodayDisplay(date: entry.date, kind: kind, spokenHeader: spoken, spokenSeparator: "", moreFormat: { _ in "" })
+        }
+        guard case .lessons(let day)? = shown?.kind else { return nil }
+        return day
+    }
+
     // MARK: Internals
 
     private func statusDisplay(_ entry: NowNextTimelineEntry,

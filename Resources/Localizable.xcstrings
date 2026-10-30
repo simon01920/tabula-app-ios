@@ -122809,6 +122809,174 @@
         }
       }
     },
+    "watch.open.noSnapshot" : {
+      "comment" : "Apple Watch app: explanation under 'Open Tabula on your iPhone' when the watch has never received the timetable.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Rozvrh se tu zobrazí, až ho iPhone pošle."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dein Stundenplan erscheint hier, sobald dein iPhone ihn sendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your timetable appears here after your iPhone sends it."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ton emploi du temps s’affiche ici dès que ton iPhone l’envoie."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Az órarend itt jelenik meg, amint az iPhone elküldi."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iPhoneから時間割が送信されると、ここに表示されます。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Plan lekcji pojawi się tu, gdy iPhone go wyśle."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Orarul apare aici după ce iPhone-ul îl trimite."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Rozvrh sa tu zobrazí, keď ho iPhone pošle."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Распоред ће се појавити овде када га iPhone пошаље."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Raspored će se pojaviti ovde kada ga iPhone pošalje."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Розклад з’явиться тут, щойно iPhone його надішле."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iPhone 发送课程表后，课程表会显示在这里。"
+          }
+        }
+      }
+    },
+    "watch.open.title" : {
+      "comment" : "Apple Watch app: title when the watch has no usable timetable yet; the user must open the iPhone app so it sends the timetable to the watch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Otevřít aplikaci Tabula v iPhonu"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula auf dem iPhone öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Tabula on your iPhone"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ouvrir Tabula sur l’iPhone"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula megnyitása az iPhone-on"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iPhoneでTabulaを開く"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Otwórz aplikację Tabula na iPhonie"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Deschide Tabula pe iPhone"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Otvoriť aplikáciu Tabula v iPhone"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Отвори Tabula на iPhone-у"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Otvori Tabula na iPhone-u"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Відкрити Tabula на iPhone"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "在 iPhone 上打开 Tabula"
+          }
+        }
+      }
+    },
     "widget.countdown.inPhrase" : {
       "comment" : "Spoken and static form of the time until something starts, e.g. 'in 1 h 30 min'. %@ = abbreviated duration such as '25 min' or '1 h 30 min'.",
       "extractionState" : "manual",
