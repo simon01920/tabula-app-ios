@@ -194,7 +194,8 @@ if [ -x "$XCODEGEN" ] && command -v rsync >/dev/null; then
     grep -q 'DEVELOPMENT_TEAM = "$(TABULA_DEVELOPMENT_TEAM)"' "$P" && ok "DEVELOPMENT_TEAM = \$(TABULA_DEVELOPMENT_TEAM)" || bad "DEVELOPMENT_TEAM not wired to the xcconfig"
     grep -q 'dstPath = "$(CONTENTS_FOLDER_PATH)/Watch"' "$P" && ok "watch app embedded (Embed Watch Content)" || bad "watch embed phase missing"
     grep -q 'TabulaWidgets.appex in Embed Foundation Extensions' "$P" && ok "widget embedded (PlugIns)" || bad "widget embed phase missing"
-    [ "$(grep -c 'PrivacyInfo.xcprivacy in Resources \*/ = {isa = PBXBuildFile' "$P")" -eq 2 ] && ok "both privacy manifests (app + widget) in Resources phases" || bad "privacy manifests not in Resources phases"
+    grep -q 'TabulaWatchWidgets.appex in Embed Foundation Extensions' "$P" && ok "watch complications embedded (TabulaWatch.app/PlugIns)" || bad "watch complication embed phase missing"
+    [ "$(grep -c 'PrivacyInfo.xcprivacy in Resources \*/ = {isa = PBXBuildFile' "$P")" -eq 4 ] && ok "privacy manifests (app, widget, watch, watch complications) in Resources phases" || bad "privacy manifests not in Resources phases"
     grep -q 'SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) TABULA_MACRO_PROBES' "$P" && ok "TabulaApp defines TABULA_MACRO_PROBES (CI macro variant)" || bad "macro define missing in pbxproj"
     # Phase 4 B3: the App Intents controls are compiled on this path (app: alarm "Done"; widget: checkbox + timetable
     # choice), and the App Shortcut phrases catalog is an app resource (Xcode's metadata step reads it).
@@ -207,7 +208,7 @@ if [ -x "$XCODEGEN" ] && command -v rsync >/dev/null; then
       || bad "AppShortcuts.xcstrings must be in exactly one Resources phase (the app's)"
     if grep -q '^[[:space:]]*ARCHS = ' "$P"; then bad "ARCHS overridden in project (could drop arm64_32)"; else ok "no ARCHS override (watch keeps ARCHS_STANDARD incl. arm64_32)"; fi
     [ -f "$TMP/xg/Tabula.xcodeproj/xcshareddata/xcschemes/TabulaApp.xcscheme" ] && ok "shared scheme TabulaApp" || bad "scheme missing"
-    for f in Config/App-Info.plist Config/Widgets-Info.plist Config/Watch-Info.plist; do
+    for f in Config/App-Info.plist Config/Widgets-Info.plist Config/Watch-Info.plist Config/WatchWidgets-Info.plist; do
       cmp -s "$TMP/xg/$f" "$REPO_ROOT/$f" && ok "xcodegen left $f untouched" || bad "xcodegen rewrote $f"
     done
   else

@@ -178,6 +178,7 @@ jobs:
           BUNDLE_ID="$(python3 scripts/identity.py TABULA_BUNDLE_ID)"
           expect "TabulaApp PRODUCT_BUNDLE_IDENTIFIER" "$(setting TabulaApp PRODUCT_BUNDLE_IDENTIFIER)" "$BUNDLE_ID"
           expect "TabulaWatch PRODUCT_BUNDLE_IDENTIFIER" "$(setting TabulaWatch PRODUCT_BUNDLE_IDENTIFIER)" "$BUNDLE_ID.watchkitapp"
+          expect "TabulaWatchWidgets PRODUCT_BUNDLE_IDENTIFIER" "$(setting TabulaWatchWidgets PRODUCT_BUNDLE_IDENTIFIER)" "$BUNDLE_ID.watchkitapp.widgets"
           expect "DEVELOPMENT_TEAM (placeholder)" "$(setting TabulaApp DEVELOPMENT_TEAM)" ""
           expect "switch OFF app entitlements" "$(setting TabulaApp CODE_SIGN_ENTITLEMENTS)" "Config/Tabula.entitlements"
           expect "switch OFF widget entitlements" "$(setting TabulaWidgets CODE_SIGN_ENTITLEMENTS)" "Config/TabulaWidgets.entitlements"
@@ -211,6 +212,9 @@ jobs:
           need() { if [ -e "$1" ]; then echo "ok   $1"; else echo "::error::missing $1"; missing=1; fi; }
           need "$WIDGET"
           need "$WATCH/TabulaWatch"
+          need "$WATCH/PlugIns/TabulaWatchWidgets.appex/TabulaWatchWidgets"   # Phase 5 W1 complications
+          need "$WATCH/PrivacyInfo.xcprivacy"
+          need "$WATCH/sk.lproj/Localizable.strings"
           for lang in en sk; do
             need "$APP/$lang.lproj/Localizable.strings"
             need "$APP/$lang.lproj/Localizable.stringsdict"
@@ -227,6 +231,8 @@ jobs:
           echo "watch archs: $(lipo -archs "$WATCH/TabulaWatch")"
           lipo -archs "$WATCH/TabulaWatch" | grep -qw arm64_32 \
             || { echo "::error::TabulaWatch lacks arm64_32 (Series 7). Check WATCHOS_DEPLOYMENT_TARGET/ARCHS."; exit 1; }
+          lipo -archs "$WATCH/PlugIns/TabulaWatchWidgets.appex/TabulaWatchWidgets" | grep -qw arm64_32 \
+            || { echo "::error::TabulaWatchWidgets lacks arm64_32 (Series 7)."; exit 1; }
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:

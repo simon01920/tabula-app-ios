@@ -100,6 +100,18 @@ check(watch_id.startswith(app_id + "."), f"watch bundle ID {watch_id} is prefixe
 watch_plist = plistlib.load(open(ROOT / base("TabulaWatch")["INFOPLIST_FILE"], "rb"))
 check(watch_plist.get("WKCompanionAppBundleIdentifier") == app_id,
       "WKCompanionAppBundleIdentifier = app bundle ID", "WKCompanionAppBundleIdentifier mismatch")
+# Phase 5 W1: watch complication extension (CI path only), embedded in the watch app, sharing its cache folder.
+complication_id = xs(base("TabulaWatchWidgets").get("PRODUCT_BUNDLE_IDENTIFIER", ""))
+check(complication_id.startswith(watch_id + "."), f"watch complication bundle ID {complication_id} is prefixed by the watch app ID",
+      f"watch complication bundle ID {complication_id} must start with {watch_id}.")
+check({"target": "TabulaWatchWidgets"} in tgt["TabulaWatch"].get("dependencies", [])
+      and "WatchApp/Complications" in srcs.get("TabulaWatchWidgets", [])
+      and all("WatchApp/Shared" in srcs.get(t, []) for t in ("TabulaWatch", "TabulaWatchWidgets")),
+      "project.yml: TabulaWatch embeds TabulaWatchWidgets; both compile WatchApp/Shared (scripts/watch-typecheck.sh = same folders)",
+      "project.yml: watch complication target wiring differs from scripts/watch-typecheck.sh")
+complication_plist = plistlib.load(open(ROOT / base("TabulaWatchWidgets")["INFOPLIST_FILE"], "rb"))
+check(complication_plist.get("NSExtension", {}).get("NSExtensionPointIdentifier") == "com.apple.widgetkit-extension",
+      "watch complication Info.plist: WidgetKit extension point", "watch complication Info.plist lacks the WidgetKit extension point")
 
 # --- deployment targets & Swift language mode ---------------------------------------------------------------
 dt = pj["options"]["deploymentTarget"]
@@ -125,7 +137,10 @@ for t, plist, ents in (("TabulaApp", xt["infoPath"], xt["entitlementsPath"]),
           f"{t} entitlements differ: project.yml resolves to {xs(base(t).get('CODE_SIGN_ENTITLEMENTS'))!r}, xtool.yml {ents!r}")
 canonical_group = re.search(r'canonicalIdentifier = "([^"]+)"',
                             (ROOT / "Packages/TimetableCore/Sources/TimetableCore/AppGroup.swift").read_text()).group(1)
-for ents in (xt["entitlementsPath"], ext["entitlementsPath"]):
+watch_ents = {base(t).get("CODE_SIGN_ENTITLEMENTS") for t in ("TabulaWatch", "TabulaWatchWidgets")}
+check(watch_ents == {"Config/TabulaWatch.entitlements"}, "project.yml: both watch targets use Config/TabulaWatch.entitlements",
+      f"project.yml watch entitlements: {watch_ents}")
+for ents in (xt["entitlementsPath"], ext["entitlementsPath"], "Config/TabulaWatch.entitlements"):
     groups = plistlib.load(open(ROOT / ents, "rb")).get("com.apple.security.application-groups", [])
     check(groups == [canonical_group], f"{ents}: App Group = TimetableCore.AppGroup.canonicalIdentifier",
           f"{ents}: groups {groups} != {canonical_group}")
@@ -284,7 +299,8 @@ check(all(v == want_lprojs for v in xt_lprojs.values()),
 check(pj.get("options", {}).get("developmentLanguage") == "en" and "knownRegions" not in pj.get("options", {}),
       "project.yml: developmentLanguage en (XcodeGen has no knownRegions option; languages come from the catalog + CFBundleLocalizations)",
       "project.yml: developmentLanguage must be en, and options.knownRegions is ignored by XcodeGen (remove it)")
-for plist_name in ("Config/App-Info.plist", "Config/Widgets-Info.plist"):
+for plist_name in ("Config/App-Info.plist", "Config/Widgets-Info.plist", "Config/Watch-Info.plist",
+                   "Config/WatchWidgets-Info.plist"):
     declared = plistlib.load(open(ROOT / plist_name, "rb")).get("CFBundleLocalizations")
     check(declared is not None and set(declared) == set(L10N.LANGS) and len(declared) == len(L10N.LANGS),
           f"{plist_name}: CFBundleLocalizations lists the shipped languages ({len(L10N.LANGS)} ids)",
@@ -422,6 +438,12 @@ for label, path, xt_res, pj_target in (
     check(path in xt_res, f"{label} privacy manifest wired into xtool.yml resources", f"{path} missing from xtool.yml")
     check(path in srcs[pj_target], f"{label} privacy manifest wired into project.yml {pj_target}",
           f"{path} missing from project.yml {pj_target}")
+# Watch app + complications (CI path only): one manifest, the widget extension's content, in both watch targets.
+watch_privacy = "Config/Privacy/Watch/PrivacyInfo.xcprivacy"
+check(plistlib.load(open(ROOT / watch_privacy, "rb")) == plistlib.load(open(ROOT / "Config/Privacy/Widgets/PrivacyInfo.xcprivacy", "rb"))
+      and all(watch_privacy in srcs[t] for t in ("TabulaWatch", "TabulaWatchWidgets")),
+      "watch privacy manifest = widget manifest, wired into TabulaWatch + TabulaWatchWidgets",
+      f"{watch_privacy} differs from the widget manifest or is missing from a watch target")
 info = plistlib.load(open(ROOT / xt["infoPath"], "rb"))
 check(info.get("ITSAppUsesNonExemptEncryption") is False, "App-Info.plist ITSAppUsesNonExemptEncryption = false",
       "ITSAppUsesNonExemptEncryption must be false")

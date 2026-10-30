@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Watch app + watch complication extension (XcodeGen/CI path only; both targets use this file). Same App Group as
+     the iPhone app: the watch app stores the received snapshot there and the complications read it (Phase 5 W1,
+     WatchApp/Shared/WatchCache.swift). Nothing paid-only, so there is no PaidAccount variant. -->
+<plist version="1.0">
+<dict>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.sk.simondev.tabula</string>
+	</array>
+</dict>
+</plist>
