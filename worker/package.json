@@ -1,0 +1,15 @@
+{
+  "name": "tabula-share-worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.ts",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "4.156.0"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}
