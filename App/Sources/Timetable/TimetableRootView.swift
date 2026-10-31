@@ -39,6 +39,7 @@ struct TimetableRootView: View {
     @State private var quickAdd: QuickAddTarget?
     @State private var editor: EditorPresentation?
     @State private var management: ManagementSheet?
+    @State private var showsExport = false
 
     init() {
         initialView = nil
@@ -94,7 +95,9 @@ struct TimetableRootView: View {
         }
         .editorSheet($editor)
         .sheet(item: $management) { item in item.route.makeView() }
+        .sheet(isPresented: $showsExport) { ExportSheet() }
         .closesForDeepLink {   // QA fix Q6: a notification tap needs the screen
+            showsExport = false
             detail = nil
             quickAdd = nil
             management = nil
@@ -251,6 +254,13 @@ struct TimetableRootView: View {
         }
     }
 
+    /// "Export…" (Phase 8): opens the export sheet.
+    private var exportMenuItem: some View {
+        Button { showsExport = true } label: {
+            Label { Text("export.menu") } icon: { Image(systemName: "square.and.arrow.up") }
+        }
+    }
+
     private func optionsMenu(timetable: Timetable, resolver: ScheduleResolver, current: TimetableSelection) -> some View {
         let kind = viewKind(for: timetable)
         let dayBased = TimetableViewChoice.isDayBased(kind)
@@ -332,6 +342,7 @@ struct TimetableRootView: View {
                     }
                 }
                 .disabled(!EditorRouteLookup.isAvailable(Self.subjectsRoute))
+                exportMenuItem
             }
         } label: {
             // One stable glyph whatever the current view (Opus H4); VoiceOver and long-press read "View Options".

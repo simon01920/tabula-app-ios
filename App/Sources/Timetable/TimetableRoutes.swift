@@ -5,6 +5,7 @@
 //   timetable.grid-legend     → the grid with the one-time symbol legend forced visible (TipKit test mode) (U4)
 //   timetable.lesson-detail   → sheet: a changed lesson of the shown week (else the first lesson)
 //   timetable.quick-add       → sheet: the subject picker for the first free slot of the shown week
+//   export.sheet              → sheet: Export (type, view, range) (Phase 8 E2)
 // Sheets pick their subject from the `-TabulaSeed` data; with no matching data they show an empty state.
 import SwiftUI
 import TimetableCore
@@ -24,6 +25,7 @@ enum TimetableRoutes: RouteProvider {
             },
             AppRoute("timetable.lesson-detail", .sheet(over: .timetable)) { LessonDetailRouteView() },
             AppRoute("timetable.quick-add", .sheet(over: .timetable)) { QuickAddRouteView() },
+            AppRoute("export.sheet", .sheet(over: .timetable)) { ExportSheet() },
         ]
     }
 }
