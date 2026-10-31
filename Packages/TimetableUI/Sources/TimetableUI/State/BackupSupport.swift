@@ -13,12 +13,19 @@ import TimetableCore
 
 extension DatabaseMutation {
     /// Applies `backup` to the current database (`BackupRestore.apply`). The clock first receives the backup's newest
-    /// timestamp, so later edits always stamp above the restored data.
+    /// timestamp, so later edits always stamp above the restored data. `settings.syncEnabled` keeps this device's value
+    /// in both modes (re-stamped now if the merge took the backup's), so a restore never switches iCloud sync.
     public static func restore(_ backup: TabulaDatabase, mode: BackupRestore.Mode) -> DatabaseMutation {
         DatabaseMutation(label: mode == .merge ? "restore backup (merge)" : "restore backup (replace)") {
             database, clock, now in
             clock.receive(backup.latestTimestamp, now: now)
-            database = try BackupRestore.apply(backup, to: database, mode: mode, clock: &clock, now: now)
+            var restored = try BackupRestore.apply(backup, to: database, mode: mode, clock: &clock, now: now)
+            if restored.settings.syncEnabled != database.settings.syncEnabled {
+                var settings = restored.settings
+                settings.syncEnabled = database.settings.syncEnabled
+                restored.settings = try MutationStamper.stamp(old: restored.settings, new: settings, clock: &clock, now: now)
+            }
+            database = restored
         }
     }
 }
