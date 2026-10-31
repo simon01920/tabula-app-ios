@@ -103,12 +103,17 @@ public struct CloudRecordBatch: Sendable {
     /// Record name → why it was skipped. Skipped records are never applied and never acknowledged.
     public var rejected: [String: CloudRecordError]
 
+    /// `true` when records of a newer app version were skipped: the engine state must not be saved past them, so
+    /// they are fetched again (after an app update) instead of being lost.
+    public var holdsBackState: Bool { rejected.values.contains(.newerVersion) }
+
     /// Decodes `records`. Every record is untrusted input: size, schema version, JSON shape, `id` = record name and
-    /// the entity decoding are checked; a bad record is skipped, never fatal for the batch.
-    public init(_ records: [CloudRecord]) {
+    /// the entity decoding are checked; a bad record is skipped, never fatal for the batch. `unknownTypeNames` are
+    /// records whose type this build does not know (a newer app version).
+    public init(_ records: [CloudRecord], unknownTypeNames: [String] = []) {
         database = TabulaDatabase(settings: .untouchedDefaults)
         hashes = [:]
-        rejected = [:]
+        rejected = Dictionary(unknownTypeNames.map { ($0, CloudRecordError.newerVersion) }, uniquingKeysWith: { first, _ in first })
         var accepted: [String: EntityType] = [:]
         for record in records {
             do {
@@ -184,9 +189,12 @@ public struct CloudSyncLedger: Codable, Hashable, Sendable {
 
     public init() {}
 
-    /// The records whose current payload is not the one on the server.
-    public func pending(_ records: [CloudRecord]) -> [CloudRecord] {
-        records.filter { serverHashes[$0.name] != $0.payloadHash }
+    /// The records whose current payload is not the one on the server. `skipping`: records whose server copy this
+    /// build cannot merge (rejected in a conflict); sending ours again would conflict forever.
+    /// Acknowledge a send (`serverHashes`, `systemFields`) only once the sent data is saved locally: otherwise a kill
+    /// before the save leaves older data on disk that the ledger then sends over the newer server copy.
+    public func pending(_ records: [CloudRecord], skipping: Set<String> = []) -> [CloudRecord] {
+        records.filter { serverHashes[$0.name] != $0.payloadHash && !skipping.contains($0.name) }
     }
 
     /// The ledger stored at `url`; a fresh one when the file is missing or unreadable.

@@ -31,46 +31,59 @@ private final class FakeCloudZone {
 }
 
 /// One device: its database, ledger and clock; `pull`/`push` do what the app adapter does with CKSyncEngine events.
+/// `persisted` is the store on disk (the ledger is written immediately, like `cloudsync.json`); `crash()` loses the rest.
 private struct FakeDevice {
     var database: TabulaDatabase
+    var persisted: TabulaDatabase
     var ledger = CloudSyncLedger()
     var clock: HybridLogicalClock
     var token = 0
+    /// Names whose conflicting server copy could not be merged (the adapter's `unmergeable`).
+    var unmergeable: Set<String> = []
 
     init(_ database: TabulaDatabase, node: UInt64) {
         self.database = database
+        persisted = database
         clock = HybridLogicalClock(node: node)
         clock.receive(database.latestTimestamp, now: SyncFixture.at(0))
     }
 
-    mutating func apply(_ fetched: [(CloudRecord, Data)]) throws {
+    mutating func crash() { database = persisted }
+
+    /// Merges, saves (`flushForSync`), then notes the server versions; returns the batch.
+    @discardableResult
+    mutating func apply(_ fetched: [(CloudRecord, Data)]) throws -> CloudRecordBatch {
         let batch = CloudRecordBatch(fetched.map(\.0))
         database = try SyncMerge.merge(local: database, remote: batch.database)
+        persisted = database
         clock.receive(batch.database.latestTimestamp, now: SyncFixture.at(0))
         for (record, tag) in fetched where batch.hashes[record.name] != nil {
             ledger.serverHashes[record.name] = batch.hashes[record.name]
             ledger.systemFields[record.name] = tag
         }
+        return batch
     }
 
+    /// The engine state (token) moves only when nothing was held back.
     mutating func pull(_ zone: FakeCloudZone) throws {
         let (fetched, token) = zone.changes(since: token)
-        try apply(fetched)
-        self.token = token
+        if try !apply(fetched).holdsBackState { self.token = token }
     }
 
-    /// Sends every pending record; a conflict merges the server copy and sends again (bounded).
-    mutating func push(_ zone: FakeCloudZone) throws {
+    /// Sends every pending record; a conflict merges the server copy and sends again (bounded). `flushFirst: false`
+    /// acknowledges before saving (the bug QA found in the first S1 adapter).
+    mutating func push(_ zone: FakeCloudZone, flushFirst: Bool = true) throws {
         for _ in 0..<3 {
-            let pending = ledger.pending(try database.cloudRecords())
+            let pending = ledger.pending(try database.cloudRecords(), skipping: unmergeable)
             if pending.isEmpty { return }
             for record in pending {
                 switch zone.save(record, knownTag: ledger.systemFields[record.name]) {
                 case .saved(let tag):
+                    if flushFirst { persisted = database }
                     ledger.serverHashes[record.name] = record.payloadHash
                     ledger.systemFields[record.name] = tag
                 case .conflict(let server, let tag):
-                    try apply([(server, tag)])
+                    unmergeable.formUnion(try apply([(server, tag)]).rejected.keys)
                 }
             }
         }
@@ -279,5 +292,51 @@ struct CloudSyncTests {
             let kept = try #require(device.database.tasks.first { $0.id == dropped.id })
             #expect(kept.isDeleted && kept.title == dropped.title)
         }
+    }
+
+    @Test(arguments: [true, false])
+    func aSendIsAcknowledgedOnlyAfterTheDataIsSaved(_ flushFirst: Bool) throws {
+        let zone = FakeCloudZone()
+        var a = FakeDevice(Fixture.fullDatabase(), node: 0xA)
+        try a.push(zone)
+        var b = FakeDevice(Fixture.fullDatabase(), node: 0xB)
+        try b.pull(zone)
+        try a.edit(\.tasks, at: 0, millis: 1_000) { $0.title = "v2" }
+        try a.push(zone, flushFirst: flushFirst)
+        a.crash()   // killed inside the save debounce
+        try a.push(zone)
+        try b.pull(zone)
+        // Saved first: nothing stale is pending after the restart. Acknowledged first: the old title overwrites v2.
+        #expect((b.database.tasks[0].title == "v2") == flushFirst)
+    }
+
+    @Test func newerVersionRecordsHoldBackTheEngineState() throws {
+        let zone = FakeCloudZone()
+        var a = FakeDevice(Fixture.fullDatabase(), node: 0xA)
+        try a.push(zone)
+        var newer = try #require(zone.records.values.first { $0.record.type == .task }?.record)
+        newer.schemaVersion = TabulaDatabase.currentSchemaVersion + 1
+        _ = zone.save(newer, knownTag: Data(String(zone.records[newer.name]!.tag).utf8))
+        var b = FakeDevice(TabulaDatabase(settings: .untouchedDefaults), node: 0xB)
+        try b.pull(zone)
+        #expect(b.token == 0)   // not acknowledged: fetched again (an updated app then applies it)
+        #expect(b.database.hasLiveContent && !b.database.tasks.contains { $0.id.uuidString == newer.name })
+        #expect(CloudRecordBatch([], unknownTypeNames: ["X"]).holdsBackState)   // unknown record types count too
+        #expect(!CloudRecordBatch(try Fixture.fullDatabase().cloudRecords()).holdsBackState)
+    }
+
+    @Test func aConflictWithAnUnmergeableServerCopyDoesNotLoop() throws {
+        let zone = FakeCloudZone()
+        var a = FakeDevice(Fixture.fullDatabase(), node: 0xA)
+        try a.push(zone)
+        var newer = try #require(zone.records.values.first { $0.record.type == .task }?.record)
+        newer.schemaVersion = TabulaDatabase.currentSchemaVersion + 1
+        _ = zone.save(newer, knownTag: Data(String(zone.records[newer.name]!.tag).utf8))   // another device, newer app
+        let index = try #require(a.database.tasks.firstIndex { $0.id.uuidString == newer.name })
+        try a.edit(\.tasks, at: index, millis: 1_000) { $0.title = "Edited on the old app" }
+        try a.push(zone)   // conflict → server copy rejected → not re-sent (push settles)
+        #expect(a.unmergeable == [newer.name])
+        #expect(zone.records[newer.name]?.record.schemaVersion == TabulaDatabase.currentSchemaVersion + 1)
+        #expect(a.ledger.pending(try a.database.cloudRecords(), skipping: a.unmergeable).isEmpty)
     }
 }

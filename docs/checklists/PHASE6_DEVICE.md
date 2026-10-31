@@ -25,7 +25,7 @@ iOS version A/B: ________ · Build: TestFlight ____ · Tester: ________ · Date:
 | S1.3 | Both online: edit a lesson room on A | B updates within ~1 min while open (silent push), or at the next launch; reminders and the widget on B follow | | |
 | S1.4 | **Airplane mode** on both. A: rename subject X, B: change X's colour. Turn both online | Both end with the new name **and** the new colour (field-level merge) | | |
 | S1.5 | Airplane on both. A and B edit the **same** field differently (A first, B a minute later). Online | Both show B's value (later write wins) | | |
-| S1.6 | Airplane on B. A: delete homework H. B: complete H (offline, before A's delete reached it). Online | H is deleted on both (the delete is newer) | | |
+| S1.6 | Airplane on B. **First** B: complete homework H (offline). **Then** A: delete H. B online | H is deleted on both (the delete is newer than B's edit) | | |
 | S1.7 | Airplane on B. A: delete homework H. Later B: edit H's title offline. Online | H comes back on both with B's title (an edit after the delete resurrects) | | |
 | S1.8 | Subtasks: A adds subtask "a", B (offline) adds "b" to the same task. Online | The task has both subtasks on both devices | | |
 | S1.9 | **First sync with data on both sides:** B with its own timetable, iCloud Sync off; turn it on | Alert "Data on This iPhone and in iCloud" with Merge (bold, top), Keep This iPhone, Use iCloud (red) | | |

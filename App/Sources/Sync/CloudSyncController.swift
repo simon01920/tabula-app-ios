@@ -45,9 +45,13 @@ final class CloudSyncController: CKSyncEngineDelegate {
     @ObservationIgnored private var engine: CKSyncEngine?
     @ObservationIgnored private var firstSyncRecords: [CloudRecord] = []
     @ObservationIgnored private var firstSyncTags: [String: Data] = [:]
+    @ObservationIgnored private var firstSyncUnknown: [String] = []
+    /// Records whose server copy this build cannot merge (newer app version): never re-sent this session (no conflict loop).
+    @ObservationIgnored private var unmergeable: Set<String> = []
     @ObservationIgnored private var heldState: CKSyncEngine.State.Serialization?
     @ObservationIgnored private var fetchFailed = false
-    /// A merge could not be saved: stop acknowledging (the next launch fetches again from the last saved state).
+    /// A merge could not be saved, or newer-version records were skipped: stop saving the engine state, so the next
+    /// launch fetches again from the last saved state (after an app update the skipped records then apply).
     @ObservationIgnored private var stateBlocked = false
     @ObservationIgnored private var operationProblem: CloudSyncStatus?
     @ObservationIgnored private var oversized = false
@@ -56,7 +60,9 @@ final class CloudSyncController: CKSyncEngineDelegate {
 
     nonisolated private static let zoneID = CKRecordZone.ID(zoneName: CloudSyncSchema.zoneName)
 
-    /// The controller for the on-disk store; `nil` for seed runs (sample data must never reach iCloud).
+    /// The controller for the on-disk store; `nil` for `-TabulaSeed` runs (developer seed data never reaches iCloud).
+    /// The onboarding "Just look around" sample timetable is ordinary data: it syncs, can trigger the first-sync alert
+    /// on a second device that also has data, and its removal syncs as tombstones.
     static func install(on model: AppModel) -> CloudSyncController? {
         guard case .file(let directory, _) = model.environment.dataSource else { return nil }
         let controller = CloudSyncController(model: model, ledgerURL: directory.appendingPathComponent("cloudsync.json"))
@@ -135,11 +141,12 @@ final class CloudSyncController: CKSyncEngineDelegate {
     }
 
     private func completeFirstSync(_ choice: FirstSyncChoice) async {
-        guard await apply(firstSyncRecords, tags: firstSyncTags, choice: choice) else { return }
+        guard await apply(firstSyncRecords, unknown: firstSyncUnknown, tags: firstSyncTags, choice: choice) != nil else { return }
         firstSyncRecords = []
         firstSyncTags = [:]
+        firstSyncUnknown = []
         ledger.initialSyncDone = true
-        if let heldState { ledger.engineState = try? JSONEncoder().encode(heldState) }
+        if let heldState, !stateBlocked { ledger.engineState = try? JSONEncoder().encode(heldState) }
         heldState = nil
         saveLedger()
         engine?.state.add(pendingDatabaseChanges: [.saveZone(CKRecordZone(zoneID: Self.zoneID))])
@@ -205,44 +212,57 @@ final class CloudSyncController: CKSyncEngineDelegate {
 
     // MARK: Fetch
 
-    private func received(_ ckRecords: [CKRecord]) async {
+    /// Applies fetched (or conflicting server) records; returns the names that could not be applied.
+    @discardableResult
+    private func received(_ ckRecords: [CKRecord]) async -> Set<String> {
         var records: [CloudRecord] = []
+        var unknown: [String] = []
         var tags: [String: Data] = [:]
         for ckRecord in ckRecords where ckRecord.recordID.zoneID == Self.zoneID {
-            guard let record = Self.cloudRecord(from: ckRecord) else { newerDataSeen = true; continue }
+            guard let record = Self.cloudRecord(from: ckRecord) else { unknown.append(ckRecord.recordID.recordName); continue }
             records.append(record)
             tags[record.name] = Self.systemFields(of: ckRecord)
         }
-        if ledger.initialSyncDone {
-            _ = await apply(records, tags: tags, choice: .merge)
-        } else {
+        guard ledger.initialSyncDone else {
             firstSyncRecords += records
+            firstSyncUnknown += unknown
             firstSyncTags.merge(tags) { _, new in new }
+            return []
         }
+        return await apply(records, unknown: unknown, tags: tags, choice: .merge) ?? []
     }
 
-    /// Merges `records` into the store, saves it, then notes the server version. `false` when nothing could be applied.
-    private func apply(_ records: [CloudRecord], tags: [String: Data], choice: FirstSyncChoice) async -> Bool {
-        let batch = CloudRecordBatch(records)
-        if batch.rejected.values.contains(.newerVersion) { newerDataSeen = true }
-        guard !batch.hashes.isEmpty else { return true }
+    /// Merges `records` into the store, saves it, then notes the server version. Returns the rejected names; `nil`
+    /// when nothing could be applied.
+    private func apply(_ records: [CloudRecord], unknown: [String], tags: [String: Data],
+                       choice: FirstSyncChoice) async -> Set<String>? {
+        let batch = CloudRecordBatch(records, unknownTypeNames: unknown)
+        if batch.holdsBackState {
+            newerDataSeen = true
+            stateBlocked = true   // never acknowledge past records this build skipped
+        }
+        let rejected = Set(batch.rejected.keys)
+        guard !batch.hashes.isEmpty else { return rejected }
         guard case .applied = model.apply(.mergeRemote(batch.database, choice: choice), origin: .sync),
               await model.flushForSync() else {
             stateBlocked = true
-            return false
+            return nil
         }
         for (name, hash) in batch.hashes {
             ledger.serverHashes[name] = hash
             ledger.systemFields[name] = tags[name]
         }
         saveLedger()
-        return true
+        return rejected
     }
 
     // MARK: Send
 
     private func handleSent(_ event: CKSyncEngine.Event.SentRecordZoneChanges) async {
-        for record in event.savedRecords where record.recordID.zoneID == Self.zoneID {
+        // Acknowledge only what is on disk: after a kill inside the save debounce, older data would otherwise be
+        // pending against a ledger that names the newer server copy, and be sent over it.
+        let persisted = await model.flushForSync()
+        for record in event.savedRecords where persisted && record.recordID.zoneID == Self.zoneID {
             let name = record.recordID.recordName
             if let payload = record[CloudSyncSchema.payloadField] as? Data {
                 ledger.serverHashes[name] = TabulaSHA256.hexDigest(payload)
@@ -257,7 +277,10 @@ final class CloudSyncController: CKSyncEngineDelegate {
             case .serverRecordChanged:
                 // Merge the server copy; the record is then pending again with the server's change tag.
                 if let server = failure.error.serverRecord { conflicts.append(server) }
-            case .zoneNotFound, .unknownItem, .userDeletedZone:
+            case .userDeletedZone:
+                zoneDeleted()   // like a purge: keep local data, do not re-send
+                return
+            case .zoneNotFound, .unknownItem:
                 if failure.error.code == .zoneNotFound {
                     engine?.state.add(pendingDatabaseChanges: [.saveZone(CKRecordZone(zoneID: Self.zoneID))])
                 }
@@ -271,7 +294,7 @@ final class CloudSyncController: CKSyncEngineDelegate {
             }
         }
         saveLedger()
-        if !conflicts.isEmpty { await received(conflicts) }
+        if !conflicts.isEmpty { unmergeable.formUnion(await received(conflicts)) }
         if !retry.isEmpty { engine?.state.add(pendingRecordZoneChanges: retry) }
         scheduleScan()
     }
@@ -279,12 +302,12 @@ final class CloudSyncController: CKSyncEngineDelegate {
     /// Queues every record whose payload is not the server's (off the main actor; the database is a value).
     private func scheduleScan() {
         guard ledger.initialSyncDone, let engine, let database = model.database else { return }
-        let ledger = self.ledger
+        let ledger = self.ledger, skipping = unmergeable
         scanTask?.cancel()
         scanTask = Task { [weak self] in
             try? await Task.sleep(for: .milliseconds(300))
             guard !Task.isCancelled else { return }
-            let pending = await Task.detached(priority: .utility) { ledger.pending((try? database.cloudRecords()) ?? []) }.value
+            let pending = await Task.detached(priority: .utility) { ledger.pending((try? database.cloudRecords()) ?? [], skipping: skipping) }.value
             guard !Task.isCancelled, let self, engine === self.engine else { return }
             oversized = pending.contains(where: \.isTooLarge)
             let queued = Set(engine.state.pendingRecordZoneChanges)
@@ -318,6 +341,8 @@ final class CloudSyncController: CKSyncEngineDelegate {
         ledger = CloudSyncLedger()
         firstSyncRecords = []
         firstSyncTags = [:]
+        firstSyncUnknown = []
+        unmergeable = []
         heldState = nil
         isAwaitingFirstSyncChoice = false
         saveLedger()
