@@ -137,7 +137,26 @@ struct TodayHeroTests {
             if case let .lesson(lesson, _, _) = item { return lesson.start > now }
             return false
         })
-        #expect(hero.earlierItems.count == 2 && hero.remainingItems.count == lessons.count - 3)
+        // Two earlier, the current one and the hero's "Next" (D8) are not in the rest of today.
+        let next = try #require(hero.header.next)
+        #expect(!hero.remainingItems.contains { $0.id == next.id.rawValue })
+        #expect(hero.earlierItems.count == 2 && hero.remainingItems.count == lessons.count - 4)
+    }
+
+    @Test func restOfTodayNeverRepeatsTheHeroLesson() throws {
+        // D8: before school and in a break the hero is the coming lesson; the list starts after it.
+        for now in [instant(today, 6, 30), instant(today, 8, 53)] {
+            let state = try state(at: now)
+            guard case let .upcoming(lesson, _) = state.header else {
+                Issue.record("expected upcoming, got \(state.header)")
+                continue
+            }
+            #expect(!state.remainingItems.contains { $0.id == lesson.id.rawValue })
+            #expect(state.remainingItems.allSatisfy { item in
+                if case let .lesson(row, _, _) = item { return row.start >= lesson.start }
+                return false
+            })
+        }
     }
 
     @Test func bringListMergesVisibleItemsOnce() throws {

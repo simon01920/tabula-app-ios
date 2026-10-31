@@ -83,9 +83,12 @@ public struct TodayState: Equatable, Sendable {
     /// Today's rotation position ("Week B"), for the navigation subtitle (U3, Opus L2).
     public var cycle: CycleLabel?
 
-    /// "Rest of today" (U3, Opus H3.2 / Astra F14): today's lessons that have not started yet. The current lesson is
-    /// in the hero and never repeated; earlier lessons are in `earlierItems`. Gaps are dropped (the rows show times).
-    public var remainingItems: [TodayItem] { items.filter { $0.timing == .upcoming } }
+    /// "Rest of today" (U3, Opus H3.2 / Astra F14, verification D8): today's lessons that have not started yet, minus
+    /// what the hero already shows (the current lesson, and its "Next" or the before-school / break lesson). Earlier
+    /// lessons are in `earlierItems`. Gaps are dropped (the rows show times).
+    public var remainingItems: [TodayItem] {
+        items.filter { $0.timing == .upcoming && $0.id != header.next?.id.rawValue }
+    }
     /// "Earlier today": the lessons that are over (a collapsed disclosure on Today).
     public var earlierItems: [TodayItem] { items.filter { $0.timing == .past } }
 

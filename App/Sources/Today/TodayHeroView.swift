@@ -52,7 +52,7 @@ struct TodayHeroView: View {
 
     @ViewBuilder
     private func lessonHero(_ lesson: ResolvedLesson, next: ResolvedLesson?) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 10) {
+        AdaptiveStack(horizontalAlignment: .firstTextBaseline, spacing: 10) {   // D21: no "until / 10:45" split at AX
             NowMarker()
             Text(verbatim: text.until(lesson.endTime))
                 .font(.subheadline)
