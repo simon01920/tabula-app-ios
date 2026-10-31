@@ -288,7 +288,7 @@ private struct LessonFormContent: View {
                 } label: {
                     Text("editor.validity")
                 }
-                .labelledBySectionHeader()   // M1: the header already says "Applies"
+                // D9 / F05: no section header here, so the picker shows its own label ("Applies   Always").
             }
             switch draft.validityMode {
             case .terms:

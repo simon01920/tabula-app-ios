@@ -161,7 +161,7 @@ struct OnboardingMinutesField: View {
     /// "%lld min" (the value with its unit) for VoiceOver.
     let valueText: (Int) -> String
     @FocusState private var isFocused: Bool
-    @ScaledMetric(relativeTo: .body) private var fieldWidth = 56.0
+    @ScaledMetric(relativeTo: .body) private var fieldWidth = 44.0
 
     private var clamped: Binding<Int> {
         Binding(get: { value }, set: { value = min(max($0, range.lowerBound), range.upperBound) })
@@ -172,22 +172,28 @@ struct OnboardingMinutesField: View {
             Text(LocalizedStringKey(titleKey))
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            HStack(spacing: 8) {
-                TextField(value: clamped, format: .number) {
-                    Text(LocalizedStringKey(titleKey))
+            // At AX sizes the field and the stepper get a line each (D2: the row overflowed the screen sideways).
+            AdaptiveStack(spacing: 8) {
+                HStack(spacing: 8) {
+                    // A set width (scaled): a fixed-size TextField takes its huge ideal width, which squeezed the unit
+                    // out (F11 / D17) and pushed the row off screen at AX sizes (D2).
+                    TextField(value: clamped, format: .number) {
+                        Text(LocalizedStringKey(titleKey))
+                    }
+                    .keyboardType(.numberPad)
+                    .multilineTextAlignment(.trailing)
+                    .font(.body.monospacedDigit())
+                    .focused($isFocused)
+                    .frame(width: fieldWidth)
+                    .frame(minHeight: 44)
+                    .padding(.horizontal, 8)
+                    .background(Color(uiColor: .tertiarySystemFill), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .accessibilityValue(Text(verbatim: valueText(value)))
+                    Text("onboarding.unit.minutes")
+                        .foregroundStyle(.secondary)
+                        .fixedSize()
+                        .accessibilityHidden(true)
                 }
-                .keyboardType(.numberPad)
-                .multilineTextAlignment(.trailing)
-                .font(.body.monospacedDigit())
-                .focused($isFocused)
-                .frame(minWidth: fieldWidth, minHeight: 44)
-                .fixedSize(horizontal: true, vertical: false)
-                .padding(.horizontal, 8)
-                .background(Color(uiColor: .tertiarySystemFill), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-                .accessibilityValue(Text(verbatim: valueText(value)))
-                Text("onboarding.unit.minutes")
-                    .foregroundStyle(.secondary)
-                    .accessibilityHidden(true)
                 Stepper(value: clamped, in: range, step: step) {
                     Text(LocalizedStringKey(titleKey))
                 }

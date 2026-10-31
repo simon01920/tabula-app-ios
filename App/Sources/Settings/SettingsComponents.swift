@@ -48,6 +48,7 @@ struct SettingsRowLabel: View {
 
     var body: some View {
         Label { title } icon: { SettingsIconTile(symbol: symbol, color: color) }
+            .labelStyle(.adaptive)   // D7: icon above the title at AX sizes
     }
 }
 

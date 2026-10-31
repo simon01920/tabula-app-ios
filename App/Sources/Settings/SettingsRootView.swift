@@ -73,6 +73,7 @@ struct SettingsRootView: View {
                                 SettingsIconTile(symbol: "rectangle.stack.fill", color: .blue)
                             }
                         }
+                        .labelStyle(.adaptive)
                     }
                 }
                 NavigationLink {

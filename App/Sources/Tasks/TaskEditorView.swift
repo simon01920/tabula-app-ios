@@ -187,7 +187,7 @@ private struct TaskFormContent: View {
             } label: {
                 Text("tasks.field.due")
             }
-            .labelledBySectionHeader()   // M1: the header already says "Due"
+            // D9 / M21: the picker carries the label ("Due   Date"), so the section has no header echoing it (M1).
             switch draft.dueMode {
             case .none:
                 EmptyView()
@@ -205,8 +205,6 @@ private struct TaskFormContent: View {
                     }
                 }
             }
-        } header: {
-            Text("tasks.editor.section.due")
         } footer: {
             IssueFooter(issues: draft.issues.filter { $0 == .nextLessonNeedsSubject || $0 == .nextLessonNotFound })
         }

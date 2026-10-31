@@ -32,6 +32,7 @@ struct SettingsRemindersView: View {
             timeSensitiveSection
             deliveryCheckSection
         }
+        .labelStyle(.adaptive)   // D7: icon above the title at AX sizes ("Home-work")
         .navigationTitle(Text("settings.reminders.title"))
         .navigationBarTitleDisplayMode(.inline)
         .disabled(model.isReadOnly)

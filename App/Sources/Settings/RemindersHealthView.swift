@@ -52,6 +52,7 @@ struct RemindersHealthView: View {
             }
             testsSection
         }
+        .labelStyle(.adaptive)   // D7: "Notifica-tions"
         .navigationTitle(Text("settings.reminder-health.title"))
         .navigationBarTitleDisplayMode(.inline)
         .task { await reminders.refreshHealth() }
