@@ -77,6 +77,34 @@ struct StrandedStoreMigrationTests {
         #expect(BackupFolder.entries(in: BackupFolder.url(forStoreDirectory: group)).count == 1)
     }
 
+    @Test func attachmentCopySkipsExistingFoldersAndLeavesNoStaging() async throws {
+        let (fallback, group) = try await makeStores(fallback: SampleScenarios.secondary().database, group: nil)
+        let source = FileAttachmentStore.root(forStoreDirectory: fallback)
+        let target = FileAttachmentStore.root(forStoreDirectory: group)
+        try FileManager.default.createDirectory(at: source.appendingPathComponent("A2"), withIntermediateDirectories: true)
+        try Data("pdf".utf8).write(to: source.appendingPathComponent("A2/doc.pdf"))
+        try FileManager.default.createDirectory(at: target.appendingPathComponent("A1"), withIntermediateDirectories: true)
+        try Data("group copy".utf8).write(to: target.appendingPathComponent("A1/photo.jpg"))
+        #expect(await StrandedStoreMigration.run(fallbackDirectory: fallback, groupDirectory: group, now: now) == .movedIn)
+        #expect(try Data(contentsOf: target.appendingPathComponent("A1/photo.jpg")) == Data("group copy".utf8))  // kept
+        #expect(try Data(contentsOf: target.appendingPathComponent("A2/doc.pdf")) == Data("pdf".utf8))
+        let staging = target.appendingPathComponent(FileAttachmentStore.stagingName)
+        #expect(((try? FileManager.default.contentsOfDirectory(atPath: staging.path)) ?? []).isEmpty)
+    }
+
+    @Test func rerunAfterCrashBetweenSaveAndMarkerIsSafe() async throws {
+        let data = SampleScenarios.secondary().database
+        let (fallback, group) = try await makeStores(fallback: data, group: nil)
+        #expect(await StrandedStoreMigration.run(fallbackDirectory: fallback, groupDirectory: group, now: now) == .movedIn)
+        // Crash after the group save, before the marker: the next launch finds a non-empty group and merges again.
+        try FileManager.default.removeItem(at: fallback.appendingPathComponent(StrandedStoreMigration.markerName))
+        #expect(await StrandedStoreMigration.run(fallbackDirectory: fallback, groupDirectory: group, now: now) == .merged)
+        #expect(try await load(group) == data.canonicalized())  // merge with itself changes nothing
+        let photo = FileAttachmentStore.root(forStoreDirectory: group).appendingPathComponent("A1/photo.jpg")
+        #expect(try Data(contentsOf: photo) == Data("photo".utf8))
+        #expect(await StrandedStoreMigration.run(fallbackDirectory: fallback, groupDirectory: group, now: now) == .nothingToDo)
+    }
+
     @Test func noFallbackDatabaseIsNothingToDo() async throws {
         let (fallback, group) = try await makeStores(fallback: nil, group: nil)
         #expect(await StrandedStoreMigration.run(fallbackDirectory: fallback, groupDirectory: group, now: now) == .nothingToDo)
@@ -130,5 +158,23 @@ struct BackupSupportTests {
         let merged = try DatabaseMutation.restore(backup, mode: .merge).apply(to: current, clock: &clock, now: now)
         #expect(Set(merged.timetables.filter { !$0.isDeleted }.map(\.id))
             == Set(current.timetables.map(\.id)).union(backup.timetables.map(\.id)))
+    }
+
+    @Test func restoreNeverSwitchesSync() throws {
+        var current = SampleScenarios.secondary().database
+        var clock = HybridLogicalClock(node: 0x5C)
+        clock.receive(current.latestTimestamp, now: now)
+        var off = current.settings
+        off.syncEnabled = false
+        current.settings = try MutationStamper.stamp(old: current.settings, new: off, clock: &clock, now: now)
+        var backup = current  // the backup turned sync back on later (newer field clock)
+        var on = backup.settings
+        on.syncEnabled = true
+        backup.settings = try MutationStamper.stamp(old: backup.settings, new: on, clock: &clock, now: now + 10)
+        for mode in [BackupRestore.Mode.merge, .replace] {
+            var deviceClock = clock
+            let restored = try DatabaseMutation.restore(backup, mode: mode).apply(to: current, clock: &deviceClock, now: now + 20)
+            #expect(restored.settings.syncEnabled == false, "mode \(mode)")
+        }
     }
 }

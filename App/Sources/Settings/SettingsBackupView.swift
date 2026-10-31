@@ -3,7 +3,8 @@
 //   Export Backup           ShareLink of a `.tabulabackup` written from the in-memory snapshot when the page appears
 //   Restore from Backup…    fileImporter → BackupImport (verified, nothing changed on failure) → confirmation dialog:
 //                           Merge (default) / Replace… → destructive alert naming what is replaced and where the
-//                           automatic pre-restore copy is kept → copy written to `<store>/Backups` FIRST, then applied
+//                           automatic pre-restore copy is kept → copy written to `<store>/Backups` FIRST (both modes),
+//                           then applied; the export file is rebuilt afterwards
 //   Automatic copies        the archives in `<store>/Backups` (pre-restore, pre-migration), each shareable
 //
 // HIG: file management (system share sheet + document picker), alerts (destructive button + Cancel, plain-word errors
@@ -130,21 +131,24 @@ struct SettingsBackupView: View {
     }
 
     private func restore(_ backup: PickedBackup, mode: BackupRestore.Mode) {
-        if mode == .replace {
-            // The automatic copy is written before anything changes; no copy → no replace.
-            guard let current = model.database,
-                  (try? BackupFolder.write(.make(from: current, createdAt: model.now), label: "pre-restore",
-                                           in: model.environment.backupDirectory)) != nil else {
-                result = .problem("settings.backup.error.copyFailed")
-                return
-            }
-            automatic = BackupFolder.entries(in: model.environment.backupDirectory)
+        // The automatic copy is written before anything changes, in both modes (a merge can also change or delete
+        // items: newer clocks, tombstones); no copy → no restore.
+        guard let current = model.database,
+              (try? BackupFolder.write(.make(from: current, createdAt: model.now), label: "pre-restore",
+                                       in: model.environment.backupDirectory)) != nil else {
+            result = .problem("settings.backup.error.copyFailed")
+            return
         }
+        automatic = BackupFolder.entries(in: model.environment.backupDirectory)
         switch model.apply(.restore(backup.database, mode: mode)) {
         case .applied:
             result = RestoreResult(titleKey: "settings.backup.done.title",
                                    messageKey: mode == .merge ? "settings.backup.done.merged" : "settings.backup.done.replaced")
-            Task { await model.flush() }
+            exportURL = nil
+            Task {
+                await model.flush()
+                await prepareExport()  // Export must share the restored data
+            }
         case .rejected, .readOnly, .failed:
             result = .problem("settings.backup.error.apply")
         }
