@@ -47,7 +47,10 @@ extension View {
     public func labelledBySectionHeader() -> some View {
         labelsHidden()
     }
+}
 
+#if !os(watchOS)   // no menu picker style on watchOS
+extension View {
     /// A form picker whose value can be long (a subject name): the menu normally, a pushed list at accessibility sizes,
     /// where the menu's value was middle-truncated ("Sl...eratúra", verification D12). Needs a NavigationStack.
     public func longValuePicker() -> some View {
@@ -66,6 +69,7 @@ private struct LongValuePickerStyle: ViewModifier {
         }
     }
 }
+#endif
 
 /// "Pro" on a Pro-only option. Not a button: it explains why the option is unavailable.
 public struct ProBadge: View {

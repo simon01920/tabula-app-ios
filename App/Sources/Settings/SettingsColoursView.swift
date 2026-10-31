@@ -120,7 +120,8 @@ private struct Swatch: View {
     var body: some View {
         Circle()
             .fill(Color(color))
-            .overlay(Circle().strokeBorder(Color.secondary.opacity(0.6), lineWidth: 0.5))
+            // D20: a full-strength 1 pt edge, so dark navy swatches stay visible on the dark card.
+            .overlay(Circle().strokeBorder(Color.secondary, lineWidth: 1))
             .frame(width: size, height: size)
             .accessibilityHidden(true)
     }

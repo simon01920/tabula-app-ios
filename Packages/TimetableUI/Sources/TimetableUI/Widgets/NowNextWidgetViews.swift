@@ -184,12 +184,11 @@ struct WidgetSubjectMark: View {
     }
 }
 
-/// The subject colour as a tint, only in full-colour rendering (elsewhere colours carry no meaning), made contrast-safe
-/// against the widget background (`LessonTileStyle.contrastSafeAccent`, ≥ 3:1 for non-text UI).
-private struct SubjectTint {
-    static func color(_ subject: SubjectSummary, mode: WidgetRenderingMode, scheme: ColorScheme) -> Color? {
-        guard mode == .fullColor else { return nil }
-        return Color(LessonTileStyle.contrastSafeAccent(subject.color, isDark: scheme == .dark))
+/// The progress tint: ink in full-colour rendering, as the app's Today hero (Opus H3.5, verification D19: a red subject
+/// must not read as an alarm); the system's accent elsewhere.
+private enum ProgressTint {
+    static func color(mode: WidgetRenderingMode) -> Color? {
+        mode == .fullColor ? Color.ink : nil
     }
 }
 
@@ -222,7 +221,6 @@ struct NowNextMainColumn: View {
     /// `true` in the medium family's left column (slightly smaller timer).
     let compact: Bool
     @Environment(\.widgetRenderingMode) private var renderingMode
-    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
@@ -244,7 +242,7 @@ struct NowNextMainColumn: View {
                 Spacer(minLength: 0)
                 timer
                 NowNextProgressBar(display: display, pauseTime: pauseTime,
-                                   tint: SubjectTint.color(lesson.subject, mode: renderingMode, scheme: colorScheme))
+                                   tint: ProgressTint.color(mode: renderingMode))
                 if let next = display.nextShort {
                     Text(verbatim: next)
                         .font(.caption2)
