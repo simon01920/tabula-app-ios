@@ -49,7 +49,7 @@ struct AppRootView: View {
             if let route = launchRoute.route, case .onboarding = route.placement {
                 route.makeView()
             } else {
-                OnboardingRootView()
+                OnboardingRootView().modifier(OnboardingShareImport())
             }
         case .main:
             if let route = launchRoute.route, case .onboarding = route.placement {
@@ -131,5 +131,23 @@ struct MainTabView: View {
         } else {
             normal()
         }
+    }
+}
+
+/// A `tabula://import` link that arrives during onboarding (no tab view, so no root presenter): the import screen as a
+/// sheet. The link is taken out of `AppNavigation` at once, so the tab view never shows it a second time after the
+/// import finishes onboarding.
+private struct OnboardingShareImport: ViewModifier {
+    @Environment(AppNavigation.self) private var navigation
+    @State private var pending: AppNavigation.PendingImport?
+
+    func body(content: Content) -> some View {
+        content
+            .onChange(of: navigation.pendingImport?.id, initial: true) {
+                guard let next = navigation.pendingImport else { return }
+                navigation.dropPendingImport()
+                pending = next
+            }
+            .sheet(item: $pending) { item in ShareImportView(initial: item.inbound) }
     }
 }

@@ -35,6 +35,8 @@ enum RootSheet: Identifiable, Hashable {
     case item(ItemLink)
     /// The in-context notification pre-explainer (QA fix Q1).
     case permissionOffer
+    /// An incoming `tabula://import` link (Phase 7 H1): the import screen, opened on that link.
+    case shareImport(ShareInbound)
 
     var id: Self { self }
 }
@@ -67,6 +69,8 @@ final class AppNavigation {
     }
     /// A deep link waiting to be shown (see the header).
     private(set) var pendingLink: PendingLink?
+    /// An incoming share link waiting to be shown (Phase 7 H1; presented like a deep link, after it).
+    private(set) var pendingImport: PendingImport?
     /// Bumped to ask every tab root to close its sheets (`.closesForDeepLink`).
     private(set) var sheetDismissRequest = 0
     /// Open sheets that hold unsaved work (`.protectsUnsavedWork`); a deep link never closes them.
@@ -90,6 +94,14 @@ final class AppNavigation {
         var dismissRequested = false
     }
 
+    /// An incoming share link not shown yet.
+    struct PendingImport: Equatable, Identifiable {
+        let inbound: ShareInbound
+        let id = UUID()
+        let requestedAt: Date
+        var dismissRequested = false
+    }
+
     /// Selects the Tasks tab on `segment` (Today's overdue chip).
     func showTasks(_ segment: TaskSegment) {
         taskSegmentRequest = TaskSegmentRequest(segment: segment)
@@ -101,6 +113,23 @@ final class AppNavigation {
     func open(_ link: ItemLink?) {
         guard let link else { return }
         pendingLink = PendingLink(link: link, requestedAt: Date())
+    }
+
+    /// Opens the import screen on `inbound` (a `tabula://import` link); a newer link replaces one still waiting.
+    func openImport(_ inbound: ShareInbound) {
+        pendingImport = PendingImport(inbound: inbound, requestedAt: Date())
+    }
+
+    /// Shows the pending share link now.
+    func showPendingImport() {
+        guard let pending = pendingImport else { return }
+        pendingImport = nil
+        presentRootSheet(.shareImport(pending.inbound), requestedAt: pending.requestedAt)
+    }
+
+    /// Drops the pending share link (too old, or taken over by the onboarding screen).
+    func dropPendingImport() {
+        pendingImport = nil
     }
 
     // MARK: Shell (MainTabView / RootPresentation.swift)
@@ -159,6 +188,9 @@ final class AppNavigation {
         if case .item(let link) = sheet, pendingLink == nil {
             pendingLink = PendingLink(link: link, requestedAt: requestedAt)
         }
+        if case .shareImport(let inbound) = sheet, pendingImport == nil {
+            pendingImport = PendingImport(inbound: inbound, requestedAt: requestedAt)
+        }
         return (sheet, requestedAt)
     }
 
@@ -170,6 +202,7 @@ final class AppNavigation {
     /// Asks the tab roots to close their sheets for the pending link (once per link).
     func requestSheetDismissal() {
         pendingLink?.dismissRequested = true
+        pendingImport?.dismissRequested = true
         sheetDismissRequest &+= 1
     }
 

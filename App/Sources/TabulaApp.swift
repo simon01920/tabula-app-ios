@@ -59,9 +59,15 @@ struct TabulaRootApp: App {
                     try? Tips.configure()
                 }
                 // Widget taps (Phase 4 A): `tabula://open/…` (ItemLinkURL) → the same path as a notification tap.
+                // Share links (Phase 7 H1): `tabula://import#<envelope>` / `tabula://import?code=<CODE>` (the landing
+                // page's "Open in Tabula") → the import screen, which previews before anything is written.
                 // Anything else is ignored (any app or web page can send the app a URL).
                 .onOpenURL { url in
-                    services.navigation.open(ItemLinkURL.link(from: url))
+                    if let inbound = ShareInbound.parse(url: url) {
+                        services.navigation.openImport(inbound)
+                    } else {
+                        services.navigation.open(ItemLinkURL.link(from: url))
+                    }
                 }
         }
         .onChange(of: scenePhase) { _, phase in

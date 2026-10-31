@@ -39,6 +39,7 @@ struct TimetableRootView: View {
     @State private var quickAdd: QuickAddTarget?
     @State private var editor: EditorPresentation?
     @State private var management: ManagementSheet?
+    @State private var sharing: ShareTarget?
 
     init() {
         initialView = nil
@@ -94,10 +95,12 @@ struct TimetableRootView: View {
         }
         .editorSheet($editor)
         .sheet(item: $management) { item in item.route.makeView() }
+        .sheet(item: $sharing) { target in ShareTimetableSheet(timetableID: target.id) }
         .closesForDeepLink {   // QA fix Q6: a notification tap needs the screen
             detail = nil
             quickAdd = nil
             management = nil
+            sharing = nil
         }
     }
 
@@ -332,6 +335,12 @@ struct TimetableRootView: View {
                     }
                 }
                 .disabled(!EditorRouteLookup.isAvailable(Self.subjectsRoute))
+            }
+
+            Section {
+                Button { sharing = ShareTarget(id: timetable.id) } label: {
+                    Label { Text("share.menu.share") } icon: { Image(systemName: "square.and.arrow.up") }
+                }
             }
         } label: {
             // One stable glyph whatever the current view (Opus H4); VoiceOver and long-press read "View Options".

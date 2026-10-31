@@ -166,6 +166,7 @@ struct StartStepView: View {
     @Bindable var flow: OnboardingFlow
     @Environment(AppModel.self) private var model
     @Environment(SampleContentController.self) private var samples
+    @State private var importing = false
 
     private var isSample: Bool { flow.draft.start == .sample }
 
@@ -189,6 +190,17 @@ struct StartStepView: View {
                     flow.draft.start = .sample
                 }
             }
+            // Phase 7 H1: not a third start mode (no radio circle) but an action: the import screen; importing finishes
+            // onboarding and the shell switches to the tabs on its own.
+            Button { importing = true } label: {
+                Label { Text("onboarding.start.import") } icon: { Image(systemName: "qrcode.viewfinder") }
+                    .font(.subheadline)
+                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                    .contentShape(Rectangle())
+            }
+            .padding(.horizontal, 4)
+            .accessibilityHint(Text("onboarding.start.import.detail"))
         }
+        .sheet(isPresented: $importing) { ShareImportView(profile: flow.draft.profile) }
     }
 }

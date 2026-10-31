@@ -1,5 +1,6 @@
 // Root presentation (Phase 3 final QA fixes Q1 + Q6): the one place that presents sheets from the root of the tab
-// view — a notification deep link (`AppNavigation.pendingLink` → the item's detail route) and the in-context
+// view — a notification deep link (`AppNavigation.pendingLink` → the item's detail route), an incoming share link
+// (`AppNavigation.pendingImport` → the import screen; Phase 7 H1, treated like a deep link) and the in-context
 // notification pre-explainer (`ReminderCoordinator.permissionOffer`).
 //
 // A root sheet cannot appear while a tab's own sheet is on screen, so `rootPresenter()` checks the screen every
@@ -85,11 +86,15 @@ private struct RootPresenter: ViewModifier {
     /// Restarts the loop when a new request arrives, one was shown / dropped, or a root sheet was set / appeared.
     private struct Key: Equatable {
         let link: UUID?
+        let shareImport: UUID?
         let offer: UUID?
         let launch: UUID?
     }
 
+    private enum Source { case link, shareImport, offer }
+
     private struct Pending {
+        let source: Source
         let kind: RootPresentationPolicy.Request
         let requestedAt: Date
         let dismissRequested: Bool
@@ -110,7 +115,8 @@ private struct RootPresenter: ViewModifier {
                             .onDisappear { navigation.rootSheetDisappeared(sheet) }
                     }
             }
-            .task(id: Key(link: navigation.pendingLink?.id, offer: reminders.permissionOffer?.id,
+            .task(id: Key(link: navigation.pendingLink?.id, shareImport: navigation.pendingImport?.id,
+                          offer: reminders.permissionOffer?.id,
                           launch: navigation.rootSheetLaunch?.id)) {
                 await run()
             }
@@ -125,15 +131,22 @@ private struct RootPresenter: ViewModifier {
             }
         case .permissionOffer:
             ReminderPermissionSheet()   // reports its own close (permissionExplainerClosed), like every entry point
+        case .shareImport(let inbound):
+            ShareImportView(initial: inbound)
         }
     }
 
     private var next: Pending? {
         if let link = navigation.pendingLink {
-            return Pending(kind: .deepLink, requestedAt: link.requestedAt, dismissRequested: link.dismissRequested)
+            return Pending(source: .link, kind: .deepLink, requestedAt: link.requestedAt,
+                           dismissRequested: link.dismissRequested)
+        }
+        if let pending = navigation.pendingImport {
+            return Pending(source: .shareImport, kind: .deepLink, requestedAt: pending.requestedAt,
+                           dismissRequested: pending.dismissRequested)
         }
         if let offer = reminders.permissionOffer {
-            return Pending(kind: .permissionOffer, requestedAt: offer.requestedAt, dismissRequested: false)
+            return Pending(source: .offer, kind: .permissionOffer, requestedAt: offer.requestedAt, dismissRequested: false)
         }
         return nil
     }
@@ -159,9 +172,10 @@ private struct RootPresenter: ViewModifier {
             switch step {
             case .present:
                 guard let pending else { return }
-                switch pending.kind {
-                case .deepLink: navigation.showPendingLink()
-                case .permissionOffer:
+                switch pending.source {
+                case .link: navigation.showPendingLink()
+                case .shareImport: navigation.showPendingImport()
+                case .offer:
                     navigation.presentRootSheet(.permissionOffer, requestedAt: pending.requestedAt)
                     reminders.permissionOfferShown()
                 }
@@ -171,9 +185,10 @@ private struct RootPresenter: ViewModifier {
             case .wait:
                 break
             case .expire:
-                switch pending?.kind {
-                case .deepLink: navigation.dropPendingLink()
-                case .permissionOffer: reminders.permissionOfferShown()   // dropped; the next save may offer it again
+                switch pending?.source {
+                case .link: navigation.dropPendingLink()
+                case .shareImport: navigation.dropPendingImport()
+                case .offer: reminders.permissionOfferShown()   // dropped; the next save may offer it again
                 case nil: break
                 }
                 return

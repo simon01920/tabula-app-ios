@@ -64,10 +64,26 @@
 		<string>fetch</string>
 		<string>remote-notification</string>
 	</array>
+	<!-- Phase 7 H1: the `tabula` scheme. `tabula://import#<envelope>` / `tabula://import?code=<CODE>` come from the share
+	     landing page ("Open in Tabula"); `tabula://open/…` are widget links (ItemLinkURL). Both handled in onOpenURL.
+	     Universal links need Associated Domains (paid account, PHASE7_PLAN decision 2). -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>sk.simondev.tabula</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>tabula</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+	</array>
 	<key>NSAlarmKitUsageDescription</key>
 	<string>Tabula schedules loud alarms only for reminders you explicitly mark as important, such as an exam tomorrow.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Tabula uses the camera to scan a printed timetable so it can be imported.</string>
+	<string>Tabula uses the camera to scan a printed timetable or a shared timetable's QR code so it can be imported.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Tabula records voice notes that you attach to your tasks.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
