@@ -39,7 +39,7 @@ public struct SecondaryScenario: Sendable {
     /// The subjects, in creation order.
     public static let seeds: [SubjectSeed] = [
         SubjectSeed(short: "SJL", name: "Slovenský jazyk a literatúra", emoji: "📖", room: "214", teacher: "Mgr. Kováčová"),
-        SubjectSeed(short: "MAT", name: "Matematika", emoji: "➗", room: "214", teacher: "Mgr. Horváth"),
+        SubjectSeed(short: "MAT", name: "Matematika", emoji: "📐", room: "214", teacher: "Mgr. Horváth"),
         SubjectSeed(short: "ANJ", name: "Anglický jazyk", emoji: "🗣️", room: "JAZ-2", teacher: "Mgr. Baláž"),
         SubjectSeed(short: "FYZ", name: "Fyzika", emoji: "⚛️", room: "Lab FYZ", teacher: "RNDr. Tóth"),
         SubjectSeed(short: "CHE", name: "Chémia", emoji: "🧪", room: "Lab CHE", teacher: "Ing. Vargová"),

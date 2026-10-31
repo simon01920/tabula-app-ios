@@ -144,7 +144,19 @@ private struct TodayContent: View {
             List {
                 if hasLessons {
                     Section {
-                        TodayHeroView(state: state, now: now, visibility: timetable.fieldVisibility)
+                        // D8 left the hero's lesson out of the rows, so the hero itself opens it (the current lesson,
+                        // else the one it announces).
+                        if let lesson = heroLesson {
+                            Button { actions.openLesson(lesson) } label: {
+                                TodayHeroView(state: state, now: now, visibility: timetable.fieldVisibility)
+                                    .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityAddTraits(.isButton)
+                            .accessibilityHint(Text("timetable.a11y.openHint"))
+                        } else {
+                            TodayHeroView(state: state, now: now, visibility: timetable.fieldVisibility)
+                        }
                     }
                 }
                 if work.showsTasks {
@@ -153,7 +165,9 @@ private struct TodayContent: View {
                 lessonSections
                 if let exam = work.nextExam {
                     Section {
+                        // Plain: in a List a default button tints its whole label ink (D5; ink means action).
                         Button { actions.openExam(exam.id) } label: { TodayExamRow(row: exam) }
+                            .buttonStyle(.plain)
                     } header: {
                         Text("today.section.nextExam")
                     }
@@ -161,6 +175,11 @@ private struct TodayContent: View {
             }
             .listStyle(.insetGrouped)
         }
+    }
+
+    private var heroLesson: ResolvedLesson? {
+        if case let .current(lesson, _) = state.header { return lesson }
+        return state.header.next
     }
 
     @ViewBuilder
@@ -198,6 +217,7 @@ private struct TodayContent: View {
             Button { actions.openLesson(lesson) } label: {
                 TodayLessonRow(lesson: lesson, reasons: reasons, visibility: timetable.fieldVisibility)
             }
+            .buttonStyle(.plain)   // D5: no ink tint on the row
             .accessibilityHint(Text("timetable.a11y.openHint"))
         }
     }
@@ -251,10 +271,12 @@ private struct DueTodaySection: View {
                     .frame(minHeight: 44)
                     .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
                 .accessibilityHint(Text("today.tasks.overdue.hint"))
             }
         } header: {
-            Text("today.section.dueToday")
+            // D23: an overdue row alone is not "due today".
+            if !work.dueToday.isEmpty { Text("today.section.dueToday") }
         }
     }
 }

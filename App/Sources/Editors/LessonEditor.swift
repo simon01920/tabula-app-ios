@@ -148,6 +148,7 @@ private struct LessonFormContent: View {
             } label: {
                 Text("editor.lesson.subject")
             }
+            .longValuePicker()   // D12: "Sl...eratúra" at AX sizes
             .onChange(of: draft.subjectID) { _, newValue in
                 guard draft.isNew, let newValue, let subject = subjects.first(where: { $0.id == newValue }) else { return }
                 draft.applySubjectDefaults(subject)
@@ -288,7 +289,7 @@ private struct LessonFormContent: View {
                 } label: {
                     Text("editor.validity")
                 }
-                .labelledBySectionHeader()   // M1: the header already says "Applies"
+                // D9 / F05: no section header here, so the picker shows its own label ("Applies   Always").
             }
             switch draft.validityMode {
             case .terms:

@@ -166,7 +166,7 @@ struct LessonDetailView: View {
     private func whenSection(_ detail: LessonDetailModel, timetable: Timetable) -> some View {
         Section {
             Label {
-                Text(verbatim: model.formatter.date(detail.lesson.date, style: .full))
+                Text(verbatim: model.formatter.contextualDate(detail.lesson.date, today: model.today))   // L1
             } icon: {
                 Image(systemName: "calendar")
             }

@@ -15,6 +15,7 @@ tasks.editor@secondary
 tasks.detail@secondary
 exams@secondary
 exams.history@secondary
+exams.detail@secondary
 exams@university
 exams.editor@secondary
 settings.reminders@secondary
@@ -38,6 +39,8 @@ debug.design@secondary
 editor.bell@secondary
 editor.bell-period@secondary
 editor.lesson@secondary
+editor.subject@secondary
+editor.subjects@secondary
 editor.day-change@secondary
 editor.timetable@secondary
 editor.terms@secondary

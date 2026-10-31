@@ -183,7 +183,7 @@ struct TaskDetailView: View {
             if let date = detail.linkedLessonDate {
                 Label {
                     Text(verbatim: model.renderer.format(key: "tasks.detail.linkedLesson", arguments: [
-                        .text(model.formatter.date(date, style: .full)),
+                        .text(model.formatter.contextualDate(date, today: model.today)),   // L1
                     ]))
                 } icon: {
                     Image(systemName: "calendar.badge.clock")

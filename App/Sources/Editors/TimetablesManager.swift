@@ -131,7 +131,7 @@ struct TimetablesManagerView: View {
 
     /// Name, emoji, lesson count and "✓ Active" (secondary). Tap = settings; swipes and the context menu = actions.
     private func rowLabel(_ timetable: Timetable, isActive: Bool, lessons: Int) -> some View {
-        HStack(spacing: 12) {
+        AdaptiveStack(spacing: 12) {   // D7: emoji above the name at AX sizes ("Gymnázi-um")
             if let emoji = timetable.emoji { Text(verbatim: emoji).font(.title2).accessibilityHidden(true) }
             VStack(alignment: .leading, spacing: 2) {
                 Text(verbatim: timetable.name).font(.body).foregroundStyle(.primary)

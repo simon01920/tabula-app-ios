@@ -75,6 +75,16 @@ public struct LessonTileStyle: Equatable, Sendable {
     /// Whether to outline for the given appearance.
     public func needsOutline(isDark: Bool) -> Bool { isDark ? needsOutlineInDark : needsOutlineInLight }
 
+    /// How far a past lesson's fill moves towards the page.
+    public static let pastFillFade = 0.5
+
+    /// A past lesson's tile (Opus M13, verification D4): only the fill steps back towards the page, and the text
+    /// colour is chosen again on that opaque fill, so it keeps ≥ 4.5:1 (an opacity on the whole tile gave 1.88:1).
+    public func past(isDark: Bool) -> LessonTileStyle {
+        LessonTileStyle(color: Self.mix(background, isDark ? Self.darkPageBackground : Self.lightPageBackground,
+                                        fraction: Self.pastFillFade))
+    }
+
     /// Minimum contrast of a non-text UI part (progress bar, ring) against the page (WCAG 2.2, 1.4.11).
     public static let nonTextMinimumRatio = 3.0
 

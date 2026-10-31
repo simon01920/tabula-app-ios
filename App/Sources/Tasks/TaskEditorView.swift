@@ -135,7 +135,7 @@ private struct TaskFormContent: View {
 
     private var titleSection: some View {
         Section {
-            EditorTitleField(promptKey: "tasks.field.title.prompt", text: $draft.title, axis: .vertical,
+            EditorTitleField(promptKey: "tasks.field.title.prompt", text: $draft.title, singleLine: false,
                              missingHintKey: TaskDraft.Issue.titleEmpty.l10nKey)
             Picker(selection: $draft.kind) {
                 ForEach(kindOptions, id: \.rawValue) { kind in
@@ -159,6 +159,7 @@ private struct TaskFormContent: View {
             } label: {
                 Text("tasks.field.subject")
             }
+            .longValuePicker()   // D12
         }
     }
 
@@ -187,7 +188,7 @@ private struct TaskFormContent: View {
             } label: {
                 Text("tasks.field.due")
             }
-            .labelledBySectionHeader()   // M1: the header already says "Due"
+            // D9 / M21: the picker carries the label ("Due   Date"), so the section has no header echoing it (M1).
             switch draft.dueMode {
             case .none:
                 EmptyView()
@@ -205,15 +206,13 @@ private struct TaskFormContent: View {
                     }
                 }
             }
-        } header: {
-            Text("tasks.editor.section.due")
         } footer: {
             IssueFooter(issues: draft.issues.filter { $0 == .nextLessonNeedsSubject || $0 == .nextLessonNotFound })
         }
     }
 
     private func nextLessonText(_ lesson: NextLesson) -> String {
-        let date = model.formatter.date(lesson.date, style: .full)
+        let date = model.formatter.contextualDate(lesson.date, today: model.today)   // L1
         guard let start = lesson.startTime else {
             return model.renderer.format(key: "tasks.editor.due.nextLesson.when", arguments: [.text(date)])
         }

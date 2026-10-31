@@ -39,17 +39,17 @@ public enum SampleData {
         func seed(_ name: String, _ symbol: String) -> SubjectSeed { SubjectSeed(name: name, symbol: symbol) }
         switch profile.effective {
         case .elementary:
-            return [seed("mathematics", "➗"), seed("nativeLanguage", "📖"), seed("foreignLanguage", "🗣️"),
+            return [seed("mathematics", "📐"), seed("nativeLanguage", "📖"), seed("foreignLanguage", "🗣️"),
                     seed("science", "🔬"), seed("art", "🎨"), seed("music", "🎵"), seed("physicalEducation", "⚽")]
         case .secondary:
-            return [seed("mathematics", "➗"), seed("nativeLanguage", "📖"), seed("foreignLanguage", "🗣️"),
+            return [seed("mathematics", "📐"), seed("nativeLanguage", "📖"), seed("foreignLanguage", "🗣️"),
                     seed("physics", "⚛️"), seed("chemistry", "🧪"), seed("biology", "🧬"), seed("history", "🏛️"),
                     seed("geography", "🌍"), seed("informatics", "💻"), seed("physicalEducation", "⚽")]
         case .university:
             return [seed("calculus", "📈"), seed("linearAlgebra", "🧮"), seed("programming", "💻"),
                     seed("databases", "🗄️"), seed("statistics", "📊"), seed("academicWriting", "✍️")]
         default: // .other and (never reached) unknown profiles
-            return [seed("mathematics", "➗"), seed("nativeLanguage", "📖"), seed("foreignLanguage", "🗣️"),
+            return [seed("mathematics", "📐"), seed("nativeLanguage", "📖"), seed("foreignLanguage", "🗣️"),
                     seed("history", "🏛️"), seed("physicalEducation", "⚽")]
         }
     }

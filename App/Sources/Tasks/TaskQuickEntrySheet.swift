@@ -47,13 +47,15 @@ struct TaskQuickEntrySheet: View {
                             detent = .large
                         }
                     })
+                } else {
+                    // A real view, because `.onAppear` on an empty Group never fires (D1: the sheet stayed blank).
+                    // Computed once: `body` re-runs (the clock, the model) and a new draft would replace the baseline.
+                    Color.clear.onAppear { initial = initialDraft() }
                 }
             } else {
                 EditorUnavailableView(messageKey: "tasks.editor.unavailable")
             }
         }
-        // Computed once: `body` re-runs (the clock, the model), and a new draft would replace the user's baseline.
-        .onAppear { if initial == nil { initial = initialDraft() } }
         .presentationDetents([.medium, .large], selection: $detent)
         .presentationDragIndicator(.visible)
     }
@@ -86,7 +88,7 @@ private struct TaskQuickEntryForm: View {
         let nextLesson = TaskSupport.nextLesson(subjectID: draft.subjectID, model: model)
         Group {
             Section {
-                EditorTitleField(promptKey: "tasks.quick.prompt", text: $draft.title, axis: .vertical,
+                EditorTitleField(promptKey: "tasks.quick.prompt", text: $draft.title, singleLine: false,
                                  missingHintKey: TaskDraft.Issue.titleEmpty.l10nKey, focus: $titleFocused)
             }
             Section {
@@ -125,6 +127,7 @@ private struct TaskQuickEntryForm: View {
         } label: {
             Text("tasks.field.subject")
         }
+        .longValuePicker()   // D12
     }
 
     /// The picked option, or what the draft represents when the pick is no longer offered (the subject changed).

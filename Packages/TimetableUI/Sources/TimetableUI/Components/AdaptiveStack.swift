@@ -45,6 +45,37 @@ public struct AdaptiveStack<Content: View>: View {
     }
 }
 
+/// A `Label` style for list rows: the platform's label normally, the icon above a full-width title at accessibility
+/// text sizes, so a row title never breaks inside a word ("Home-work", "Gymnázi-um"; verification D7).
+public struct AdaptiveLabelStyle: LabelStyle {
+    public init() {}
+
+    public func makeBody(configuration: Configuration) -> some View {
+        AdaptiveLabel(configuration: configuration)
+    }
+
+    private struct AdaptiveLabel: View {
+        let configuration: LabelStyleConfiguration
+        @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+        var body: some View {
+            if AdaptiveLayout.isStacked(dynamicTypeSize) {
+                VStack(alignment: .leading, spacing: 6) {
+                    configuration.icon
+                    configuration.title
+                }
+            } else {
+                Label(configuration)
+            }
+        }
+    }
+}
+
+extension LabelStyle where Self == AdaptiveLabelStyle {
+    /// `AdaptiveLabelStyle`: icon above the title at accessibility text sizes.
+    public static var adaptive: AdaptiveLabelStyle { AdaptiveLabelStyle() }
+}
+
 /// The switch point of the adaptive layouts (one place, so every screen stacks at the same size).
 public enum AdaptiveLayout {
     /// `true` at accessibility text sizes (AX1 … AX5).

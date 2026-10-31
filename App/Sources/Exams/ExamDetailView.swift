@@ -104,7 +104,7 @@ struct ExamDetailContent: View {
                 .accessibilityLabel(Text(verbatim: texts.accessibilityLabel(row, facts: facts)))
             }
             Section {
-                fact("exams.detail.date", texts.fullDate(exam.date))
+                fact("exams.detail.date", model.formatter.contextualDate(exam.date, today: model.today))   // L1
                 if let time = texts.time(exam) { fact("exams.detail.time", time) }
                 fact("exams.detail.kind", texts.kind(exam.kind))
                 if let subject { fact("exams.detail.subject", subject.name) }

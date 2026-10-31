@@ -49,6 +49,28 @@ extension View {
     }
 }
 
+#if !os(watchOS)   // no menu picker style on watchOS
+extension View {
+    /// A form picker whose value can be long (a subject name): the menu normally, a pushed list at accessibility sizes,
+    /// where the menu's value was middle-truncated ("Sl...eratúra", verification D12). Needs a NavigationStack.
+    public func longValuePicker() -> some View {
+        modifier(LongValuePickerStyle())
+    }
+}
+
+private struct LongValuePickerStyle: ViewModifier {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    func body(content: Content) -> some View {
+        if AdaptiveLayout.isStacked(dynamicTypeSize) {
+            content.pickerStyle(.navigationLink)
+        } else {
+            content.pickerStyle(.menu)
+        }
+    }
+}
+#endif
+
 /// "Pro" on a Pro-only option. Not a button: it explains why the option is unavailable.
 public struct ProBadge: View {
     private let text: Text

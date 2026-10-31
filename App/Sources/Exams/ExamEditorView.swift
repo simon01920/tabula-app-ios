@@ -139,6 +139,7 @@ private struct ExamFormContent: View {
             } label: {
                 Text("exams.editor.subject")
             }
+            .longValuePicker()   // D12
             EditorTitleField(promptKey: "exams.editor.name.prompt", text: $draft.title,
                              missingHintKey: ExamDraft.Issue.noTitle.l10nKey)
             Picker(selection: $draft.kindRaw) {
@@ -176,6 +177,7 @@ private struct ExamFormContent: View {
                 } label: {
                     Text("exams.editor.when.lessonPick")
                 }
+                .longValuePicker()
             case .custom:
                 TimeRow(titleKey: "exams.editor.start", time: $draft.start)
                 Toggle(isOn: Binding(get: { draft.hasEnd }, set: { draft.setHasEnd($0) })) {

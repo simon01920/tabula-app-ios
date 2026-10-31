@@ -6,7 +6,7 @@
 import Foundation
 import TimetableCore
 
-/// A due date described relative to today ("Today, 8:00", "Tomorrow", "In 3 days", "2 days overdue", "Oct 20, 2026").
+/// A due date described relative to today ("Today, 8:00", "Tomorrow", "In 3 days", "2 days overdue", "Oct 20").
 public struct TaskDueDescription: Equatable, Sendable {
     public enum Kind: Equatable, Sendable {
         case today
@@ -22,10 +22,14 @@ public struct TaskDueDescription: Equatable, Sendable {
     public let kind: Kind
     /// The due time of a `dateTime` due (not shown for overdue-by-days).
     public let time: LocalTime?
+    /// The day it was described from: an `onDate` in this year drops the year (Opus L1 / D15: "Oct 21", not
+    /// "Oct 21, 2026"). `nil` keeps the full date.
+    public let today: LocalDate?
 
-    public init(kind: Kind, time: LocalTime?) {
+    public init(kind: Kind, time: LocalTime?, today: LocalDate? = nil) {
         self.kind = kind
         self.time = kind.isOverdueDays ? nil : time
+        self.today = today
     }
 
     /// `nil` for a task without a (known) due date.
@@ -40,7 +44,7 @@ public struct TaskDueDescription: Equatable, Sendable {
         case 2...6: kind = .inDays(delta)
         default: kind = .onDate(date)
         }
-        return TaskDueDescription(kind: kind, time: due.time)
+        return TaskDueDescription(kind: kind, time: due.time, today: today)
     }
 
     /// The catalog key of the phrase (see `TaskL10nKeys.dueKeys`).
@@ -65,7 +69,10 @@ public struct TaskDueDescription: Equatable, Sendable {
         case .today, .tomorrow: return timeText
         case .inDays(let days): return [.integer(Int64(days))] + timeText
         case .overdueDays(let days): return [.integer(Int64(days))]
-        case .onDate(let date): return [.text(formatter.date(date, style: .abbreviated))] + timeText
+        case .onDate(let date):
+            let text = today.map { formatter.contextualDate(date, today: $0, style: .dayMonth) }
+                ?? formatter.date(date, style: .abbreviated)
+            return [.text(text)] + timeText
         }
     }
 

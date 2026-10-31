@@ -5,7 +5,7 @@
 // HIG toggles.md › "Outside of a list, use a button that behaves like a toggle" and "Make sure the visual differences in a
 // toggle's state are obvious": on = filled, off = outlined (shape, not colour alone). VoiceOver gets a real switch
 // (`accessibilityRepresentation`) named with the full weekday. Seven equal columns at standard sizes; at accessibility
-// sizes the chips wrap into a grid with full names (no word-internal breaks: one line per chip).
+// sizes the chips wrap into a grid; the names stay abbreviated (D10: full names truncated, "Wednes…").
 // Colours: U1 tokens, on = `ink` fill with an `onInk` label (8.5:1 light, 8.8:1 dark), off = outline.
 import SwiftUI
 import TimetableCore
@@ -29,7 +29,8 @@ struct WeekdayChips: View {
         LazyVGrid(columns: columns, alignment: .leading, spacing: 8) {
             ForEach(days, id: \.self) { day in
                 Toggle(isOn: Binding(get: { isOn(day) }, set: { setOn(day, $0) })) {
-                    Text(verbatim: model.formatter.weekdayName(day, width: typeSize.isAccessibilitySize ? .wide : .abbreviated))
+                    // Abbreviated at every size ("Wed"): the full name truncated to "Wednes…" at AX sizes (D10).
+                    Text(verbatim: model.formatter.weekdayName(day, width: .abbreviated))
                 }
                 .toggleStyle(WeekdayChipStyle())
                 .accessibilityLabel(Text(verbatim: model.formatter.weekdayName(day)))
