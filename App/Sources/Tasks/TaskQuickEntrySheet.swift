@@ -47,13 +47,15 @@ struct TaskQuickEntrySheet: View {
                             detent = .large
                         }
                     })
+                } else {
+                    // A real view, because `.onAppear` on an empty Group never fires (D1: the sheet stayed blank).
+                    // Computed once: `body` re-runs (the clock, the model) and a new draft would replace the baseline.
+                    Color.clear.onAppear { initial = initialDraft() }
                 }
             } else {
                 EditorUnavailableView(messageKey: "tasks.editor.unavailable")
             }
         }
-        // Computed once: `body` re-runs (the clock, the model), and a new draft would replace the user's baseline.
-        .onAppear { if initial == nil { initial = initialDraft() } }
         .presentationDetents([.medium, .large], selection: $detent)
         .presentationDragIndicator(.visible)
     }
