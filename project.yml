@@ -95,7 +95,9 @@ targets:
         # default is the macro-free base variant (Package.swift, CLAUDE.md rule 5).
         # TABULA_APP_INTENTS (Phase 4 B3): Xcode generates Metadata.appintents, so this path compiles the intent-driven
         # controls (loud-alarm "Done"); xtool cannot (RISKS #19) and keeps the fallbacks (Package.swift).
-        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) TABULA_MACRO_PROBES TABULA_APP_INTENTS"
+        # TABULA_CLOUDKIT (Phase 6 S1): iCloud sync, only when TABULA_PAID_ACCOUNT = 1 (xcconfig indirection
+        # TABULA_CLOUDKIT_CONDITION); without the entitlement CKContainer would trap (RISKS #34).
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) TABULA_MACRO_PROBES TABULA_APP_INTENTS $(TABULA_CLOUDKIT_CONDITION)"
     dependencies:
       - package: TimetableCore
       - package: TimetableUI

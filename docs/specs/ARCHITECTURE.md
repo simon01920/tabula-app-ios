@@ -16,7 +16,7 @@
 - Unidirectional data flow; small view models; no singletons beyond a dependency container.
 
 ## iCloud sync (default on)
-Private CloudKit DB via `CKSyncEngine`; one record type per entity; field-level last-writer-wins for scalar fields, set-merge for subtasks/attachments; attachments as `CKAsset`; tombstones; first-sync merge dialog when both sides have data; sync status UI; schema deployed to Production before release. Fake transport for Linux tests.
+Private CloudKit DB via `CKSyncEngine`; one record type per entity; field-level last-writer-wins for scalar fields, set-merge for subtasks/attachments; attachments as `CKAsset`; tombstones; first-sync merge dialog when both sides have data; sync status UI; schema deployed to Production before release. Fake transport for Linux tests. **Built (Phase 6 S1):** one zone `Tabula`, one record per entity (type = `EntityType` raw value, name = id, `payload` = canonical entity JSON, `schemaVersion`), tombstones as records, pending = payload hash ≠ server ledger (`cloudsync.json`), code compiled only with `TABULA_CLOUDKIT` (paid builds); attachments' `CKAsset` still deferred (RISKS #55).
 
 ## Time
 Always explicit `Calendar`/`TimeZone`. Test: DST changes, week start (Mon/Sun/Sat), midnight rollover, time-zone travel, term boundaries, leap years, 53-week years for odd/even logic. Property tests for the resolver.

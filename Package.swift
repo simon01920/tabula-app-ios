@@ -26,8 +26,11 @@ let crossImportOverlays: [SwiftSetting] = [.unsafeFlags(["-Xfrontend", "-enable-
 // experiment "what does a metadata-less intent control do?" (docs/checklists/PHASE4_DEVICE.md B3.X1).
 let appIntentsUI = Context.environment["TABULA_APP_INTENTS"] == "1"
 let intentDefines: [SwiftSetting] = appIntentsUI ? [.define("TABULA_APP_INTENTS")] : []
+// iCloud sync (Phase 6 S1): project.yml defines TABULA_CLOUDKIT only with the paid entitlements. TABULA_CLOUDKIT=1 here
+// is a COMPILE CHECK only (`xtool-dev.sh --cloudkit` refuses to install: CKContainer traps without the entitlement).
+let cloudKitDefines: [SwiftSetting] = Context.environment["TABULA_CLOUDKIT"] == "1" ? [.define("TABULA_CLOUDKIT")] : []
 let appSwiftSettings: [SwiftSetting] = crossImportOverlays + (macroProbes ? [.define("TABULA_MACRO_PROBES")] : [])
-    + intentDefines
+    + intentDefines + cloudKitDefines
 
 let package = Package(
     name: "Tabula",

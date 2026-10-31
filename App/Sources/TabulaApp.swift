@@ -48,6 +48,10 @@ struct TabulaRootApp: App {
                 .environment(services.reminders)
                 .environment(services.liveActivities)
                 .environment(services.sampleContent)
+                #if TABULA_CLOUDKIT
+                .environment(services.cloudSync)
+                .modifier(FirstSyncAlert(cloudSync: services.cloudSync))
+                #endif
                 .task { await services.model.load() }
                 // TipKit once per launch (the Timetable symbol legend, U4); its screenshot route shows every tip.
                 .task {

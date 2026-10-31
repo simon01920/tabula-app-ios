@@ -24,6 +24,10 @@ final class AppServices {
     let intents: AppIntentHost
     /// The "Just look around" sample-data record and its Remove banner (Phase 4U U6).
     let sampleContent: SampleContentController
+    #if TABULA_CLOUDKIT
+    /// iCloud sync (Phase 6 S1); `nil` for seed runs. Only in paid builds (TABULA_CLOUDKIT, RISKS #34).
+    let cloudSync: CloudSyncController?
+    #endif
 
     init(environment: AppEnvironment) {
         let model = AppModel(environment: environment)
@@ -46,6 +50,9 @@ final class AppServices {
         widgets = WidgetSnapshotWriter.install(on: model)   // widget snapshot after load + changes (Phase 4 A); chains onChange
         let liveActivities = LiveActivityController.install(on: model)   // Live Activities (Phase 4 B2); chains onChange
         self.liveActivities = liveActivities
+        #if TABULA_CLOUDKIT
+        cloudSync = CloudSyncController.install(on: model)   // fetch/send after load + changes; chains onChange
+        #endif
         // A background refresh near the next lesson boundary / exam start while an activity runs.
         reminders.additionalRefreshDate = { [weak liveActivities] in liveActivities?.backgroundRefreshHint }
         // App Intents (Phase 4 B3): registered here, before launch finishes, so an intent that launched the app in the

@@ -23,6 +23,8 @@
 #   bash scripts/xtool-dev.sh --app-intents        # Phase 4 B3 experiment: compile the intent-driven controls
 #                                                  # (TABULA_APP_INTENTS=1) although xtool writes no App Intents
 #                                                  # metadata; own work dir (-intents). Checklist row B3.X1 only.
+#   bash scripts/xtool-dev.sh --cloudkit build     # Phase 6 S1 compile check of the iCloud sync code (TABULA_CLOUDKIT=1);
+#                                                  # build only (CKContainer traps without the paid entitlement); -cloudkit dir
 # Env: TABULA_WORKDIR (default ~/.cache/tabula/work; variants append -macro / -sim)
 set -euo pipefail
 
@@ -34,15 +36,21 @@ WORK="${TABULA_WORKDIR:-$HOME/.cache/tabula/work}"
 
 VARIANT="base"
 SIMULATOR=0
-unset TABULA_MACRO_PROBES TABULA_APP_INTENTS
+unset TABULA_MACRO_PROBES TABULA_APP_INTENTS TABULA_CLOUDKIT
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --macro-probes) VARIANT="macro-probes"; WORK="$WORK-macro"; export TABULA_MACRO_PROBES=1; shift ;;
     --simulator) SIMULATOR=1; WORK="$WORK-sim"; shift ;;
     --app-intents) WORK="$WORK-intents"; export TABULA_APP_INTENTS=1; shift ;;
+    --cloudkit) WORK="$WORK-cloudkit"; export TABULA_CLOUDKIT=1; shift ;;
     *) break ;;
   esac
 done
+
+if [ "${TABULA_CLOUDKIT:-}" = "1" ] && [ "${1:-}" != "build" ]; then
+  echo "error: --cloudkit is a compile check: use '--cloudkit build' (installing would trap in CKContainer without the paid entitlement)" >&2
+  exit 64
+fi
 
 tabula_require swift clang xtool
 if xtool sdk status 2>/dev/null | grep -qi "not installed"; then
@@ -73,7 +81,7 @@ if [ "$SIMULATOR" -eq 1 ]; then
 elif [ "$#" -eq 0 ]; then
   set -- run
 fi
-echo "+ variant: $VARIANT (TABULA_MACRO_PROBES=${TABULA_MACRO_PROBES:-unset}, TABULA_APP_INTENTS=${TABULA_APP_INTENTS:-unset})$([ "$SIMULATOR" -eq 1 ] && echo ', iOS Simulator')"
+echo "+ variant: $VARIANT (TABULA_MACRO_PROBES=${TABULA_MACRO_PROBES:-unset}, TABULA_APP_INTENTS=${TABULA_APP_INTENTS:-unset}, TABULA_CLOUDKIT=${TABULA_CLOUDKIT:-unset})$([ "$SIMULATOR" -eq 1 ] && echo ', iOS Simulator')"
 echo "+ (cd $WORK && xtool dev $*)"
 xtool dev "$@"
 
@@ -98,5 +106,19 @@ if [ -f "$APPEX" ] && command -v llvm-objdump >/dev/null 2>&1; then
     fi
   done
   echo "+ widget appex check: __text + __swift5_entry present"
+fi
+# Phase 6 S1: CloudKit is linked iff TABULA_CLOUDKIT is set (without the paid entitlement any CKContainer use traps).
+APP_BIN="$WORK/xtool/TabulaApp.app/TabulaApp"
+if [ -f "$APP_BIN" ] && command -v llvm-objdump >/dev/null 2>&1; then
+  if llvm-objdump --macho --dylibs-used "$APP_BIN" 2>/dev/null | grep -q "CloudKit.framework"; then linked=1; else linked=0; fi
+  if [ "${TABULA_CLOUDKIT:-}" = "1" ] && [ "$linked" -eq 0 ]; then
+    echo "error: --cloudkit build does not link CloudKit: TABULA_CLOUDKIT did not reach App/Sources/Sync (Package.swift)." >&2
+    exit 5
+  fi
+  if [ "${TABULA_CLOUDKIT:-}" != "1" ] && [ "$linked" -eq 1 ]; then
+    echo "error: the app links CloudKit without TABULA_CLOUDKIT: CloudKit code escaped its #if TABULA_CLOUDKIT guard." >&2
+    exit 5
+  fi
+  echo "+ CloudKit check: linked=$linked (TABULA_CLOUDKIT=${TABULA_CLOUDKIT:-unset})"
 fi
 echo "xtool output directory: $WORK/xtool/"

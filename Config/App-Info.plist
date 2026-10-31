@@ -56,9 +56,13 @@
 	<array>
 		<string>sk.simondev.tabula.reminders.refresh</string>
 	</array>
+	<!-- Phase 6 S1: remote-notification lets CKSyncEngine's silent pushes wake the app ("CKSyncEngine requires the
+	     CloudKit and Remote notifications entitlements", CKSyncEngine docs). Harmless without aps-environment (free and
+	     xtool builds never receive a push); the entitlement itself stays in Config/Entitlements/PaidAccount. -->
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
+		<string>remote-notification</string>
 	</array>
 	<key>NSAlarmKitUsageDescription</key>
 	<string>Tabula schedules loud alarms only for reminders you explicitly mark as important, such as an exam tomorrow.</string>

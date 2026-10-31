@@ -199,7 +199,7 @@ if [ -x "$XCODEGEN" ] && command -v rsync >/dev/null; then
     grep -q 'SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) TABULA_MACRO_PROBES' "$P" && ok "TabulaApp defines TABULA_MACRO_PROBES (CI macro variant)" || bad "macro define missing in pbxproj"
     # Phase 4 B3: the App Intents controls are compiled on this path (app: alarm "Done"; widget: checkbox + timetable
     # choice), and the App Shortcut phrases catalog is an app resource (Xcode's metadata step reads it).
-    grep -q 'SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) TABULA_MACRO_PROBES TABULA_APP_INTENTS"' "$P" \
+    grep -q 'SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) TABULA_MACRO_PROBES TABULA_APP_INTENTS $(TABULA_CLOUDKIT_CONDITION)"' "$P" \
       && grep -q 'SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) TABULA_APP_INTENTS"' "$P" \
       && ok "TabulaApp + TabulaWidgets define TABULA_APP_INTENTS (App Intents controls on the Xcode path)" \
       || bad "TABULA_APP_INTENTS missing from the app or widget target in pbxproj"
