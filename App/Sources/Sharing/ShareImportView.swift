@@ -250,11 +250,14 @@ private struct ScannerScreen: View {
     let onUnavailable: () -> Void
     @Environment(\.dismiss) private var dismiss
     @State private var foreignCode = false
+    @State private var found = false   // the scanner may report the same code again before the cover closes
 
     var body: some View {
         NavigationStack {
             QRScannerView { payload in
+                guard !found else { return }
                 if let inbound = try? ShareInbound.parse(pasted: payload, configuration: ShareService.configuration) {
+                    found = true
                     onFound(inbound)
                 } else {
                     foreignCode = true
