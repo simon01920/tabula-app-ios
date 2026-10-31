@@ -129,6 +129,16 @@ public struct DatabaseMutation: Sendable {
         }
     }
 
+    /// Merges data fetched from iCloud (Phase 6 S1): `SyncMerge`, or the user's first-sync choice. Never issues
+    /// timestamps for `.merge`; the clock first learns everything in `remote` so later local edits sort after it.
+    /// Replacing (it may start from `emptyBase` on a device that has no store yet).
+    public static func mergeRemote(_ remote: TabulaDatabase, choice: FirstSyncChoice = .merge) -> DatabaseMutation {
+        DatabaseMutation(label: "sync \(choice.rawValue)", replacesDatabase: true) { database, clock, now in
+            clock.receive(remote.latestTimestamp, now: now)
+            database = try CloudFirstSync.resolve(choice, local: database, remote: remote, clock: &clock, now: now)
+        }
+    }
+
     /// Applies the mutation to a copy of `database`. On error `database` and `clock` keep their input values.
     public func apply(to database: TabulaDatabase, clock: inout HybridLogicalClock, now: Date) throws(MutationError) -> TabulaDatabase {
         var copy = database

@@ -89041,6 +89041,1014 @@
         }
       }
     },
+    "settings.icloud.status.iCloudDataDeleted" : {
+      "comment" : "iCloud status line after the user deleted the app's iCloud data in iOS Settings; sync was switched off. 'iCloud Sync' = the switch title above.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Data aplikace Tabula v iCloudu byla smazána. Data v tomto iPhonu zůstávají. Chcete-li je znovu nahrát, zapněte Synchronizaci s iCloudem."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Die Daten von Tabula in iCloud wurden gelöscht. Deine Daten auf diesem iPhone bleiben erhalten. Aktiviere „iCloud-Synchronisierung“, um sie erneut hochzuladen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabula's data in iCloud was deleted. Your data on this iPhone is kept. Turn on iCloud Sync to upload it again."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Les données de Tabula dans iCloud ont été supprimées. Vos données sur cet iPhone sont conservées. Activez Synchronisation iCloud pour les envoyer à nouveau."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A Tabula iCloudban tárolt adatai törlődtek. Az ezen az iPhone-on lévő adataid megmaradtak. Az újbóli feltöltéshez kapcsold be az iCloud-szinkronizálást."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloud上のTabulaのデータが削除されました。このiPhone上のデータは保持されています。再度アップロードするには、iCloud同期をオンにしてください。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dane aplikacji Tabula w iCloud zostały usunięte. Dane na tym iPhonie zostają zachowane. Włącz Synchronizację z iCloud, aby przesłać je ponownie."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Datele Tabula din iCloud au fost șterse. Datele de pe acest iPhone sunt păstrate. Activează Sincronizare iCloud pentru a le încărca din nou."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Údaje aplikácie Tabula v iCloude boli vymazané. Údaje v tomto iPhone zostávajú. Ak ich chcete znova nahrať, zapnite Synchronizáciu s iCloudom."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Подаци апликације Tabula на iCloud-у су обрисани. Ваши подаци на овом iPhone-у су сачувани. Укључите iCloud синхронизацију да бисте их поново отпремили."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Podaci aplikacije Tabula na iCloud-u su obrisani. Vaši podaci na ovom iPhone-u su sačuvani. Uključite iCloud sinhronizaciju da biste ih ponovo otpremili."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Дані Tabula в iCloud видалено. Ваші дані на цьому iPhone збережено. Увімкніть «Синхронізація з iCloud», щоб вивантажити їх знову."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula 在 iCloud 中的数据已被删除。这台 iPhone 上的数据已保留。打开“iCloud 同步”即可重新上传。"
+          }
+        }
+      }
+    },
+    "settings.icloud.status.itemsTooLarge" : {
+      "comment" : "iCloud status line when an item exceeds iCloud's size limit per record.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Některé položky jsou pro iCloud příliš velké a zůstávají jen v tomto iPhonu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Einige Objekte sind zu groß für iCloud und bleiben nur auf diesem iPhone."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some items are too large for iCloud and stay on this iPhone only."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Certains éléments sont trop volumineux pour iCloud et restent uniquement sur cet iPhone."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Néhány elem túl nagy az iCloudhoz, ezért csak ezen az iPhone-on marad."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "一部の項目はiCloudには大きすぎるため、このiPhoneにのみ保存されます。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Niektóre elementy są za duże dla iCloud i pozostają tylko na tym iPhonie."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Unele elemente sunt prea mari pentru iCloud și rămân doar pe acest iPhone."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Niektoré položky sú pre iCloud príliš veľké a zostávajú len v tomto iPhone."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Неке ставке су превелике за iCloud и остају само на овом iPhone-у."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Neke stavke su prevelike za iCloud i ostaju samo na ovom iPhone-u."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Деякі елементи завеликі для iCloud і залишаються лише на цьому iPhone."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "部分项目对 iCloud 来说太大，仅保留在这台 iPhone 上。"
+          }
+        }
+      }
+    },
+    "settings.icloud.status.newerAppVersion" : {
+      "comment" : "iCloud status line when data from a newer app version could not be read. 'Tabula' is the app name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Jiné zařízení používá novější verzi aplikace Tabula. Aktualizujte aplikaci Tabula, aby se synchronizovalo vše."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ein anderes Gerät verwendet eine neuere Version von Tabula. Aktualisiere Tabula, um alles zu synchronisieren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Another device uses a newer version of Tabula. Update Tabula to sync everything."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Un autre appareil utilise une version plus récente de Tabula. Mettez à jour Tabula pour tout synchroniser."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Egy másik eszköz a Tabula újabb verzióját használja. Frissítsd a Tabulát, hogy minden szinkronizálódjon."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "別のデバイスで新しいバージョンのTabulaが使われています。すべてを同期するにはTabulaをアップデートしてください。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Inne urządzenie używa nowszej wersji aplikacji Tabula. Zaktualizuj aplikację Tabula, aby zsynchronizować wszystko."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Alt dispozitiv folosește o versiune mai nouă a Tabula. Actualizează Tabula pentru a sincroniza tot."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Iné zariadenie používa novšiu verziu aplikácie Tabula. Aktualizujte aplikáciu Tabula, aby sa synchronizovalo všetko."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Други уређај користи новију верзију апликације Tabula. Ажурирајте апликацију Tabula да бисте синхронизовали све."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Drugi uređaj koristi noviju verziju aplikacije Tabula. Ažurirajte aplikaciju Tabula da biste sinhronizovali sve."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Інший пристрій використовує новішу версію Tabula. Оновіть Tabula, щоб синхронізувати все."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "另一台设备正在使用较新版本的 Tabula。请更新 Tabula 以同步所有内容。"
+          }
+        }
+      }
+    },
+    "settings.icloud.status.noAccount" : {
+      "comment" : "iCloud status line when no iCloud account is signed in on the iPhone. 'Settings' = the iOS Settings app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Chcete-li synchronizovat s ostatními zařízeními, přihlaste se k iCloudu v aplikaci Nastavení."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Melde dich in der App „Einstellungen“ bei iCloud an, um mit deinen anderen Geräten zu synchronisieren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in to iCloud in the Settings app to sync with your other devices."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Connectez-vous à iCloud dans l’app Réglages pour synchroniser avec vos autres appareils."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Jelentkezz be az iCloudba a Beállítások alkalmazásban, hogy szinkronizálhass a többi eszközöddel."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ほかのデバイスと同期するには、設定アプリでiCloudにサインインしてください。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zaloguj się do iCloud w aplikacji Ustawienia, aby synchronizować z innymi urządzeniami."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Conectează-te la iCloud în aplicația Setări pentru a sincroniza cu celelalte dispozitive."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ak chcete synchronizovať s ostatnými zariadeniami, prihláste sa do iCloudu v aplikácii Nastavenia."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Пријавите се на iCloud у апликацији Подешавања да бисте синхронизовали са другим уређајима."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Prijavite se na iCloud u aplikaciji Podešavanja da biste sinhronizovali sa drugim uređajima."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Увійдіть в iCloud у застосунку «Параметри», щоб синхронізувати з іншими пристроями."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "在“设置”App 中登录 iCloud，即可与你的其他设备同步。"
+          }
+        }
+      }
+    },
+    "settings.icloud.status.notSyncedYet" : {
+      "comment" : "iCloud status line before the first successful sync.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zatím nesynchronizováno."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Noch nicht synchronisiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not synced yet."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pas encore synchronisé."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Még nincs szinkronizálva."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "まだ同期されていません。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Jeszcze nie zsynchronizowano."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nesincronizat încă."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zatiaľ nesynchronizované."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Још није синхронизовано."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Još nije sinhronizovano."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ще не синхронізовано."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "尚未同步。"
+          }
+        }
+      }
+    },
+    "settings.icloud.status.off" : {
+      "comment" : "iCloud status line when the user turned iCloud Sync off.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vaše data zůstávají v tomto iPhonu a nekopírují se do iCloudu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Deine Daten bleiben auf diesem iPhone und werden nicht in iCloud kopiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your data stays on this iPhone and is not copied to iCloud."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vos données restent sur cet iPhone et ne sont pas copiées dans iCloud."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Az adataid ezen az iPhone-on maradnak, és nem kerülnek az iCloudba."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "データはこのiPhoneにのみ保存され、iCloudにはコピーされません。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dane pozostają na tym iPhonie i nie są kopiowane do iCloud."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Datele tale rămân pe acest iPhone și nu sunt copiate în iCloud."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vaše údaje zostávajú v tomto iPhone a nekopírujú sa do iCloudu."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ваши подаци остају на овом iPhone-у и не копирају се на iCloud."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vaši podaci ostaju na ovom iPhone-u i ne kopiraju se na iCloud."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ваші дані залишаються на цьому iPhone і не копіюються в iCloud."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你的数据保留在这台 iPhone 上，不会复制到 iCloud。"
+          }
+        }
+      }
+    },
+    "settings.icloud.status.quotaExceeded" : {
+      "comment" : "iCloud status line when the user's iCloud storage is full. 'Settings' = the iOS Settings app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Úložiště iCloud je plné. Chcete-li pokračovat v synchronizaci, uvolněte místo v aplikaci Nastavení."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dein iCloud-Speicher ist voll. Gib in der App „Einstellungen“ Speicherplatz frei, um weiter zu synchronisieren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your iCloud storage is full. Free up space in the Settings app to keep syncing."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Votre stockage iCloud est plein. Libérez de l’espace dans l’app Réglages pour continuer la synchronisation."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Megtelt az iCloud-tárhelyed. Szabadíts fel helyet a Beállítások alkalmazásban a szinkronizálás folytatásához."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloudストレージがいっぱいです。同期を続けるには、設定アプリで空き容量を増やしてください。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Miejsce w iCloud jest zapełnione. Zwolnij miejsce w aplikacji Ustawienia, aby kontynuować synchronizację."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Spațiul tău iCloud este plin. Eliberează spațiu în aplicația Setări pentru a continua sincronizarea."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Úložisko iCloud je plné. Ak chcete pokračovať v synchronizácii, uvoľnite miesto v aplikácii Nastavenia."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ваш iCloud простор је пун. Ослободите простор у апликацији Подешавања да бисте наставили синхронизацију."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vaš iCloud prostor je pun. Oslobodite prostor u aplikaciji Podešavanja da biste nastavili sinhronizaciju."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Сховище iCloud заповнене. Звільніть місце в застосунку «Параметри», щоб продовжити синхронізацію."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你的 iCloud 储存空间已满。请在“设置”App 中释放空间以继续同步。"
+          }
+        }
+      }
+    },
+    "settings.icloud.status.synced" : {
+      "comment" : "iCloud status line under the switch. %@ = a relative time such as '5 minutes ago' or 'yesterday', already localized.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Naposledy synchronizováno %@."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zuletzt synchronisiert: %@."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last synced %@."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dernière synchronisation : %@."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Utolsó szinkronizálás: %@."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "最終同期：%@。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ostatnia synchronizacja: %@."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ultima sincronizare: %@."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Naposledy synchronizované %@."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Последња синхронизација: %@."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Poslednja sinhronizacija: %@."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Остання синхронізація: %@."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "上次同步：%@。"
+          }
+        }
+      }
+    },
+    "settings.icloud.status.syncing" : {
+      "comment" : "iCloud status line while data is being sent or fetched. Ends with an ellipsis character.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Synchronizace…"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wird synchronisiert …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Syncing…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Synchronisation…"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Szinkronizálás…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "同期中…"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Synchronizowanie…"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Se sincronizează…"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Synchronizuje sa…"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Синхронизација…"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sinhronizacija…"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Синхронізація…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "正在同步…"
+          }
+        }
+      }
+    },
+    "settings.icloud.title" : {
+      "comment" : "Settings row title: syncing the user's data through their private iCloud. 'iCloud' is a brand name, never translated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Synchronizace s iCloudem"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloud-Synchronisierung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud Sync"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Synchronisation iCloud"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloud-szinkronizálás"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloud同期"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Synchronizacja z iCloud"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sincronizare iCloud"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Synchronizácia s iCloudom"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloud синхронизација"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloud sinhronizacija"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Синхронізація з iCloud"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloud 同步"
+          }
+        }
+      }
+    },
+    "settings.icloud.unavailable.footer" : {
+      "comment" : "Footer under the iCloud Sync row in builds without iCloud. Honest: there is no switch yet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Synchronizace s iCloudem přijde s verzí z App Storu. Do té doby zůstávají vaše data v tomto iPhonu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Die iCloud-Synchronisierung kommt mit der App-Store-Version. Bis dahin bleiben deine Daten auf diesem iPhone."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud sync arrives with the App Store version. Until then, your data stays on this iPhone."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "La synchronisation iCloud arrivera avec la version de l’App Store. D’ici là, vos données restent sur cet iPhone."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Az iCloud-szinkronizálás az App Store-verzióval érkezik. Addig az adataid ezen az iPhone-on maradnak."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloud同期はApp Store版で利用できるようになります。それまでは、データはこのiPhoneに保存されます。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Synchronizacja z iCloud pojawi się w wersji z App Store. Do tego czasu dane pozostają na tym iPhonie."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sincronizarea iCloud vine odată cu versiunea din App Store. Până atunci, datele tale rămân pe acest iPhone."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Synchronizácia s iCloudom príde s verziou z App Store. Dovtedy zostávajú vaše údaje v tomto iPhone."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloud синхронизација стиже са верзијом из App Store-а. До тада ваши подаци остају на овом iPhone-у."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloud sinhronizacija stiže sa verzijom iz App Store-a. Do tada vaši podaci ostaju na ovom iPhone-u."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Синхронізація з iCloud з’явиться у версії з App Store. До того часу ваші дані залишаються на цьому iPhone."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloud 同步将随 App Store 版本推出。在此之前，你的数据仅保存在这台 iPhone 上。"
+          }
+        }
+      }
+    },
+    "settings.icloud.unavailable.value" : {
+      "comment" : "Settings › iCloud Sync row value in builds without iCloud (the free/test version). Short, title-style.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nedostupné"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nicht verfügbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not Available"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Non disponible"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nem érhető el"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "利用できません"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Niedostępne"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Indisponibil"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nedostupné"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Није доступно"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nije dostupno"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Недоступно"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "不可用"
+          }
+        }
+      }
+    },
     "settings.language.footer" : {
       "comment" : "Footer under the language button.",
       "extractionState" : "manual",
@@ -100629,6 +101637,426 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "无法打开你的数据"
+          }
+        }
+      }
+    },
+    "sync.firstSync.keepThisDevice" : {
+      "comment" : "Alert button: this iPhone's data wins; items only in iCloud are deleted. Title-style, short.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ponechat tento iPhone"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dieses iPhone behalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep This iPhone"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Garder cet iPhone"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Az iPhone megtartása"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このiPhoneを優先"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zachowaj ten iPhone"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Păstrează acest iPhone"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ponechať tento iPhone"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Задржи овај iPhone"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zadrži ovaj iPhone"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Залишити цей iPhone"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "保留这台 iPhone"
+          }
+        }
+      }
+    },
+    "sync.firstSync.merge" : {
+      "comment" : "Alert button (default): combine the data of this iPhone and iCloud. Must match the word used in sync.firstSync.message.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sloučit"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zusammenführen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merge"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fusionner"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Egyesítés"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "結合"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Scal"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Îmbină"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zlúčiť"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Обједини"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Objedini"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Об’єднати"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "合并"
+          }
+        }
+      }
+    },
+    "sync.firstSync.message" : {
+      "comment" : "Alert message, first iCloud sync. 'Merge' = the exact title of the first button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sloučit ponechá vše z obou stran. Ostatní možnosti smažou položky, které jsou jen na druhé straně."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "„Zusammenführen“ behält alles von beiden Seiten. Die anderen Optionen löschen Objekte, die nur auf der anderen Seite vorhanden sind."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merge keeps everything from both. The other choices delete items that exist only on the other side."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fusionner conserve tout des deux côtés. Les autres choix suppriment les éléments qui n’existent que de l’autre côté."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Az Egyesítés mindkét oldalról mindent megtart. A többi lehetőség törli azokat az elemeket, amelyek csak a másik oldalon vannak."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "「結合」は両方のデータをすべて残します。ほかの選択肢では、片方にしかない項目が削除されます。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Scal zachowuje wszystko z obu stron. Pozostałe opcje usuwają elementy, które istnieją tylko po drugiej stronie."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Îmbină păstrează tot ce există pe ambele părți. Celelalte opțiuni șterg elementele care există doar pe cealaltă parte."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zlúčiť ponechá všetko z oboch strán. Ostatné možnosti vymažú položky, ktoré sú len na druhej strane."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Обједини задржава све са обе стране. Остали избори бришу ставке које постоје само на другој страни."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Objedini zadržava sve sa obe strane. Ostali izbori brišu stavke koje postoje samo na drugoj strani."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "«Об’єднати» зберігає все з обох сторін. Інші варіанти видаляють елементи, які є лише на іншій стороні."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "“合并”会保留双方的全部内容。其他选项会删除仅存在于另一方的项目。"
+          }
+        }
+      }
+    },
+    "sync.firstSync.title" : {
+      "comment" : "Alert title, first iCloud sync: both this iPhone and iCloud already hold timetable data. Title-style fragment, no ending punctuation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Data v tomto iPhonu i v iCloudu"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Daten auf diesem iPhone und in iCloud"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data on This iPhone and in iCloud"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Données sur cet iPhone et dans iCloud"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Adatok ezen az iPhone-on és az iCloudban"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このiPhoneとiCloudにデータがあります"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dane na tym iPhonie i w iCloud"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Date pe acest iPhone și în iCloud"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Údaje v tomto iPhone aj v iCloude"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Подаци на овом iPhone-у и на iCloud-у"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Podaci na ovom iPhone-u i na iCloud-u"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Дані на цьому iPhone і в iCloud"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "这台 iPhone 和 iCloud 中都有数据"
+          }
+        }
+      }
+    },
+    "sync.firstSync.useICloud" : {
+      "comment" : "Alert button: iCloud's data wins; items only on this iPhone are deleted. Title-style, short.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Použít iCloud"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloud verwenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use iCloud"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Utiliser iCloud"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloud használata"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "iCloudを使用"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Użyj iCloud"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Folosește iCloud"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Použiť iCloud"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Користи iCloud"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Koristi iCloud"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Використати iCloud"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "使用 iCloud"
           }
         }
       }

@@ -39,6 +39,9 @@ enum ApplyOrigin: Equatable, Sendable {
     case userSave
     /// Everything else (toggles, completion, deletes, settings, notification actions, debug tools).
     case other
+    /// Data merged from iCloud (`DatabaseMutation.mergeRemote`, Phase 6 S1). Never rejected for validation errors: the
+    /// data already exists on another device, and a batch may reference entities of a later batch.
+    case sync
 }
 
 /// What `AppModel.onChange` reports.
@@ -175,6 +178,16 @@ final class AppModel {
         await persist()
     }
 
+    /// Writes pending changes now and reports whether the current snapshot is on disk. iCloud sync calls it before it
+    /// records that the server holds something (Phase 6 S1): data must never be acknowledged before it is saved.
+    func flushForSync() async -> Bool {
+        await flush()
+        switch lastSaveOutcome {
+        case .saved?, .skippedStale?: return true
+        default: return database == nil
+        }
+    }
+
     // MARK: Write API
 
     /// Applies a change: stamps it, validates (new errors block, new warnings are returned), updates the snapshot
@@ -193,9 +206,12 @@ final class AppModel {
         } catch {
             return .failed(error)
         }
+        if origin == .sync && candidate == database { return .applied(warnings: []) }   // re-applied data: no save, no re-plan
         let candidateIssues = candidate.validate()
         // A replacing mutation starts from scratch: only its own errors count.
-        switch MutationValidation.verdict(before: mutation.replacesDatabase ? [] : issues, after: candidateIssues) {
+        var verdict = MutationValidation.verdict(before: mutation.replacesDatabase ? [] : issues, after: candidateIssues)
+        if origin == .sync, case .rejected = verdict { verdict = .accepted(newWarnings: []) }
+        switch verdict {
         case .rejected(let errors):
             show(.changeRejected)
             return .rejected(errors: errors)

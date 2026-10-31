@@ -157,6 +157,33 @@ check("TABULA_MACRO_PROBES" in str(base("TabulaApp").get("SWIFT_ACTIVE_COMPILATI
       "project.yml: CI builds the macro variant (SWIFT_ACTIVE_COMPILATION_CONDITIONS)",
       "project.yml TabulaApp must define TABULA_MACRO_PROBES")
 
+# --- iCloud sync code (Phase 6 S1; RISKS #34: CKContainer traps without the paid entitlement) -----------------
+check(all("TABULA_CLOUDKIT" not in defines(d, t) for d in (dump_default, dump_macro) for t in ("TabulaApp", "TabulaWidgets")),
+      "Package.swift (xtool): no TABULA_CLOUDKIT by default (only `xtool-dev.sh --cloudkit build`, a compile check)",
+      "Package.swift defines TABULA_CLOUDKIT by default: xtool builds would trap in CKContainer")
+check(ID.get("TABULA_CLOUDKIT_CONDITION") == "" and ID_PAID.get("TABULA_CLOUDKIT_CONDITION") == "TABULA_CLOUDKIT",
+      "xcconfig: TABULA_CLOUDKIT_CONDITION is empty with the switch off, TABULA_CLOUDKIT with TABULA_PAID_ACCOUNT=1",
+      f"TABULA_CLOUDKIT_CONDITION resolves to {ID.get('TABULA_CLOUDKIT_CONDITION')!r} / {ID_PAID.get('TABULA_CLOUDKIT_CONDITION')!r}")
+app_conditions = str(base("TabulaApp").get("SWIFT_ACTIVE_COMPILATION_CONDITIONS", ""))
+literal_ck = [t for t in tgt if "TABULA_CLOUDKIT" in str(base(t).get("SWIFT_ACTIVE_COMPILATION_CONDITIONS", "")).replace(
+    "$(TABULA_CLOUDKIT_CONDITION)", "")]
+check("$(TABULA_CLOUDKIT_CONDITION)" in app_conditions and not literal_ck,
+      "project.yml: TabulaApp gets TABULA_CLOUDKIT only through $(TABULA_CLOUDKIT_CONDITION) (paid switch)",
+      f"project.yml CloudKit condition wiring wrong (app: {app_conditions!r}, literal in {literal_ck})")
+ck_files = sorted(p for d in ("App", "WidgetExtension", "WatchApp", "Packages") for p in (ROOT / d).rglob("*.swift")
+                  if re.search(r"^\s*import\s+CloudKit\b", p.read_text(encoding="utf-8"), re.M))
+def first_code_line(p):
+    return next((ln.strip() for ln in p.read_text(encoding="utf-8").splitlines()
+                 if ln.strip() and not ln.strip().startswith("//")), "")
+unguarded = [str(p.relative_to(ROOT)) for p in ck_files
+             if not str(p.relative_to(ROOT)).startswith("App/") or first_code_line(p) != "#if TABULA_CLOUDKIT"]
+check(ck_files and not unguarded,
+      f"CloudKit is imported only in App/ files wrapped whole in #if TABULA_CLOUDKIT ({len(ck_files)} file(s))",
+      f"CloudKit import outside a whole-file #if TABULA_CLOUDKIT guard: {unguarded or 'no CloudKit file found'}")
+check("remote-notification" in plistlib.load(open(ROOT / "Config/App-Info.plist", "rb")).get("UIBackgroundModes", []),
+      "App-Info.plist: UIBackgroundModes has remote-notification (CKSyncEngine silent pushes)",
+      "App-Info.plist: UIBackgroundModes lacks remote-notification (CKSyncEngine needs it)")
+
 # --- App Intents (Phase 4 B3; RISKS #19: only Xcode writes Metadata.appintents) ------------------------------
 # The intent-driven controls compile only where the metadata exists: project.yml defines TABULA_APP_INTENTS for the
 # app and the widget; the xtool manifest does not (only `xtool-dev.sh --app-intents`, an on-device experiment).
@@ -546,7 +573,8 @@ check(not xc_res, "no Package.swift target declares a .xcstrings resource (would
 # .env.example documents every variable the scripts/CI read (names only, never values).
 ENV_NAMES = ("TABULA_PAID_ACCOUNT", "TABULA_DEVELOPMENT_TEAM", "APPLE_TEAM_ID", "ASC_KEY_ID", "ASC_ISSUER_ID",
              "ASC_KEY_P8_BASE64", "TABULA_MACRO_PROBES", "TABULA_WORKDIR", "TABULA_SCRATCH", "TABULA_SWIFTLY_ENV",
-             "TABULA_DARWIN_SDK", "TABULA_WATCH_TARGET", "XCODEGEN", "TABULA_APP_INTENTS")
+             "TABULA_DARWIN_SDK", "TABULA_WATCH_TARGET", "XCODEGEN", "TABULA_APP_INTENTS",
+             "TABULA_CLOUDKIT")
 env_example = ROOT / ".env.example"
 if env_example.is_file():
     lines = [ln.strip() for ln in env_example.read_text().splitlines() if ln.strip() and not ln.lstrip().startswith("#")]
@@ -570,6 +598,11 @@ xcg = json.dumps(wf["jobs"]["ios-xcodegen"])
 check("arm64_32" in xcg and "lipo -archs" in xcg, "ios.yml asserts arm64_32 in the watch binary", "watch arch check missing")
 check("TABULA_PAID_ACCOUNT=1" in xcg and "-showBuildSettings" in xcg,
       "ios.yml resolves the paid switch with xcodebuild -showBuildSettings (both states)", "paid switch CI assertion missing")
+ck_step = next((st for st in wf["jobs"]["ios-xcodegen"]["steps"] if "TABULA_CLOUDKIT" in str(st.get("name", ""))), {})
+check("xcodebuild build" in ck_step.get("run", "") and "TABULA_PAID_ACCOUNT=1" in ck_step.get("run", "")
+      and "CODE_SIGNING_ALLOWED=NO" in ck_step.get("run", "") and "CloudKit.framework" in ck_step.get("run", ""),
+      "ios.yml compiles the TABULA_CLOUDKIT variant unsigned and checks it links CloudKit (Phase 6 S1)",
+      "ios.yml: the unsigned TABULA_CLOUDKIT compile step is missing or incomplete")
 rel = json.dumps(wf["jobs"]["release-testflight"])
 check("vars.TABULA_PAID_ACCOUNT" in rel and 'TABULA_PAID_ACCOUNT=\\"$TABULA_PAID_ACCOUNT\\"' in rel
       and 'TABULA_DEVELOPMENT_TEAM=\\"$APPLE_TEAM_ID\\"' in rel,

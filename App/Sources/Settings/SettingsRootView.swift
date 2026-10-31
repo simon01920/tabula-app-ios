@@ -32,6 +32,7 @@ struct SettingsRootView: View {
                 timetableSection
                 notificationsSection
                 generalSection
+                CloudSyncSettingsSection()
                 proSection
                 Section {
                     NavigationLink { SettingsAboutView() } label: {

@@ -107,7 +107,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.app == 'true'
     runs-on: xcode-27
-    timeout-minutes: 15   # measured 1 m 07 s (run 37449454629); private-repo macOS minutes are billed
+    timeout-minutes: 22   # measured 1 m 07 s (run 37449454629) + the CloudKit compile step (Phase 6 S1)
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Select Xcode 27
@@ -187,6 +187,11 @@ jobs:
           expect "switch ON widget entitlements" "$(setting TabulaWidgets CODE_SIGN_ENTITLEMENTS TABULA_PAID_ACCOUNT=1)" \
             "Config/Entitlements/PaidAccount/TabulaWidgets.entitlements"
           expect "team override" "$(setting TabulaApp DEVELOPMENT_TEAM TABULA_DEVELOPMENT_TEAM=ABCDE12345)" "ABCDE12345"
+          # Phase 6 S1: the iCloud sync code is compiled only with the paid switch on.
+          conditions_off="$(setting TabulaApp SWIFT_ACTIVE_COMPILATION_CONDITIONS)"
+          conditions_on="$(setting TabulaApp SWIFT_ACTIVE_COMPILATION_CONDITIONS TABULA_PAID_ACCOUNT=1)"
+          case " $conditions_off " in *" TABULA_CLOUDKIT "*) expect "switch OFF: no TABULA_CLOUDKIT" "$conditions_off" "(without TABULA_CLOUDKIT)" ;; *) echo "ok   switch OFF conditions: $conditions_off" ;; esac
+          case " $conditions_on " in *" TABULA_CLOUDKIT "*) echo "ok   switch ON conditions: $conditions_on" ;; *) expect "switch ON: TABULA_CLOUDKIT" "$conditions_on" "(with TABULA_CLOUDKIT)" ;; esac
           exit "$fail"
       - name: Build (generic iOS device, all architectures, no signing)
         run: |
@@ -225,6 +230,9 @@ jobs:
           if [ "$missing" -ne 0 ]; then find "$APP" -maxdepth 3 | sort | head -150; exit 1; fi
           [ "$(plutil -extract ITSAppUsesNonExemptEncryption raw "$APP/Info.plist")" = "false" ] \
             || { echo "::error::ITSAppUsesNonExemptEncryption must be false"; exit 1; }
+          if otool -L "$APP/TabulaApp" | grep -q CloudKit.framework; then
+            echo "::error::the unflagged app links CloudKit (TABULA_CLOUDKIT leaked; CKContainer traps unentitled)"; exit 1
+          fi
           [ "$(plutil -extract CFBundleIdentifier raw "$APP/Info.plist")" = "$(python3 scripts/identity.py TABULA_BUNDLE_ID)" ] \
             || { echo "::error::CFBundleIdentifier does not match Config/AppIdentity.xcconfig"; exit 1; }
           # Apple Watch Series 7 (S7) is arm64_32: the embedded watch binary must contain that slice.
@@ -233,11 +241,29 @@ jobs:
             || { echo "::error::TabulaWatch lacks arm64_32 (Series 7). Check WATCHOS_DEPLOYMENT_TARGET/ARCHS."; exit 1; }
           lipo -archs "$WATCH/PlugIns/TabulaWatchWidgets.appex/TabulaWatchWidgets" | grep -qw arm64_32 \
             || { echo "::error::TabulaWatchWidgets lacks arm64_32 (Series 7)."; exit 1; }
+      - name: Compile the iCloud sync variant (TABULA_PAID_ACCOUNT=1 -> TABULA_CLOUDKIT, unsigned)
+        # Phase 6 S1. Compile check only: no signing, so the paid entitlements are not needed (and the product is not
+        # run). Runs after the bundle checks and reuses their derived data (incremental: only the app target recompiles).
+        timeout-minutes: 8
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project Tabula.xcodeproj \
+            -scheme TabulaApp \
+            -configuration Debug \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build/DerivedData \
+            TABULA_PAID_ACCOUNT=1 \
+            CODE_SIGNING_ALLOWED=NO \
+            | tee build/xcodebuild-cloudkit.log | xcbeautify --renderer github-actions
+          APP="$(find build/DerivedData/Build/Products -maxdepth 2 -name 'TabulaApp.app' -type d | head -1)"
+          otool -L "$APP/TabulaApp" | grep -q CloudKit.framework \
+            || { echo "::error::the TABULA_CLOUDKIT build does not link CloudKit"; exit 1; }
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
           name: xcodebuild-log
-          path: build/xcodebuild.log
+          path: build/xcodebuild*.log
           retention-days: 7
 
   ios-xtool-path:
