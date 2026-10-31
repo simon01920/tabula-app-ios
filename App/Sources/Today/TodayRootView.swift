@@ -144,7 +144,19 @@ private struct TodayContent: View {
             List {
                 if hasLessons {
                     Section {
-                        TodayHeroView(state: state, now: now, visibility: timetable.fieldVisibility)
+                        // D8 left the hero's lesson out of the rows, so the hero itself opens it (the current lesson,
+                        // else the one it announces).
+                        if let lesson = heroLesson {
+                            Button { actions.openLesson(lesson) } label: {
+                                TodayHeroView(state: state, now: now, visibility: timetable.fieldVisibility)
+                                    .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityAddTraits(.isButton)
+                            .accessibilityHint(Text("timetable.a11y.openHint"))
+                        } else {
+                            TodayHeroView(state: state, now: now, visibility: timetable.fieldVisibility)
+                        }
                     }
                 }
                 if work.showsTasks {
@@ -163,6 +175,11 @@ private struct TodayContent: View {
             }
             .listStyle(.insetGrouped)
         }
+    }
+
+    private var heroLesson: ResolvedLesson? {
+        if case let .current(lesson, _) = state.header { return lesson }
+        return state.header.next
     }
 
     @ViewBuilder

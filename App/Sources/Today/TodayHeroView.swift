@@ -9,7 +9,8 @@
 // is ink, never the subject colour (a red subject must not read as an alarm). Reading order at every size: subject,
 // room, time left, next lesson; at accessibility sizes the teacher (in the lesson detail and the VoiceOver sentence)
 // leaves the card so the next lesson follows the essentials. VoiceOver reads the card as one sentence.
-// Static content (no tap target): Now is status, not an action (Astra F17); the lesson rows below open the detail.
+// Plain, untinted content (Astra F17: Now is status, not ink); TodayRootView wraps it in a plain button that opens the
+// lesson's detail, because "Rest of today" leaves the hero's lesson out (verification D8).
 // APIs: ProgressView(value:total:), Divider, Label, accessibilityElement(children: .ignore), accessibilityLabel(_:),
 //       Environment(\.dynamicTypeSize).
 import SwiftUI
