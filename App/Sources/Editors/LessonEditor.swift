@@ -148,6 +148,7 @@ private struct LessonFormContent: View {
             } label: {
                 Text("editor.lesson.subject")
             }
+            .longValuePicker()   // D12: "Sl...eratúra" at AX sizes
             .onChange(of: draft.subjectID) { _, newValue in
                 guard draft.isNew, let newValue, let subject = subjects.first(where: { $0.id == newValue }) else { return }
                 draft.applySubjectDefaults(subject)

@@ -3,8 +3,8 @@
 // - title = the timetable's name (a title menu switches timetables when there are several); the shown week's range
 //   and rotation phrase ("12 Oct – 16 Oct · Odd week") are the iOS 26 navigation subtitle, so no date header and no
 //   button-like "Week B" capsule sit in the content;
-// - toolbar: leading "Today" only when another week/day is shown; trailing previous / next week, then ONE stable
-//   "View Options" menu (`ellipsis`): the view picker (Grid / Week / Day / Tiles, each with its symbol), Edit
+// - toolbar: previous / next week, then ONE stable "View Options" menu (`ellipsis`): "Today" first when another
+//   week/day is shown (D13: a leading button truncated the title), the view picker (Grid / Week / Day / Tiles), Edit
 //   Timetable, Add Lesson, "Change for This Day…" in day views, then density, "Show Week" and Subjects;
 // - an empty timetable shows "No lessons yet" with an Add Lesson button above the (quiet) grid;
 // - the one-time symbol legend (TipKit, TimetableMarkers.swift) above weeks with change markers.
@@ -227,17 +227,7 @@ struct TimetableRootView: View {
             let current = selectionBinding(resolver).wrappedValue
             let kind = viewKind(for: timetable)
             let dayBased = TimetableViewChoice.isDayBased(kind)
-            let todayWeek = resolver.context.startOfWeek(containing: model.today)
-            if current.weekStart != todayWeek || (dayBased && current.selectedDate != model.today) {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        selection = TimetableSelection.initial(today: model.today, resolver: resolver)
-                    } label: {
-                        Text("timetable.week.today")
-                    }
-                    .accessibilityHint(Text(dayBased ? "timetable.a11y.todayHint.day" : "timetable.a11y.todayHint.week"))
-                }
-            }
+            // Today is the ⋯ menu's first item (D13 / L8: a leading Today button truncated the title).
             // Day views at accessibility sizes page by day in the content (DayPagerHeader); everywhere else the
             // toolbar pages by week.
             if !(dayBased && typeSize.isAccessibilitySize) {
@@ -263,7 +253,18 @@ struct TimetableRootView: View {
 
     private func optionsMenu(timetable: Timetable, resolver: ScheduleResolver, current: TimetableSelection) -> some View {
         let kind = viewKind(for: timetable)
+        let dayBased = TimetableViewChoice.isDayBased(kind)
+        let showsToday = current.weekStart != resolver.context.startOfWeek(containing: model.today)
+            || (dayBased && current.selectedDate != model.today)
         return Menu {
+            if showsToday {
+                Button {
+                    selection = TimetableSelection.initial(today: model.today, resolver: resolver)
+                } label: {
+                    Label { Text("timetable.week.today") } icon: { Image(AppSymbol.date) }
+                }
+                .accessibilityHint(Text(dayBased ? "timetable.a11y.todayHint.day" : "timetable.a11y.todayHint.week"))
+            }
             Picker(selection: Binding(get: { kind }, set: { choose($0, for: timetable) })) {
                 ForEach(TimetableViewChoice.offered, id: \.self) { option in
                     Label { Text(LocalizedStringKey(TimetableViewChoice.nameKey(option))) } icon: {

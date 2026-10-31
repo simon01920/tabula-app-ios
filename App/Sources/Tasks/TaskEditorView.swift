@@ -135,7 +135,7 @@ private struct TaskFormContent: View {
 
     private var titleSection: some View {
         Section {
-            EditorTitleField(promptKey: "tasks.field.title.prompt", text: $draft.title, axis: .vertical,
+            EditorTitleField(promptKey: "tasks.field.title.prompt", text: $draft.title, singleLine: false,
                              missingHintKey: TaskDraft.Issue.titleEmpty.l10nKey)
             Picker(selection: $draft.kind) {
                 ForEach(kindOptions, id: \.rawValue) { kind in
@@ -159,6 +159,7 @@ private struct TaskFormContent: View {
             } label: {
                 Text("tasks.field.subject")
             }
+            .longValuePicker()   // D12
         }
     }
 
@@ -211,7 +212,7 @@ private struct TaskFormContent: View {
     }
 
     private func nextLessonText(_ lesson: NextLesson) -> String {
-        let date = model.formatter.date(lesson.date, style: .full)
+        let date = model.formatter.contextualDate(lesson.date, today: model.today)   // L1
         guard let start = lesson.startTime else {
             return model.renderer.format(key: "tasks.editor.due.nextLesson.when", arguments: [.text(date)])
         }

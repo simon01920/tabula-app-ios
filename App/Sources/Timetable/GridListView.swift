@@ -97,7 +97,7 @@ struct GridListView: View {
 
     private func header(_ column: TimetableCore.GridLayout.Column) -> some View {
         HStack(spacing: 8) {
-            Text(verbatim: model.formatter.date(column.date, style: .full))
+            Text(verbatim: model.formatter.contextualDate(column.date, today: model.today))   // L1 / D15
             if let day = strip.days.first(where: { $0.date == column.date }) {
                 if day.isToday {
                     Text("timetable.list.todayTag")

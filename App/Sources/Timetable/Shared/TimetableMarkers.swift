@@ -118,6 +118,7 @@ struct ChangeLegendTipStyle: TipViewStyle {
             HStack(alignment: .firstTextBaseline) {
                 (configuration.title ?? Text("timetable.legend.title"))
                     .font(.headline)
+                    .fixedSize(horizontal: false, vertical: true)   // D14: wraps instead of "Symbols in t…"
                     .accessibilityAddTraits(.isHeader)
                 Spacer(minLength: 8)
                 Button {
@@ -135,6 +136,7 @@ struct ChangeLegendTipStyle: TipViewStyle {
             ForEach(Self.rows) { row in
                 Label {
                     Text(LocalizedStringKey(row.key))
+                        .fixedSize(horizontal: false, vertical: true)   // D14: "Substitute te…"
                 } icon: {
                     Image(systemName: row.symbol)
                         .foregroundStyle(row.symbol == AppSymbol.cancelled.name ? Color.correction : Color.primary)

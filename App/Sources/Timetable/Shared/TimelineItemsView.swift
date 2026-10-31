@@ -91,7 +91,7 @@ struct DayEmptyView: View {
         ContentUnavailableView {
             Label { Text(verbatim: title) } icon: { Image(systemName: symbol) }
         } description: {
-            Text(verbatim: model.formatter.date(schedule.date, style: .full))
+            Text(verbatim: model.formatter.contextualDate(schedule.date, today: model.today))   // L1
         } actions: {
             EmptyView()
         }

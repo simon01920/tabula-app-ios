@@ -245,7 +245,9 @@ struct EditorTitleField: View {
     /// Catalog key of the prompt and accessibility label ("Exam title").
     let promptKey: LocalizedStringKey
     @Binding var text: String
-    var axis: Axis = .horizontal
+    /// `true` (names): the field wraps long text but a typed line break becomes a space, so the stored value stays one
+    /// line as before. `false` (task titles): line breaks are kept.
+    var singleLine = true
     /// Catalog key of the hint shown while the title is missing (`nil` = no hint).
     var missingHintKey: String?
     /// Focus binding of the quick-entry sheet (the title is focused on open); `nil` elsewhere.
@@ -263,7 +265,11 @@ struct EditorTitleField: View {
 
     @ViewBuilder
     private var field: some View {
-        let base = TextField(text: $text, prompt: Text(promptKey), axis: axis) { Text(promptKey) }
+        // Always wrapping (D24: "Gymnázium –…" truncated at AX sizes).
+        let binding = singleLine
+            ? Binding(get: { text }, set: { text = $0.replacingOccurrences(of: "\n", with: " ") })
+            : $text
+        let base = TextField(text: binding, prompt: Text(promptKey), axis: .vertical) { Text(promptKey) }
             .font(.title3)
             .multilineTextAlignment(.leading)
         if let focus { base.focused(focus) } else { base }
@@ -279,7 +285,12 @@ struct LabeledTextField: View {
 
     var body: some View {
         LabeledContent {
-            TextField(text: $text, prompt: Text(emptyPrompt), axis: axis) { Text(titleKey) }
+            // Always wraps (D24: "1. polrok 2026…" truncated at AX sizes); `.horizontal` keeps the value on one line
+            // by turning a typed line break into a space, as the single-line field did.
+            TextField(text: axis == .horizontal
+                        ? Binding(get: { text }, set: { text = $0.replacingOccurrences(of: "\n", with: " ") })
+                        : $text,
+                      prompt: Text(emptyPrompt), axis: .vertical) { Text(titleKey) }
                 .multilineTextAlignment(.trailing)
         } label: {
             Text(titleKey)

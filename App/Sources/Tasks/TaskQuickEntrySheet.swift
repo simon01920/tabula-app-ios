@@ -88,7 +88,7 @@ private struct TaskQuickEntryForm: View {
         let nextLesson = TaskSupport.nextLesson(subjectID: draft.subjectID, model: model)
         Group {
             Section {
-                EditorTitleField(promptKey: "tasks.quick.prompt", text: $draft.title, axis: .vertical,
+                EditorTitleField(promptKey: "tasks.quick.prompt", text: $draft.title, singleLine: false,
                                  missingHintKey: TaskDraft.Issue.titleEmpty.l10nKey, focus: $titleFocused)
             }
             Section {
@@ -127,6 +127,7 @@ private struct TaskQuickEntryForm: View {
         } label: {
             Text("tasks.field.subject")
         }
+        .longValuePicker()   // D12
     }
 
     /// The picked option, or what the draft represents when the pick is no longer offered (the subject changed).

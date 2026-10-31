@@ -76,8 +76,15 @@ private struct ExamFactLines: View {
     let texts: ExamTexts
 
     var body: some View {
-        Label { Text(verbatim: texts.date(row.exam.date)) } icon: { Image(AppSymbol.date) }
-        relative
+        // D11: a plain relative time shares the date's line ("Thu, Oct 22 · in 9 days"), never an outdented line.
+        let plainRelative = !row.exam.isCompleted && row.showsRelativeTime && row.urgency.emphasisSymbolName == nil
+        Label {
+            Text(verbatim: plainRelative
+                 ? texts.renderer.format(key: "today.exam.when", arguments: [.text(texts.date(row.exam.date)),
+                                                                             .text(texts.when(row.when))])
+                 : texts.date(row.exam.date))
+        } icon: { Image(AppSymbol.date) }
+        if !plainRelative { relative }
         if let time = texts.time(row.exam) {
             Label { Text(verbatim: time) } icon: { Image(AppSymbol.time) }
         }
@@ -99,8 +106,6 @@ private struct ExamFactLines: View {
                 Label { Text(verbatim: texts.when(row.when)).fontWeight(.semibold) } icon: {
                     Image(systemName: symbol).foregroundStyle(row.urgency.tint)
                 }
-            } else {
-                Text(verbatim: texts.when(row.when))
             }
         }
     }
@@ -225,9 +230,13 @@ struct ExamPeriodHeader: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
         .background(Color.ink.opacity(0.08), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        // D22: an ink hairline separates the banner from the page in dark mode too.
+        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Color.ink.opacity(0.35), lineWidth: 1))
         .foregroundStyle(.primary)
         .textCase(nil)
         .padding(.bottom, 4)
+        // D22: as wide as the cards below it (a header is otherwise inset to the row text).
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isHeader)
     }

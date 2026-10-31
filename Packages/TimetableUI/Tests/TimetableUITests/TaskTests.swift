@@ -85,6 +85,10 @@ struct TaskRowModelTests {
         #expect(overdue?.kind == .overdueDays(3) && overdue?.time == nil && overdue?.catalogKey == "tasks.due.overdueDays")
         #expect(make(.dateTime(today, time(8, 5)))?.text(renderer: renderer) == "Today, 8:05")
         #expect(make(.date(date(2026, 10, 14)))?.text(renderer: renderer) == "Tomorrow")
+        // L1 / D15: a far date of this year has no year; next year's keeps it.
+        let thisYear = make(.date(date(2026, 10, 30)))?.text(renderer: renderer) ?? ""
+        #expect(thisYear.contains("30") && !thisYear.contains("2026"))
+        #expect(make(.date(date(2027, 1, 5)))?.text(renderer: renderer).contains("2027") == true)
     }
 
     @Test func absentFieldsAndBadges() {
