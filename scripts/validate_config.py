@@ -596,10 +596,11 @@ check(not any("secrets." in str(v) for v in job_env.values()), "ios.yml: release
       "ios.yml: secrets mapped at job level")
 xcg = json.dumps(wf["jobs"]["ios-xcodegen"])
 check("arm64_32" in xcg and "lipo -archs" in xcg, "ios.yml asserts arm64_32 in the watch binary", "watch arch check missing")
-check("TABULA_PAID_ACCOUNT=1" in xcg and "-showBuildSettings" in xcg,
+check("TABULA_PAID_ACCOUNT=1" in xcg and "-showBuildSettings" in xcg
+      and "SWIFT_ACTIVE_COMPILATION_CONDITIONS TABULA_PAID_ACCOUNT=1" in xcg,
       "ios.yml resolves the paid switch with xcodebuild -showBuildSettings (both states)", "paid switch CI assertion missing")
 ck_step = next((st for st in wf["jobs"]["ios-xcodegen"]["steps"] if "TABULA_CLOUDKIT" in str(st.get("name", ""))), {})
-check("xcodebuild build" in ck_step.get("run", "") and "TABULA_PAID_ACCOUNT=1" in ck_step.get("run", "")
+check("xcodebuild build" in ck_step.get("run", "") and "TABULA_CLOUDKIT_CONDITION=TABULA_CLOUDKIT" in ck_step.get("run", "")
       and "CODE_SIGNING_ALLOWED=NO" in ck_step.get("run", "") and "CloudKit.framework" in ck_step.get("run", ""),
       "ios.yml compiles the TABULA_CLOUDKIT variant unsigned and checks it links CloudKit (Phase 6 S1)",
       "ios.yml: the unsigned TABULA_CLOUDKIT compile step is missing or incomplete")

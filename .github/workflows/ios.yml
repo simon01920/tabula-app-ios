@@ -107,7 +107,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.app == 'true'
     runs-on: xcode-27
-    timeout-minutes: 22   # measured 1 m 07 s (run 37449454629) + the CloudKit compile step (Phase 6 S1)
+    timeout-minutes: 15   # measured 1 m 07 s (run 37449454629); private-repo macOS minutes are billed
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Select Xcode 27
@@ -241,9 +241,9 @@ jobs:
             || { echo "::error::TabulaWatch lacks arm64_32 (Series 7). Check WATCHOS_DEPLOYMENT_TARGET/ARCHS."; exit 1; }
           lipo -archs "$WATCH/PlugIns/TabulaWatchWidgets.appex/TabulaWatchWidgets" | grep -qw arm64_32 \
             || { echo "::error::TabulaWatchWidgets lacks arm64_32 (Series 7)."; exit 1; }
-      - name: Compile the iCloud sync variant (TABULA_PAID_ACCOUNT=1 -> TABULA_CLOUDKIT, unsigned)
-        # Phase 6 S1. Compile check only: no signing, so the paid entitlements are not needed (and the product is not
-        # run). Runs after the bundle checks and reuses their derived data (incremental: only the app target recompiles).
+      - name: Compile the iCloud sync variant (TABULA_CLOUDKIT, unsigned)
+        # Phase 6 S1. Compile check only: the condition is set directly (the paid switch -> condition wiring is asserted
+        # by the -showBuildSettings step above), no signing, no paid entitlements, the product is never run. Runs after the bundle checks and reuses their derived data (incremental: only the app target recompiles).
         timeout-minutes: 8
         run: |
           set -o pipefail
@@ -253,7 +253,7 @@ jobs:
             -configuration Debug \
             -destination 'generic/platform=iOS' \
             -derivedDataPath build/DerivedData \
-            TABULA_PAID_ACCOUNT=1 \
+            TABULA_CLOUDKIT_CONDITION=TABULA_CLOUDKIT \
             CODE_SIGNING_ALLOWED=NO \
             | tee build/xcodebuild-cloudkit.log | xcbeautify --renderer github-actions
           APP="$(find build/DerivedData/Build/Products -maxdepth 2 -name 'TabulaApp.app' -type d | head -1)"
