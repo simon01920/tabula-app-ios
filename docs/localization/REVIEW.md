@@ -292,3 +292,8 @@ uses the "label: N" form in sk, cs, pl, uk and sr to avoid number agreement; "Cu
 2 new keys, model-authored for 11 languages (`sr-Latn` derived), all `needs_review`: `watch.open.title` ("Open Tabula
 on your iPhone", the Apple Watch empty state; titles follow `widget.open.title`: infinitive, "aplikáciu Tabula") and
 `watch.open.noSnapshot` (the line under it before the iPhone has sent the timetable).
+### Phase 6 S1 additions (2026-10-31)
+17 new keys, model-authored for 11 languages (`sr-Latn` derived), all `needs_review`: `settings.icloud.*` (row title, the
+"Not Available" value and footer of builds without iCloud, nine status lines; `settings.icloud.status.synced` takes a
+localized relative time as %@) and `sync.firstSync.*` (alert title, message, buttons Merge / Keep This iPhone / Use
+iCloud; the message names the Merge button by its exact title). "iCloud" and "iPhone" are never translated.

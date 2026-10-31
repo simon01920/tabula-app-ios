@@ -1,4 +1,5 @@
-// Settings root (Phase 4U U5a, R3): one grouped Form in four groups (Timetable, Notifications, General, About & Feedback).
+// Settings root (Phase 4U U5a, R3): one grouped Form in four groups (Timetable, Notifications, General, About & Feedback),
+// plus iCloud (Phase 6 S1, `CloudSyncSettingsSection` in Sync/CloudSyncViews.swift) after General.
 // Every row PUSHES inside this NavigationStack (HIG modality: a sheet is for a self-contained task, not for browsing a
 // hierarchy); the only sheet is the create flow "Add Another Timetable…". Sub-pages: SettingsCalendarView (Date & Time),
 // SettingsColoursView (Colors), SettingsRemindersView, SettingsLiveActivitiesView, SettingsAboutView. The timetable
