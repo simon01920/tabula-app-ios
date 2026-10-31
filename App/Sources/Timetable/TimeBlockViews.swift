@@ -2,8 +2,8 @@
 // (route `timetable.week`) and the single-day view (route `timetable.day`). Overlapping lessons share the column in
 // lanes. Durations stay exact (block height = duration; short blocks only widen their hit area to 44 pt).
 // Phase 4U U4:
-// - now line (Opus M11, Astra F19): drawn ABOVE the blocks (zIndex), full column width, a 2 pt correction-red line on
-//   a 4 pt backplate in the page background colour, so it stays visible on red, blue, grey, light and dark subjects;
+// - now line (Opus M11, Astra F19, verification D3): a 2 pt correction-red line on a 4 pt backplate across today's
+//   column, drawn BEHIND the blocks so it never strikes through a card's text; a dot at the column edge stays above;
 //   a "10:20" label (correction capsule, white / black text ≥ 4.5:1) sits in the gutter and hides the hour label it
 //   would cover (`NowLinePresentation.hiddenHourMarks`). Moved once a minute by the parent's TimelineView, never
 //   animated (Reduce Motion needs nothing); frozen at `-TabulaNow` in screenshot mode;
@@ -171,15 +171,18 @@ struct TimeBlockCanvas: View {
                 .accessibilitySortPriority(-Double(block.column * 10_000 + block.entry.startTime.minuteOfDay))
             }
 
-            // Above the blocks (Opus M11): full column width, backplate + correction line, time label in the gutter.
+            // The line runs behind the blocks so it never strikes through a card's text (verification D3); the time
+            // label and a dot at the column edge sit above them, so the time stays visible on a card too.
             if let marker {
-                NowLine(time: LocalTime(minuteOfDay: nowMinute).map(model.formatter.time) ?? "",
-                        gutterWidth: gutterWidth, lineX: gutterWidth + CGFloat(marker.column) * columnWidth,
-                        lineWidth: columnWidth, labelHeight: nowLabelHeight)
-                    .offset(y: CGFloat(marker.position) * height - nowLabelHeight / 2)
-                    .zIndex(1)
-                    .allowsHitTesting(false)
-                    .accessibilityHidden(true)   // the current block's value says "in progress"
+                ForEach([NowLine.Layer.line, .marker], id: \.self) { layer in
+                    NowLine(layer: layer, time: LocalTime(minuteOfDay: nowMinute).map(model.formatter.time) ?? "",
+                            gutterWidth: gutterWidth, lineX: gutterWidth + CGFloat(marker.column) * columnWidth,
+                            lineWidth: columnWidth, labelHeight: nowLabelHeight)
+                        .offset(y: CGFloat(marker.position) * height - nowLabelHeight / 2)
+                        .zIndex(layer == .line ? -1 : 1)
+                        .allowsHitTesting(false)
+                        .accessibilityHidden(true)   // the current block's value says "in progress"
+                }
             }
         }
         .frame(width: width, height: height, alignment: .topLeading)
@@ -201,41 +204,59 @@ struct TimeBlockCanvas: View {
 /// today's column (week view), then the correction line on a backplate in the page background colour across today's
 /// column (`lineX` … `lineX + lineWidth`).
 private struct NowLine: View {
+    /// `.line` is drawn behind the blocks, `.marker` (dot + time label) above them.
+    enum Layer: Hashable { case line, marker }
+    let layer: Layer
     let time: String
     let gutterWidth: CGFloat
     let lineX: CGFloat
     let lineWidth: CGFloat
     let labelHeight: CGFloat
+    @ScaledMetric(relativeTo: .caption2) private var dot: CGFloat = 9
 
     var body: some View {
         ZStack(alignment: .leading) {
-            if lineX > gutterWidth {
+            switch layer {
+            case .line:
+                if lineX > gutterWidth {
+                    Rectangle()
+                        .fill(Color.correction.opacity(0.5))
+                        .frame(width: lineX - gutterWidth, height: 1)
+                        .offset(x: gutterWidth)
+                }
+                // Backplate: contrasting halo around the line where it crosses a free slot (Astra F19).
                 Rectangle()
-                    .fill(Color.correction.opacity(0.5))
-                    .frame(width: lineX - gutterWidth, height: 1)
-                    .offset(x: gutterWidth)
+                    .fill(Color(.systemBackground))
+                    .frame(width: lineWidth, height: 4)
+                    .offset(x: lineX)
+                Rectangle()
+                    .fill(Color.correction)
+                    .frame(width: lineWidth, height: 2)
+                    .offset(x: lineX)
+            case .marker:
+                // A dot at today's column edge: only the card's padding lies under it, never its text.
+                Circle()
+                    .fill(Color.correction)
+                    .overlay(Circle().strokeBorder(Color(.systemBackground), lineWidth: 1.5))
+                    .frame(width: dot, height: dot)
+                    .offset(x: lineX - dot / 2)
+                label
             }
-            // Backplate: contrasting halo around the line on any subject colour (Astra F19).
-            Rectangle()
-                .fill(Color(.systemBackground))
-                .frame(width: lineWidth, height: 4)
-                .offset(x: lineX)
-            Rectangle()
-                .fill(Color.correction)
-                .frame(width: lineWidth, height: 2)
-                .offset(x: lineX)
-            Text(verbatim: time)
-                .font(.caption2.weight(.bold))
-                .monospacedDigit()
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-                .foregroundStyle(Color.onCorrection)
-                .padding(.horizontal, 4)
-                .frame(maxWidth: gutterWidth - 2, minHeight: labelHeight)
-                .background(Capsule().fill(Color.correction))
-                .fixedSize(horizontal: false, vertical: true)
         }
         .frame(height: labelHeight)
+    }
+
+    private var label: some View {
+        Text(verbatim: time)
+            .font(.caption2.weight(.bold))
+            .monospacedDigit()
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
+            .foregroundStyle(Color.onCorrection)
+            .padding(.horizontal, 4)
+            .frame(maxWidth: gutterWidth - 2, minHeight: labelHeight)
+            .background(Capsule().fill(Color.correction))
+            .fixedSize(horizontal: false, vertical: true)
     }
 }
 

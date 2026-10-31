@@ -26,7 +26,7 @@ extension SampleScenarios {
         let classTeacher = "Mgr. Novotná"
         let seeds: [Seed] = [
             Seed(short: "SJL", name: "Slovenský jazyk", emoji: "📖", room: "3.A", teacher: classTeacher),
-            Seed(short: "MAT", name: "Matematika", emoji: "➗", room: "3.A", teacher: classTeacher),
+            Seed(short: "MAT", name: "Matematika", emoji: "📐", room: "3.A", teacher: classTeacher),
             Seed(short: "ANJ", name: "Anglický jazyk", emoji: "🗣️", room: "Jazyková učebňa", teacher: "Mgr. Hanková"),
             Seed(short: "PDA", name: "Prírodoveda", emoji: "🌱", room: "3.A", teacher: classTeacher),
             Seed(short: "VLA", name: "Vlastiveda", emoji: "🗺️", room: "3.A", teacher: classTeacher),

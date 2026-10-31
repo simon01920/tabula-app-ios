@@ -84,6 +84,11 @@ struct LessonTileStyleTests {
                 let style = LessonTileStyle(color: colour.value)
                 #expect(style.textContrast >= 4.5, "\(colour.nameKey)")
                 #expect(style.foreground == .black || style.foreground == .white)
+                // D4: a past (dimmed) tile keeps legible text in both appearances.
+                for isDark in [false, true] {
+                    let past = style.past(isDark: isDark)
+                    #expect(past.textContrast >= 4.5, "\(colour.nameKey) past dark=\(isDark)")
+                }
             }
         }
     }

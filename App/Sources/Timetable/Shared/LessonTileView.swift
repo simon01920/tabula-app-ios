@@ -3,7 +3,8 @@
 // `LessonTileStyle.foreground` (WCAG black/white), the status is an icon + text badge, and VoiceOver reads the single
 // `LessonAccessibilityLabel` sentence (which ends with the task / exam badges of `\.lessonWork`, Phase 3 C1).
 // Phase 4U U4 (Opus M13, Astra F03 / F21):
-// - past lessons are dimmed (opacity 0.6) and carry no checkmark (children read it as "homework done");
+// - past lessons get a faded fill (`LessonTileStyle.past`, text re-chosen for ≥ 4.5:1; D4) and no checkmark (children
+//   read it as "homework done");
 // - the current lesson gets the highlighter outline and a "NOW" tag (words, not a black ring);
 // - at accessibility text sizes the subject name gets a full-width row (symbol and period number above it), time and
 //   fields beneath, badges on the following lines, so "Matematika" no longer breaks inside the word.
@@ -41,7 +42,9 @@ struct LessonTileView: View {
     @ScaledMetric(relativeTo: .body) private var padding: CGFloat = 14
 
     var body: some View {
-        let style = LessonTileStyle(color: lesson.subject.color)
+        // Past lessons step back (Opus M13: a faded fill, no checkmark); the text keeps its contrast (D4).
+        let base = LessonTileStyle(color: lesson.subject.color)
+        let style = timing == .past ? base.past(isDark: colorScheme == .dark) : base
         let badges = work.badges(for: lesson.id)
         let foreground = Color(style.foreground)
         let isCancelled = lesson.status == .cancelled
@@ -105,8 +108,6 @@ struct LessonTileView: View {
                 RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(Color.secondary.opacity(0.6), lineWidth: 1)
             }
         }
-        // Past lessons step back (Opus M13: dimmed, no checkmark); the current one has the strongest hierarchy (F21).
-        .opacity(timing == .past ? 0.6 : 1)
         .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(verbatim: LessonAccessibilityLabel.make(lesson: lesson, visibility: visibility,

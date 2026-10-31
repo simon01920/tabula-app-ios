@@ -298,6 +298,8 @@ struct GridCellView: View {
     var isCurrent = false
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.colorSchemeContrast) private var contrast
+    /// The height of `CellBadgeView` (a 10 pt caption2 symbol plus its capsule padding).
+    @ScaledMetric(relativeTo: .caption2) private var badgeRow: CGFloat = 19
 
     private let cornerRadius: CGFloat = 8
 
@@ -314,7 +316,9 @@ struct GridCellView: View {
         }
         .foregroundStyle(foreground)
         .padding(.horizontal, 2)
-        .padding(.vertical, 3)
+        .padding(.top, 3)
+        // The badge's row is reserved below the text, so it never covers the room (H5 "room always", D6).
+        .padding(.bottom, badge == nil ? 3 : badgeRow)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous).fill(Color(style.background)))
         .overlay {
