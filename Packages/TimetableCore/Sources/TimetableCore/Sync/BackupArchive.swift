@@ -163,6 +163,7 @@ public enum BackupRestore {
             var result = current
             var settings = backup.settings
             settings.id = current.settings.id
+            settings.syncEnabled = current.settings.syncEnabled  // a device choice: a restore must not switch sync
             result.settings = try MutationStamper.stamp(old: current.settings, new: settings, clock: &clock, now: now)
             result.timetables = try replace(current.timetables, with: backup.timetables, clock: &clock, now: now)
             result.subjects = try replace(current.subjects, with: backup.subjects, clock: &clock, now: now)

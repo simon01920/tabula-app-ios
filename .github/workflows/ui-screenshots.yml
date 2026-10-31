@@ -30,7 +30,7 @@ on:
       screens:
         description: "Space-separated entries id[@seed[@lang]] — id = -TabulaScreen route, seed = -TabulaSeed (empty|blank|elementary|secondary|university), lang = -AppleLanguages code (e.g. sk, de)"
         type: string
-        default: "today@secondary today.after-school@secondary timetable.grid@secondary timetable.week@university timetable.tiles@elementary tasks@secondary tasks.quick-add@secondary exams@secondary settings@secondary settings.reminders@secondary onboarding@empty widgets.gallery@secondary widgets.gallery-live@secondary today@secondary@sk"
+        default: "today@secondary today.after-school@secondary timetable.grid@secondary timetable.week@university timetable.tiles@elementary tasks@secondary tasks.quick-add@secondary exams@secondary settings@secondary settings.reminders@secondary settings.backup@secondary onboarding@empty widgets.gallery@secondary widgets.gallery-live@secondary today@secondary@sk"
       device:
         description: "Simulator device type name, e.g. 'iPhone 17 Pro Max' (empty = largest available Pro Max)"
         type: string
@@ -52,7 +52,7 @@ env:
   XCODEGEN_VERSION: "2.46.0"
   XCODEGEN_SHA256: 4d9e34b62172d645eed6457cac13fc222569974098ef4ee9c3368bedf0196806
   # Core set only (fits the 45-min job); full list for UX reviews: scripts/ui-screens-full.txt, dispatch in batches.
-  SCREENS: ${{ inputs.screens || 'today@secondary today.after-school@secondary timetable.grid@secondary timetable.week@university timetable.tiles@elementary tasks@secondary tasks.quick-add@secondary exams@secondary settings@secondary settings.reminders@secondary onboarding@empty widgets.gallery@secondary widgets.gallery-live@secondary today@secondary@sk' }}
+  SCREENS: ${{ inputs.screens || 'today@secondary today.after-school@secondary timetable.grid@secondary timetable.week@university timetable.tiles@elementary tasks@secondary tasks.quick-add@secondary exams@secondary settings@secondary settings.reminders@secondary settings.backup@secondary onboarding@empty widgets.gallery@secondary widgets.gallery-live@secondary today@secondary@sk' }}
   DEVICE_OVERRIDE: ${{ inputs.device || '' }}
   OUT: screenshots
 

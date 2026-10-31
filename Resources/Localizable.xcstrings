@@ -85807,6 +85807,2022 @@
         }
       }
     },
+    "settings.backup.automatic.footer" : {
+      "comment" : "Footer of the Automatic copies section. 'Restore from Backup…' is the button name (settings.backup.restore).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula sem uloží kopii vašich dat dřív, než je obnova nahradí. Klepnutím kopii sdílíte nebo uložíte do Souborů; chcete-li se k ní vrátit, použijte Obnovit ze zálohy…."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula sichert hier eine Kopie deiner Daten, bevor eine Wiederherstellung sie ersetzt. Tippe auf eine Kopie, um sie zu teilen oder in „Dateien“ zu sichern; um zu ihr zurückzukehren, nutze „Aus Backup wiederherstellen …“."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabula saves a copy of your data here before a restore replaces it. Tap a copy to share it or save it to Files; to go back to it, use Restore from Backup…."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula enregistre ici une copie de vos données avant qu’une restauration ne les remplace. Touchez une copie pour la partager ou l’enregistrer dans Fichiers ; pour y revenir, utilisez Restaurer une sauvegarde…."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A Tabula ide ment egy másolatot az adataidról, mielőtt egy visszaállítás lecserélné őket. Koppints egy másolatra a megosztáshoz vagy a Fájlokba mentéshez; ha vissza szeretnél térni hozzá, használd a Visszaállítás mentésből… gombot."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "復元でデータが置き換えられる前に、Tabulaはここにデータのコピーを保存します。コピーをタップすると共有したり“ファイル”に保存したりできます。元に戻すには「バックアップから復元…」を使ってください。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula zapisuje tu kopię Twoich danych, zanim przywracanie je zastąpi. Stuknij kopię, aby ją udostępnić lub zapisać w Plikach; aby do niej wrócić, użyj opcji Przywróć z kopii zapasowej…."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula salvează aici o copie a datelor tale înainte ca o restaurare să le înlocuiască. Atinge o copie pentru a o partaja sau a o salva în Fișiere; pentru a reveni la ea, folosește Restaurează din backup…."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula sem uloží kópiu vašich údajov predtým, ako ich obnova nahradí. Klepnutím kópiu zdieľate alebo uložíte do Súborov; ak sa k nej chcete vrátiť, použite Obnoviť zo zálohy…."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula овде чува копију ваших података пре него што их враћање замени. Додирните копију да бисте је поделили или сачували у Датотекама; да бисте јој се вратили, користите Врати из резервне копије…."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula ovde čuva kopiju vaših podataka pre nego što ih vraćanje zameni. Dodirnite kopiju da biste je podelili ili sačuvali u Datotekama; da biste joj se vratili, koristite Vrati iz rezervne kopije…."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula зберігає тут копію ваших даних, перш ніж відновлення їх замінить. Торкніться копії, щоб поділитися нею або зберегти її у Файлах; щоб повернутися до неї, скористайтеся «Відновити з резервної копії…»."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "在恢复替换你的数据之前，Tabula 会在此保存一份数据副本。轻点副本可共享或存储到“文件”；如需恢复到该副本，请使用“从备份恢复…”。"
+          }
+        }
+      }
+    },
+    "settings.backup.automatic.header" : {
+      "comment" : "Section header (Settings › Backup): copies the app saved by itself before replacing data. Must match the name used in settings.backup.replace.message and settings.backup.done.replaced.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Automatické kopie"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Automatische Kopien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatic copies"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Copies automatiques"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Automatikus másolatok"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "自動コピー"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kopie automatyczne"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Copii automate"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Automatické kópie"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Аутоматске копије"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Automatske kopije"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Автоматичні копії"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "自动副本"
+          }
+        }
+      }
+    },
+    "settings.backup.done.merged" : {
+      "comment" : "Alert message after a successful Merge restore.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Záloha byla sloučena s daty v tomto iPhonu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Das Backup wurde mit den Daten auf diesem iPhone zusammengeführt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The backup was merged with the data on this iPhone."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "La sauvegarde a été fusionnée avec les données de cet iPhone."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A mentés egyesítve lett az iPhone-on lévő adatokkal."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "バックアップをこのiPhoneのデータと結合しました。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kopia zapasowa została scalona z danymi na tym iPhonie."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Backupul a fost combinat cu datele de pe acest iPhone."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Záloha sa zlúčila s údajmi v tomto iPhone."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Резервна копија је спојена са подацима на овом iPhone-у."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Rezervna kopija je spojena sa podacima na ovom iPhone-u."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Резервну копію об’єднано з даними на цьому iPhone."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "备份已与此 iPhone 上的数据合并。"
+          }
+        }
+      }
+    },
+    "settings.backup.done.replaced" : {
+      "comment" : "Alert message after a successful Replace restore. 'Automatic copies' = settings.backup.automatic.header.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tento iPhone má teď data ze zálohy. Kopie vašich předchozích dat je v Automatických kopiích."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dieses iPhone hat jetzt die Daten aus dem Backup. Eine Kopie deiner vorherigen Daten findest du unter „Automatische Kopien“."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This iPhone now has the data from the backup. A copy of your previous data is in Automatic copies."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Cet iPhone contient maintenant les données de la sauvegarde. Une copie de vos données précédentes se trouve dans Copies automatiques."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Az iPhone-on most a mentés adatai vannak. A korábbi adataid másolata az Automatikus másolatok között található."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このiPhoneのデータはバックアップの内容になりました。以前のデータのコピーは「自動コピー」にあります。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ten iPhone ma teraz dane z kopii zapasowej. Kopia poprzednich danych jest w sekcji Kopie automatyczne."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Acest iPhone are acum datele din backup. O copie a datelor anterioare se află în Copii automate."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tento iPhone má teraz údaje zo zálohy. Kópia vašich predchádzajúcich údajov je v Automatických kópiách."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Овај iPhone сада има податке из резервне копије. Копија ваших претходних података налази се у Аутоматским копијама."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ovaj iPhone sada ima podatke iz rezervne kopije. Kopija vaših prethodnih podataka nalazi se u Automatskim kopijama."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Тепер на цьому iPhone дані з резервної копії. Копія ваших попередніх даних — в «Автоматичних копіях»."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "此 iPhone 现在使用备份中的数据。之前数据的副本位于“自动副本”中。"
+          }
+        }
+      }
+    },
+    "settings.backup.done.title" : {
+      "comment" : "Alert title after a successful restore.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Záloha obnovena"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Backup wiederhergestellt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup Restored"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sauvegarde restaurée"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Mentés visszaállítva"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "バックアップを復元しました"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Przywrócono kopię zapasową"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Backup restaurat"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Záloha obnovená"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Резервна копија враћена"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Rezervna kopija vraćena"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Резервну копію відновлено"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "已恢复备份"
+          }
+        }
+      }
+    },
+    "settings.backup.error.apply" : {
+      "comment" : "Restore error: the backup was read but could not be applied (invalid data).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula nemohla tuto zálohu použít. Nic se nezměnilo."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula konnte dieses Backup nicht anwenden. Es wurde nichts geändert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabula couldn't apply this backup. Nothing was changed."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula n’a pas pu appliquer cette sauvegarde. Rien n’a été modifié."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A Tabula nem tudta alkalmazni ezt a mentést. Semmi sem változott."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabulaはこのバックアップを適用できませんでした。何も変更されていません。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula nie mogła zastosować tej kopii zapasowej. Nic nie zostało zmienione."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula nu a putut aplica acest backup. Nu s-a modificat nimic."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula nemohla použiť túto zálohu. Nič sa nezmenilo."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula није могла да примени ову резервну копију. Ништа није промењено."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula nije mogla da primeni ovu rezervnu kopiju. Ništa nije promenjeno."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula не вдалося застосувати цю резервну копію. Нічого не змінено."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula 无法应用此备份。未做任何更改。"
+          }
+        }
+      }
+    },
+    "settings.backup.error.copyFailed" : {
+      "comment" : "Replace error: the automatic safety copy could not be written, so the replace was cancelled.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula nemohla uložit kopii vašich aktuálních dat, proto se nic nenahradilo. Uvolněte místo v úložišti a zkuste to znovu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula konnte keine Kopie deiner aktuellen Daten sichern, daher wurde nichts ersetzt. Gib Speicherplatz frei und versuch es erneut."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabula couldn't save a copy of your current data, so nothing was replaced. Free up some storage, then try again."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula n’a pas pu enregistrer une copie de vos données actuelles, donc rien n’a été remplacé. Libérez de l’espace, puis réessayez."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A Tabula nem tudott másolatot menteni a jelenlegi adataidról, ezért semmi sem lett lecserélve. Szabadíts fel tárhelyet, majd próbáld újra."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabulaは現在のデータのコピーを保存できなかったため、何も置き換えませんでした。空き容量を増やしてから、もう一度お試しください。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula nie mogła zapisać kopii Twoich bieżących danych, więc nic nie zostało zastąpione. Zwolnij miejsce i spróbuj ponownie."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula nu a putut salva o copie a datelor actuale, așa că nu s-a înlocuit nimic. Eliberează spațiu de stocare, apoi încearcă din nou."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula nemohla uložiť kópiu vašich aktuálnych údajov, preto sa nič nenahradilo. Uvoľnite miesto v úložisku a skúste to znova."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula није могла да сачува копију ваших тренутних података, па ништа није замењено. Ослободите простор, па покушајте поново."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula nije mogla da sačuva kopiju vaših trenutnih podataka, pa ništa nije zamenjeno. Oslobodite prostor, pa pokušajte ponovo."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula не вдалося зберегти копію ваших поточних даних, тому нічого не замінено. Звільніть місце й спробуйте ще раз."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabula 无法保存当前数据的副本，因此未替换任何内容。请释放储存空间，然后重试。"
+          }
+        }
+      }
+    },
+    "settings.backup.error.damaged" : {
+      "comment" : "Restore error: the backup file is incomplete or corrupted.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tato záloha je poškozená a nelze ji použít. Nic se nezměnilo."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dieses Backup ist beschädigt und kann nicht verwendet werden. Es wurde nichts geändert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This backup is damaged and can't be used. Nothing was changed."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Cette sauvegarde est endommagée et inutilisable. Rien n’a été modifié."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ez a mentés sérült, és nem használható. Semmi sem változott."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このバックアップは破損しているため使用できません。何も変更されていません。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ta kopia zapasowa jest uszkodzona i nie można jej użyć. Nic nie zostało zmienione."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Acest backup este deteriorat și nu poate fi folosit. Nu s-a modificat nimic."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Táto záloha je poškodená a nedá sa použiť. Nič sa nezmenilo."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ова резервна копија је оштећена и не може да се користи. Ништа није промењено."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ova rezervna kopija je oštećena i ne može da se koristi. Ništa nije promenjeno."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ця резервна копія пошкоджена, і її не можна використати. Нічого не змінено."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "此备份已损坏，无法使用。未做任何更改。"
+          }
+        }
+      }
+    },
+    "settings.backup.error.newer" : {
+      "comment" : "Restore error: the backup comes from a newer app version.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tato záloha pochází z novější verze aplikace Tabula. Aktualizujte aplikaci a zkuste to znovu. Nic se nezměnilo."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dieses Backup stammt aus einer neueren Version von Tabula. Aktualisiere die App und versuch es erneut. Es wurde nichts geändert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This backup was made by a newer version of Tabula. Update the app, then try again. Nothing was changed."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Cette sauvegarde provient d’une version plus récente de Tabula. Mettez l’app à jour, puis réessayez. Rien n’a été modifié."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ez a mentés a Tabula egy újabb verziójával készült. Frissítsd az appot, majd próbáld újra. Semmi sem változott."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このバックアップは新しいバージョンのTabulaで作成されました。Appをアップデートしてから、もう一度お試しください。何も変更されていません。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ta kopia zapasowa pochodzi z nowszej wersji Tabula. Zaktualizuj aplikację i spróbuj ponownie. Nic nie zostało zmienione."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Acest backup a fost făcut cu o versiune mai nouă de Tabula. Actualizează aplicația, apoi încearcă din nou. Nu s-a modificat nimic."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Táto záloha pochádza z novšej verzie aplikácie Tabula. Aktualizujte aplikáciu a skúste to znova. Nič sa nezmenilo."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ова резервна копија је направљена новијом верзијом апликације Tabula. Ажурирајте апликацију, па покушајте поново. Ништа није промењено."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ova rezervna kopija je napravljena novijom verzijom aplikacije Tabula. Ažurirajte aplikaciju, pa pokušajte ponovo. Ništa nije promenjeno."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Цю резервну копію створено новішою версією Tabula. Оновіть застосунок і спробуйте ще раз. Нічого не змінено."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "此备份由较新版本的 Tabula 创建。请更新 App，然后重试。未做任何更改。"
+          }
+        }
+      }
+    },
+    "settings.backup.error.notBackup" : {
+      "comment" : "Restore error: the chosen file is not a backup of this app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tento soubor není záloha aplikace Tabula. Nic se nezměnilo."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Diese Datei ist kein Tabula-Backup. Es wurde nichts geändert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This file isn't a Tabula backup. Nothing was changed."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ce fichier n’est pas une sauvegarde Tabula. Rien n’a été modifié."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ez a fájl nem Tabula-mentés. Semmi sem változott."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このファイルはTabulaのバックアップではありません。何も変更されていません。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ten plik nie jest kopią zapasową Tabula. Nic nie zostało zmienione."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Acest fișier nu este un backup Tabula. Nu s-a modificat nimic."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tento súbor nie je záloha aplikácie Tabula. Nič sa nezmenilo."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ова датотека није Tabula резервна копија. Ништа није промењено."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ova datoteka nije Tabula rezervna kopija. Ništa nije promenjeno."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Цей файл не є резервною копією Tabula. Нічого не змінено."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "此文件不是 Tabula 备份。未做任何更改。"
+          }
+        }
+      }
+    },
+    "settings.backup.error.title" : {
+      "comment" : "Alert title when a backup cannot be restored.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zálohu nelze obnovit"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Backup kann nicht wiederhergestellt werden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Can't Restore Backup"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Impossible de restaurer la sauvegarde"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A mentés nem állítható vissza"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "バックアップを復元できません"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nie można przywrócić kopii"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Backupul nu poate fi restaurat"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zálohu nemožno obnoviť"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Није могуће вратити резервну копију"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nije moguće vratiti rezervnu kopiju"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Не вдається відновити резервну копію"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "无法恢复备份"
+          }
+        }
+      }
+    },
+    "settings.backup.error.unreadable" : {
+      "comment" : "Restore error: the chosen file cannot be read (e.g. not downloaded from iCloud Drive).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Soubor se nepodařilo otevřít. Zkontrolujte, že je stažený, a zkuste to znovu. Nic se nezměnilo."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Die Datei konnte nicht geöffnet werden. Stelle sicher, dass sie geladen ist, und versuch es erneut. Es wurde nichts geändert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The file couldn't be opened. Make sure it's downloaded, then try again. Nothing was changed."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Le fichier n’a pas pu être ouvert. Vérifiez qu’il est téléchargé, puis réessayez. Rien n’a été modifié."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A fájlt nem sikerült megnyitni. Ellenőrizd, hogy le van-e töltve, majd próbáld újra. Semmi sem változott."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ファイルを開けませんでした。ダウンロード済みか確認してから、もう一度お試しください。何も変更されていません。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nie udało się otworzyć pliku. Upewnij się, że jest pobrany, i spróbuj ponownie. Nic nie zostało zmienione."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fișierul nu a putut fi deschis. Asigură-te că este descărcat, apoi încearcă din nou. Nu s-a modificat nimic."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Súbor sa nepodarilo otvoriť. Skontrolujte, či je stiahnutý, a skúste to znova. Nič sa nezmenilo."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Датотека није могла да се отвори. Проверите да ли је преузета, па покушајте поново. Ништа није промењено."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Datoteka nije mogla da se otvori. Proverite da li je preuzeta, pa pokušajte ponovo. Ništa nije promenjeno."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Не вдалося відкрити файл. Переконайтеся, що його завантажено, і спробуйте ще раз. Нічого не змінено."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "无法打开该文件。请确认文件已下载，然后重试。未做任何更改。"
+          }
+        }
+      }
+    },
+    "settings.backup.export" : {
+      "comment" : "Button (Settings › Backup): opens the share sheet with a backup file of all app data.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exportovat zálohu"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Backup exportieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export Backup"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exporter une sauvegarde"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Mentés exportálása"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "バックアップを書き出す"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Eksportuj kopię zapasową"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exportă backupul"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exportovať zálohu"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Извези резервну копију"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Izvezi rezervnu kopiju"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Експортувати резервну копію"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "导出备份"
+          }
+        }
+      }
+    },
+    "settings.backup.export.failed" : {
+      "comment" : "Footer (Settings › Backup) when writing the export file failed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Soubor zálohy se nepodařilo připravit. Vraťte se zpět a otevřete tuto stránku znovu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Die Backup-Datei konnte nicht vorbereitet werden. Geh zurück und öffne diese Seite erneut."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The backup file couldn't be prepared. Go back and open this page again."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Le fichier de sauvegarde n’a pas pu être préparé. Revenez en arrière et rouvrez cette page."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A mentésfájlt nem sikerült előkészíteni. Lépj vissza, és nyisd meg újra ezt az oldalt."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "バックアップファイルを準備できませんでした。前の画面に戻ってから、このページをもう一度開いてください。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nie udało się przygotować pliku kopii zapasowej. Wróć i otwórz tę stronę ponownie."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fișierul de backup nu a putut fi pregătit. Revino și deschide din nou această pagină."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Súbor zálohy sa nepodarilo pripraviť. Vráťte sa späť a otvorte túto stránku znova."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Датотека резервне копије није могла да се припреми. Вратите се назад и поново отворите ову страницу."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Datoteka rezervne kopije nije mogla da se pripremi. Vratite se nazad i ponovo otvorite ovu stranicu."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Не вдалося підготувати файл резервної копії. Поверніться назад і знову відкрийте цю сторінку."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "无法准备备份文件。请返回并重新打开此页面。"
+          }
+        }
+      }
+    },
+    "settings.backup.footer" : {
+      "comment" : "Footer under Export Backup / Restore from Backup….",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Záloha obsahuje vaše rozvrhy, předměty, hodiny, úkoly, písemky, připomínky a nastavení. Připojené soubory (fotky, dokumenty, hlasové poznámky) v ní nejsou."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ein Backup enthält deine Stundenpläne, Fächer, Stunden, Aufgaben, Prüfungen, Erinnerungen und Einstellungen. Angehängte Dateien (Fotos, Dokumente, Sprachnotizen) sind nicht enthalten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A backup contains your timetables, subjects, lessons, tasks, exams, reminders and settings. Attachment files (photos, documents, voice notes) are not included."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Une sauvegarde contient vos emplois du temps, matières, cours, devoirs, examens, rappels et réglages. Les pièces jointes (photos, documents, mémos vocaux) ne sont pas incluses."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A mentés tartalmazza az órarendjeidet, tantárgyaidat, óráidat, feladataidat, vizsgáidat, emlékeztetőidet és beállításaidat. A csatolt fájlok (fotók, dokumentumok, hangjegyzetek) nincsenek benne."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "バックアップには、時間割、科目、授業、課題、試験、リマインダー、設定が含まれます。添付ファイル（写真、書類、ボイスメモ）は含まれません。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kopia zapasowa zawiera Twoje plany lekcji, przedmioty, lekcje, zadania, sprawdziany, przypomnienia i ustawienia. Załączone pliki (zdjęcia, dokumenty, notatki głosowe) nie są w niej uwzględnione."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Un backup conține orarele, materiile, orele, temele, examenele, mementourile și setările tale. Fișierele atașate (poze, documente, note vocale) nu sunt incluse."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Záloha obsahuje vaše rozvrhy, predmety, hodiny, úlohy, písomky, pripomienky a nastavenia. Priložené súbory (fotky, dokumenty, hlasové poznámky) v nej nie sú."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Резервна копија садржи ваше распореде, предмете, часове, задатке, испите, подсетнике и подешавања. Приложене датотеке (фотографије, документи, гласовне белешке) нису укључене."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Rezervna kopija sadrži vaše rasporede, predmete, časove, zadatke, ispite, podsetnike i podešavanja. Priložene datoteke (fotografije, dokumenti, glasovne beleške) nisu uključene."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Резервна копія містить ваші розклади, предмети, уроки, завдання, іспити, нагадування й параметри. Вкладені файли (фото, документи, голосові нотатки) не включено."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "备份包含你的课表、科目、课程、作业、考试、提醒和设置。不包含附件文件（照片、文稿、语音备忘录）。"
+          }
+        }
+      }
+    },
+    "settings.backup.mode.merge" : {
+      "comment" : "Button in the restore dialog: combine the backup with the current data (default, safe).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sloučit"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zusammenführen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merge"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fusionner"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Egyesítés"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "結合"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Scal"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Combină"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zlúčiť"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Споји"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Spoji"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Об’єднати"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "合并"
+          }
+        }
+      }
+    },
+    "settings.backup.mode.message" : {
+      "comment" : "Message of the restore dialog. %@ = date and time the backup was made. 'Merge' and 'Replace' are the two buttons.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Záloha z %@. Sloučit spojí zálohu s daty v tomto iPhonu; pokud se stejná položka změnila na obou místech, vyhraje novější změna. Nahradit sladí tento iPhone se zálohou."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Backup vom %@. „Zusammenführen“ kombiniert das Backup mit den Daten auf diesem iPhone; wurde dasselbe Element an beiden Stellen geändert, gilt die neuere Änderung. „Ersetzen“ gleicht dieses iPhone an das Backup an."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup from %@. Merge combines the backup with the data on this iPhone; where both changed the same item, the newer change wins. Replace makes this iPhone match the backup."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sauvegarde du %@. Fusionner combine la sauvegarde avec les données de cet iPhone ; si un même élément a changé des deux côtés, la modification la plus récente l’emporte. Remplacer aligne cet iPhone sur la sauvegarde."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Mentés ekkor: %@. Az Egyesítés összevonja a mentést az iPhone-on lévő adatokkal; ha ugyanaz az elem mindkét helyen változott, az újabb módosítás érvényes. A Csere az iPhone-t a mentéssel teszi azonossá."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@のバックアップです。「結合」はバックアップとこのiPhoneのデータを組み合わせます。同じ項目が両方で変更されている場合は、新しい変更が優先されます。「置き換え」はこのiPhoneをバックアップと同じ状態にします。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kopia z %@. Scal łączy kopię z danymi na tym iPhonie; jeśli ten sam element zmieniono w obu miejscach, wygrywa nowsza zmiana. Zastąp sprawia, że ten iPhone będzie zgodny z kopią."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Backup din %@. Combină unește backupul cu datele de pe acest iPhone; dacă același element s-a schimbat în ambele locuri, câștigă modificarea mai nouă. Înlocuiește face ca acest iPhone să corespundă backupului."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Záloha z %@. Zlúčiť spojí zálohu s údajmi v tomto iPhone; ak sa tá istá položka zmenila na oboch miestach, vyhrá novšia zmena. Nahradiť zosúladí tento iPhone so zálohou."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Резервна копија од %@. Споји комбинује резервну копију са подацима на овом iPhone-у; ако је иста ставка промењена на оба места, важи новија промена. Замени усклађује овај iPhone са резервном копијом."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Rezervna kopija od %@. Spoji kombinuje rezervnu kopiju sa podacima na ovom iPhone-u; ako je ista stavka promenjena na oba mesta, važi novija promena. Zameni usklađuje ovaj iPhone sa rezervnom kopijom."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Резервна копія від %@. «Об’єднати» поєднує резервну копію з даними на цьому iPhone; якщо той самий елемент змінено в обох місцях, перемагає новіша зміна. «Замінити» робить цей iPhone таким, як резервна копія."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ 的备份。“合并”会将备份与此 iPhone 上的数据合并；如果同一项目在两处都有更改，以较新的更改为准。“替换”会使此 iPhone 与备份完全一致。"
+          }
+        }
+      }
+    },
+    "settings.backup.mode.replace" : {
+      "comment" : "Destructive button in the restore dialog: replace all current data with the backup (asks again). Keep the ellipsis.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nahradit…"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ersetzen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Remplacer…"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Csere…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "置き換え…"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zastąp…"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Înlocuiește…"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nahradiť…"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Замени…"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zameni…"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Замінити…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "替换…"
+          }
+        }
+      }
+    },
+    "settings.backup.mode.title" : {
+      "comment" : "Title of the dialog that asks how to restore a chosen backup file.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Obnovit zálohu"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Backup wiederherstellen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore Backup"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Restaurer la sauvegarde"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Mentés visszaállítása"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "バックアップを復元"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Przywróć kopię zapasową"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Restaurează backupul"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Obnoviť zálohu"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Врати резервну копију"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vrati rezervnu kopiju"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Відновити резервну копію"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "恢复备份"
+          }
+        }
+      }
+    },
+    "settings.backup.replace.confirm" : {
+      "comment" : "Destructive confirm button: replace all data with the backup.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nahradit"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ersetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Remplacer"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Csere"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "置き換える"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zastąp"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Înlocuiește"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nahradiť"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Замени"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zameni"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Замінити"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "替换"
+          }
+        }
+      }
+    },
+    "settings.backup.replace.message" : {
+      "comment" : "Message of the Replace confirmation. %@ = date and time of the backup. The path uses the Settings tab name, settings.backup.title and settings.backup.automatic.header.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vaše rozvrhy, předměty, hodiny, úkoly, písemky, připomínky a nastavení v tomto iPhonu se nahradí zálohou z %@. Soubory připojené k úkolům, které v záloze nejsou, se smažou. Tabula nejdřív uloží kopii vašich aktuálních dat do Nastavení › Záloha › Automatické kopie."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Deine Stundenpläne, Fächer, Stunden, Aufgaben, Prüfungen, Erinnerungen und Einstellungen auf diesem iPhone werden durch das Backup vom %@ ersetzt. Dateien, die an Aufgaben hängen, die nicht im Backup sind, werden gelöscht. Tabula sichert vorher eine Kopie deiner aktuellen Daten unter Einstellungen › Backup › Automatische Kopien."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your timetables, subjects, lessons, tasks, exams, reminders and settings on this iPhone will be replaced with the backup from %@. Files attached to tasks that aren't in the backup will be deleted. Tabula first saves a copy of your current data in Settings › Backup › Automatic copies."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vos emplois du temps, matières, cours, devoirs, examens, rappels et réglages sur cet iPhone seront remplacés par la sauvegarde du %@. Les fichiers joints aux devoirs absents de la sauvegarde seront supprimés. Tabula enregistre d’abord une copie de vos données actuelles dans Réglages › Sauvegarde › Copies automatiques."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Az iPhone-on lévő órarendjeidet, tantárgyaidat, óráidat, feladataidat, vizsgáidat, emlékeztetőidet és beállításaidat lecseréli a(z) %@ időpontú mentés. A mentésben nem szereplő feladatokhoz csatolt fájlok törlődnek. A Tabula előbb ment egy másolatot a jelenlegi adataidról ide: Beállítások › Biztonsági mentés › Automatikus másolatok."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このiPhoneの時間割、科目、授業、課題、試験、リマインダー、設定が、%@のバックアップに置き換えられます。バックアップにない課題の添付ファイルは削除されます。Tabulaは先に現在のデータのコピーを「設定」›「バックアップ」›「自動コピー」に保存します。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Twoje plany lekcji, przedmioty, lekcje, zadania, sprawdziany, przypomnienia i ustawienia na tym iPhonie zostaną zastąpione kopią z %@. Pliki załączone do zadań, których nie ma w kopii, zostaną usunięte. Tabula najpierw zapisze kopię Twoich bieżących danych w Ustawienia › Kopia zapasowa › Kopie automatyczne."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Orarele, materiile, orele, temele, examenele, mementourile și setările de pe acest iPhone vor fi înlocuite cu backupul din %@. Fișierele atașate temelor care nu sunt în backup vor fi șterse. Tabula salvează mai întâi o copie a datelor actuale în Setări › Backup › Copii automate."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vaše rozvrhy, predmety, hodiny, úlohy, písomky, pripomienky a nastavenia v tomto iPhone sa nahradia zálohou z %@. Súbory priložené k úlohám, ktoré v zálohe nie sú, sa vymažú. Tabula najprv uloží kópiu vašich aktuálnych údajov do Nastavenia › Záloha › Automatické kópie."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ваши распореди, предмети, часови, задаци, испити, подсетници и подешавања на овом iPhone-у биће замењени резервном копијом од %@. Датотеке приложене задацима којих нема у резервној копији биће обрисане. Tabula прво чува копију ваших тренутних података у Подешавања › Резервна копија › Аутоматске копије."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vaši rasporedi, predmeti, časovi, zadaci, ispiti, podsetnici i podešavanja na ovom iPhone-u biće zamenjeni rezervnom kopijom od %@. Datoteke priložene zadacima kojih nema u rezervnoj kopiji biće obrisane. Tabula prvo čuva kopiju vaših trenutnih podataka u Podešavanja › Rezervna kopija › Automatske kopije."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ваші розклади, предмети, уроки, завдання, іспити, нагадування й параметри на цьому iPhone буде замінено резервною копією від %@. Файли, вкладені в завдання, яких немає в резервній копії, буде видалено. Спочатку Tabula зберігає копію ваших поточних даних у Параметри › Резервна копія › Автоматичні копії."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "此 iPhone 上的课表、科目、课程、作业、考试、提醒和设置将被 %@ 的备份替换。备份中不存在的作业的附件将被删除。Tabula 会先将当前数据的副本保存到“设置”›“备份”›“自动副本”。"
+          }
+        }
+      }
+    },
+    "settings.backup.replace.title" : {
+      "comment" : "Title of the destructive confirmation before a backup replaces all data.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nahradit všechna data?"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Alle Daten ersetzen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace All Data?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Remplacer toutes les données ?"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Lecseréled az összes adatot?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "すべてのデータを置き換えますか？"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zastąpić wszystkie dane?"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Înlocuiești toate datele?"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nahradiť všetky údaje?"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Заменити све податке?"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zameniti sve podatke?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Замінити всі дані?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "替换所有数据？"
+          }
+        }
+      }
+    },
+    "settings.backup.restore" : {
+      "comment" : "Button (Settings › Backup): opens the file picker to choose a backup file. Keep the ellipsis.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Obnovit ze zálohy…"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Aus Backup wiederherstellen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore from Backup…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Restaurer une sauvegarde…"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Visszaállítás mentésből…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "バックアップから復元…"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Przywróć z kopii zapasowej…"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Restaurează din backup…"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Obnoviť zo zálohy…"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Врати из резервне копије…"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vrati iz rezervne kopije…"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Відновити з резервної копії…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "从备份恢复…"
+          }
+        }
+      }
+    },
+    "settings.backup.title" : {
+      "comment" : "Settings row and page title: export and restore backup files of all app data.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Záloha"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Backup"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sauvegarde"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Biztonsági mentés"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "バックアップ"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kopia zapasowa"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Backup"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Záloha"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Резервна копија"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Rezervna kopija"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Резервна копія"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "备份"
+          }
+        }
+      }
+    },
     "settings.bell.periods" : {
       "comment" : "Settings, trailing value of the Bell schedule row: number of periods (lesson slots) in the schedule. Plural on arg 1.",
       "extractionState" : "manual",

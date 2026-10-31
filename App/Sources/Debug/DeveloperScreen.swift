@@ -73,6 +73,7 @@ struct DeveloperScreen: View {
         List {
             Section {
                 row("Data source", dataSource)
+                row("Stranded-data migration", model.strandedMigration.map { "\($0)" } ?? "not run")
                 row("Launch route", RouteTable.summary(RouteRegistry.resolve(LaunchContext.options.screen).resolution))
                 ForEach(LaunchContext.options.problems, id: \.self) { problem in
                     ProbeRow("Launch argument", value: problem, status: .fail)

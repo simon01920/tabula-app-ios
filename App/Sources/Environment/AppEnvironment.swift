@@ -61,6 +61,11 @@ struct AppEnvironment: Sendable {
     /// Device-local onboarding state (Phase 4U U6): the sample-data record behind "This is sample data · Remove" and
     /// the school type kept across an app-language change. App Group UserDefaults; in memory for seed runs.
     let onboardingStore: any OnboardingLocalStore
+    /// `<store directory>/Backups` (Phase 6 S2): automatic pre-restore / pre-migration archives; a temp folder for seed runs.
+    let backupDirectory: URL
+    /// Set when the App Group store is used and data may be stranded in the Application Support fallback (RISKS #47):
+    /// `StrandedStoreMigration` runs once before the store loads.
+    let strandedStore: (fallback: URL, group: URL)?
 
     /// The environment for this process.
     static func make(launchOptions: LaunchOptions) -> AppEnvironment {
@@ -87,7 +92,10 @@ struct AppEnvironment: Sendable {
                     : .inMemory(),
                 attachments: FileAttachmentStore(root: FileManager.default.temporaryDirectory
                     .appendingPathComponent("TabulaSeedAttachments", isDirectory: true)),
-                widgetContainer: nil, liveActivities: .inMemory(), onboardingStore: InMemoryOnboardingLocalStore())
+                widgetContainer: nil, liveActivities: .inMemory(), onboardingStore: InMemoryOnboardingLocalStore(),
+                backupDirectory: FileManager.default.temporaryDirectory
+                    .appendingPathComponent("TabulaSeedBackups", isDirectory: true),
+                strandedStore: nil)
         }
         #endif
         // The real store always uses the real clock and the system zone: -TabulaNow/-TabulaTimeZone are honoured only
@@ -103,7 +111,9 @@ struct AppEnvironment: Sendable {
             reminders: .live(defaults: location.defaults),
             attachments: FileAttachmentStore(root: FileAttachmentStore.root(forStoreDirectory: location.directory)),
             widgetContainer: location.groupContainer, liveActivities: .live(defaults: location.defaults),
-            onboardingStore: UserDefaultsOnboardingLocalStore(defaults: location.defaults))
+            onboardingStore: UserDefaultsOnboardingLocalStore(defaults: location.defaults),
+            backupDirectory: BackupFolder.url(forStoreDirectory: location.directory),
+            strandedStore: location.fallbackDirectory.map { (fallback: $0, group: location.directory) })
     }
 }
 
@@ -114,6 +124,12 @@ struct StoreLocation {
     let defaults: UserDefaults
     /// The App Group container itself (`nil` for the Application Support fallback).
     let groupContainer: URL?
+    /// With the App Group: where the fallback store would be (`<Application Support>/Tabula`, not created), RISKS #47.
+    var fallbackDirectory: URL? {
+        guard isAppGroup else { return nil }
+        return FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?
+            .appendingPathComponent("Tabula", isDirectory: true)
+    }
 
     /// `<App Group container>/Tabula`, else `<Application Support>/Tabula`.
     static func resolve(bundleIdentifier: String? = Bundle.main.bundleIdentifier) -> StoreLocation {

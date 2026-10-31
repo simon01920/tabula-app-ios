@@ -1,7 +1,7 @@
 // Launch routes of Settings: `settings` (root), `settings.calendar` (Date & Time), `settings.colours` (Colors; the old id
 // `settings.appearance` stays as an alias), `settings.reminders`, `settings.reminder-rule` (a kind's page: the "Remind me"
 // switch, times, delivery; seed: the homework rule), `settings.reminder-health`, `reminders.permission` (sheet),
-// `settings.about` (About & Feedback), `settings.live-activities`, `settings.timetable-new` (the create sheet, over
+// `settings.about` (About & Feedback), `settings.live-activities`, `settings.backup` (Phase 6 S2), `settings.timetable-new` (the create sheet, over
 // Settings). Sub-pages are wrapped in their own NavigationStack so they can be opened directly
 // (`-TabulaScreen settings.colours`); data comes from the `-TabulaSeed` settings.
 // Add entries here only; see Routing/RouteRegistry.swift.
@@ -22,6 +22,7 @@ enum SettingsRoutes: RouteProvider {
             AppRoute("reminders.permission", .sheet(over: .settings)) { ReminderPermissionSheet() },
             AppRoute("settings.about", .tabRoot(.settings)) { NavigationStack { SettingsAboutView() } },
             AppRoute("settings.live-activities", .tabRoot(.settings)) { NavigationStack { SettingsLiveActivitiesView() } },
+            AppRoute("settings.backup", .tabRoot(.settings)) { NavigationStack { SettingsBackupView() } },
             AppRoute("settings.timetable-new", .sheet(over: .settings)) { NewTimetableSheet() },
         ]
     }

@@ -297,3 +297,8 @@ on your iPhone", the Apple Watch empty state; titles follow `widget.open.title`:
 "Not Available" value and footer of builds without iCloud, nine status lines; `settings.icloud.status.synced` takes a
 localized relative time as %@) and `sync.firstSync.*` (alert title, message, buttons Merge / Keep This iPhone / Use
 iCloud; the message names the Merge button by its exact title). "iCloud" and "iPhone" are never translated.
+### Phase 6 S2 additions (2026-10-30)
+24 new `settings.backup.*` keys (Settings › Backup: export, restore modes, Replace confirmation, plain-word errors),
+model-authored for 11 languages (`sr-Latn` derived), all `needs_review`. Check: the path "Settings › Backup › Automatic
+copies" in `settings.backup.replace.message` must use the translated tab name, `settings.backup.title` and
+`settings.backup.automatic.header`; "Merge" / "Replace" in `settings.backup.mode.message` must match the button names.

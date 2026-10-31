@@ -46,6 +46,7 @@ settings@secondary
 settings.colours@secondary
 settings.calendar@secondary
 settings.about@secondary
+settings.backup@secondary
 settings.reminders@university
 timetable.grid-next-week@secondary
 timetable.grid-legend@secondary
