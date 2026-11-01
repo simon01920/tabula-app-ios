@@ -66,6 +66,7 @@ private struct LessonEditorBody: View {
     let timetable: Timetable
     let initial: LessonDraft
     @Environment(AppModel.self) private var model
+    @State private var creatingSubject = false
 
     var body: some View {
         EditorScaffold(
@@ -76,17 +77,30 @@ private struct LessonEditorBody: View {
                 guard let lesson = draft.makeLesson(in: timetable) else { return nil }
                 return model.apply(.upsert(lesson))
             },
-            content: { draft in LessonFormContent(draft: draft, timetable: timetable) })
+            content: { draft in LessonFormContent(draft: draft, timetable: timetable, creatingSubject: $creatingSubject) },
+            presentations: { draft in
+                // Hosted outside the Form (EditorScaffold.presentations): on the subject Section it was duplicated per
+                // row and closed the lesson editor about half a second after New Subject appeared.
+                Color.clear.sheet(isPresented: $creatingSubject) {
+                    SubjectEditorView(subjectID: nil, timetableID: timetable.id) { newID in
+                        // `apply` already stored it; the draft keeps everything typed so far.
+                        if let subject = model.database?.subjects.first(where: { $0.id == newID }) {
+                            draft.wrappedValue.select(subject)
+                        }
+                    }
+                }
+            })
     }
 }
 
 private struct LessonFormContent: View {
     @Binding var draft: LessonDraft
     let timetable: Timetable
+    /// "New Subject": the sheet itself is hosted by `LessonEditorBody`, outside the Form.
+    @Binding var creatingSubject: Bool
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var typeSize
-    @State private var creatingSubject = false
     @State private var confirmingDelete = false
     @State private var deleteFailed = false
     /// `nil` until the user opens or closes "More details" (then it starts from `draft.hasOptionalDetails`).
@@ -163,9 +177,6 @@ private struct LessonFormContent: View {
             if let issue = draft.issues(in: timetable).first(where: { $0 == .noSubject }) {
                 Text(LocalizedStringKey(issue.l10nKey))
             }
-        }
-        .sheet(isPresented: $creatingSubject) {
-            SubjectEditorView(subjectID: nil, timetableID: timetable.id) { newID in draft.subjectID = newID }
         }
     }
 
@@ -449,22 +460,23 @@ private struct LessonFormContent: View {
             } label: {
                 Text("editor.lesson.delete").frame(maxWidth: .infinity, minHeight: 44)
             }
+            // On the one row, not the Section (a Section modifier is applied to each row, footer included).
+            .sheet(isPresented: $confirmingDelete) {
+                let changes = database.map { TimetableManagement.lessonChangeCount(draft.lessonID, in: $0) } ?? 0
+                ImpactConfirmation(
+                    title: "editor.lesson.delete.title", subjectName: subjectName,
+                    rows: [ImpactRow(id: "changes", key: "editor.impact.dayChanges", count: changes)],
+                    note: "editor.lesson.delete.note", action: "editor.lesson.delete") {
+                        guard let database else { return }
+                        if case .applied = model.apply(TimetableManagement.deleteLessonMutation(draft.lessonID, in: database)) {
+                            dismiss()
+                        } else {
+                            deleteFailed = true
+                        }
+                    }
+            }
         } footer: {
             if deleteFailed { Text("editor.error.failed").foregroundStyle(.red) }
-        }
-        .sheet(isPresented: $confirmingDelete) {
-            let changes = database.map { TimetableManagement.lessonChangeCount(draft.lessonID, in: $0) } ?? 0
-            ImpactConfirmation(
-                title: "editor.lesson.delete.title", subjectName: subjectName,
-                rows: [ImpactRow(id: "changes", key: "editor.impact.dayChanges", count: changes)],
-                note: "editor.lesson.delete.note", action: "editor.lesson.delete") {
-                    guard let database else { return }
-                    if case .applied = model.apply(TimetableManagement.deleteLessonMutation(draft.lessonID, in: database)) {
-                        dismiss()
-                    } else {
-                        deleteFailed = true
-                    }
-                }
         }
     }
 

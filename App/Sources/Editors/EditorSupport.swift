@@ -23,7 +23,7 @@ var emptyPrompt: LocalizedStringKey { "" }
 // MARK: - Scaffold
 
 /// A sheet with Cancel / Save, a Form for `content` and a discard confirmation when there are unsaved edits.
-struct EditorScaffold<Draft: Equatable, Content: View>: View {
+struct EditorScaffold<Draft: Equatable, Content: View, Presentations: View>: View {
     let titleKey: LocalizedStringKey
     let initial: Draft
     let canSave: (Draft) -> Bool
@@ -37,6 +37,10 @@ struct EditorScaffold<Draft: Equatable, Content: View>: View {
     /// The confirmation button's label: "Save", or "Add" for the quick-entry sheet.
     var confirmKey: LocalizedStringKey = "editor.common.save"
     @ViewBuilder let content: (Binding<Draft>) -> Content
+    /// Sheets opened from the form that read or write the draft (e.g. "New Subject"), hosted once outside the Form.
+    /// Never attach a presenter to a Form `Section`: SwiftUI applies it to every row of the section, and the duplicate
+    /// presenters dismissed the whole editor right after the nested sheet appeared (bug: Lesson › New Subject).
+    @ViewBuilder let presentations: (Binding<Draft>) -> Presentations
 
     @Environment(\.dismiss) private var dismiss
     @State private var edited: Draft?
@@ -92,6 +96,7 @@ struct EditorScaffold<Draft: Equatable, Content: View>: View {
                 Text("editor.common.discard.message")
             }
         }
+        .background { presentations(binding) }
         .alert("editor.warnings.title", isPresented: $showingWarnings) {
             Button("editor.warnings.ok") { dismiss() }
         } message: {
@@ -131,6 +136,17 @@ struct EditorScaffold<Draft: Equatable, Content: View>: View {
         } else {
             result = outcome
         }
+    }
+}
+
+extension EditorScaffold where Presentations == EmptyView {
+    /// An editor that opens no sheet of its own.
+    init(titleKey: LocalizedStringKey, initial: Draft, canSave: @escaping (Draft) -> Bool,
+         save: @escaping (Draft) -> ApplyResult?, isBusy: Bool = false, startsDirty: Bool = false,
+         confirmKey: LocalizedStringKey = "editor.common.save",
+         @ViewBuilder content: @escaping (Binding<Draft>) -> Content) {
+        self.init(titleKey: titleKey, initial: initial, canSave: canSave, save: save, isBusy: isBusy,
+                  startsDirty: startsDirty, confirmKey: confirmKey, content: content, presentations: { _ in EmptyView() })
     }
 }
 

@@ -59,6 +59,8 @@ struct TaskEditorBody: View {
     /// Attachment presenters, store protection and in-flight copies for this editor (B3). While a copy runs, Save and
     /// swipe-to-dismiss are disabled so the attachment cannot be dropped.
     @State private var attachmentSession = AttachmentEditorSession()
+    /// The notification pre-explainer of `ReminderOverrideSection`, hosted here outside the Form.
+    @State private var showsReminderExplainer = false
 
     var body: some View {
         EditorScaffold(
@@ -77,13 +79,15 @@ struct TaskEditorBody: View {
             },
             isBusy: attachmentSession.importingCount > 0,
             startsDirty: startsDirty,
-            content: { draft in TaskFormContent(draft: draft) })
+            content: { draft in TaskFormContent(draft: draft, showsReminderExplainer: $showsReminderExplainer) })
         .attachmentsHost(attachmentSession, initial: initial.attachments)
+        .reminderPermissionSheet(isPresented: $showsReminderExplainer)
     }
 }
 
 private struct TaskFormContent: View {
     @Binding var draft: TaskDraft
+    @Binding var showsReminderExplainer: Bool
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
     @State private var newSubtask = ""
@@ -96,7 +100,8 @@ private struct TaskFormContent: View {
         prioritySection
         subtasksSection
         repeatSection
-        ReminderOverrideSection(override: $draft.reminderOverride, target: ReminderTarget(rawValue: draft.kind.rawValue))
+        ReminderOverrideSection(override: $draft.reminderOverride, target: ReminderTarget(rawValue: draft.kind.rawValue),
+                                showsExplainer: $showsReminderExplainer)
         AttachmentsSection(attachments: $draft.attachments, ownerID: draft.taskID)
         if !draft.isNew {
             Section {

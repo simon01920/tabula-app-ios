@@ -421,28 +421,29 @@ private struct TimetableFormContent: View {
                 Text("editor.timetables.reset.action").frame(maxWidth: .infinity, minHeight: 44)
             }
             .disabled(lessonCount == 0)
+            // On the one row, not the Section (a Section modifier is applied to each row, footer included).
+            .sheet(isPresented: $confirmingReset) {
+                if let database = model.database {
+                    let impact = TimetableManagement.resetImpact(of: timetable.id, in: database)
+                    ImpactConfirmation(
+                        title: "editor.timetables.reset.title", subjectName: timetable.name,
+                        rows: [ImpactRow(id: "lessons", key: "editor.impact.lessons", count: impact.lessons),
+                               ImpactRow(id: "changes", key: "editor.impact.dayChanges", count: impact.changes)],
+                        note: "editor.timetables.reset.note", action: "editor.timetables.reset") {
+                            guard let database = model.database else { return }
+                            if case .applied = model.apply(TimetableManagement.resetMutation(timetable.id, in: database)) {
+                                resetFailed = false
+                            } else {
+                                resetFailed = true
+                            }
+                        }
+                }
+            }
         } footer: {
             if resetFailed {
                 Text("editor.error.failed").foregroundStyle(.red)
             } else if lessonCount == 0 {
                 Text("editor.timetable.reset.empty.footer")
-            }
-        }
-        .sheet(isPresented: $confirmingReset) {
-            if let database = model.database {
-                let impact = TimetableManagement.resetImpact(of: timetable.id, in: database)
-                ImpactConfirmation(
-                    title: "editor.timetables.reset.title", subjectName: timetable.name,
-                    rows: [ImpactRow(id: "lessons", key: "editor.impact.lessons", count: impact.lessons),
-                           ImpactRow(id: "changes", key: "editor.impact.dayChanges", count: impact.changes)],
-                    note: "editor.timetables.reset.note", action: "editor.timetables.reset") {
-                        guard let database = model.database else { return }
-                        if case .applied = model.apply(TimetableManagement.resetMutation(timetable.id, in: database)) {
-                            resetFailed = false
-                        } else {
-                            resetFailed = true
-                        }
-                    }
             }
         }
     }

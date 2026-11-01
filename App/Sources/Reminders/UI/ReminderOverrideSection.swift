@@ -1,6 +1,8 @@
 // Per-item reminder override section (Phase 3 B4), embedded by the task (B1) and exam (B2) editors in their Form.
-// KEEP THIS SIGNATURE:
-//     ReminderOverrideSection(override: Binding<ReminderOverride?>, target: ReminderTarget)
+// Signature:
+//     ReminderOverrideSection(override: Binding<ReminderOverride?>, target: ReminderTarget, showsExplainer: Binding<Bool>)
+// The editor hosts the notification pre-explainer once, outside its Form (`.reminderPermissionSheet(isPresented:)` on
+// the EditorScaffold): on this Section the sheet was applied to every row and could close the editor with it.
 // `target` = `ReminderTarget(rawValue: task.kind.rawValue)` for tasks, `.exam` for exams; it selects the default rule
 // shown as "Default: …". `nil` override = follow the rules ("Use default reminders" on). Saving is the editor's job
 // (`model.apply(.upsert(item))`), which re-plans automatically.
@@ -17,11 +19,12 @@ struct ReminderOverrideSection: View {
     let target: ReminderTarget
     @Environment(AppModel.self) private var model
     @Environment(ReminderCoordinator.self) private var reminders
-    @State private var showsExplainer = false
+    @Binding var showsExplainer: Bool
 
-    init(override: Binding<ReminderOverride?>, target: ReminderTarget) {
+    init(override: Binding<ReminderOverride?>, target: ReminderTarget, showsExplainer: Binding<Bool>) {
         _override = override
         self.target = target
+        _showsExplainer = showsExplainer
     }
 
     private var defaultRule: ReminderRule? {
@@ -51,7 +54,6 @@ struct ReminderOverrideSection: View {
         } footer: {
             footer
         }
-        .reminderPermissionSheet(isPresented: $showsExplainer)
     }
 
     @ViewBuilder private func customRows(_ value: ReminderOverride) -> some View {
