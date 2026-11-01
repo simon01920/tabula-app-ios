@@ -657,3 +657,18 @@ Path: **Settings tab › Developer** (the last row, hammer icon) › section **D
 - [ ] Settings › Backup › Automatic copies lists one copy per load. Restore the oldest (**Replace**): your own data is back.
 - [ ] Force-quit and relaunch after a load: the demo data is still there (it was saved, not in memory only).
 - [ ] VoiceOver: each button reads its name; the dialog's buttons read "Back Up and Replace" and "Cancel".
+
+### Launch screen (LaunchView)
+Cold start = force-quit Tabula, then tap its icon. Loading is short, so watch closely or record the screen.
+- [ ] Light mode: no white-to-other-colour flash. The system's blank launch screen turns into the mark (ink square, yellow
+      bar, three white tiles) with "Tabula" below in ink blue, on the same white.
+- [ ] Dark mode: the same on black; no flash of white. The wordmark is light periwinkle and easy to read.
+- [ ] The yellow bar swipes in once from left to right (about a third of a second); the tiles then light up top to
+      bottom in a loop if loading lasts long enough to see it.
+- [ ] As soon as loading finishes the app fades in (about 0.2 s); there is no extra wait.
+- [ ] Reduce Motion on: the mark is still (bar already there, tiles fading top to bottom like the icon); no loop.
+- [ ] The mark looks like the Home Screen icon (bar tilted and slanted the same way, tiles centred under it).
+- [ ] VoiceOver on, cold start: one element that reads "Loading…" (in the app language), nothing else.
+- [ ] Largest text (AX-XXXL): the wordmark grows, stays on one line, and the mark stays 96 pt.
+- [ ] Slovak, Japanese or Chinese app language: the wordmark still reads "Tabula"; VoiceOver reads the localised "Loading…".
+- [ ] DEBUG: `-TabulaScreen launch` (or the CI screenshot `launch@secondary`) shows the launch screen permanently.

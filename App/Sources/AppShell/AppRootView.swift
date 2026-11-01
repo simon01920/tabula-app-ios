@@ -1,6 +1,6 @@
 // The root of the window: loading → onboarding / main tabs / blocking problem, the store banner on top, the
 // appearance preference from settings, and the launch route (`-TabulaScreen`).
-// APIs: View.preferredColorScheme(_:), VStack, ProgressView, NavigationStack, View.sheet(isPresented:content:),
+// APIs: View.preferredColorScheme(_:), VStack, NavigationStack, View.animation(_:value:), AnyTransition.opacity, View.sheet(isPresented:content:),
 //       Environment(AppModel.self) (Observation), ContentUnavailableView (iOS 17), View.tint(_:) (iOS 15),
 //       (no root `\.locale` override: see body).
 import SwiftUI
@@ -32,17 +32,22 @@ struct AppRootView: View {
                 if case .main = model.phase { SampleDataBanner() }   // "This is sample data · Remove" (U6)
                 phaseView
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .animation(.easeOut(duration: 0.2), value: isLoading)   // cross-fade out of LaunchView
             }
         }
+    }
+
+    private var isLoading: Bool {
+        if case .loading = model.phase { return true }
+        return false
     }
 
     @ViewBuilder
     private var phaseView: some View {
         switch model.phase {
         case .loading:
-            ProgressView {
-                Text("shell.loading")
-            }
+            LaunchView()
+                .transition(.opacity)
         case .blocked(let problem):
             StoreProblemView(problem: problem)
         case .onboarding:

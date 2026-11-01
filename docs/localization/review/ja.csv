@@ -614,6 +614,7 @@ intent.timetable.typeName,,Type name of a timetable in system UI (Shortcuts / wi
 intent.whatsNext.description,,App Intent description of the What's Next? shortcut (Shortcuts app).,Tells you the current lesson and what comes next.,現在の授業と次の予定を伝えます。,,
 intent.whatsNext.shortTitle,,Short App Shortcut tile title (Shortcuts app / Spotlight) for the What's Next? shortcut. Keep it short.,What's Next,次の予定,,
 intent.whatsNext.title,,"App Shortcut / App Intent title: tells the user the current or next lesson (Siri, Shortcuts, Spotlight).",What's Next?,次は何？,,
+launch.wordmark,,"Wordmark under the app mark on the launch screen. Brand name, intentionally identical in every language (like the Home Screen name).",Tabula,Tabula,,
 lesson.badge.exam,,"Badge on a lesson tile/row: an exam of this subject takes place on this lesson's day. One short word, shown next to a graduation-cap icon.",Exam,試験,,
 lesson.badge.tasks,other,Badge on a lesson tile/row: number of open tasks (homework) due in or linked to this lesson. Keep very short (shown next to a checklist icon on small timetable tiles). Plural on the count.,%lld tasks,タスク%lld件,,
 lesson.status.added,,Status badge on a one-off lesson added for this day only. Short (badge).,Extra lesson,追加授業,,

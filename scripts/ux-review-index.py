@@ -14,6 +14,7 @@ import sys
 
 # route id -> (section, title, what it is / how to reach it)
 SCREENS = {
+    "launch": ("0 Launch", "Launch screen", "Shown only while the data loads: the icon mark (highlighter swipes in, lesson tiles light up in turn) and the wordmark on the system background. DEBUG route shows it permanently."),
     "onboarding": ("1 Onboarding", "Welcome · School type", "First launch, step 1 of 4: product line, four school-type cards, compact 'App language · Change' row (opens iOS Settings)."),
     "onboarding.school-type": ("1 Onboarding", "School type (selected)", "Step 1 with Secondary selected; Continue enabled."),
     "onboarding.start": ("1 Onboarding", "How do you want to start?", "Step 2: 'Set up my timetable' (default) or 'Just look around' (sample data, removable). Imports hidden until they work."),

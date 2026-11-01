@@ -654,6 +654,7 @@ intent.timetable.typeName,,Type name of a timetable in system UI (Shortcuts / wi
 intent.whatsNext.description,,App Intent description of the What's Next? shortcut (Shortcuts app).,Tells you the current lesson and what comes next.,Каже вам који је час сада и шта следи.,,
 intent.whatsNext.shortTitle,,Short App Shortcut tile title (Shortcuts app / Spotlight) for the What's Next? shortcut. Keep it short.,What's Next,Шта је следеће,,
 intent.whatsNext.title,,"App Shortcut / App Intent title: tells the user the current or next lesson (Siri, Shortcuts, Spotlight).",What's Next?,Шта је следеће?,,
+launch.wordmark,,"Wordmark under the app mark on the launch screen. Brand name, intentionally identical in every language (like the Home Screen name).",Tabula,Tabula,,
 lesson.badge.exam,,"Badge on a lesson tile/row: an exam of this subject takes place on this lesson's day. One short word, shown next to a graduation-cap icon.",Exam,Испит,,
 lesson.badge.tasks,one,Badge on a lesson tile/row: number of open tasks (homework) due in or linked to this lesson. Keep very short (shown next to a checklist icon on small timetable tiles). Plural on the count.,%lld task,%lld задатак,,
 lesson.badge.tasks,few,Badge on a lesson tile/row: number of open tasks (homework) due in or linked to this lesson. Keep very short (shown next to a checklist icon on small timetable tiles). Plural on the count.,%lld tasks,%lld задатка,,
