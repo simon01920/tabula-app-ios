@@ -97,22 +97,32 @@ struct ExportPrintJob {
 struct ExportPreviewRouteView: View {
     @Environment(AppModel.self) private var model
     @State private var image: UIImage?
+    @State private var renderFailed = false
+
+    /// The model loads asynchronously; the task re-runs once the active timetable and its resolver exist.
+    private var readyID: Timetable.ID? {
+        guard let timetable = model.activeTimetable, model.resolver(for: timetable.id) != nil else { return nil }
+        return timetable.id
+    }
 
     var body: some View {
         ScrollView {
             if let image {
                 Image(uiImage: image).resizable().scaledToFit().padding(8)
+            } else if renderFailed {
+                Text("export.failed.title").padding()
             } else {
                 ContentUnavailableView {
                     Label { Text("timetable.route.nothingToShow") } icon: { Image(systemName: "tray") }
                 } description: { EmptyView() } actions: { EmptyView() }
             }
         }
-        .task {
+        .task(id: readyID) {
             guard let timetable = model.activeTimetable, let resolver = model.resolver(for: timetable.id) else { return }
             let week = resolver.context.startOfWeek(containing: model.today)
             let job = ExportPrintJob(model: model, timetable: timetable, resolver: resolver, view: .grid, pages: [week])
             image = job.pngData().flatMap(UIImage.init(data:))
+            renderFailed = image == nil
         }
     }
 }
