@@ -207,6 +207,8 @@ if [ -x "$XCODEGEN" ] && command -v rsync >/dev/null; then
     grep -q 'TabulaWidgets.appex in Embed Foundation Extensions' "$P" && ok "widget embedded (PlugIns)" || bad "widget embed phase missing"
     grep -q 'TabulaWatchWidgets.appex in Embed Foundation Extensions' "$P" && ok "watch complications embedded (TabulaWatch.app/PlugIns)" || bad "watch complication embed phase missing"
     [ "$(grep -c 'PrivacyInfo.xcprivacy in Resources \*/ = {isa = PBXBuildFile' "$P")" -eq 4 ] && ok "privacy manifests (app, widget, watch, watch complications) in Resources phases" || bad "privacy manifests not in Resources phases"
+    grep -q 'lastKnownFileType = wrapper.icon; path = AppIcon.icon' "$P" && [ "$(grep -c 'AppIcon.icon in Resources \*/ = {isa = PBXBuildFile' "$P")" -eq 2 ] \
+      && ok "AppIcon.icon is an Icon Composer icon (wrapper.icon) in the app + watch Resources phases" || bad "AppIcon.icon not wired as wrapper.icon (XcodeGen >= 2.45.1)"
     grep -q 'SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) TABULA_MACRO_PROBES' "$P" && ok "TabulaApp defines TABULA_MACRO_PROBES (CI macro variant)" || bad "macro define missing in pbxproj"
     # Phase 4 B3: the App Intents controls are compiled on this path (app: alarm "Done"; widget: checkbox + timetable
     # choice), and the App Shortcut phrases catalog is an app resource (Xcode's metadata step reads it).

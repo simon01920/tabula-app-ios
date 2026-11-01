@@ -4,8 +4,8 @@
 #   WidgetExtension/Sources  <-> Package.swift target TabulaWidgets  (path: WidgetExtension/Sources)
 #   Packages/TimetableCore, Packages/TimetableUI <-> same local packages
 #   Config/*.plist, Config/*.entitlements, Resources/Localizable.xcstrings <-> same files
-# Differences by design (documented in docs/ENVIRONMENT.md): watch app (CI only), asset catalog icon
-# (xtool uses Resources/AppIcon.png), Xcode compiles Localizable.xcstrings itself (xtool path uses
+# Differences by design (documented in docs/ENVIRONMENT.md): watch app (CI only), Icon Composer icon
+# Resources/AppIcon.icon (xtool uses the flattened Resources/AppIcon.png; both from scripts/make-app-icon.py), Xcode compiles Localizable.xcstrings itself (xtool path uses
 # scripts/l10n-compile.py), versions come from MARKETING_VERSION/CURRENT_PROJECT_VERSION.
 # Validate locally (Linux): bash scripts/validate.sh   (runs `xcodegen generate` if available)
 name: Tabula
@@ -75,6 +75,10 @@ targets:
         buildPhase: resources
       - path: Resources/Assets.xcassets
         buildPhase: resources
+      # Icon Composer icon (Liquid Glass, dark/clear/tinted). Same name as AppIcon.appiconset, so Xcode 26 uses
+      # this one and the asset-catalog PNGs stay a fallback. Needs XcodeGen >= 2.45.1 (wrapper.icon, #1600).
+      - path: Resources/AppIcon.icon
+        buildPhase: resources
       - path: Config/Privacy/App/PrivacyInfo.xcprivacy
         buildPhase: resources
     settings:
@@ -139,6 +143,8 @@ targets:
       - path: Resources/Localizable.xcstrings
         buildPhase: resources
       - path: Resources/Assets.xcassets
+        buildPhase: resources
+      - path: Resources/AppIcon.icon        # circle-masked on watchOS (icon.json supported-platforms)
         buildPhase: resources
       - path: Config/Privacy/Watch/PrivacyInfo.xcprivacy
         buildPhase: resources

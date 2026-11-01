@@ -325,7 +325,7 @@ smoke test) · **Device** = later, after a device is available (xtool install) o
 | 7 | **@Entry** value | compiles (OAM `SwiftUIMacros`) | `injected-by-DebugScreen` PASS (`debug-macros`) | Step B on the xtool build (OAM expansion at runtime) |
 | 8 | **AppIntent** in-process + Shortcuts listing | compiles; xtool bundle has no `Metadata.appintents` | row visible; needs a tap (`debug-macros`) | tap + Shortcuts search (expect listed only on TestFlight) |
 | 9 | **@Generable** schema text | compiles (118 symbols, schema calls) | schema text visible (`debug-macros`) | Step B on the xtool build |
-| 10 | App icon | `AppIcon.png` + `CFBundleIconFile` (xtool); asset catalog (Xcode) | not visible in app screenshots | Home Screen |
+| 10 | App icon | `AppIcon.png` + `CFBundleIconFile` (xtool); `AppIcon.icon` + asset-catalog fallback (Xcode), see §38 | not visible in app screenshots | Home Screen |
 | 11 | SwiftData / xcstrings probes | **done**: both FAILED as recorded in §13 | — | — |
 | 12 | Import + AlarmKit sections | compile | static rows: OCR language flags, Foundation Models availability, AlarmKit authorization state (`debug-import`, `debug-alarms`) | photo OCR, alarms ringing, Silent/Focus matrix (`docs/spikes/*`) |
 | 13 | Dark mode / Dynamic Type layout | — | light, dark and `accessibility-extra-extra-extra-large` screenshots of every id | VoiceOver pass |
@@ -710,3 +710,15 @@ API names checked in the installed iPhoneOS27.0.sdk (`VisionKit.swiftmodule`, `V
 | `CFBundleURLTypes` (`tabula`) in `Config/App-Info.plist` reaches the xtool app's Info.plist | VERIFIED (build: `plutil -p TabulaApp.app/Info.plist`) | XcodeGen path uses the same file (INFOPLIST_FILE) |
 | `SwiftUI.ShareLink` and `TimetableCore.ShareLink` clash in files that import both: qualify both | VERIFIED (build) | `App/Sources/Sharing/ShareTimetableSheet.swift` |
 | `DatabaseMutation.step` is now `internal` (was `private`) so `importShared` can run `TimetableManagement` steps on the database after the insert | DESIGN | `Packages/TimetableUI/Sources/TimetableUI/State/DatabaseMutation.swift` |
+
+## 38. App icon — Icon Composer `.icon` + flattened PNGs (orchestrator, 2026-11-01)
+
+Design: a "T" for Tabula drawn as a day's timetable column. The top bar is the highlighter "Now" stroke (signature element, UX_OVERHAUL_PLAN D1), and three lesson tiles fade into the future. It uses the ink and highlighter tokens and follows `apple-design` `app-icons.md` (layers, filled shapes, no text, dark/tinted built from the light icon, centred for the watchOS circle). One generator, `scripts/make-app-icon.py` (stdlib only, replaces `make-placeholder-icon.py`), writes the SVG layers and the flattened PNGs from the same geometry. The SVG composite rendered in Chrome matches the Python PNG. The layers are flat because the system adds Liquid Glass to them. The flattened PNGs get no system effects, so they carry their own depth (human request, 2026-11-01): the whole T casts one soft shadow onto the background only, and each shape has a top-lit gradient plus a light top rim and a dark bottom rim. In `icon.json` the group shadows are at 0.8 and translucency is lowered (0.1 / 0.25), so the T stands off the background.
+
+| Fact | Status | Evidence |
+|---|---|---|
+| XcodeGen ≥ 2.45.1 adds a `.icon` folder as `lastKnownFileType = wrapper.icon` in Resources (CI pins 2.46.0) | VERIFIED (local 2.46.0 generate: app + watch Resources phases; `validate.sh` checks it) | XcodeGen CHANGELOG, PR #1600 (its fixture uses a full-canvas 1024 SVG layer at `scale 1`) |
+| A `.icon` named like the asset-catalog set (`AppIcon`) is used by Xcode 26 in place of `AppIcon.appiconset` | REPORTED (forums, not Apple docs) | developer.apple.com/forums/thread/803368, 787576; UNVERIFIED here until a CI build of this change |
+| `icon.json` schema (`fill-specializations` + `appearance`, `automatic-gradient`, layer `glass`/`image-name`/`position`, group `shadow`/`translucency`/`specular`, `supported-platforms.circles: [watchOS]`) | REVERSE-ENGINEERED (Apple publishes no schema) | copied from Icon Composer output in IceCubesApp, mastodon-ios, yattee |
+| Asset-catalog dark/tinted icon keys: `"appearances": [{"appearance": "luminosity", "value": "dark" \| "tinted"}]` | VERIFIED (real Contents.json) | yattee `Yattee/Assets.xcassets/AppIcon.appiconset` |
+| xtool installs show only the flattened light `AppIcon.png` (`CFBundleIconFile`); iOS generates its own dark/tinted variants | DESIGN | `xtool.yml` `iconPath` |
