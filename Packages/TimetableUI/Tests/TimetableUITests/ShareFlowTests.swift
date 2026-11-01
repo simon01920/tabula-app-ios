@@ -206,6 +206,14 @@ struct ShareImportFlowTests {
         #expect(after.reminderRules == db.reminderRules)
     }
 
+    @Test func importAfterOnboardingNeverRestoresDeletedReminderRules() throws {
+        var db = SampleScenarios.secondary().database
+        db.reminderRules = []
+        #expect(db.settings.onboardingCompletedAt != nil)
+        let after = try apply(.importShared(try payload(db)), to: db)
+        #expect(after.reminderRules.isEmpty)
+    }
+
     @Test func replacingAVanishedTimetableFailsInsteadOfAdding() throws {
         let db = SampleScenarios.secondary().database
         let gone = Timetable.ID(UUID())

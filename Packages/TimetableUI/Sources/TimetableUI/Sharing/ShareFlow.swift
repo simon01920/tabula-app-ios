@@ -282,8 +282,9 @@ extension DatabaseMutation {
     /// Adds the shared timetable as a new timetable (`replacing == nil`) or in place of `replacing` (same position;
     /// the old timetable is deleted like "Delete Timetable": its tasks and exams stay, unlinked). The new timetable
     /// becomes active and onboarding counts as finished; `profile` is set when given (import from onboarding).
-    /// A database without live reminder rules (first launch, onboarding) gets the profile's preset rules, as
-    /// onboarding would (OnboardingBuilder / OnboardingFinish). A `replacing` timetable that no longer exists is an
+    /// An import that finishes onboarding into a database without live reminder rules gets the profile's preset
+    /// rules, as onboarding would (OnboardingBuilder / OnboardingFinish); after onboarding, rules the user deleted
+    /// stay deleted. A `replacing` timetable that no longer exists is an
     /// error (`MutationError.notFound`), never a silent add.
     /// `replacesDatabase` only when nothing is stored yet (first launch), so the model accepts it without a base.
     public static func importShared(_ payload: SharePayloadV1, replacing: Timetable.ID? = nil, profile: UserProfile? = nil,
@@ -306,7 +307,7 @@ extension DatabaseMutation {
             if let replaced, let delete = TimetableManagement.deleteMutation(replaced.id, in: database) {
                 try delete.step(&database, &clock, now)
             }
-            if !database.reminderRules.contains(where: { !$0.isDeleted }) {
+            if database.settings.onboardingCompletedAt == nil, !database.reminderRules.contains(where: { !$0.isDeleted }) {
                 database.reminderRules += ProfilePreset.for(profile ?? database.settings.profile).reminderRules.map {
                     $0.makeRule(id: ids.next(), meta: .created(at: clock.tick(now: now)))
                 }

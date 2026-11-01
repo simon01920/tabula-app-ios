@@ -40,6 +40,7 @@ struct TimetableRootView: View {
     @State private var editor: EditorPresentation?
     @State private var management: ManagementSheet?
     @State private var sharing: ShareTarget?
+    @State private var showsExport = false
 
     init() {
         initialView = nil
@@ -96,7 +97,9 @@ struct TimetableRootView: View {
         .editorSheet($editor)
         .sheet(item: $management) { item in item.route.makeView() }
         .sheet(item: $sharing) { target in ShareTimetableSheet(timetableID: target.id) }
+        .sheet(isPresented: $showsExport) { ExportSheet() }
         .closesForDeepLink {   // QA fix Q6: a notification tap needs the screen
+            showsExport = false
             detail = nil
             quickAdd = nil
             management = nil
@@ -254,6 +257,13 @@ struct TimetableRootView: View {
         }
     }
 
+    /// "Export…" (Phase 8): opens the export sheet.
+    private var exportMenuItem: some View {
+        Button { showsExport = true } label: {
+            Label { Text("export.menu") } icon: { Image(systemName: "arrow.up.doc") }
+        }
+    }
+
     private func optionsMenu(timetable: Timetable, resolver: ScheduleResolver, current: TimetableSelection) -> some View {
         let kind = viewKind(for: timetable)
         let dayBased = TimetableViewChoice.isDayBased(kind)
@@ -341,6 +351,7 @@ struct TimetableRootView: View {
                 Button { sharing = ShareTarget(id: timetable.id) } label: {
                     Label { Text("share.menu.share") } icon: { Image(systemName: "square.and.arrow.up") }
                 }
+                exportMenuItem
             }
         } label: {
             // One stable glyph whatever the current view (Opus H4); VoiceOver and long-press read "View Options".

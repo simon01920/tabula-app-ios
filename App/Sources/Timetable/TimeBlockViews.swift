@@ -46,7 +46,7 @@ struct TimeBlockWeekView: View {
                     }
                 }
                 Divider()
-                ScrollView(.vertical) {
+                ExportAwareScroll {
                     TimeBlockCanvas(layout: layout, timetable: timetable, reasons: reasons, today: today,
                                     nowMinute: nowMinute, width: width, gutterWidth: gutterWidth, detailed: false,
                                     onOpen: onOpen)
@@ -71,7 +71,7 @@ struct TimeBlockDayView: View {
 
     var body: some View {
         GeometryReader { proxy in
-            ScrollView(.vertical) {
+            ExportAwareScroll {
                 TimeBlockCanvas(layout: layout, timetable: timetable, reasons: reasons, today: today, nowMinute: nowMinute,
                                 width: proxy.size.width - 32, gutterWidth: gutterWidth, detailed: true, onOpen: onOpen)
                     .padding(.horizontal, 16)

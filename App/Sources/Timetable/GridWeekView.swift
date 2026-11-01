@@ -110,7 +110,7 @@ struct GridWeekView: View {
                 let heights = rowHeights(available: scrollProxy.size.height)
                 let tops = tops(heights)
                 let total = heights.reduce(0, +)
-                ScrollView(.vertical) {
+                ExportAwareScroll {
                     ZStack(alignment: .topLeading) {
                         rowBands(tops: tops, heights: heights, width: width)
                         periodLabels(tops: tops, heights: heights)

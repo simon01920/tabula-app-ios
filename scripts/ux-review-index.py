@@ -35,6 +35,8 @@ SCREENS = {
     "timetable.day": ("3 Timetable", "Day view", "One day, proportional time blocks (time is the primary datum). At the largest text size: compact date header (previous / date picker / next) and full-width subject names."),
     "timetable.tiles": ("3 Timetable", "Tiles view", "Big vertical tiles (elementary default): past tiles dimmed, highlighter 'NOW' on the current tile."),
     "timetable.lesson-detail": ("3 Timetable", "Lesson detail", "Tap a lesson: time (a changed time in the change colour, usual time struck through), room, teacher, homework, changes on this day."),
+    "export.sheet": ("3 Timetable", "Export", "Timetable menu, Export...: type (Image, PDF, CSV, Excel, Calendar), view for image and PDF, range (this week, current term, custom dates); Export opens the share sheet."),
+    "export.preview": ("3 Timetable", "Export preview (debug)", "Debug build only: the current week's grid rendered by the export path, shown as the PNG the share sheet would carry."),
     "timetable.quick-add": ("3 Timetable", "Quick add", "Tap a free slot: opaque sheet, header 'Every Monday · Week B · Period 7 (13:40–14:25)'."),
     "editor.timetables": ("4 Editors", "Timetables manager", "Settings/Timetable: list of timetables (multiple allowed)."),
     "editor.timetable": ("4 Editors", "Timetable editor", "Name, rotation, term dates, time zone."),
