@@ -238,6 +238,13 @@ public struct LessonDraft: Equatable, Sendable {
         if EditorText.trimmedOrNil(teacher) == nil { teacher = subject.defaultTeacher ?? "" }
     }
 
+    /// Selects `subject` as the subject picker does: a new lesson also takes its defaults (`applySubjectDefaults`).
+    /// The lesson editor's "New Subject" sheet calls it on save, so it does not depend on the picker row updating.
+    public mutating func select(_ subject: Subject) {
+        subjectID = subject.id
+        if isNew { applySubjectDefaults(subject) }
+    }
+
     /// `true` when "More details" should start expanded (some optional field holds a value).
     public var hasOptionalDetails: Bool {
         EditorFieldPolicy.moreDetailsStartsExpanded(texts: [room, building, teacher, notes], lessonType: lessonType,

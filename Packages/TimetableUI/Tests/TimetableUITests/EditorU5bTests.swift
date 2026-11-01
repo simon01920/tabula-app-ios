@@ -163,13 +163,26 @@ struct EditorFieldRuleD10Tests {
         subject.id = Subject.ID(UUID())
         subject.defaultRoom = "B12"
         subject.defaultTeacher = "Ing. Y"
-        draft.subjectID = subject.id
-        draft.applySubjectDefaults(subject)
+        draft.select(subject)                                           // what the New Subject sheet does on save
+        #expect(draft.subjectID == subject.id)
         #expect(draft.room == "Lab 2")                                  // typed value wins
         #expect(draft.teacher == "Ing. Y")                              // empty field gets the default
         #expect(draft.notes == "Bring goggles")
         #expect(draft.day == .weekday(.thursday) && draft.slot.periodID == period.id)
         #expect(draft.hasOptionalDetails)
+    }
+
+    /// Editing an existing lesson: a newly created subject is selected but, like the picker, fills no defaults.
+    @Test func subjectCreatedWhileEditingAnExistingLessonOnlySelectsIt() throws {
+        let lesson = try #require(scenario.database.lessons.first { !$0.isDeleted })
+        var draft = LessonDraft(lesson: lesson, timetable: scenario.timetable, today: Self.today)
+        draft.teacher = ""
+        var subject = try #require(scenario.database.subjects.first)
+        subject.id = Subject.ID(UUID())
+        subject.defaultTeacher = "Ing. Y"
+        draft.select(subject)
+        #expect(draft.subjectID == subject.id)
+        #expect(draft.teacher.isEmpty)
     }
 }
 

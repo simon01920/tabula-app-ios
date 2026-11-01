@@ -162,7 +162,8 @@ private struct SubjectFormContent: View {
         Section {
             EditorTitleField(promptKey: "editor.subject.name.prompt", text: $draft.name,
                              missingHintKey: SubjectDraft.Issue.noName.l10nKey)
-            LabeledTextField(titleKey: "editor.subject.shortName", text: $draft.shortName)
+            EditorHintField(promptKey: "editor.subject.shortName.prompt", labelKey: "editor.subject.shortName",
+                            text: $draft.shortName)
         }
     }
 
@@ -295,11 +296,12 @@ private struct SubjectFormContent: View {
             } label: {
                 Text("editor.subject.delete").frame(maxWidth: .infinity, minHeight: 44)
             }
+            // On the one row, not the Section (a Section modifier is applied to each row, footer included).
+            .sheet(isPresented: $confirmingDelete) {
+                SubjectDeleteConfirmation(subjectID: draft.subjectID, name: draft.name) { dismiss() } onFailure: { deleteFailed = true }
+            }
         } footer: {
             if deleteFailed { Text("editor.error.failed").foregroundStyle(.red) }
-        }
-        .sheet(isPresented: $confirmingDelete) {
-            SubjectDeleteConfirmation(subjectID: draft.subjectID, name: draft.name) { dismiss() } onFailure: { deleteFailed = true }
         }
     }
 }

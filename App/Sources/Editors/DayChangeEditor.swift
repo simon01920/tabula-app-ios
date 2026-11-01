@@ -20,6 +20,7 @@ struct DayChangeEditorView: View {
     var timetableID: Timetable.ID?
     @Environment(AppModel.self) private var model
     @State private var newID = ScheduleOverride.ID(UUID())
+    @State private var editingBell = false
 
     var body: some View {
         if let database = model.database,
@@ -37,7 +38,10 @@ struct DayChangeEditorView: View {
                     guard let override = draft.makeOverride() else { return nil }
                     return model.apply(.upsert(override))
                 },
-                content: { draft in DayChangeFormContent(draft: draft, timetable: timetable) })
+                content: { draft in DayChangeFormContent(draft: draft, timetable: timetable, editingBell: $editingBell) })
+            // Outside the Form: on the bell Section this sheet was applied to every row of it (Picker, button, footer)
+            // and could close this editor along with it (same bug as Lesson › New Subject).
+            .sheet(isPresented: $editingBell) { BellScheduleEditorView(timetableID: timetable.id) }
         } else {
             EditorUnavailableView(messageKey: "editor.dayChange.unavailable")
         }
@@ -71,8 +75,8 @@ struct DayLessonEntry: Identifiable, Equatable {
 private struct DayChangeFormContent: View {
     @Binding var draft: DayChangeDraft
     let timetable: Timetable
+    @Binding var editingBell: Bool
     @Environment(AppModel.self) private var model
-    @State private var editingBell = false
 
     private var database: TabulaDatabase? { model.database }
     private var labels: EditorLabels { EditorLabels(model: model) }
@@ -185,7 +189,6 @@ private struct DayChangeFormContent: View {
                     issueFooter
                 }
             }
-            .sheet(isPresented: $editingBell) { BellScheduleEditorView(timetableID: timetable.id) }
         case .followDay:
             Section {
                 Picker(selection: $draft.followDay) {

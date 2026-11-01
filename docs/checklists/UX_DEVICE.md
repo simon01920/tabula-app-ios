@@ -642,3 +642,39 @@ Slovak strings / Japanese / VoiceOver.
 List section scrolling, the undo message timing with VoiceOver, the segmented control at large sizes, the hero card button
 inside a `List` (tap target, highlight), `AccessibilityNotification.Announcement`, keyboard focus on a sheet at the medium
 detent, and everything visual.
+
+## Editor fixes (2026-11-01, branch wip/editor-fixes)
+
+### E1 Nested sheets never close their parent (bug: Lesson › New Subject closed both sheets)
+Before each row, type something into the parent first (a room, a note, a title) so a lost parent is obvious.
+- [ ] E1.1 Timetable ⋯ › Add Lesson › type a room › New Subject. Wait 5 s without touching anything: New Subject stays
+      open and New Lesson is still behind it (the recording showed both closing after about 0.6 s).
+- [ ] E1.2 Same, then type a name and Save: back in New Lesson with the room still typed; the new subject is selected;
+      empty Room / Building / Teacher are filled from the subject's defaults, typed ones are kept.
+- [ ] E1.3 Same, then Cancel in New Subject: back in New Lesson, everything typed kept, subject unchanged.
+- [ ] E1.4 Edit an existing lesson › New Subject › Save: the new subject is selected, no other field changes. Cancel also
+      returns intact.
+- [ ] E1.5 Tap an empty grid cell (quick add) › New Subject › Save: back in the quick-add sheet, the new subject is in
+      the list (tap it to add the lesson). Cancel also returns to quick add.
+- [ ] E1.6 Repeat E1.1–E1.3 at AX-XXXL (the subject picker is a pushed list there) and with VoiceOver on.
+- [ ] E1.7 Day change (Change for This Day…) › change the bell schedule › "Edit bell schedule": the bell editor opens
+      and stays; Cancel and Save both return to the day change with its edits.
+- [ ] E1.8 Task editor (new task, type a title) › Reminders › turn off "Use default reminders" while notifications are
+      not decided yet: the explainer sheet appears over the task editor; Not Now returns to the task with the title kept.
+      Same in the exam editor. (Needs notification permission "not determined": delete and reinstall the app.)
+- [ ] E1.9 Delete confirmations open and Cancel back to the editor with edits kept: lesson (Delete Lesson), subject
+      (Delete Subject), exam (Delete Exam dialog), timetable settings (Reset Timetable). After Reset Timetable succeeds,
+      the timetable settings stay open.
+
+### E2 Short name and Emoji fields
+- [ ] E2.1 Subject editor: Short name sits under Name as a full-width field starting at the leading edge, with the hint
+      "Short name (e.g. MAT)" inside; the hint disappears when typing. VoiceOver reads "Short name, text field".
+- [ ] E2.2 Timetable settings and New Timetable: Emoji sits under the name the same way, hint "Emoji (e.g. 🏫)"; typing
+      several characters keeps only the first (timetable settings).
+- [ ] E2.3 German and Hungarian at AX-XXXL: the hints wrap, nothing truncated; Japanese and Chinese hints read naturally.
+- [ ] E2.4 Dark mode: the hint text is legible (system placeholder colour). Room / Building / Teacher rows below are
+      unchanged (label left, value right).
+
+### Not verifiable without a device (E1)
+That duplicated presenters were the trigger (UIKit's "already presenting" console messages need Console.app on a Mac),
+sheet timing, and everything visual.

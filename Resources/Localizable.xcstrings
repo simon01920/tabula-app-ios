@@ -30073,6 +30073,90 @@
         }
       }
     },
+    "editor.subject.shortName.prompt" : {
+      "comment" : "Hint text inside the empty short-name field of the subject editor, under the name (disappears when typing). The example is a typical 2-4 letter abbreviation of Mathematics in the language; VoiceOver reads \"Short name\".",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zkrácený název (např. MAT)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kurzname (z. B. MA)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Short name (e.g. MAT)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nom court (p. ex. MATH)"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Rövid név (pl. MAT)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "略称（例：数）"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Skrót (np. MAT)"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nume scurt (de ex. MAT)"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Skrátený názov (napr. MAT)"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Кратак назив (нпр. МАТ)"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kratak naziv (npr. MAT)"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Коротка назва (напр. МАТ)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "简称（例如：数）"
+          }
+        }
+      }
+    },
     "editor.subject.symbol" : {
       "comment" : "Subject editor: section header and picker label for the emoji or SF Symbol shown on the tile.",
       "extractionState" : "manual",
@@ -33513,6 +33597,90 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "表情符号"
+          }
+        }
+      }
+    },
+    "editor.timetable.emoji.prompt" : {
+      "comment" : "Hint text inside the empty emoji field of the timetable editor, under the name (disappears when typing). Keep the school emoji; VoiceOver reads \"Emoji\".",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Emoji (např. 🏫)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Emoji (z. B. 🏫)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Emoji (e.g. 🏫)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Emoji (p. ex. 🏫)"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Emoji (pl. 🏫)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "絵文字（例：🏫）"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Emoji (np. 🏫)"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Emoji (de ex. 🏫)"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Emoji (napr. 🏫)"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Емоџи (нпр. 🏫)"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Emodži (npr. 🏫)"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Емодзі (напр. 🏫)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "表情符号（例如：🏫）"
           }
         }
       }

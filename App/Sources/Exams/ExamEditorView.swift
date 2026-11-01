@@ -47,6 +47,8 @@ struct ExamEditorView: View {
 private struct ExamEditorBody: View {
     let initial: ExamDraft
     @Environment(AppModel.self) private var model
+    /// The notification pre-explainer of `ReminderOverrideSection`, hosted here outside the Form.
+    @State private var showsReminderExplainer = false
 
     var body: some View {
         EditorScaffold(
@@ -63,12 +65,14 @@ private struct ExamEditorBody: View {
                 case .save(let exam)?: return model.apply(.upsert(exam), origin: .userSave)
                 }
             },
-            content: { draft in ExamFormContent(draft: draft) })
+            content: { draft in ExamFormContent(draft: draft, showsReminderExplainer: $showsReminderExplainer) })
+        .reminderPermissionSheet(isPresented: $showsReminderExplainer)
     }
 }
 
 private struct ExamFormContent: View {
     @Binding var draft: ExamDraft
+    @Binding var showsReminderExplainer: Bool
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
     @State private var confirmingDelete = false
@@ -104,7 +108,7 @@ private struct ExamFormContent: View {
             timeSection
             topicsSection
             moreDetailsSection
-            ReminderOverrideSection(override: $draft.reminderOverride, target: .exam)
+            ReminderOverrideSection(override: $draft.reminderOverride, target: .exam, showsExplainer: $showsReminderExplainer)
             if !draft.isNew { deleteSection }
         }
         .onChange(of: draft.date) { _, _ in syncTimeMode() }
@@ -251,18 +255,19 @@ private struct ExamFormContent: View {
             } label: {
                 Text("exams.editor.delete").frame(maxWidth: .infinity, minHeight: 44)
             }
+            // On the one row, not the Section (a Section modifier is applied to each row, footer included).
+            .confirmationDialog("exams.editor.delete.title", isPresented: $confirmingDelete, titleVisibility: .visible) {
+                Button("exams.editor.delete.confirm", role: .destructive) {
+                    if case .applied = model.apply(.delete(draft.examID)) {
+                        dismiss()
+                    } else {
+                        deleteFailed = true
+                    }
+                }
+                Button("editor.common.cancel", role: .cancel) {}
+            }
         } footer: {
             if deleteFailed { Text("editor.error.failed").foregroundStyle(.red) }
-        }
-        .confirmationDialog("exams.editor.delete.title", isPresented: $confirmingDelete, titleVisibility: .visible) {
-            Button("exams.editor.delete.confirm", role: .destructive) {
-                if case .applied = model.apply(.delete(draft.examID)) {
-                    dismiss()
-                } else {
-                    deleteFailed = true
-                }
-            }
-            Button("editor.common.cancel", role: .cancel) {}
         }
     }
 }

@@ -331,7 +331,8 @@ struct NewTimetableSheet: View {
                 Section {
                     EditorTitleField(promptKey: "editor.timetable.name.prompt", text: draft.name,
                                      missingHintKey: TimetableDraft.Issue.noName.l10nKey)
-                    LabeledTextField(titleKey: "editor.timetable.emoji", text: draft.emoji)
+                    EditorHintField(promptKey: "editor.timetable.emoji.prompt", labelKey: "editor.timetable.emoji",
+                                    text: draft.emoji)
                 }
                 Section {
                     Picker(selection: draft.structure) {
