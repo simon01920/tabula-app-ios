@@ -115,9 +115,11 @@ struct CloudSyncTests {
     @Test func roundTripKeepsEveryEntityAndUnknownKeys() throws {
         let database = try Self.withUnknownKey(Fixture.fullDatabase())
         let records = try database.cloudRecords()
-        #expect(records.count == 1 + database.timetables.count + database.subjects.count + database.bellSchedules.count
-                + database.lessons.count + database.terms.count + database.breaks.count + database.overrides.count
-                + database.tasks.count + database.exams.count + database.reminderRules.count)
+        let counts: [Int] = [1, database.timetables.count, database.subjects.count, database.bellSchedules.count,
+                             database.lessons.count, database.terms.count, database.breaks.count, database.overrides.count,
+                             database.tasks.count, database.exams.count, database.reminderRules.count]
+        let expected = counts.reduce(0, +)
+        #expect(records.count == expected)
         #expect(Set(records.map(\.name)).count == records.count)
         #expect(records.allSatisfy { UUID(uuidString: $0.name) != nil && !$0.isTooLarge })
         let task = try #require(records.first { $0.type == .task })
