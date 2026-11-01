@@ -1,6 +1,6 @@
 // Developer screen (DEBUG only): what the app foundation is doing, usable on a physical device without Xcode —
-// data source, launch options, clock/calendar, store status, validation, plus onboarding reset and recovery fault
-// injection. Reachable from Settings → Developer and `-TabulaScreen debug-developer`.
+// data source, launch options, clock/calendar, store status, validation, plus demo data, onboarding reset and recovery
+// fault injection. Reachable from Settings → Developer and `-TabulaScreen debug-developer`.
 // Developer-facing: verbatim strings on purpose (never shipped).
 // APIs: List, Section, NavigationLink(destination:label:), Button(role:action:label:),
 //       confirmationDialog(_:isPresented:titleVisibility:actions:), LabeledContent (iOS 16), textSelection (iOS).
@@ -28,6 +28,39 @@ struct DeveloperSettingsLink: View {
 final class DeveloperScreenState: ObservableObject {
     @Published var confirmReset = false
     @Published var faultMessage: String?
+    @Published var demoKind: SeedKind?
+    @Published var demoMessage: String?
+}
+
+/// Replaces the store with a sample scenario moved to this week (`DemoData`). The current data is written to
+/// `<store>/Backups` first, exactly like a Replace restore (Settings › Backup lists it); no backup → nothing replaced.
+@MainActor
+enum DemoDataLoader {
+    static let kinds: [(kind: SeedKind, name: String)] = [(.secondary, "High school"), (.university, "University"),
+                                                          (.elementary, "Elementary")]
+
+    static func load(_ kind: SeedKind, model: AppModel, state: DeveloperScreenState) async {
+        guard !model.isReadOnly, let current = model.database,
+              let demo = DemoData.database(kind, today: model.today, now: model.now) else {
+            state.demoMessage = "not loaded: the store is read-only or not loaded"
+            return
+        }
+        let backup: URL
+        do {
+            backup = try BackupFolder.write(.make(from: current, createdAt: model.now), label: "pre-demo",
+                                            in: model.environment.backupDirectory)
+        } catch {
+            state.demoMessage = "backup failed, nothing replaced: \(error)"
+            return
+        }
+        let result = model.apply(.restore(demo, mode: .replace))
+        guard case .applied = result else {
+            state.demoMessage = "not applied (\(result)); backup \(backup.lastPathComponent)"
+            return
+        }
+        await model.flush()
+        state.demoMessage = "loaded \(kind.rawValue); backup \(backup.lastPathComponent)"
+    }
 }
 
 /// Writes broken or newer-version data straight into the store files so the recovery and read-only paths can be
@@ -105,9 +138,19 @@ struct DeveloperScreen: View {
                 }
             } header: { Text(verbatim: "Store") }
 
-            // No "load sample data into the real store" action on purpose (QA 2026-10-09): the scenarios carry fixed
-            // IDs, foreign HLC nodes and fixed 2026 dates. Use -TabulaSeed (in-memory) for sample data; real sample
-            // data for a user's store comes from onboarding (TimetableCore.SampleData with the app's ids/clock/now).
+            // Demo data answers QA 2026-10-09 (fixed IDs, foreign HLC nodes, fixed 2026 dates): DemoData moves the dates to
+            // this week and the Replace restore re-stamps every entity with this device's clock; a backup comes first.
+            Section {
+                ForEach(DemoDataLoader.kinds, id: \.kind) { item in
+                    Button { state.demoKind = item.kind } label: { Text(verbatim: item.name) }
+                }
+                if let message = state.demoMessage {
+                    ProbeRow("Result", value: message)
+                }
+            } header: { Text(verbatim: "Demo data") } footer: {
+                Text(verbatim: "Replaces all data. Your data is backed up first: Settings › Backup › Automatic copies.")
+            }
+
             Section {
                 Button { state.confirmReset = true } label: {
                     Text(verbatim: "Show onboarding again (finishing it adds a timetable)")
@@ -145,6 +188,15 @@ struct DeveloperScreen: View {
                 model.apply(.settings { $0.onboardingCompletedAt = nil })
             } label: { Text(verbatim: "Show onboarding") }
         }
+        .confirmationDialog(Text(verbatim: "Replace all data with demo data?"), isPresented: isPresented($state.demoKind),
+                            titleVisibility: .visible, presenting: state.demoKind) { kind in
+            Button(role: .destructive) {
+                Task { await DemoDataLoader.load(kind, model: model, state: state) }
+            } label: { Text(verbatim: "Back Up and Replace") }
+        } message: { _ in
+            Text(verbatim: "A backup of your data is written first; restore it from Settings › Backup. "
+                + "With iCloud sync on, the demo data syncs to your other devices too.")
+        }
     }
 
     private var dataSource: String {
@@ -152,6 +204,10 @@ struct DeveloperScreen: View {
         case let .file(directory, isAppGroup): return "\(isAppGroup ? "App Group" : "Application Support (fallback)"): \(directory.path)"
         case .seed(let kind): return "in-memory seed \(kind.rawValue)"
         }
+    }
+
+    private func isPresented<Value>(_ binding: Binding<Value?>) -> Binding<Bool> {
+        Binding(get: { binding.wrappedValue != nil }, set: { if !$0 { binding.wrappedValue = nil } })
     }
 
     private func row(_ title: String, _ value: String) -> some View {

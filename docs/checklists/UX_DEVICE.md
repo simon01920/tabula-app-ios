@@ -642,3 +642,18 @@ Slovak strings / Japanese / VoiceOver.
 List section scrolling, the undo message timing with VoiceOver, the segmented control at large sizes, the hero card button
 inside a `List` (tap target, highlight), `AccessibilityNotification.Announcement`, keyboard focus on a sheet at the medium
 detent, and everything visual.
+
+## Demo data and launch screen (wip/demo-launch)
+
+### Demo data (Developer screen, DEBUG builds)
+Path: **Settings tab › Developer** (the last row, hammer icon) › section **Demo data**.
+- [ ] Before: enter one subject or task of your own so you can recognise your data later.
+- [ ] Tap **High school**: a dialog "Replace all data with demo data?" with **Back Up and Replace** and Cancel. Cancel
+      changes nothing.
+- [ ] Back Up and Replace: the Result row reads "loaded secondary; backup <date>-pre-demo.tabulabackup". Today shows the
+      gymnázium timetable (2.B, 12 subjects); Tasks has an overdue or upcoming task, Exams has upcoming exams, all dated
+      within this week and the next two, never weeks in the past.
+- [ ] Repeat with **University** (free times, buildings, exam period) and **Elementary** (big tiles). No onboarding appears.
+- [ ] Settings › Backup › Automatic copies lists one copy per load. Restore the oldest (**Replace**): your own data is back.
+- [ ] Force-quit and relaunch after a load: the demo data is still there (it was saved, not in memory only).
+- [ ] VoiceOver: each button reads its name; the dialog's buttons read "Back Up and Replace" and "Cancel".
