@@ -176,79 +176,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula používá fotoaparát ke skenování vytištěného rozvrhu, aby jej bylo možné importovat."
+            "value" : "Tabula používá fotoaparát k naskenování vytištěného rozvrhu nebo QR kódu sdíleného rozvrhu, aby ho mohla importovat."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula verwendet die Kamera, um einen gedruckten Stundenplan zu scannen, damit er importiert werden kann."
+            "value" : "Tabula verwendet die Kamera, um einen gedruckten Stundenplan oder den QR-Code eines geteilten Stundenplans zu scannen und zu importieren."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tabula uses the camera to scan a printed timetable so it can be imported."
+            "value" : "Tabula uses the camera to scan a printed timetable or a shared timetable's QR code so it can be imported."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula utilise l’appareil photo pour scanner un emploi du temps imprimé afin de pouvoir l’importer."
+            "value" : "Tabula utilise l’appareil photo pour scanner un emploi du temps imprimé ou le code QR d’un emploi du temps partagé afin de l’importer."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "A Tabula a kamerát egy kinyomtatott órarend beolvasására használja, hogy importálni lehessen."
+            "value" : "A Tabula a kamerával beolvassa a nyomtatott órarendet vagy egy megosztott órarend QR-kódját, hogy importálhassa."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabulaは、印刷された時間割をスキャンして読み込むためにカメラを使用します。"
+            "value" : "Tabulaは、印刷された時間割や共有された時間割のQRコードを読み取って取り込むためにカメラを使用します。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula używa aparatu do zeskanowania wydrukowanego planu lekcji, aby można go było zaimportować."
+            "value" : "Tabula używa aparatu, aby zeskanować wydrukowany plan lekcji lub kod QR udostępnionego planu i go zaimportować."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula folosește camera pentru a scana un orar tipărit, astfel încât să poată fi importat."
+            "value" : "Tabula folosește camera pentru a scana un orar tipărit sau codul QR al unui orar partajat, ca să îl poată importa."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula používa fotoaparát na naskenovanie vytlačeného rozvrhu, aby sa dal importovať."
+            "value" : "Tabula používa fotoaparát na naskenovanie vytlačeného rozvrhu alebo QR kódu zdieľaného rozvrhu, aby ho mohla importovať."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula користи камеру за скенирање одштампаног распореда како би могао да се увезе."
+            "value" : "Табула користи камеру да скенира одштампани распоред или QR код подељеног распореда како би могао да се увезе."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula koristi kameru za skeniranje odštampanog rasporeda kako bi mogao da se uveze."
+            "value" : "Tabula koristi kameru da skenira odštampani raspored ili QR kod podeljenog rasporeda kako bi mogao da se uveze."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula використовує камеру, щоб сканувати надрукований розклад і імпортувати його."
+            "value" : "Tabula використовує камеру, щоб сканувати надрукований розклад або QR-код поширеного розкладу й імпортувати його."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula 使用相机扫描打印的课程表，以便导入。"
+            "value" : "Tabula 使用相机扫描打印的课程表或共享课程表的二维码，以便将其导入。"
           }
         }
       }

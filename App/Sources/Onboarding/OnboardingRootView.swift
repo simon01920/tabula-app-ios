@@ -35,7 +35,7 @@ struct OnboardingRootView: View {
 
     var body: some View {
         if let flow {
-            OnboardingFlowView(flow: flow)
+            OnboardingFlowView(flow: flow).modifier(OnboardingShareImport(profile: flow.draft.profile))
         } else {
             ProgressView().task {
                 flow = OnboardingFlow(today: model.today, step: initialStep, prefill: prefill,
@@ -166,6 +166,7 @@ struct StartStepView: View {
     @Bindable var flow: OnboardingFlow
     @Environment(AppModel.self) private var model
     @Environment(SampleContentController.self) private var samples
+    @Environment(AppNavigation.self) private var navigation
 
     private var isSample: Bool { flow.draft.start == .sample }
 
@@ -189,6 +190,37 @@ struct StartStepView: View {
                     flow.draft.start = .sample
                 }
             }
+            // Phase 7 H1: not a third start mode (no radio circle) but an action: the import screen; importing finishes
+            // onboarding and the shell switches to the tabs on its own.
+            Button { navigation.openImport(nil) } label: {
+                Label { Text("onboarding.start.import") } icon: { Image(systemName: "qrcode.viewfinder") }
+                    .font(.subheadline)
+                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                    .contentShape(Rectangle())
+            }
+            .padding(.horizontal, 4)
+            .accessibilityHint(Text("onboarding.start.import.detail"))
         }
+    }
+}
+
+/// The import screen during onboarding (no tab view, so no root presenter): "Import a Shared Timetable…" and
+/// `tabula://import` links both arrive as `AppNavigation.pendingImport`. The request is taken out at once (the tab view
+/// never shows it again after the import finishes onboarding); a link that arrives while the sheet is open replaces
+/// its content ("If item changes, the system dismisses the sheet and replaces it with a new one", sheet(item:) docs),
+/// so there is only ever one sheet and no request is lost.
+private struct OnboardingShareImport: ViewModifier {
+    let profile: UserProfile?
+    @Environment(AppNavigation.self) private var navigation
+    @State private var pending: AppNavigation.PendingImport?
+
+    func body(content: Content) -> some View {
+        content
+            .onChange(of: navigation.pendingImport?.id, initial: true) {
+                guard let next = navigation.pendingImport else { return }
+                navigation.dropPendingImport()
+                pending = next
+            }
+            .sheet(item: $pending) { item in ShareImportView(initial: item.inbound, profile: profile) }
     }
 }

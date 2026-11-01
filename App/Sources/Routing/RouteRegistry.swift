@@ -25,6 +25,7 @@ enum RouteRegistry {
             TasksRoutes.self,
             ExamsRoutes.self,
             SettingsRoutes.self,
+            SharingRoutes.self,
         ]
         #if DEBUG
         list.append(DebugRoutes.self)

@@ -45,7 +45,7 @@ public struct DatabaseMutation: Sendable {
     public let label: String
     /// `true` when the mutation replaces the whole database (onboarding, debug sample loading).
     public let replacesDatabase: Bool
-    private let step: @Sendable (inout TabulaDatabase, inout HybridLogicalClock, Date) throws -> Void
+    let step: @Sendable (inout TabulaDatabase, inout HybridLogicalClock, Date) throws -> Void
 
     init(label: String, replacesDatabase: Bool = false,
                  step: @escaping @Sendable (inout TabulaDatabase, inout HybridLogicalClock, Date) throws -> Void) {

@@ -26,6 +26,7 @@ struct SettingsRootView: View {
     @Environment(LiveActivityController.self) private var liveActivities
     @Environment(\.openURL) private var openURL
     @State private var addingTimetable = false
+    @State private var importing = false
 
     var body: some View {
         NavigationStack {
@@ -51,7 +52,11 @@ struct SettingsRootView: View {
             }
             .navigationTitle(Text("shell.tab.settings"))
             .sheet(isPresented: $addingTimetable) { NewTimetableSheet() }
-            .closesForDeepLink { addingTimetable = false }   // QA fix Q6
+            .sheet(isPresented: $importing) { ShareImportView() }
+            .closesForDeepLink {   // QA fix Q6
+                addingTimetable = false
+                importing = false
+            }
         }
     }
 
@@ -126,6 +131,10 @@ struct SettingsRootView: View {
                 Label { Text("settings.timetables.add") } icon: { Image(systemName: "plus.circle.fill") }
             }
             .disabled(!canAddTimetable)
+            Button { importing = true } label: {
+                Label { Text("share.import.menu") } icon: { Image(systemName: "square.and.arrow.down") }
+            }
+            .disabled(model.isReadOnly || model.database == nil)
         } header: {
             Text("settings.section.timetable")
         }

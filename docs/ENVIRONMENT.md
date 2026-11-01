@@ -695,3 +695,18 @@ API names checked in the installed iOS 27 SDK (`iPhoneOS.sdk/System/Library/Fram
 | Layout: private DB, zone `Tabula`, record type = `EntityType` raw value, record name = entity id, fields `payload` (Bytes, canonical entity JSON) + `schemaVersion` (Int64); payload ≤ 900 000 B (1 MB record limit); tombstones are records, never CKRecord deletes; pending = payload SHA-256 ≠ ledger (restart-safe, no outbox) | DESIGN + VERIFIED (Linux tests) | `TimetableCore/Sync/CloudSync.swift`; `CloudSyncTests` (fake CloudKit zone) |
 | `TABULA_CLOUDKIT` = `$(TABULA_CLOUDKIT_CONDITION_$(TABULA_PAID_ACCOUNT))` (xcconfig); xtool `--cloudkit build` compiles it (compile check only, refuses install); `xtool-dev.sh` fails if CloudKit is linked without the flag or missing with it | VERIFIED (build) | base: `+ CloudKit check: linked=0`; `--cloudkit build`: `linked=1`, 0 warnings both |
 | CloudKit schema must be deployed Development → Production in the CloudKit Console before the App Store release | HUMAN STEP | RISKS #92; `docs/checklists/PHASE6_DEVICE.md` |
+
+## 37. Phase 7 H1 — sharing in the app (swiftui-engineer, 2026-11-01)
+
+API names checked in the installed iPhoneOS27.0.sdk (`VisionKit.swiftmodule`, `Vision.swiftmodule`
+`arm64e-apple-ios.swiftinterface`, `CoreImage.framework/Headers/CIFilterBuiltins.h`) and Apple's docs on 2026-10-31.
+
+| Fact | Status | Evidence |
+|---|---|---|
+| `DataScannerViewController` (iOS 16): `init(recognizedDataTypes:qualityLevel:recognizesMultipleItems:isHighFrameRateTrackingEnabled:isPinchToZoomEnabled:isGuidanceEnabled:isHighlightingEnabled:)`, `RecognizedDataType.barcode(symbologies: [VNBarcodeSymbology])`, `class var isSupported` / `isAvailable`, `startScanning() throws`, `stopScanning()`; delegate `dataScanner(_:didAdd:allItems:)`, `dataScanner(_:becameUnavailableWithError: ScanningUnavailable)`; `RecognizedItem.barcode(Barcode)`, `Barcode.payloadStringValue` | VERIFIED (SDK + xtool build, 0 warnings); runtime UNVERIFIED (PHASE7_DEVICE H1.11–H1.14) | VisionKit.swiftinterface lines 16–64, 268–386 |
+| `isAvailable` is `true` until the user **denies** the camera ("If the user doesn't deny your app access to the camera…"); the first `startScanning()` shows the system prompt; a denial arrives as `becameUnavailableWithError` | DOCS | https://developer.apple.com/documentation/visionkit/scanning-data-with-the-camera, …/datascannerviewcontroller/isavailable |
+| Vision `DetectBarcodesRequest` (iOS 18, Swift value type, used instead of `VNDetectBarcodesRequest` for Swift 6): `symbologies: [BarcodeSymbology]` (`.qr`), `perform(on: Data, orientation:) async throws -> [BarcodeObservation]`, `BarcodeObservation.payloadString` | VERIFIED (SDK + build) | Vision.swiftinterface lines 1314–1328, 2867–2884 |
+| `CIFilter.qrCodeGenerator()`: `message` (Data), `correctionLevel` ("L"/"M"/"Q"/"H"); one pixel per module, so `Image(uiImage:).interpolation(.none)` scales it crisply | VERIFIED (SDK + build); rendering UNVERIFIED (H1.2) | CIFilterBuiltins.h `@protocol CIQRCodeGenerator` |
+| `CFBundleURLTypes` (`tabula`) in `Config/App-Info.plist` reaches the xtool app's Info.plist | VERIFIED (build: `plutil -p TabulaApp.app/Info.plist`) | XcodeGen path uses the same file (INFOPLIST_FILE) |
+| `SwiftUI.ShareLink` and `TimetableCore.ShareLink` clash in files that import both: qualify both | VERIFIED (build) | `App/Sources/Sharing/ShareTimetableSheet.swift` |
+| `DatabaseMutation.step` is now `internal` (was `private`) so `importShared` can run `TimetableManagement` steps on the database after the insert | DESIGN | `Packages/TimetableUI/Sources/TimetableUI/State/DatabaseMutation.swift` |
