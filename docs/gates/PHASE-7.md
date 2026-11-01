@@ -21,7 +21,7 @@ Status: **READY FOR REVIEW, with one open CI failure (the iCloud sync variant ch
 - **xtool build:** 0 warnings.
 - **Worker:** `node:test` **12 of 12 pass**.
 - **iOS CI run 41273158234 (8b78047): green.** All jobs pass: Linux validate and core tests, xtool/SwiftPM, and on macOS the core tests, the unsigned iOS + watchOS build and the CloudKit variant compile. The earlier red run 41271764610 failed only the CloudKit link check: Xcode 16+ Debug builds keep the code in `TabulaApp.debug.dylib`, so the check now reads that file too (`8b78047`).
-- **Screenshots run 41271737929: success.** Inspected: `share.import-preview` is correct. `export.preview` showed the empty state: the route rendered before the async model load. Fixed in `ce8a045`; the re-run result is below.
+- **Screenshots run 41271737929: success.** Inspected: `share.import-preview` is correct. `export.preview` showed the empty state: the route rendered before the async model load. Fixed in `ce8a045`; the re-run (41274364258) shows the full grid.
 
 ### Device
 - **Not run:** `PHASE7_DEVICE.md` (rows H1.1–H1.46, H2.1–H2.3). Nothing about the QR code, the scanner, the share sheet or the import preview has been seen on a phone.

@@ -19,13 +19,13 @@ Status: **READY FOR REVIEW, with one open CI failure (the iCloud sync variant ch
 - **`validate.sh` exit 0:** **564 core + 667 TimetableUI tests** (551 + 634 at the Phase 6 gate; the rise includes Phase 7), 1,482 catalog keys complete in all 12 languages.
 - **xtool build:** 0 warnings.
 - **iOS CI run 41273158234 (8b78047): green.** All jobs pass: Linux validate and core tests, xtool/SwiftPM, and on macOS the core tests, the unsigned iOS + watchOS build and the CloudKit variant compile. The earlier red run 41271764610 failed only the CloudKit link check: Xcode 16+ Debug builds keep the code in `TabulaApp.debug.dylib`, so the check now reads that file too (`8b78047`).
-- **Screenshots run 41271737929: success.** Inspected: `share.import-preview` is correct. `export.preview` showed the empty state: the route rendered before the async model load. Fixed in `ce8a045`; the re-run result is below.
+- **Screenshots run 41271737929: success.** Inspected: `share.import-preview` is correct. `export.preview` showed the empty state: the route rendered before the async model load. Fixed in `ce8a045`; the re-run (41274364258) shows the full grid.
 
 ### Device
 - **Not run:** `PHASE8_DEVICE.md`. No exported file has been opened in Photos, Files, Numbers, Excel or Calendar. The checklist has the rows for each.
 
 ## Not done / known limits
-- **`ImageRenderer` output is unchecked on a device.** The risk is `GeometryReader` and `ScrollView` content rendering blank or clipped. Use the DEBUG-only route `export.preview` to see the real export of the current week's grid, then the PDF and image rows of the checklist.
+- **`ImageRenderer` draws the export in the iOS Simulator** (screenshots run 41274364258, `export.preview` for secondary and university): the title, the week range, every lesson, room changes, substitutions and the struck-through cancelled lesson. Still open on a device: the PDF path and the image and PDF rows of the checklist.
 - **A Week-view page taller than the paper is clipped** (the print layout does not scale it down).
 - **A term longer than 366 days exports only its first 366 days** (`ExportPlan.maximumDays`).
 - **Temp-file removal timing needs a device check:** when the exported file is deleted relative to the share sheet closing.
