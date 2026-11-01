@@ -36,7 +36,7 @@ enum RootSheet: Identifiable, Hashable {
     /// The in-context notification pre-explainer (QA fix Q1).
     case permissionOffer
     /// An incoming `tabula://import` link (Phase 7 H1): the import screen, opened on that link.
-    case shareImport(ShareInbound)
+    case shareImport(ShareInbound?)
 
     var id: Self { self }
 }
@@ -96,7 +96,8 @@ final class AppNavigation {
 
     /// An incoming share link not shown yet.
     struct PendingImport: Equatable, Identifiable {
-        let inbound: ShareInbound
+        /// `nil` = the import screen's choices (onboarding's "Import a Shared Timetable…").
+        let inbound: ShareInbound?
         let id = UUID()
         let requestedAt: Date
         var dismissRequested = false
@@ -116,7 +117,7 @@ final class AppNavigation {
     }
 
     /// Opens the import screen on `inbound` (a `tabula://import` link); a newer link replaces one still waiting.
-    func openImport(_ inbound: ShareInbound) {
+    func openImport(_ inbound: ShareInbound?) {
         pendingImport = PendingImport(inbound: inbound, requestedAt: Date())
     }
 
