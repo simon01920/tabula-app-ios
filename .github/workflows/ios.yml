@@ -257,8 +257,10 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             | tee build/xcodebuild-cloudkit.log | xcbeautify --renderer github-actions
           APP="$(find build/DerivedData/Build/Products -maxdepth 2 -name 'TabulaApp.app' -type d | head -1)"
-          otool -L "$APP/TabulaApp" | grep -q CloudKit.framework \
-            || { echo "::error::the TABULA_CLOUDKIT build does not link CloudKit"; exit 1; }
+          # Xcode 16+ Debug builds (ENABLE_DEBUG_DYLIB) keep the app code in TabulaApp.debug.dylib; the executable is a stub.
+          BINS="$APP/TabulaApp"; [ -f "$APP/TabulaApp.debug.dylib" ] && BINS="$BINS $APP/TabulaApp.debug.dylib"
+          otool -L $BINS | grep -q CloudKit.framework \
+            || { ls "$APP"; echo "::error::the TABULA_CLOUDKIT build does not link CloudKit"; exit 1; }
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
