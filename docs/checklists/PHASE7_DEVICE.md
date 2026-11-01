@@ -99,3 +99,10 @@ marked **[service]** above and add:
 | H2.1 | B without Tabula: open A's inline link in Safari | Landing page with "Open in Tabula" and the store placeholder; no trackers | | |
 | H2.2 | B with Tabula: landing page → Open in Tabula | Tabula opens on the import preview (`tabula://import#…` / `?code=`) | | |
 | H2.3 | Share 10+ codes within a minute | Eventually "Too many shares in a short time. Wait a minute, then try again." | | |
+
+## QA re-check items (2026-11-01)
+| # | Step | Expected | Result | Notes |
+|---|---|---|---|---|
+| H1.Q1 | Fresh install, onboarding: import a shared link | The import finishes onboarding; Settings > Reminders lists the profile's preset rules | | |
+| H1.Q2 | During onboarding with the import sheet open, open a second `tabula://import` link | The open sheet swaps to the new timetable; no second sheet, nothing lost | | |
+| H1.Q3 | After onboarding: delete every reminder rule, then import a link | No reminder rules come back | | |

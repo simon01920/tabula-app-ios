@@ -72,6 +72,7 @@ struct ExportSheet: View {
                 }
             }
             .overlay { if isWorking { ProgressView().controlSize(.large) } }
+            .interactiveDismissDisabled(isWorking)   // QA: a swipe mid-render would orphan the PDF task
             .alert(Text("export.failed.title"), isPresented: $failed) {
                 Button(role: .cancel) {} label: { Text("export.failed.ok") }
             } message: { Text("export.failed.message") }

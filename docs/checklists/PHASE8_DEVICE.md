@@ -44,3 +44,9 @@ Tabula Pro.").
 - [ ] Cancelled lessons appear as cancelled/struck events (STATUS:CANCELLED), not as normal events.
 - [ ] Re-import after changing a lesson (room) and exporting again: the existing events update, nothing is duplicated. Re-import after cancelling a lesson: the earlier event is cancelled.
 - [ ] Description shows teacher and change text; calendar name is the timetable name.
+
+## QA re-check items (2026-11-01)
+- [ ] Debug build: open the `export.preview` route (Developer screen or `-TabulaScreen export.preview`). The rendered image shows the full week grid, not a blank or clipped page.
+- [ ] Export a term-long PDF in Day view: the spinner keeps moving, the sheet can't be swiped away while it works, and the share sheet appears at the end.
+- [ ] Share the exported file with AirDrop, Mail and Save to Files. Each one gets the file, even though the temp folder is deleted when the share sheet closes.
+- [ ] A week-view page taller than the paper size is clipped (known limit); note how bad it looks.
