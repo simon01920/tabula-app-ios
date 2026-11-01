@@ -22,6 +22,7 @@ Never type or paste an Apple ID password, 2FA code or app-specific password into
 >
 >   Run `bash scripts/xtool-dev.sh build` first, so the work dir is current.
 > - Use xtool **1.22.2+**; 1.20.1 cannot log in (error -80045).
+> - VERIFIED 2026-11-01: `idevice_id -l` = 0 and the relay logs "upstream connect failed [WinError 1225]" mean the Apple Mobile Device service is down (nothing on 127.0.0.1:27015). Opening the Apple Devices app ("Apple zariadenia" in Slovak Windows) starts it; [Orch] can open it with `Start-Process "shell:AppsFolder\AppleInc.AppleDevices_nzyj5cx40ttqa!App"`.
 > - VERIFIED 2026-11-01: if `xtool dev run` stops at `[Provisioning]` with 409 "There are no current IOS devices on this team matching the provided device IDs", run it again; the second run installed fine.
 > - The human opens a root shell without the first-run prompt using `wsl -d Ubuntu -u root --exec bash -l`.
 
