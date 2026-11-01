@@ -33,6 +33,30 @@ Defaults the orchestrator took (listed for the gate, the human can reverse them)
 | D11 | **Glossary** (Opus §10): Task (types Homework/Assignment/To-do); Break = gap between lessons; **Holidays** = days off; Week A/Week B; Change (Cancel/Move/Substitute/Room); **Custom times**; **School type**. Rotation labels come from localised full-phrase keys; no "Week " + label concatenation. |
 | D12 | **Capitalisation:** Title Case for navigation titles, tab names, buttons and menu items; sentence case for section headers, row labels, footers, body text and empty states. English only; other languages follow their own rules. |
 
+**Human decision 2026-11-01: Grid = days × periods.** The periods × days grid looked almost like the Week view, so
+the Grid becomes the Slovak aSc-style layout (reference: the human's screenshot, 13 periods 7.00–17.10, Po–Pi rows).
+The Week view is unchanged. Implemented on `wip/grid-transpose`:
+- Rows = days (abbreviated weekday as in the week strip + day of month; today tinted ink; change symbol); columns =
+  the bell schedule's lesson periods, header "number / start time" in the app's time format. Pure maths in
+  `DayPeriodGrid` and `GridMode` (TimetableUI, `GridTransposeTests`).
+- Columns share the width when each is at least 46 pt (scaled with Dynamic Type): 7 periods fit a 375 pt phone in
+  portrait. Otherwise they keep 46 pt and scroll horizontally with the header; the day column stays pinned.
+  Landscape shows more. Rows share the height (50 pt minimum, 1.5x normal maximum); only when they do not fit
+  (7 days in landscape) does the grid scroll vertically, and then the header scrolls with it.
+- **Break columns are dropped** (not thin columns): the header's start times already show the gaps, a phone needs
+  every point for periods, and a double period across a break becomes one cell over two adjacent columns, as in the
+  reference. A lesson placed only on a break period goes to the "Outside the bell schedule" list below the grid.
+- Cells: subject colour, short name bold and centred (emoji above when it fits), room small bottom-trailing, the one
+  badge slot (cancelled > exam > tasks > change) bottom-leading; cancelled dimmed and struck through; highlighter on
+  the current lesson and the current period number; holidays shade their row. Free periods are faint neutral cells
+  without an outline (tap → quick add).
+- **Free-form timetables (university)** keep `GridLayout`'s rows: one column per distinct start–end pair of the shown
+  week, in time order, so every lesson lands in exactly one column and no fake periods are invented. Their header shows
+  start / end time instead of a period number, VoiceOver omits "period n", and a slot is not offered as free when a
+  lesson of that day is running at its start time (Monday 9:00 during an 8:00–9:30 lecture).
+- VoiceOver reads row by row ("<day>: <lesson sentence>", free "<day>, period n, <time>, free"). AX sizes, or fewer
+  than 3 visible period columns, still switch to `GridListView`. The export page fits all periods at fixed widths.
+
 **Needs the human (not implemented):**
 - **M30:** a reduced *free* Lock Screen widget. This changes the Free/Pro split, which CLAUDE.md says needs the human's approval.
 - **Grade recording** for past exams (schema change).

@@ -403,6 +403,34 @@ is "Week B" (the sample's own A/B labels); university seed: this week is "Even w
 - [ ] AX-XXXL: the grid becomes the day-by-day list (kept); the current lesson row shows the "NOW" tag; today's header
       tag is ink, not red.
 
+### Grid = days × periods (human decision 2026-11-01)
+Supersedes the U4.2 lines about "room on line 2", "badge bottom-right", "period number in the gutter" and "rows fill
+the screen" for the Grid (the Week view is unchanged).
+- [ ] Portrait, `timetable.grid` (secondary): rows PO–PI, columns 1–8 with start times (e.g. 8:00) in the device's
+      12/24-hour format; all 8 periods visible without scrolling; no break columns.
+- [ ] Cells: subject colour, short name bold and centred, room small bottom-right; badge bottom-left (task ☑ count,
+      exam cap, change symbol, red ⊗ on cancelled ANJ Thu P4, which is dimmed and struck through).
+- [ ] Spans: Wed INF covers periods 4–5 as one cell; tapping it opens the lesson. A schedule with a lunch period:
+      no lunch column, a double period across it is still one cell.
+- [ ] Now (`-TabulaNow` Tue 10:20): SJL Tue P3 has the highlighter outline, header "3" has the highlighter, the TUE
+      row label is ink-tinted. VoiceOver on the cell adds "in progress".
+- [ ] Free periods are faint grey cells with no outline; press shows the dashed "+", release opens quick add for
+      that day and period.
+- [ ] Long day: give a timetable 12+ periods (edit the bell schedule) → portrait scrolls horizontally; the day column
+      stays pinned, the header scrolls with the cells and stays aligned; landscape shows more (or all) periods.
+- [ ] Landscape (secondary, 5 days): all periods fit; rows still readable (≥ 50 pt); no clipped names.
+- [ ] Holiday week (26–30 Oct): Thu and Fri rows are one shaded band with the umbrella and "Jesenné prázdniny".
+- [ ] University (`timetable.grid@university`): columns are the week's start times (8:00, 9:00, 10:00, 11:00, 13:00,
+      14:00) with end times below; no period numbers; Monday 9:00 and 11:00 are not offered as free.
+- [ ] VoiceOver: swipe through the grid → Monday's cells and free periods left to right, then Tuesday, …; a cell reads
+      "Monday, 12 October: Slovenský jazyk, period 1, …"; a free period reads "…, period 7, 13:40 to 14:25, free";
+      a holiday row reads the day sentence with "holiday".
+- [ ] Dynamic Type XXL: columns widen and scroll sooner; names shrink before truncating. AX sizes: the list (kept).
+- [ ] Dark mode and Increase Contrast: free cells still visible but quiet; today's ink label readable.
+- [ ] German / Slovak / Japanese: weekday labels (MO, PO, 月) fit the day column.
+- [ ] Export (`export.preview`, Share → PDF/Image): the Grid page shows every period at fixed widths, no scroll
+      cut-off, no today/now markers.
+
 ### U4.3 Symbol legend (TipKit)
 - [ ] Fresh install (delete and reinstall the app to reset TipKit):
       open the Timetable tab on the secondary seed WITHOUT `-TabulaNow` → an inline card "Symbols in the timetable"

@@ -204,15 +204,14 @@ struct TodayStateTests {
 @Suite("Grid presentation")
 struct GridPresentationTests {
     @Test func modeSwitchesToListAtAccessibilitySizesAndWhenTooNarrow() {
-        #expect(GridMode.choose(isAccessibilitySize: false, columnCount: 5, availableWidth: 402, periodColumnWidth: 44) == .grid)
-        #expect(GridMode.choose(isAccessibilitySize: false, columnCount: 7, availableWidth: 375, periodColumnWidth: 44) == .grid)
-        #expect(GridMode.choose(isAccessibilitySize: true, columnCount: 5, availableWidth: 440, periodColumnWidth: 44) == .list)
-        #expect(GridMode.choose(isAccessibilitySize: false, columnCount: 7, availableWidth: 300, periodColumnWidth: 44) == .list)
-        // Day columns are at least 44 pt wide (tap target): a 7-day week fits the grid on 375/393 pt phones, not below.
+        #expect(GridMode.choose(isAccessibilitySize: false, availableWidth: 402, labelColumnWidth: 36) == .grid)
+        #expect(GridMode.choose(isAccessibilitySize: true, availableWidth: 440, labelColumnWidth: 36) == .list)
+        // Period columns are at least 44 pt wide (tap target); fewer than 3 visible columns → list.
         #expect(GridMode.minimumColumnWidth >= 44)
-        #expect(GridMode.choose(isAccessibilitySize: false, columnCount: 7, availableWidth: 359, periodColumnWidth: 46) == .grid)
-        #expect(GridMode.choose(isAccessibilitySize: false, columnCount: 7, availableWidth: 340, periodColumnWidth: 46) == .list)
-        #expect(GridMode.choose(isAccessibilitySize: false, columnCount: 7, availableWidth: 360, periodColumnWidth: 60) == .list)
+        #expect(GridMode.choose(isAccessibilitySize: false, availableWidth: 36 + 3 * GridMode.minimumColumnWidth,
+                                labelColumnWidth: 36) == .grid)
+        #expect(GridMode.choose(isAccessibilitySize: false, availableWidth: 35 + 3 * GridMode.minimumColumnWidth,
+                                labelColumnWidth: 36) == .list)
         #expect(TapTarget.hitArea(drawn: 22) == (44, 11))
         #expect(TapTarget.hitArea(drawn: 80) == (80, 0))
     }
