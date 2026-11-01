@@ -23,7 +23,7 @@ Status: **READY FOR REVIEW, with one open CI failure — waiting for your approv
   - xtool path green.
   - **XcodeGen job RED.** The macOS core-test compile fails with "the compiler is unable to type-check this expression in reasonable time" on the `#expect` sum at `Packages/TimetableCore/Tests/TimetableCoreTests/Sync/CloudSyncTests.swift:118-120`. Linux's compiler accepts it. The same step failed the same way on `81b9d50` (run 41216929532).
   - **Skipped because of it:** the XcodeGen iOS + watchOS build, the bundle-layout check, and the "Compile the iCloud sync variant (`TABULA_CLOUDKIT`)" step.
-  - **Fix (not done here, docs only):** split the sum into a local `let expected = …` and compare once.
+  - **Fixed after this report:** `1484f16` splits the sum. That uncovered a wrong CloudKit link check (Xcode 16+ Debug builds keep the code in `TabulaApp.debug.dylib`), fixed in `8b78047`. **iOS CI run 41273158234 is green on every job**, including the XcodeGen iOS + watchOS build and the `TABULA_CLOUDKIT` variant compile.
 - **Local builds (ENVIRONMENT §36):** the base xtool build links no CloudKit (`linked=0`); `--cloudkit build` compiles the adapter (`linked=1`, compile check only, refuses install); both report 0 warnings.
 - **Sync logic:** `CloudSyncTests` covers both merge directions, tombstones, idempotent re-apply and all three first-sync choices converging on a fake zone.
 - **Backup and migration:** Linux tests for restore (Merge and Replace keep `syncEnabled`), attachment copy, crash re-run, and the stranded-store migration.

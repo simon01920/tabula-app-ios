@@ -18,10 +18,8 @@ Status: **READY FOR REVIEW, with one open CI failure (the iCloud sync variant ch
 ### Merged state `cc5f1fc` (Phases 7 and 8 on `wip/integration`), verified
 - **`validate.sh` exit 0:** **564 core + 667 TimetableUI tests** (551 + 634 at the Phase 6 gate; the rise includes Phase 7), 1,482 catalog keys complete in all 12 languages.
 - **xtool build:** 0 warnings.
-- **iOS CI run 41271764610: FAILED, one step.**
-  - Green: change detection, the Linux job, the xtool/SwiftPM job, and on macOS the core tests (so the E1 writers pass on Apple's Foundation and time-zone data), project generation, the unsigned iOS + watchOS build (this compiles the export code on the iOS SDK), and the bundle-layout check.
-  - **Red: "Compile the iCloud sync variant (TABULA_CLOUDKIT, unsigned)".** The build ends "Build Succeeded", then the check that `otool -L TabulaApp` lists `CloudKit.framework` fails with "the TABULA_CLOUDKIT build does not link CloudKit". Phase 6 code; no export file is involved. Cause not established (a guess: the debug build keeps linked frameworks in `TabulaApp.debug.dylib`).
-- **Screenshots run 41271737929:** **success** (2026-11-01, ~21 min). Light, dark and large-text screenshots uploaded as artifact `ui-screenshots-41` (the optional watch step was skipped). The images were not inspected for this report.
+- **iOS CI run 41273158234 (8b78047): green.** All jobs pass: Linux validate and core tests, xtool/SwiftPM, and on macOS the core tests, the unsigned iOS + watchOS build and the CloudKit variant compile. The earlier red run 41271764610 failed only the CloudKit link check: Xcode 16+ Debug builds keep the code in `TabulaApp.debug.dylib`, so the check now reads that file too (`8b78047`).
+- **Screenshots run 41271737929: success.** Inspected: `share.import-preview` is correct. `export.preview` showed the empty state: the route rendered before the async model load. Fixed in `ce8a045`; the re-run result is below.
 
 ### Device
 - **Not run:** `PHASE8_DEVICE.md`. No exported file has been opened in Photos, Files, Numbers, Excel or Calendar. The checklist has the rows for each.
@@ -50,7 +48,7 @@ Status: **READY FOR REVIEW, with one open CI failure (the iCloud sync variant ch
 ## Decisions needed from you
 | # | Decision | Recommendation |
 |---|---|---|
-| **P8-1** | **Approve Phase 8** and move on | Approve once CI is green on a tip that fixes the CloudKit link check (Phase 6 code) and `export.preview` looks right on your phone |
+| **P8-1** | **Approve Phase 8** and move on | CI is green (run 41273158234); approve and `export.preview` looks right on your phone |
 | P8-2 | **Exports are Pro, but the current tier is all-access.** Keep exports in Pro? | Keep: it is already in the entitlements helper (MONETIZATION) and costs nothing to hold until the paid account |
 | P8-3 | **A Week-view page taller than the paper:** scale to fit, or add pages? | Decide after the device rows show how often it happens |
 

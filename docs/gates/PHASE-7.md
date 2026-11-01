@@ -20,11 +20,8 @@ Status: **READY FOR REVIEW, with one open CI failure (the iCloud sync variant ch
 - **`validate.sh` exit 0:** **564 core + 667 TimetableUI tests** (551 + 634 at the Phase 6 gate; the rise includes Phase 8), 1,482 catalog keys complete in all 12 languages.
 - **xtool build:** 0 warnings.
 - **Worker:** `node:test` **12 of 12 pass**.
-- **iOS CI run 41271764610: FAILED, one step.**
-  - Green: change detection, the Linux job (validate and core tests), the xtool/SwiftPM job, and on macOS the core tests (the `CloudSyncTests` fix `1484f16` works), project generation, the unsigned iOS + watchOS build, and the bundle-layout check.
-  - **Red: "Compile the iCloud sync variant (TABULA_CLOUDKIT, unsigned)".** The xcodebuild build itself ends "Build Succeeded", then the check `otool -L TabulaApp | grep CloudKit.framework` fails with "the TABULA_CLOUDKIT build does not link CloudKit". Phase 6 never reached this step (it was skipped behind the test failure), so this is its first run.
-  - **Cause not established.** One guess: the debug build puts the linked frameworks in `TabulaApp.debug.dylib`, so `otool` on the stub executable shows none. Not a Phase 7 change; no sharing file is involved.
-- **Screenshots run 41271737929:** **success** (2026-11-01, ~21 min). Light, dark and large-text screenshots uploaded as artifact `ui-screenshots-41` (the optional watch step was skipped). The images were not inspected for this report.
+- **iOS CI run 41273158234 (8b78047): green.** All jobs pass: Linux validate and core tests, xtool/SwiftPM, and on macOS the core tests, the unsigned iOS + watchOS build and the CloudKit variant compile. The earlier red run 41271764610 failed only the CloudKit link check: Xcode 16+ Debug builds keep the code in `TabulaApp.debug.dylib`, so the check now reads that file too (`8b78047`).
+- **Screenshots run 41271737929: success.** Inspected: `share.import-preview` is correct. `export.preview` showed the empty state: the route rendered before the async model load. Fixed in `ce8a045`; the re-run result is below.
 
 ### Device
 - **Not run:** `PHASE7_DEVICE.md` (rows H1.1–H1.46, H2.1–H2.3). Nothing about the QR code, the scanner, the share sheet or the import preview has been seen on a phone.
@@ -52,7 +49,7 @@ Status: **READY FOR REVIEW, with one open CI failure (the iCloud sync variant ch
 ## Decisions needed from you
 | # | Decision | Recommendation |
 |---|---|---|
-| **P7-1** | **Approve Phase 7** and move on | Approve once CI is green on a tip that fixes the CloudKit link check (Phase 6 code) |
+| **P7-1** | **Approve Phase 7** and move on | CI is green (run 41273158234); approve |
 | P7-2 | **The real share domain** (placeholder: `tabula.simondev.sk`) | Pick it before the Cloudflare step: the domain is baked into QR codes and links people already shared |
 | P7-3 | **Deploy the Worker now or after the paid account** | Now: the free Cloudflare plan costs nothing and short codes then work on any build; universal links wait for the paid account either way |
 
