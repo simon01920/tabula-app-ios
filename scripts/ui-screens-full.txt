@@ -36,6 +36,7 @@ widgets.gallery-live@secondary
 widgets.gallery-live-exam@secondary
 settings.live-activities@secondary
 debug.design@secondary
+launch@secondary
 editor.bell@secondary
 editor.bell-period@secondary
 editor.lesson@secondary

@@ -86,6 +86,8 @@ private struct LessonEditorBody: View {
                         // `apply` already stored it; the draft keeps everything typed so far.
                         if let subject = model.database?.subjects.first(where: { $0.id == newID }) {
                             draft.wrappedValue.select(subject)
+                        } else {
+                            draft.wrappedValue.subjectID = newID   // QA: never lose the selection
                         }
                     }
                 }

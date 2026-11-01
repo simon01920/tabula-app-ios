@@ -1,6 +1,6 @@
 // The root of the window: loading → onboarding / main tabs / blocking problem, the store banner on top, the
 // appearance preference from settings, and the launch route (`-TabulaScreen`).
-// APIs: View.preferredColorScheme(_:), VStack, ProgressView, NavigationStack, View.sheet(isPresented:content:),
+// APIs: View.preferredColorScheme(_:), VStack, NavigationStack, View.animation(_:value:), AnyTransition.opacity, View.sheet(isPresented:content:),
 //       Environment(AppModel.self) (Observation), ContentUnavailableView (iOS 17), View.tint(_:) (iOS 15),
 //       (no root `\.locale` override: see body).
 import SwiftUI
@@ -9,6 +9,7 @@ import TimetableUI
 struct AppRootView: View {
     let launchRoute: LaunchRoute
     @Environment(AppModel.self) private var model
+    @State private var launchHeld = false
 
     var body: some View {
         content
@@ -29,20 +30,38 @@ struct AppRootView: View {
                 if let banner = model.banners.first {
                     StoreBannerView(banner: banner) { model.dismissBanner() }
                 }
-                if case .main = model.phase { SampleDataBanner() }   // "This is sample data · Remove" (U6)
+                if case .main = model.phase, launchHeld { SampleDataBanner() }   // "This is sample data · Remove" (U6)
                 phaseView
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .animation(.easeOut(duration: 0.2), value: showsLaunch)   // cross-fade out of LaunchView
             }
         }
     }
 
+    private var isLoading: Bool {
+        if case .loading = model.phase { return true }
+        return false
+    }
+
+    /// QA: a fast load would show the mark for one frame and fade it (a flash), so it stays for its one highlighter
+    /// swipe (0.3 s from launch, never longer) or until loading ends, whichever is later.
+    private var showsLaunch: Bool { isLoading || !launchHeld }
+
     @ViewBuilder
     private var phaseView: some View {
+        if showsLaunch {
+            LaunchView(onSwipeFinished: { launchHeld = true })
+                .transition(.opacity)
+        } else {
+            phaseContent
+        }
+    }
+
+    @ViewBuilder
+    private var phaseContent: some View {
         switch model.phase {
         case .loading:
-            ProgressView {
-                Text("shell.loading")
-            }
+            EmptyView()
         case .blocked(let problem):
             StoreProblemView(problem: problem)
         case .onboarding:

@@ -678,3 +678,32 @@ Before each row, type something into the parent first (a room, a note, a title) 
 ### Not verifiable without a device (E1)
 That duplicated presenters were the trigger (UIKit's "already presenting" console messages need Console.app on a Mac),
 sheet timing, and everything visual.
+## Demo data and launch screen (wip/demo-launch)
+
+### Demo data (Developer screen, DEBUG builds)
+Path: **Settings tab › Developer** (the last row, hammer icon) › section **Demo data**.
+- [ ] Before: enter one subject or task of your own so you can recognise your data later.
+- [ ] Tap **High school**: a dialog "Replace all data with demo data?" with **Back Up and Replace** and Cancel. Cancel
+      changes nothing.
+- [ ] Back Up and Replace: the Result row reads "loaded secondary; backup <date>-pre-demo.tabulabackup". Today shows the
+      gymnázium timetable (2.B, 12 subjects); Tasks has an overdue or upcoming task, Exams has upcoming exams, all dated
+      within this week and the next two, never weeks in the past.
+- [ ] Repeat with **University** (free times, buildings, exam period) and **Elementary** (big tiles). No onboarding appears.
+- [ ] Settings › Backup › Automatic copies lists one copy per load. Restore the oldest (**Replace**): your own data is back.
+- [ ] Force-quit and relaunch after a load: the demo data is still there (it was saved, not in memory only).
+- [ ] VoiceOver: each button reads its name; the dialog's buttons read "Back Up and Replace" and "Cancel".
+
+### Launch screen (LaunchView)
+Cold start = force-quit Tabula, then tap its icon. Loading is short, so watch closely or record the screen.
+- [ ] Light mode: no white-to-other-colour flash. The system's blank launch screen turns into the mark (ink square, yellow
+      bar, three white tiles) with "Tabula" below in ink blue, on the same white.
+- [ ] Dark mode: the same on black; no flash of white. The wordmark is light periwinkle and easy to read.
+- [ ] The yellow bar swipes in once from left to right (about a third of a second); the tiles then light up top to
+      bottom in a loop if loading lasts long enough to see it.
+- [ ] As soon as loading finishes the app fades in (about 0.2 s); there is no extra wait.
+- [ ] Reduce Motion on: the mark is still (bar already there, tiles fading top to bottom like the icon); no loop.
+- [ ] The mark looks like the Home Screen icon (bar tilted and slanted the same way, tiles centred under it).
+- [ ] VoiceOver on, cold start: one element that reads "Loading…" (in the app language), nothing else.
+- [ ] Largest text (AX-XXXL): the wordmark grows, stays on one line, and the mark stays 96 pt.
+- [ ] Slovak, Japanese or Chinese app language: the wordmark still reads "Tabula"; VoiceOver reads the localised "Loading…".
+- [ ] DEBUG: `-TabulaScreen launch` (or the CI screenshot `launch@secondary`) shows the launch screen permanently.
