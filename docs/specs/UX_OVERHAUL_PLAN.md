@@ -38,6 +38,12 @@ Defaults the orchestrator took (listed for the gate, the human can reverse them)
 - **Grade recording** for past exams (schema change).
 - **Merging Assignment into Homework** (schema and reminder kinds).
 
+### Next iteration: Grid layout option (human decision 2026-11-01)
+- **Default:** the Slovak / aSc layout. Rows are days (Po–Pi). Columns are periods, with the period number and start time in the header. Multi-period lessons span columns; the room sits at bottom-trailing; empty cells are quiet grey.
+- **Settings:** a user switch for the Grid layout. The current periods × days layout stays as the other option. Add the new layout next to `GridLayout`/`GridWeekView`; do not delete or rewrite them. The Week view is unchanged.
+- **Starting point:** `wip/grid-transpose` (`89ce03a`, pure `DayPeriodGrid` maths with Linux tests; not QA'd or merged).
+- **Persistence:** the setting is persisted, so ask the human before changing the schema (CLAUDE.md).
+
 ## 1. Stages, tiers, ownership
 | Stage | Agent (tier) | Findings |
 |---|---|---|
