@@ -42,7 +42,7 @@ Status: **READY FOR REVIEW — waiting for your approval** (2026-11-01) · Plan:
 ## Not done / known limits
 - **The fix pass is not re-verified.**
   - There was no screenshot review and no qa-reviewer run after `16ac596`.
-  - **D16 (Liquid Glass tab bar tinted by saturated tiles; same cause as L5) is not fixed:** no fix-pass commit names it and the diff has no tab-bar or bottom-margin change.
+  - **D16 (Liquid Glass tab bar tinted by saturated tiles): closed, by design.** The suggested bottom margin has been in place since U4 (`TimetableRootView` `.contentMargins(.bottom, 24, for: .scrollContent)`, L5), so the last tile ends above the bar. The tint left over is content scrolling beneath the glass bar, which is what iOS 26 bars are designed to do (HIG: content scrolls under bars).
   - Partials that no fix-pass commit names:
     - H2 (widgets and Live Activities keep timer style);
     - M4, M6, M29, M31, L4, F15, F21.
@@ -77,7 +77,7 @@ D1–D12 are in the plan §0. The ones that change behaviour most:
 | P4U-3 | **Grade recording** for past exams (schema change after Phase 1) | Defer to v1.1 |
 | P4U-4 | **Merge Assignment into Homework** (schema and reminder kinds) | Keep three types (D5) |
 | P4U-5 | **D1–D12 and the integration decisions** above | Accept; each is reversible in one stage |
-| P4U-6 | Run a **re-verification** (screenshots + qa-reviewer) of the fix pass, D16 and the unnamed partials before Phase 11 | Yes, one short run |
+| P4U-6 | Run a **re-verification** (screenshots + qa-reviewer) of the fix pass and the unnamed partials before Phase 11 | Yes, one short run |
 | P4U-7 | **P4-3** Lock Screen privacy option (carried over from Phase 4) | Add it; small |
 
 ## Manual on-device checklist
