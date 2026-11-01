@@ -337,20 +337,13 @@ struct GridCellView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .opacity(dim)
-            // One bottom row: badge leading, room trailing, side by side (D6: the badge never covers the room). The
-            // room has priority; the badge drops its task count first when the cell is narrow.
-            HStack(spacing: 2) {
-                if let badge { CellBadgeView(badge: badge).padding(.leading, -3) }
-                Spacer(minLength: 0)
-                if let room {
-                    Text(verbatim: room)
-                        .font(.caption2)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.6)
-                        .strikethrough(cancelled, pattern: .solid, color: foreground)
-                        .opacity(dim)
-                        .layoutPriority(1)
-                }
+            // One bottom row: badge leading, room trailing, side by side (D6: the badge never covers the room). When
+            // the room and the badge with its task count do not both fit, the badge drops the count first.
+            ViewThatFits(in: .horizontal) {
+                bottomRow(badge: badge, room: room, badgeWidth: badgeRow * 1.8, fixedRoom: true,
+                          foreground: foreground, cancelled: cancelled, dim: dim)
+                bottomRow(badge: badge, room: room, badgeWidth: badgeRow + 2, fixedRoom: false,
+                          foreground: foreground, cancelled: cancelled, dim: dim)
             }
             .frame(height: badgeRow)
         }
@@ -378,6 +371,31 @@ struct GridCellView: View {
             }
         }
         .contentShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+    }
+
+    /// The badge in a slot `badgeWidth` wide (it shows its task count only when that fits), the room in the rest,
+    /// trailing; `fixedRoom` keeps the room at full size so `ViewThatFits` falls back when it does not fit.
+    private func bottomRow(badge: LessonCellBadge?, room: String?, badgeWidth: CGFloat, fixedRoom: Bool,
+                           foreground: Color, cancelled: Bool, dim: Double) -> some View {
+        HStack(spacing: 0) {
+            if let badge {
+                CellBadgeView(badge: badge)
+                    .padding(.leading, -3)
+                    .frame(width: badgeWidth, alignment: .leading)
+            }
+            Group {
+                if let room {
+                    Text(verbatim: room)
+                        .font(.caption2)
+                        .lineLimit(1)
+                        .minimumScaleFactor(fixedRoom ? 1 : 0.6)
+                        .strikethrough(cancelled, pattern: .solid, color: foreground)
+                        .fixedSize(horizontal: fixedRoom, vertical: false)
+                        .opacity(dim)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .trailing)
+        }
     }
 
     private func title(_ lesson: ResolvedLesson, foreground: Color, cancelled: Bool, withEmoji: Bool) -> some View {
