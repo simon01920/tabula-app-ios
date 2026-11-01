@@ -1,0 +1,38 @@
+# Tabula share-code Worker. Human setup: docs/SHARING_DEPLOY.md. No secrets live here (CLAUDE.md rule 7):
+# the account ID comes from `wrangler login` / CLOUDFLARE_ACCOUNT_ID, the IDs below are not credentials.
+name = "tabula-share"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+workers_dev = false
+# account_id = "<CLOUDFLARE_ACCOUNT_ID>"   # PLACEHOLDER: only needed if your login can see several accounts
+
+# PLACEHOLDER domain: keep in sync with ShareConfiguration.defaultDomain (TimetableCore) and PUBLIC_ORIGIN below.
+routes = [{ pattern = "tabula.simondev.sk", custom_domain = true }]
+
+# No Workers Logs / traces: requests, IPs and payloads are not recorded by this Worker.
+[observability]
+enabled = false
+
+[[kv_namespaces]]
+binding = "SHARES"
+id = "<KV_NAMESPACE_ID>"   # PLACEHOLDER: output of `npx wrangler kv namespace create SHARES`
+
+# Workers Rate Limiting binding (per IP, per Cloudflare location, approximate). Costs no KV operations.
+[[ratelimits]]
+name = "RL_WRITE"
+namespace_id = "1001"
+  [ratelimits.simple]
+  limit = 5
+  period = 60
+
+[[ratelimits]]
+name = "RL_READ"
+namespace_id = "1002"
+  [ratelimits.simple]
+  limit = 60
+  period = 60
+
+[vars]
+PUBLIC_ORIGIN = "https://tabula.simondev.sk"   # PLACEHOLDER domain
+APPLE_TEAM_ID = ""                             # PLACEHOLDER: 10-character Team ID once the paid account exists
+APP_BUNDLE_ID = "sk.simondev.tabula"           # = TABULA_BUNDLE_ID in Config/AppIdentity.xcconfig

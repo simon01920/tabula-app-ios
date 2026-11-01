@@ -170,6 +170,17 @@ for helper in ci_paths.py sim_pick.py; do
   fi
 done
 
+step "Share Worker tests (worker/, node:test; skipped without a Node that strips TypeScript types)"
+if ! command -v node >/dev/null; then
+  echo "SKIP no node on PATH (install Node >= 22.18 to run: cd worker && node --test test/*.test.ts)"
+elif [ "$(node -p 'Boolean(process.features.typescript)' 2>/dev/null)" != "true" ]; then
+  echo "SKIP node $(node --version) cannot run .ts files (needs >= 22.18 / 23.6)"
+elif (cd "$REPO_ROOT/worker" && node --test test/*.test.ts) >"$TMP/worker.log" 2>&1; then
+  ok "worker: $(grep -oE '(tests|pass|fail) [0-9]+$' "$TMP/worker.log" | tr '\n' ' ')"
+else
+  tail -40 "$TMP/worker.log"; bad "worker tests (node --test)"
+fi
+
 step "App icon PNG"
 python3 - "$REPO_ROOT/Resources/AppIcon.png" <<'PY' || FAILS=$((FAILS + 1))
 import struct, sys
