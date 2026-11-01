@@ -315,6 +315,24 @@ struct LabeledTextField: View {
     }
 }
 
+/// A short input directly under an `EditorTitleField` (subject short name, timetable emoji): full width and leading like
+/// the title, with the hint as placeholder. A label-left, value-right row there left people unsure where to type.
+/// `labelKey` stays the VoiceOver label.
+struct EditorHintField: View {
+    let promptKey: LocalizedStringKey
+    let labelKey: LocalizedStringKey
+    @Binding var text: String
+
+    var body: some View {
+        // Wraps at AX sizes like the title (D24); a typed line break becomes a space, as in `LabeledTextField`.
+        TextField(text: Binding(get: { text }, set: { text = $0.replacingOccurrences(of: "\n", with: " ") }),
+                  prompt: Text(promptKey), axis: .vertical) { Text(labelKey) }
+            .multilineTextAlignment(.leading)
+            .frame(minHeight: 44)
+            .accessibilityLabel(Text(labelKey))
+    }
+}
+
 /// A time-of-day row (hour and minute) bridged to `LocalTime`.
 struct TimeRow: View {
     let titleKey: LocalizedStringKey

@@ -99,7 +99,8 @@ private struct TimetableFormContent: View {
         Section {
             EditorTitleField(promptKey: "editor.timetable.name.prompt", text: $draft.name,
                              missingHintKey: TimetableDraft.Issue.noName.l10nKey)
-            LabeledTextField(titleKey: "editor.timetable.emoji", text: $draft.emoji)
+            EditorHintField(promptKey: "editor.timetable.emoji.prompt", labelKey: "editor.timetable.emoji",
+                            text: $draft.emoji)
                 .onChange(of: draft.emoji) { _, newValue in
                     if let first = EditorText.firstCharacter(newValue), first != newValue { draft.emoji = first }
                 }

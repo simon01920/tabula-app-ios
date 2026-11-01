@@ -162,7 +162,8 @@ private struct SubjectFormContent: View {
         Section {
             EditorTitleField(promptKey: "editor.subject.name.prompt", text: $draft.name,
                              missingHintKey: SubjectDraft.Issue.noName.l10nKey)
-            LabeledTextField(titleKey: "editor.subject.shortName", text: $draft.shortName)
+            EditorHintField(promptKey: "editor.subject.shortName.prompt", labelKey: "editor.subject.shortName",
+                            text: $draft.shortName)
         }
     }
 

@@ -666,6 +666,15 @@ Before each row, type something into the parent first (a room, a note, a title) 
       (Delete Subject), exam (Delete Exam dialog), timetable settings (Reset Timetable). After Reset Timetable succeeds,
       the timetable settings stay open.
 
+### E2 Short name and Emoji fields
+- [ ] E2.1 Subject editor: Short name sits under Name as a full-width field starting at the leading edge, with the hint
+      "Short name (e.g. MAT)" inside; the hint disappears when typing. VoiceOver reads "Short name, text field".
+- [ ] E2.2 Timetable settings and New Timetable: Emoji sits under the name the same way, hint "Emoji (e.g. 🏫)"; typing
+      several characters keeps only the first (timetable settings).
+- [ ] E2.3 German and Hungarian at AX-XXXL: the hints wrap, nothing truncated; Japanese and Chinese hints read naturally.
+- [ ] E2.4 Dark mode: the hint text is legible (system placeholder colour). Room / Building / Teacher rows below are
+      unchanged (label left, value right).
+
 ### Not verifiable without a device (E1)
 That duplicated presenters were the trigger (UIKit's "already presenting" console messages need Console.app on a Mac),
 sheet timing, and everything visual.
