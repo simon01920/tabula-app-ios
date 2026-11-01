@@ -282,12 +282,16 @@ extension DatabaseMutation {
     /// Adds the shared timetable as a new timetable (`replacing == nil`) or in place of `replacing` (same position;
     /// the old timetable is deleted like "Delete Timetable": its tasks and exams stay, unlinked). The new timetable
     /// becomes active and onboarding counts as finished; `profile` is set when given (import from onboarding).
+    /// A database without live reminder rules (first launch, onboarding) gets the profile's preset rules, as
+    /// onboarding would (OnboardingBuilder / OnboardingFinish). A `replacing` timetable that no longer exists is an
+    /// error (`MutationError.notFound`), never a silent add.
     /// `replacesDatabase` only when nothing is stored yet (first launch), so the model accepts it without a base.
     public static func importShared(_ payload: SharePayloadV1, replacing: Timetable.ID? = nil, profile: UserProfile? = nil,
                                     startsFromScratch: Bool = false) -> DatabaseMutation {
         DatabaseMutation(label: replacing == nil ? "import shared timetable" : "import shared timetable (replace)",
                          replacesDatabase: startsFromScratch) { database, clock, now in
             let replaced = replacing.flatMap { id in database.timetables.first { $0.id == id && !$0.isDeleted } }
+            if let replacing, replaced == nil { throw MutationError.notFound(.timetable, replacing.uuid) }
             let sortIndex: Int
             if let replaced {
                 sortIndex = replaced.sortIndex
@@ -301,6 +305,11 @@ extension DatabaseMutation {
             database = try imported.inserted(into: database)
             if let replaced, let delete = TimetableManagement.deleteMutation(replaced.id, in: database) {
                 try delete.step(&database, &clock, now)
+            }
+            if !database.reminderRules.contains(where: { !$0.isDeleted }) {
+                database.reminderRules += ProfilePreset.for(profile ?? database.settings.profile).reminderRules.map {
+                    $0.makeRule(id: ids.next(), meta: .created(at: clock.tick(now: now)))
+                }
             }
             let newID = imported.timetable.id
             try DatabaseMutation.settings { settings in

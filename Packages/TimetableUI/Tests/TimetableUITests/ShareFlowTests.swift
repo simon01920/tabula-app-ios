@@ -194,5 +194,23 @@ struct ShareImportFlowTests {
         #expect(after.settings.onboardingCompletedAt == now)
         #expect(after.settings.profile == .university)
         #expect(after.settings.activeTimetableID == after.timetables.first?.id)
+        let presets = ProfilePreset.for(.university).reminderRules
+        #expect(!presets.isEmpty)
+        #expect(after.reminderRules.map(\.target) == presets.map(\.target))
+        #expect(after.validate().allSatisfy { $0.severity != .error })
+    }
+
+    @Test func importKeepsExistingReminderRules() throws {
+        let db = SampleScenarios.secondary().database
+        let after = try apply(.importShared(try payload(db)), to: db)
+        #expect(after.reminderRules == db.reminderRules)
+    }
+
+    @Test func replacingAVanishedTimetableFailsInsteadOfAdding() throws {
+        let db = SampleScenarios.secondary().database
+        let gone = Timetable.ID(UUID())
+        #expect(throws: MutationError.notFound(.timetable, gone.uuid)) {
+            try apply(.importShared(try payload(db), replacing: gone), to: db)
+        }
     }
 }
