@@ -718,7 +718,8 @@ Design: a "T" for Tabula drawn as a day's timetable column. The top bar is the h
 | Fact | Status | Evidence |
 |---|---|---|
 | XcodeGen ≥ 2.45.1 adds a `.icon` folder as `lastKnownFileType = wrapper.icon` in Resources (CI pins 2.46.0) | VERIFIED (local 2.46.0 generate: app + watch Resources phases; `validate.sh` checks it) | XcodeGen CHANGELOG, PR #1600 (its fixture uses a full-canvas 1024 SVG layer at `scale 1`) |
-| A `.icon` named like the asset-catalog set (`AppIcon`) is used by Xcode 26 in place of `AppIcon.appiconset` | REPORTED (forums, not Apple docs) | developer.apple.com/forums/thread/803368, 787576; UNVERIFIED here until a CI build of this change |
+| `actool` compiles `Resources/AppIcon.icon` with `--app-icon AppIcon` for the app and the watch app (`Assets.car` + `AppIcon60x60@2x.png`), no icon warnings | VERIFIED (CI run 41330074205, Xcode 27, `xcodebuild-log` artifact) | `CompileAssetCatalogVariant thinned … TabulaApp.app` / `… TabulaWatch.app` |
+| A `.icon` named like the asset-catalog set (`AppIcon`) is used in place of `AppIcon.appiconset` (actool gets both inputs) | REPORTED (forums, not Apple docs) | developer.apple.com/forums/thread/803368, 787576; which one wins is visible only on a signed install |
 | `icon.json` schema (`fill-specializations` + `appearance`, `automatic-gradient`, layer `glass`/`image-name`/`position`, group `shadow`/`translucency`/`specular`, `supported-platforms.circles: [watchOS]`) | REVERSE-ENGINEERED (Apple publishes no schema) | copied from Icon Composer output in IceCubesApp, mastodon-ios, yattee |
 | Asset-catalog dark/tinted icon keys: `"appearances": [{"appearance": "luminosity", "value": "dark" \| "tinted"}]` | VERIFIED (real Contents.json) | yattee `Yattee/Assets.xcassets/AppIcon.appiconset` |
 | xtool installs show only the flattened light `AppIcon.png` (`CFBundleIconFile`); iOS generates its own dark/tinted variants | DESIGN | `xtool.yml` `iconPath` |
