@@ -67,7 +67,11 @@ public enum XLSXExport {
     }
 
     static func sanitizedSheetName(_ name: String) -> String {
-        let cleaned = String(name.filter { !"[]:*?/\\".contains($0) }.prefix(31))
+        var cleaned = String(name.filter { !"[]:*?/\\".contains($0) }.prefix(31))
+        // Excel rejects a name that starts or ends with an apostrophe and the reserved name "History".
+        while cleaned.first == "'" { cleaned.removeFirst() }
+        while cleaned.last == "'" { cleaned.removeLast() }
+        if cleaned.lowercased() == "history" { cleaned += "_" }
         return cleaned.isEmpty ? "Sheet1" : cleaned
     }
 }

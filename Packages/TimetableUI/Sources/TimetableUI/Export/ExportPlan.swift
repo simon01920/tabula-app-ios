@@ -57,13 +57,17 @@ public enum ExportPlan {
             let start = context.startOfWeek(containing: today)
             return LocalDateRange(start: start, end: start.adding(days: 6))
         case .term:
-            if let term = currentTerm(terms, today: today) { return term.range }
-            return LocalDateRange(start: today, end: today.adding(days: fallbackDays - 1))
+            let term = currentTerm(terms, today: today)?.range
+                ?? LocalDateRange(start: today, end: today.adding(days: fallbackDays - 1))
+            return capped(term)
         case .custom:
-            let end = max(custom.start, custom.end)
-            let capped = min(end, custom.start.adding(days: maximumDays - 1))
-            return LocalDateRange(start: custom.start, end: capped)
+            return capped(LocalDateRange(start: custom.start, end: max(custom.start, custom.end)))
         }
+    }
+
+    /// `range` cut to `maximumDays` days (a term can be set to any length).
+    private static func capped(_ range: LocalDateRange) -> LocalDateRange {
+        LocalDateRange(start: range.start, end: min(range.end, range.start.adding(days: maximumDays - 1)))
     }
 
     /// The term containing `today` (the earliest-starting one when they overlap).
@@ -103,8 +107,9 @@ public enum ExportPlan {
     }
 
     /// `Timetable 2.B – week 42.pdf`: only characters that are safe in a file name, no path separators,
-    /// at most 80 characters of base name. `suffix` is the localised range description.
-    public static func fileName(timetable: String, suffix: String, ext: String) -> String {
+    /// at most 80 characters of base name. `suffix` is the localised range description; `fallback` (catalog text) names
+    /// a file whose timetable name is empty after sanitising.
+    public static func fileName(timetable: String, suffix: String, ext: String, fallback: String) -> String {
         let forbidden = CharacterSet(charactersIn: "/\\:*?\"<>|").union(.controlCharacters).union(.newlines)
         func clean(_ text: String) -> String {
             var out = ""
@@ -114,7 +119,7 @@ public enum ExportPlan {
         var base = clean([timetable, suffix].filter { !$0.isEmpty }.joined(separator: " – "))
         while let first = base.first, first == "." || first == " " { base.removeFirst() }   // no hidden or "../" names
         if base.count > 80 { base = String(base.prefix(80)).trimmingCharacters(in: .whitespaces) }
-        if base.isEmpty { base = "Timetable" }
+        if base.isEmpty { base = clean(fallback) }
         return base + "." + ext
     }
 

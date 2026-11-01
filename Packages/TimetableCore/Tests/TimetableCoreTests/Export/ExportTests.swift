@@ -81,6 +81,9 @@ struct ExportTests {
         #expect(CSVExport.field("two\nlines") == "\"two\nlines\"")
         #expect(CSVExport.field("cr\r\nlf") == "\"cr\r\nlf\"")
         #expect(CSVExport.field("=1+1") == "'=1+1")
+        #expect(CSVExport.field(" =1") == "' =1")
+        #expect(CSVExport.field("\u{FF1D}1") == "'\u{FF1D}1")
+        #expect(CSVExport.field("\u{FF20}SUM") == "'\u{FF20}SUM")
         #expect(CSVExport.field("@x,y") == "\"'@x,y\"")
         #expect(CSVExport.field("Fyzika č. 2") == "Fyzika č. 2")
     }
@@ -212,6 +215,10 @@ struct ExportTests {
         #expect(entries[1].bytes.count == 4096 && entries[0].bytes == Array("x".utf8))
         #expect(XLSXExport.sanitizedSheetName("[]:*?/\\") == "Sheet1")
         #expect(XLSXExport.sanitizedSheetName(String(repeating: "n", count: 40)).count == 31)
+        #expect(XLSXExport.sanitizedSheetName("'Math'") == "Math")
+        #expect(XLSXExport.sanitizedSheetName("''") == "Sheet1")
+        #expect(XLSXExport.sanitizedSheetName("history") == "history_")
+        #expect(XLSXExport.sanitizedSheetName("History 2") == "History 2")
     }
 
     static func isWellFormed(_ bytes: [UInt8]) -> Bool {

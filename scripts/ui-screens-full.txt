@@ -58,6 +58,7 @@ timetable.day@secondary
 timetable.tiles@elementary
 timetable.quick-add@secondary
 export.sheet@secondary
+export.preview@secondary
 onboarding@empty
 onboarding.school-type@empty
 onboarding.start@empty

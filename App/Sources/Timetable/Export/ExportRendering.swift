@@ -12,6 +12,31 @@ import TimetableCore
 import TimetableUI
 import UIKit
 
+/// `true` inside an export page: scroll wrappers are dropped (ImageRenderer does not draw UIKit-backed scroll views);
+/// the page frame is fixed, so the views' GeometryReaders read the page size.
+private struct IsExportRenderingKey: EnvironmentKey { static let defaultValue = false }
+
+extension EnvironmentValues {
+    var isExportRendering: Bool {
+        get { self[IsExportRenderingKey.self] }
+        set { self[IsExportRenderingKey.self] = newValue }
+    }
+}
+
+/// A vertical `ScrollView`, or plain stacked content when exporting.
+struct ExportAwareScroll<Content: View>: View {
+    @Environment(\.isExportRendering) private var exporting
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        if exporting {
+            VStack(spacing: 0) { content() }.frame(maxHeight: .infinity, alignment: .top)
+        } else {
+            ScrollView(.vertical) { content() }
+        }
+    }
+}
+
 struct ExportPrintJob {
     let model: AppModel
     let timetable: Timetable
@@ -29,16 +54,18 @@ struct ExportPrintJob {
             .environment(model)
             .environment(\.colorScheme, .light)
             .environment(\.dynamicTypeSize, .large)
+            .environment(\.isExportRendering, true)
     }
 
     /// One PDF, one page per entry of `pages`.
     @MainActor
-    func pdfData() -> Data? {
+    func pdfData() async -> Data? {
         let data = NSMutableData()
         guard let consumer = CGDataConsumer(data: data as CFMutableData) else { return nil }
         var box = CGRect(origin: .zero, size: pageSize)
         guard let context = CGContext(consumer: consumer, mediaBox: &box, nil) else { return nil }
         for date in pages {
+            await Task.yield()   // a long PDF must not freeze the progress indicator between pages
             let renderer = ImageRenderer(content: pageView(date))
             renderer.proposedSize = ProposedViewSize(pageSize)
             renderer.render { _, draw in
@@ -63,6 +90,33 @@ struct ExportPrintJob {
         return renderer.uiImage?.pngData()
     }
 }
+
+#if DEBUG
+/// Debug route `export.preview`: the current week as the grid, rendered by the real export path and shown as the PNG
+/// image the share sheet would carry (proof that ImageRenderer draws the views, on a device).
+struct ExportPreviewRouteView: View {
+    @Environment(AppModel.self) private var model
+    @State private var image: UIImage?
+
+    var body: some View {
+        ScrollView {
+            if let image {
+                Image(uiImage: image).resizable().scaledToFit().padding(8)
+            } else {
+                ContentUnavailableView {
+                    Label { Text("timetable.route.nothingToShow") } icon: { Image(systemName: "tray") }
+                } description: { EmptyView() } actions: { EmptyView() }
+            }
+        }
+        .task {
+            guard let timetable = model.activeTimetable, let resolver = model.resolver(for: timetable.id) else { return }
+            let week = resolver.context.startOfWeek(containing: model.today)
+            let job = ExportPrintJob(model: model, timetable: timetable, resolver: resolver, view: .grid, pages: [week])
+            image = job.pngData().flatMap(UIImage.init(data:))
+        }
+    }
+}
+#endif
 
 /// One printed page: title line, then the unchanged timetable view.
 private struct ExportPageView: View {

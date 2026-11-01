@@ -18,7 +18,10 @@ public enum CSVExport {
         // Subjects can come from someone else's share code: a leading = + - @ TAB CR would run as a spreadsheet
         // formula (CSV injection), so it gets a leading apostrophe (OWASP); XLSX inline strings never evaluate.
         var value = value
-        if let first = value.unicodeScalars.first, "=+-@\t\r".unicodeScalars.contains(first) { value = "'" + value }
+        // Also a leading space (some apps trim it first) and the full-width ＝＋－＠ (Excel normalises them).
+        if let first = value.unicodeScalars.first, "=+-@\t\r \u{FF1D}\u{FF0B}\u{FF0D}\u{FF20}".unicodeScalars.contains(first) {
+            value = "'" + value
+        }
         guard value.contains(where: { $0 == "," || $0 == "\"" || $0.isNewline }) else { return value }
         return "\"" + value.replacingOccurrences(of: "\"", with: "\"\"") + "\""
     }

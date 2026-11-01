@@ -56,7 +56,10 @@ struct ExportSheet: View {
                     footer
                 }
             }
+            // The pickers show and return days in the timetable's zone (the same zone `localDate(of:)` reads back).
             .environment(\.timeZone, model.calendarContext.timeZone)
+            .environment(\.calendar, model.calendarContext.calendar)
+            .task { Self.clearOldExports() }
             .navigationTitle(Text("export.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -74,7 +77,10 @@ struct ExportSheet: View {
             } message: { Text("export.failed.message") }
         }
         .sheet(item: $shared) { file in
-            ActivityView(url: file.url) { shared = nil }
+            ActivityView(url: file.url) {
+                try? FileManager.default.removeItem(at: file.url.deletingLastPathComponent())
+                shared = nil
+            }
                 .presentationDetents([.medium, .large])
         }
         .presentationDetents([.medium, .large])
@@ -119,13 +125,14 @@ struct ExportSheet: View {
         await Task.yield()   // let the progress indicator appear before the main-actor render
         let range = range
         let suffix = ExportPlan.fileSuffix(choice, range: range, termName: currentTermName, renderer: model.renderer)
-        let name = ExportPlan.fileName(timetable: timetable.name, suffix: suffix, ext: kind.fileExtension)
+        let name = ExportPlan.fileName(timetable: timetable.name, suffix: suffix, ext: kind.fileExtension,
+                                       fallback: model.renderer.string(forKey: "export.file.fallback"))
         let data: Data?
         switch kind {
         case .image, .pdf:
             let pages = ExportPlan.pages(view: view, range: range, context: context, enabledDays: timetable.enabledDays)
             let job = ExportPrintJob(model: model, timetable: timetable, resolver: resolver, view: view, pages: pages)
-            data = kind == .pdf ? job.pdfData() : job.pngData()
+            if kind == .pdf { data = await job.pdfData() } else { data = job.pngData() }
         case .csv, .excel, .calendar:
             let rows = ExportRows.build(database: database, timetableID: timetable.id, range: range, context: context)
             let labels = ExportPlan.labels(renderer: model.renderer)
@@ -141,6 +148,13 @@ struct ExportSheet: View {
         }
         guard let data, let url = write(data, name: name) else { failed = true; return }
         shared = SharedFile(url: url)
+    }
+
+    /// Removes `export-<UUID>` folders left by earlier exports (a cancelled or crashed share).
+    private static func clearOldExports() {
+        let temp = FileManager.default.temporaryDirectory
+        let items = (try? FileManager.default.contentsOfDirectory(at: temp, includingPropertiesForKeys: nil)) ?? []
+        for item in items where item.lastPathComponent.hasPrefix("export-") { try? FileManager.default.removeItem(at: item) }
     }
 
     /// Writes into a fresh temporary folder so the share sheet shows the sanitised name.

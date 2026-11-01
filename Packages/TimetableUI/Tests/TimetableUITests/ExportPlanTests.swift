@@ -66,14 +66,30 @@ struct ExportPlanTests {
                                  enabledDays: []).isEmpty)
     }
 
+    private var fb: String { renderer.string(forKey: "export.file.fallback") }
+
+    @Test func longTermIsCappedLikeCustom() {
+        let long = [term("Forever", date(2020, 1, 1), date(2040, 1, 1))]
+        let range = ExportPlan.range(.term, custom: none, today: today, context: context, terms: long)
+        #expect(range.start == date(2020, 1, 1) && range.dayCount == ExportPlan.maximumDays)
+    }
+
+    /// The date picker value (start of day in the timetable's zone) maps back to the same calendar day.
+    @Test func pickedDateRoundTripsInAnyZone() {
+        for id in ["Pacific/Kiritimati", "America/Los_Angeles", "Europe/Bratislava", "Pacific/Pago_Pago"] {
+            let zone = CalendarContext(timeZone: TimeZone(identifier: id)!, firstWeekday: .monday)
+            #expect(zone.localDate(of: zone.startOfDay(today)) == today, "zone \(id)")
+        }
+    }
+
     @Test func fileNamesAreSanitised() {
-        #expect(ExportPlan.fileName(timetable: "Timetable 2.B", suffix: "week 42", ext: "pdf") == "Timetable 2.B – week 42.pdf")
-        let evil = ExportPlan.fileName(timetable: "../../a/b:c*?\"<>|\n", suffix: "", ext: "csv")
+        #expect(ExportPlan.fileName(timetable: "Timetable 2.B", suffix: "week 42", ext: "pdf", fallback: fb) == "Timetable 2.B – week 42.pdf")
+        let evil = ExportPlan.fileName(timetable: "../../a/b:c*?\"<>|\n", suffix: "", ext: "csv", fallback: fb)
         #expect(evil == "a b c.csv")
         #expect(!evil.contains("/") && !evil.contains(".."))
-        #expect(ExportPlan.fileName(timetable: "   ", suffix: "", ext: "ics") == "Timetable.ics")
-        #expect(ExportPlan.fileName(timetable: ".hidden", suffix: "", ext: "csv") == "hidden.csv")
-        let long = ExportPlan.fileName(timetable: String(repeating: "x", count: 300), suffix: "", ext: "png")
+        #expect(ExportPlan.fileName(timetable: "   ", suffix: "", ext: "ics", fallback: fb) == "Timetable.ics")
+        #expect(ExportPlan.fileName(timetable: ".hidden", suffix: "", ext: "csv", fallback: fb) == "hidden.csv")
+        let long = ExportPlan.fileName(timetable: String(repeating: "x", count: 300), suffix: "", ext: "png", fallback: fb)
         #expect(long.count == 84)
     }
 
@@ -106,7 +122,7 @@ struct ExportPlanTests {
     @Test func everyExportKeyIsInTheCatalog() {
         let keys = ExportKind.allCases.map(\.nameKey) + ExportView.allCases.map(\.nameKey)
             + ExportRangeChoice.allCases.map(\.nameKey)
-            + ["export.menu", "export.title", "export.action", "export.range.span", "export.file.week",
+            + ["export.file.fallback", "export.menu", "export.title", "export.action", "export.range.span", "export.file.week",
                "export.pro.footer", "export.image.footer", "export.range.term.footer", "export.failed.title"]
         for key in keys { #expect(!renderer.isMissing(key), "missing catalog key \(key)") }
     }
