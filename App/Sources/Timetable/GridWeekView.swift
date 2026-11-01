@@ -326,44 +326,51 @@ struct GridCellView: View {
         let cancelled = lesson.status == .cancelled
         let badge = LessonCellBadge.make(status: lesson.status, reasons: reasons, badges: badges)
         let room = VisibleLessonFields(lesson: lesson, visibility: visibility).room
+        // Cancelled: the cell steps back (Opus H5): background, name and room at 0.4; the badge stays at full strength.
+        let dim = cancelled ? 0.4 : 1.0
+        // Inside the highlighter outline (4.5 pt) the text keeps clear of it.
+        let inset: CGFloat = isCurrent ? 6 : 4
         VStack(spacing: 0) {
             ViewThatFits(in: .vertical) {
                 title(lesson, foreground: foreground, cancelled: cancelled, withEmoji: true)
                 title(lesson, foreground: foreground, cancelled: cancelled, withEmoji: false)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            Group {
+            .opacity(dim)
+            // One bottom row: badge leading, room trailing, side by side (D6: the badge never covers the room). The
+            // room has priority; the badge drops its task count first when the cell is narrow.
+            HStack(spacing: 2) {
+                if let badge { CellBadgeView(badge: badge).padding(.leading, -3) }
+                Spacer(minLength: 0)
                 if let room {
                     Text(verbatim: room)
                         .font(.caption2)
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)
                         .strikethrough(cancelled, pattern: .solid, color: foreground)
+                        .opacity(dim)
+                        .layoutPriority(1)
                 }
             }
-            // The badge sits bottom-leading; the room keeps clear of it (D6: the badge never covers the room).
-            .padding(.leading, badge == nil ? 0 : badgeRow)
-            .frame(maxWidth: .infinity, minHeight: badgeRow, maxHeight: badgeRow, alignment: .trailing)
+            .frame(height: badgeRow)
         }
         .foregroundStyle(foreground)
-        .padding(.horizontal, 4)
+        .padding(.horizontal, inset)
         .padding(.top, 3)
-        .padding(.bottom, 1)
+        .padding(.bottom, isCurrent ? 3 : 1)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous).fill(Color(style.background)))
+        .background {
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous).fill(Color(style.background)).opacity(dim)
+        }
         .overlay {
             if style.needsOutline(isDark: colorScheme == .dark) || contrast == .increased {
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                     .strokeBorder(Color.secondary.opacity(0.6), lineWidth: 1)
+                    .opacity(dim)
             }
         }
-        // Cancelled: the whole cell steps back (Opus H5); the badge below stays at full strength.
-        .opacity(cancelled ? 0.4 : 1)
         .overlay {
             if isCurrent { HighlighterOutline(cornerRadius: cornerRadius) }
-        }
-        .overlay(alignment: .bottomLeading) {
-            if let badge { CellBadgeView(badge: badge) }
         }
         .overlay(alignment: .topLeading) {
             if cell.isInConflict {
