@@ -194,6 +194,19 @@ struct ImportEvalTests {
         #expect(fixtures.contains { $0.id == "sk-asc-human" })
     }
 
+    /// The human's aSc example must come out exactly, as table cells and transposed.
+    @Test(arguments: ["sk-asc-human", "sk-asc-transposed"])
+    func humanExampleIsExact(_ id: String) throws {
+        let fixture = try #require(try ImportFixture.all().first { $0.id == id })
+        let candidate = TimetableImportParser.parse(fixture.table, options: fixture.parserOptions)
+        let score = ImportScore(fixture, candidate)
+        #expect(score.structureExact, "\(score.structureChecks)")
+        #expect(score.lessonsAllCorrect, "\(score.mismatches)")
+        #expect(candidate.periods.map(\.start.isoString) == ["07:00", "07:50", "08:40", "09:30", "10:20", "11:10", "12:00",
+                                                             "12:50", "13:50", "14:40", "15:30", "16:20", "17:10"])
+        #expect(candidate.lessons.filter(\.needsReview).isEmpty)
+    }
+
     @Test func neverInventsLessonsAndIsDeterministic() throws {
         for fixture in try ImportFixture.all() {
             let candidate = TimetableImportParser.parse(fixture.table, options: fixture.parserOptions)
