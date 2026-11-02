@@ -1,0 +1,278 @@
+{
+ "id": "sk-uni-start-only",
+ "description": "Slovak university, start times only (7:30, 9:10, ...): 90-minute ends inferred; (P)/(C)/(L)/(S) types.",
+ "language": "sk",
+ "mode": "cells",
+ "layout": "rows",
+ "table": {
+  "version": 1,
+  "pageWidth": 2480,
+  "pageHeight": 3508,
+  "languages": [
+   "sk"
+  ],
+  "cells": [
+   {
+    "text": "07:30",
+    "row": 0,
+    "column": 1,
+    "box": {
+     "x": 0.1,
+     "y": 0.05,
+     "width": 0.176,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "09:10",
+    "row": 0,
+    "column": 2,
+    "box": {
+     "x": 0.276,
+     "y": 0.05,
+     "width": 0.176,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "10:50",
+    "row": 0,
+    "column": 3,
+    "box": {
+     "x": 0.452,
+     "y": 0.05,
+     "width": 0.176,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "12:30",
+    "row": 0,
+    "column": 4,
+    "box": {
+     "x": 0.628,
+     "y": 0.05,
+     "width": 0.176,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "14:10",
+    "row": 0,
+    "column": 5,
+    "box": {
+     "x": 0.804,
+     "y": 0.05,
+     "width": 0.176,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Pondelok",
+    "row": 1,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.2,
+     "width": 0.08,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Analýza (P)\nAula",
+    "row": 1,
+    "column": 1,
+    "box": {
+     "x": 0.1,
+     "y": 0.2,
+     "width": 0.176,
+     "height": 0.15
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Analýza (C)\nH3",
+    "row": 1,
+    "column": 2,
+    "box": {
+     "x": 0.276,
+     "y": 0.2,
+     "width": 0.176,
+     "height": 0.15
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Utorok",
+    "row": 2,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.35,
+     "width": 0.08,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Programovanie (P)\nB-204",
+    "row": 2,
+    "column": 3,
+    "box": {
+     "x": 0.452,
+     "y": 0.35,
+     "width": 0.176,
+     "height": 0.15
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Streda",
+    "row": 3,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.5,
+     "width": 0.08,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Databázy (L)\nC2",
+    "row": 3,
+    "column": 1,
+    "box": {
+     "x": 0.1,
+     "y": 0.5,
+     "width": 0.176,
+     "height": 0.15
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Štvrtok",
+    "row": 4,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.65,
+     "width": 0.08,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Piatok",
+    "row": 5,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.8,
+     "width": 0.08,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Filozofia (S)\nA1",
+    "row": 5,
+    "column": 4,
+    "box": {
+     "x": 0.628,
+     "y": 0.8,
+     "width": 0.176,
+     "height": 0.15
+    },
+    "confidence": 0.95
+   }
+  ]
+ },
+ "expected": {
+  "orientation": "daysAsRows",
+  "days": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "periods": [
+   {
+    "number": 1,
+    "start": "07:30",
+    "end": "09:00"
+   },
+   {
+    "number": 2,
+    "start": "09:10",
+    "end": "10:40"
+   },
+   {
+    "number": 3,
+    "start": "10:50",
+    "end": "12:20"
+   },
+   {
+    "number": 4,
+    "start": "12:30",
+    "end": "14:00"
+   },
+   {
+    "number": 5,
+    "start": "14:10",
+    "end": "15:40"
+   }
+  ],
+  "checkTimes": true,
+  "weekCycleLength": null,
+  "lessons": [
+   {
+    "day": 1,
+    "period": 1,
+    "span": 1,
+    "subject": "Analýza",
+    "room": "Aula",
+    "lessonType": "lecture"
+   },
+   {
+    "day": 1,
+    "period": 2,
+    "span": 1,
+    "subject": "Analýza",
+    "room": "H3",
+    "lessonType": "tutorial"
+   },
+   {
+    "day": 2,
+    "period": 3,
+    "span": 1,
+    "subject": "Programovanie",
+    "room": "B-204",
+    "lessonType": "lecture"
+   },
+   {
+    "day": 3,
+    "period": 1,
+    "span": 1,
+    "subject": "Databázy",
+    "room": "C2",
+    "lessonType": "lab"
+   },
+   {
+    "day": 5,
+    "period": 4,
+    "span": 1,
+    "subject": "Filozofia",
+    "room": "A1",
+    "lessonType": "seminar"
+   }
+  ]
+ }
+}

@@ -1,0 +1,404 @@
+{
+ "id": "de-ab-blocks",
+ "description": "German A/B weeks as two runs of days (Mo-Fr, Mo-Fr).",
+ "language": "de",
+ "mode": "cells",
+ "layout": "rows",
+ "table": {
+  "version": 1,
+  "pageWidth": 2480,
+  "pageHeight": 3508,
+  "languages": [
+   "de"
+  ],
+  "cells": [
+   {
+    "text": "1\n08:00-08:45",
+    "row": 0,
+    "column": 1,
+    "box": {
+     "x": 0.1,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.0818
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "2\n08:55-09:40",
+    "row": 0,
+    "column": 2,
+    "box": {
+     "x": 0.2257,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.0818
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "3\n09:50-10:35",
+    "row": 0,
+    "column": 3,
+    "box": {
+     "x": 0.3514,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.0818
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "4\n10:55-11:40",
+    "row": 0,
+    "column": 4,
+    "box": {
+     "x": 0.4771,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.0818
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "5\n11:50-12:35",
+    "row": 0,
+    "column": 5,
+    "box": {
+     "x": 0.6029,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.0818
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "6\n12:45-13:30",
+    "row": 0,
+    "column": 6,
+    "box": {
+     "x": 0.7286,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.0818
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "7\n13:35-14:20",
+    "row": 0,
+    "column": 7,
+    "box": {
+     "x": 0.8543,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.0818
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Mo",
+    "row": 1,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.1318,
+     "width": 0.08,
+     "height": 0.0818
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Mathe\nR1",
+    "row": 1,
+    "column": 1,
+    "box": {
+     "x": 0.1,
+     "y": 0.1318,
+     "width": 0.1257,
+     "height": 0.0818
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Di",
+    "row": 2,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.2136,
+     "width": 0.08,
+     "height": 0.0818
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Deutsch\nR2",
+    "row": 2,
+    "column": 2,
+    "box": {
+     "x": 0.2257,
+     "y": 0.2136,
+     "width": 0.1257,
+     "height": 0.0818
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Mi",
+    "row": 3,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.2955,
+     "width": 0.08,
+     "height": 0.0818
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Do",
+    "row": 4,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.3773,
+     "width": 0.08,
+     "height": 0.0818
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Fr",
+    "row": 5,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.4591,
+     "width": 0.08,
+     "height": 0.0818
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Kunst\nK1",
+    "row": 5,
+    "column": 3,
+    "box": {
+     "x": 0.3514,
+     "y": 0.4591,
+     "width": 0.1257,
+     "height": 0.0818
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Mo",
+    "row": 6,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.5409,
+     "width": 0.08,
+     "height": 0.0818
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Physik\nP1",
+    "row": 6,
+    "column": 1,
+    "box": {
+     "x": 0.1,
+     "y": 0.5409,
+     "width": 0.1257,
+     "height": 0.0818
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Di",
+    "row": 7,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.6227,
+     "width": 0.08,
+     "height": 0.0818
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Mi",
+    "row": 8,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.7045,
+     "width": 0.08,
+     "height": 0.0818
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Chemie\nC1",
+    "row": 8,
+    "column": 2,
+    "box": {
+     "x": 0.2257,
+     "y": 0.7045,
+     "width": 0.1257,
+     "height": 0.0818
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Do",
+    "row": 9,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.7864,
+     "width": 0.08,
+     "height": 0.0818
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Fr",
+    "row": 10,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.8682,
+     "width": 0.08,
+     "height": 0.0818
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Musik\nM1",
+    "row": 10,
+    "column": 3,
+    "box": {
+     "x": 0.3514,
+     "y": 0.8682,
+     "width": 0.1257,
+     "height": 0.0818
+    },
+    "confidence": 0.95
+   }
+  ]
+ },
+ "expected": {
+  "orientation": "daysAsRows",
+  "days": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "periods": [
+   {
+    "number": 1,
+    "start": "08:00",
+    "end": "08:45"
+   },
+   {
+    "number": 2,
+    "start": "08:55",
+    "end": "09:40"
+   },
+   {
+    "number": 3,
+    "start": "09:50",
+    "end": "10:35"
+   },
+   {
+    "number": 4,
+    "start": "10:55",
+    "end": "11:40"
+   },
+   {
+    "number": 5,
+    "start": "11:50",
+    "end": "12:35"
+   },
+   {
+    "number": 6,
+    "start": "12:45",
+    "end": "13:30"
+   },
+   {
+    "number": 7,
+    "start": "13:35",
+    "end": "14:20"
+   }
+  ],
+  "checkTimes": true,
+  "weekCycleLength": 2,
+  "lessons": [
+   {
+    "day": 1,
+    "period": 1,
+    "span": 1,
+    "subject": "Mathe",
+    "room": "R1",
+    "weeks": [
+     1
+    ]
+   },
+   {
+    "day": 2,
+    "period": 2,
+    "span": 1,
+    "subject": "Deutsch",
+    "room": "R2",
+    "weeks": [
+     1
+    ]
+   },
+   {
+    "day": 5,
+    "period": 3,
+    "span": 1,
+    "subject": "Kunst",
+    "room": "K1",
+    "weeks": [
+     1
+    ]
+   },
+   {
+    "day": 1,
+    "period": 1,
+    "span": 1,
+    "subject": "Physik",
+    "room": "P1",
+    "weeks": [
+     2
+    ]
+   },
+   {
+    "day": 3,
+    "period": 2,
+    "span": 1,
+    "subject": "Chemie",
+    "room": "C1",
+    "weeks": [
+     2
+    ]
+   },
+   {
+    "day": 5,
+    "period": 3,
+    "span": 1,
+    "subject": "Musik",
+    "room": "M1",
+    "weeks": [
+     2
+    ]
+   }
+  ]
+ }
+}

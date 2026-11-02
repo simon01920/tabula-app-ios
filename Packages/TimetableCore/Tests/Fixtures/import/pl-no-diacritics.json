@@ -1,0 +1,393 @@
+{
+ "id": "pl-no-diacritics",
+ "description": "Polish abbreviations without diacritics ('Sr' for 'Śr'); loose lines.",
+ "language": "pl",
+ "mode": "lines",
+ "layout": "rows",
+ "table": {
+  "version": 1,
+  "pageWidth": 2480,
+  "pageHeight": 3508,
+  "languages": [
+   "pl"
+  ],
+  "lines": [
+   {
+    "text": "1",
+    "box": {
+     "x": 0.1593,
+     "y": 0.1066,
+     "width": 0.0072,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "08:00-08:45",
+    "box": {
+     "x": 0.1233,
+     "y": 0.125,
+     "width": 0.0792,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "2",
+    "box": {
+     "x": 0.285,
+     "y": 0.1066,
+     "width": 0.0072,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "08:55-09:40",
+    "box": {
+     "x": 0.249,
+     "y": 0.125,
+     "width": 0.0792,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "3",
+    "box": {
+     "x": 0.4107,
+     "y": 0.1066,
+     "width": 0.0072,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "09:50-10:35",
+    "box": {
+     "x": 0.3747,
+     "y": 0.125,
+     "width": 0.0792,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "4",
+    "box": {
+     "x": 0.5364,
+     "y": 0.1066,
+     "width": 0.0072,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "10:55-11:40",
+    "box": {
+     "x": 0.5004,
+     "y": 0.125,
+     "width": 0.0792,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "5",
+    "box": {
+     "x": 0.6621,
+     "y": 0.1066,
+     "width": 0.0072,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "11:50-12:35",
+    "box": {
+     "x": 0.6261,
+     "y": 0.125,
+     "width": 0.0792,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "6",
+    "box": {
+     "x": 0.7878,
+     "y": 0.1066,
+     "width": 0.0072,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "12:45-13:30",
+    "box": {
+     "x": 0.7518,
+     "y": 0.125,
+     "width": 0.0792,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "7",
+    "box": {
+     "x": 0.9135,
+     "y": 0.1066,
+     "width": 0.0072,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "13:35-14:20",
+    "box": {
+     "x": 0.8775,
+     "y": 0.125,
+     "width": 0.0792,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Pon",
+    "box": {
+     "x": 0.0492,
+     "y": 0.2658,
+     "width": 0.0216,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Polski",
+    "box": {
+     "x": 0.1413,
+     "y": 0.2566,
+     "width": 0.0432,
+     "height": 0.016
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "12",
+    "box": {
+     "x": 0.1557,
+     "y": 0.275,
+     "width": 0.0144,
+     "height": 0.016
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Wt",
+    "box": {
+     "x": 0.0528,
+     "y": 0.4158,
+     "width": 0.0144,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Angielski",
+    "box": {
+     "x": 0.2562,
+     "y": 0.4066,
+     "width": 0.0648,
+     "height": 0.016
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "14",
+    "box": {
+     "x": 0.2814,
+     "y": 0.425,
+     "width": 0.0144,
+     "height": 0.016
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Sr",
+    "box": {
+     "x": 0.0528,
+     "y": 0.5658,
+     "width": 0.0144,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Biologia",
+    "box": {
+     "x": 0.4483,
+     "y": 0.5566,
+     "width": 0.0576,
+     "height": 0.016
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "B2",
+    "box": {
+     "x": 0.4699,
+     "y": 0.575,
+     "width": 0.0144,
+     "height": 0.016
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Czw",
+    "box": {
+     "x": 0.0492,
+     "y": 0.7158,
+     "width": 0.0216,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Muzyka",
+    "box": {
+     "x": 0.7698,
+     "y": 0.7066,
+     "width": 0.0432,
+     "height": 0.016
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "M1",
+    "box": {
+     "x": 0.7842,
+     "y": 0.725,
+     "width": 0.0144,
+     "height": 0.016
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Pt",
+    "box": {
+     "x": 0.0528,
+     "y": 0.8658,
+     "width": 0.0144,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Informatyka",
+    "box": {
+     "x": 0.1233,
+     "y": 0.8566,
+     "width": 0.0792,
+     "height": 0.016
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "I3",
+    "box": {
+     "x": 0.1557,
+     "y": 0.875,
+     "width": 0.0144,
+     "height": 0.016
+    },
+    "confidence": 0.95
+   }
+  ]
+ },
+ "expected": {
+  "orientation": "daysAsRows",
+  "days": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "periods": [
+   {
+    "number": 1,
+    "start": "08:00",
+    "end": "08:45"
+   },
+   {
+    "number": 2,
+    "start": "08:55",
+    "end": "09:40"
+   },
+   {
+    "number": 3,
+    "start": "09:50",
+    "end": "10:35"
+   },
+   {
+    "number": 4,
+    "start": "10:55",
+    "end": "11:40"
+   },
+   {
+    "number": 5,
+    "start": "11:50",
+    "end": "12:35"
+   },
+   {
+    "number": 6,
+    "start": "12:45",
+    "end": "13:30"
+   },
+   {
+    "number": 7,
+    "start": "13:35",
+    "end": "14:20"
+   }
+  ],
+  "checkTimes": true,
+  "weekCycleLength": null,
+  "lessons": [
+   {
+    "day": 1,
+    "period": 1,
+    "span": 1,
+    "subject": "Polski",
+    "room": "12"
+   },
+   {
+    "day": 2,
+    "period": 2,
+    "span": 1,
+    "subject": "Angielski",
+    "room": "14"
+   },
+   {
+    "day": 3,
+    "period": 3,
+    "span": 2,
+    "subject": "Biologia",
+    "room": "B2"
+   },
+   {
+    "day": 4,
+    "period": 6,
+    "span": 1,
+    "subject": "Muzyka",
+    "room": "M1"
+   },
+   {
+    "day": 5,
+    "period": 1,
+    "span": 1,
+    "subject": "Informatyka",
+    "room": "I3"
+   }
+  ]
+ }
+}

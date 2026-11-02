@@ -1,0 +1,349 @@
+{
+ "id": "en-columns",
+ "description": "English secondary school, days as columns, '1' over '08:00-08:45'.",
+ "language": "en",
+ "mode": "cells",
+ "layout": "columns",
+ "table": {
+  "version": 1,
+  "pageWidth": 2480,
+  "pageHeight": 3508,
+  "languages": [
+   "en"
+  ],
+  "cells": [
+   {
+    "text": "1\n08:00-08:45",
+    "row": 1,
+    "column": 0,
+    "box": {
+     "x": 0.05,
+     "y": 0.1,
+     "width": 0.15,
+     "height": 0.1257
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "2\n08:55-09:40",
+    "row": 2,
+    "column": 0,
+    "box": {
+     "x": 0.05,
+     "y": 0.2257,
+     "width": 0.15,
+     "height": 0.1257
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "3\n09:50-10:35",
+    "row": 3,
+    "column": 0,
+    "box": {
+     "x": 0.05,
+     "y": 0.3514,
+     "width": 0.15,
+     "height": 0.1257
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "4\n10:55-11:40",
+    "row": 4,
+    "column": 0,
+    "box": {
+     "x": 0.05,
+     "y": 0.4771,
+     "width": 0.15,
+     "height": 0.1257
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "5\n11:50-12:35",
+    "row": 5,
+    "column": 0,
+    "box": {
+     "x": 0.05,
+     "y": 0.6029,
+     "width": 0.15,
+     "height": 0.1257
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "6\n12:45-13:30",
+    "row": 6,
+    "column": 0,
+    "box": {
+     "x": 0.05,
+     "y": 0.7286,
+     "width": 0.15,
+     "height": 0.1257
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "7\n13:35-14:20",
+    "row": 7,
+    "column": 0,
+    "box": {
+     "x": 0.05,
+     "y": 0.8543,
+     "width": 0.15,
+     "height": 0.1257
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Monday",
+    "row": 0,
+    "column": 1,
+    "box": {
+     "x": 0.2,
+     "y": 0.02,
+     "width": 0.15,
+     "height": 0.08
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Maths\nRoom 12\nMr Smith",
+    "row": 1,
+    "column": 1,
+    "box": {
+     "x": 0.2,
+     "y": 0.1,
+     "width": 0.15,
+     "height": 0.1257
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "English\nRoom 4\nMs Brown",
+    "row": 2,
+    "column": 1,
+    "box": {
+     "x": 0.2,
+     "y": 0.2257,
+     "width": 0.15,
+     "height": 0.1257
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Tuesday",
+    "row": 0,
+    "column": 2,
+    "box": {
+     "x": 0.35,
+     "y": 0.02,
+     "width": 0.15,
+     "height": 0.08
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Biology\nLab 2",
+    "row": 1,
+    "column": 2,
+    "box": {
+     "x": 0.35,
+     "y": 0.1,
+     "width": 0.15,
+     "height": 0.1257
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "History\nB12",
+    "row": 3,
+    "column": 2,
+    "rowSpan": 2,
+    "box": {
+     "x": 0.35,
+     "y": 0.3514,
+     "width": 0.15,
+     "height": 0.2514
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Wednesday",
+    "row": 0,
+    "column": 3,
+    "box": {
+     "x": 0.5,
+     "y": 0.02,
+     "width": 0.15,
+     "height": 0.08
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Art\nA01",
+    "row": 4,
+    "column": 3,
+    "box": {
+     "x": 0.5,
+     "y": 0.4771,
+     "width": 0.15,
+     "height": 0.1257
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Thursday",
+    "row": 0,
+    "column": 4,
+    "box": {
+     "x": 0.65,
+     "y": 0.02,
+     "width": 0.15,
+     "height": 0.08
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Physics\nLab 1\nDr Jones",
+    "row": 1,
+    "column": 4,
+    "box": {
+     "x": 0.65,
+     "y": 0.1,
+     "width": 0.15,
+     "height": 0.1257
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Friday",
+    "row": 0,
+    "column": 5,
+    "box": {
+     "x": 0.8,
+     "y": 0.02,
+     "width": 0.15,
+     "height": 0.08
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "PE\nGym",
+    "row": 6,
+    "column": 5,
+    "box": {
+     "x": 0.8,
+     "y": 0.7286,
+     "width": 0.15,
+     "height": 0.1257
+    },
+    "confidence": 0.95
+   }
+  ]
+ },
+ "expected": {
+  "orientation": "daysAsColumns",
+  "days": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "periods": [
+   {
+    "number": 1,
+    "start": "08:00",
+    "end": "08:45"
+   },
+   {
+    "number": 2,
+    "start": "08:55",
+    "end": "09:40"
+   },
+   {
+    "number": 3,
+    "start": "09:50",
+    "end": "10:35"
+   },
+   {
+    "number": 4,
+    "start": "10:55",
+    "end": "11:40"
+   },
+   {
+    "number": 5,
+    "start": "11:50",
+    "end": "12:35"
+   },
+   {
+    "number": 6,
+    "start": "12:45",
+    "end": "13:30"
+   },
+   {
+    "number": 7,
+    "start": "13:35",
+    "end": "14:20"
+   }
+  ],
+  "checkTimes": true,
+  "weekCycleLength": null,
+  "lessons": [
+   {
+    "day": 1,
+    "period": 1,
+    "span": 1,
+    "subject": "Maths",
+    "room": "Room 12",
+    "teacher": "Mr Smith"
+   },
+   {
+    "day": 1,
+    "period": 2,
+    "span": 1,
+    "subject": "English",
+    "room": "Room 4",
+    "teacher": "Ms Brown"
+   },
+   {
+    "day": 2,
+    "period": 1,
+    "span": 1,
+    "subject": "Biology",
+    "room": "Lab 2"
+   },
+   {
+    "day": 2,
+    "period": 3,
+    "span": 2,
+    "subject": "History",
+    "room": "B12"
+   },
+   {
+    "day": 3,
+    "period": 4,
+    "span": 1,
+    "subject": "Art",
+    "room": "A01"
+   },
+   {
+    "day": 4,
+    "period": 1,
+    "span": 1,
+    "subject": "Physics",
+    "room": "Lab 1",
+    "teacher": "Dr Jones"
+   },
+   {
+    "day": 5,
+    "period": 6,
+    "span": 1,
+    "subject": "PE",
+    "room": "Gym"
+   }
+  ]
+ }
+}

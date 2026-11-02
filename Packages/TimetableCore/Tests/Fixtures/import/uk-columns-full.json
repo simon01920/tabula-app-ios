@@ -1,0 +1,366 @@
+{
+ "id": "uk-columns-full",
+ "description": "Ukrainian full names, days as columns; loose lines.",
+ "language": "uk",
+ "mode": "lines",
+ "layout": "columns",
+ "table": {
+  "version": 1,
+  "pageWidth": 2480,
+  "pageHeight": 3508,
+  "languages": [
+   "uk"
+  ],
+  "lines": [
+   {
+    "text": "1",
+    "box": {
+     "x": 0.1066,
+     "y": 0.1593,
+     "width": 0.016,
+     "height": 0.0072
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "08:00-08:45",
+    "box": {
+     "x": 0.125,
+     "y": 0.1233,
+     "width": 0.016,
+     "height": 0.0792
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "2",
+    "box": {
+     "x": 0.1066,
+     "y": 0.285,
+     "width": 0.016,
+     "height": 0.0072
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "08:55-09:40",
+    "box": {
+     "x": 0.125,
+     "y": 0.249,
+     "width": 0.016,
+     "height": 0.0792
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "3",
+    "box": {
+     "x": 0.1066,
+     "y": 0.4107,
+     "width": 0.016,
+     "height": 0.0072
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "09:50-10:35",
+    "box": {
+     "x": 0.125,
+     "y": 0.3747,
+     "width": 0.016,
+     "height": 0.0792
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "4",
+    "box": {
+     "x": 0.1066,
+     "y": 0.5364,
+     "width": 0.016,
+     "height": 0.0072
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "10:55-11:40",
+    "box": {
+     "x": 0.125,
+     "y": 0.5004,
+     "width": 0.016,
+     "height": 0.0792
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "5",
+    "box": {
+     "x": 0.1066,
+     "y": 0.6621,
+     "width": 0.016,
+     "height": 0.0072
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "11:50-12:35",
+    "box": {
+     "x": 0.125,
+     "y": 0.6261,
+     "width": 0.016,
+     "height": 0.0792
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "6",
+    "box": {
+     "x": 0.1066,
+     "y": 0.7878,
+     "width": 0.016,
+     "height": 0.0072
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "12:45-13:30",
+    "box": {
+     "x": 0.125,
+     "y": 0.7518,
+     "width": 0.016,
+     "height": 0.0792
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "7",
+    "box": {
+     "x": 0.1066,
+     "y": 0.9135,
+     "width": 0.016,
+     "height": 0.0072
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "13:35-14:20",
+    "box": {
+     "x": 0.125,
+     "y": 0.8775,
+     "width": 0.016,
+     "height": 0.0792
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Понеділок",
+    "box": {
+     "x": 0.2658,
+     "y": 0.0276,
+     "width": 0.016,
+     "height": 0.0648
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Алгебра",
+    "box": {
+     "x": 0.2566,
+     "y": 0.1377,
+     "width": 0.016,
+     "height": 0.0504
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "21",
+    "box": {
+     "x": 0.275,
+     "y": 0.1557,
+     "width": 0.016,
+     "height": 0.0144
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Вівторок",
+    "box": {
+     "x": 0.4158,
+     "y": 0.0312,
+     "width": 0.016,
+     "height": 0.0576
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Географія",
+    "box": {
+     "x": 0.4066,
+     "y": 0.2562,
+     "width": 0.016,
+     "height": 0.0648
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "15",
+    "box": {
+     "x": 0.425,
+     "y": 0.2814,
+     "width": 0.016,
+     "height": 0.0144
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Середа",
+    "box": {
+     "x": 0.5658,
+     "y": 0.0384,
+     "width": 0.016,
+     "height": 0.0432
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Четвер",
+    "box": {
+     "x": 0.7158,
+     "y": 0.0384,
+     "width": 0.016,
+     "height": 0.0432
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Біологія",
+    "box": {
+     "x": 0.7066,
+     "y": 0.4483,
+     "width": 0.016,
+     "height": 0.0576
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "8",
+    "box": {
+     "x": 0.725,
+     "y": 0.4735,
+     "width": 0.016,
+     "height": 0.0072
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "П'ятниця",
+    "box": {
+     "x": 0.8658,
+     "y": 0.0312,
+     "width": 0.016,
+     "height": 0.0576
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Англійська",
+    "box": {
+     "x": 0.8566,
+     "y": 0.504,
+     "width": 0.016,
+     "height": 0.072
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "33",
+    "box": {
+     "x": 0.875,
+     "y": 0.5328,
+     "width": 0.016,
+     "height": 0.0144
+    },
+    "confidence": 0.95
+   }
+  ]
+ },
+ "expected": {
+  "orientation": "daysAsColumns",
+  "days": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "periods": [
+   {
+    "number": 1,
+    "start": "08:00",
+    "end": "08:45"
+   },
+   {
+    "number": 2,
+    "start": "08:55",
+    "end": "09:40"
+   },
+   {
+    "number": 3,
+    "start": "09:50",
+    "end": "10:35"
+   },
+   {
+    "number": 4,
+    "start": "10:55",
+    "end": "11:40"
+   },
+   {
+    "number": 5,
+    "start": "11:50",
+    "end": "12:35"
+   },
+   {
+    "number": 6,
+    "start": "12:45",
+    "end": "13:30"
+   },
+   {
+    "number": 7,
+    "start": "13:35",
+    "end": "14:20"
+   }
+  ],
+  "checkTimes": true,
+  "weekCycleLength": null,
+  "lessons": [
+   {
+    "day": 1,
+    "period": 1,
+    "span": 1,
+    "subject": "Алгебра",
+    "room": "21"
+   },
+   {
+    "day": 2,
+    "period": 2,
+    "span": 1,
+    "subject": "Географія",
+    "room": "15"
+   },
+   {
+    "day": 4,
+    "period": 3,
+    "span": 2,
+    "subject": "Біологія",
+    "room": "8"
+   },
+   {
+    "day": 5,
+    "period": 4,
+    "span": 1,
+    "subject": "Англійська",
+    "room": "33"
+   }
+  ]
+ }
+}
