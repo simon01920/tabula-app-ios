@@ -200,6 +200,13 @@ struct SettingsRootView: View {
                     SettingsRowLabel("settings.colors.title", symbol: "paintpalette.fill", color: .pink)
                 }
             }
+            NavigationLink { SettingsGridLayoutView() } label: {
+                LabeledContent {
+                    Text(LocalizedStringKey(GridLayoutStrings.nameKey(model.settings.effectiveGridLayout)))
+                } label: {
+                    SettingsRowLabel("settings.gridLayout.title", symbol: "square.grid.3x3.fill", color: .orange)
+                }
+            }
             Button {
                 if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
             } label: {
@@ -236,20 +243,30 @@ struct SettingsRootView: View {
 
     // MARK: Pro
 
+    /// One quiet status row (human decision 2026-11-02: most features are free, nothing to buy here): "Tabula Pro",
+    /// the Pro badge, "Active" and "All features unlocked" while the entitlements allow everything; otherwise "Free".
     private var proSection: some View {
-        Section {
+        let unlocked = ProFeature.allCases.allSatisfy(model.entitlements.isAllowed)
+        return Section {
             LabeledContent {
-                if model.entitlements.tier == .pro { Text("settings.pro.tier.pro") } else { Text("settings.pro.tier.free") }
+                if unlocked { Text("settings.pro.active") } else { Text("settings.pro.tier.free") }
             } label: {
-                SettingsRowLabel("settings.pro.plan", symbol: "star.fill", color: .purple)
+                Label {
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack(spacing: 6) {
+                            Text("settings.pro.title")
+                            if unlocked { ProBadge().accessibilityHidden(true) }
+                        }
+                        if unlocked {
+                            Text("settings.pro.active.detail").font(.footnote).foregroundStyle(.secondary)
+                        }
+                    }
+                } icon: {
+                    SettingsIconTile(symbol: "star.fill", color: .purple)
+                }
+                .labelStyle(.adaptive)
             }
             .accessibilityElement(children: .combine)
-        } header: {
-            Text("settings.pro.title")
-        } footer: {
-            if ProFeature.allCases.allSatisfy(model.entitlements.isAllowed) {
-                Text("settings.pro.unlocked")
-            }
         }
     }
 }
