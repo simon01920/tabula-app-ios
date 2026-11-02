@@ -27,7 +27,7 @@ public enum EntityFieldCatalog {
         case .settings:
             return ["profile", "onboardingCompletedAt", "activeTimetableID", "weekStartOverride", "hourCycle",
                     "timeZoneMode", "appearance", "palettePackID", "globalQuietHours", "timeSensitivePolicy",
-                    "alarmPolicy", "syncEnabled"]
+                    "alarmPolicy", "syncEnabled", "gridLayout"]
         case .timetable:
             return ["name", "emoji", "enabledDays", "rotation", "rotationWeekStart", "timeStructure", "fieldVisibility",
                     "defaultView", "density", "palettePackID", "sortIndex"]
