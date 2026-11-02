@@ -1,0 +1,373 @@
+{
+ "id": "en-two-header-rows",
+ "description": "Two header rows: period numbers, then ranges.",
+ "language": "en",
+ "mode": "cells",
+ "layout": "rows",
+ "table": {
+  "version": 1,
+  "pageWidth": 2480,
+  "pageHeight": 3508,
+  "languages": [
+   "en"
+  ],
+  "cells": [
+   {
+    "text": "1",
+    "row": 0,
+    "column": 1,
+    "box": {
+     "x": 0.1,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "2",
+    "row": 0,
+    "column": 2,
+    "box": {
+     "x": 0.2257,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "3",
+    "row": 0,
+    "column": 3,
+    "box": {
+     "x": 0.3514,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "4",
+    "row": 0,
+    "column": 4,
+    "box": {
+     "x": 0.4771,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "5",
+    "row": 0,
+    "column": 5,
+    "box": {
+     "x": 0.6029,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "6",
+    "row": 0,
+    "column": 6,
+    "box": {
+     "x": 0.7286,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "7",
+    "row": 0,
+    "column": 7,
+    "box": {
+     "x": 0.8543,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "08:00-08:45",
+    "row": 1,
+    "column": 1,
+    "box": {
+     "x": 0.1,
+     "y": 0.1786,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "08:55-09:40",
+    "row": 1,
+    "column": 2,
+    "box": {
+     "x": 0.2257,
+     "y": 0.1786,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "09:50-10:35",
+    "row": 1,
+    "column": 3,
+    "box": {
+     "x": 0.3514,
+     "y": 0.1786,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "10:55-11:40",
+    "row": 1,
+    "column": 4,
+    "box": {
+     "x": 0.4771,
+     "y": 0.1786,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "11:50-12:35",
+    "row": 1,
+    "column": 5,
+    "box": {
+     "x": 0.6029,
+     "y": 0.1786,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "12:45-13:30",
+    "row": 1,
+    "column": 6,
+    "box": {
+     "x": 0.7286,
+     "y": 0.1786,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "13:35-14:20",
+    "row": 1,
+    "column": 7,
+    "box": {
+     "x": 0.8543,
+     "y": 0.1786,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Monday",
+    "row": 2,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.3071,
+     "width": 0.08,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Maths\nM1",
+    "row": 2,
+    "column": 1,
+    "box": {
+     "x": 0.1,
+     "y": 0.3071,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Tuesday",
+    "row": 3,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.4357,
+     "width": 0.08,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Science\nS1",
+    "row": 3,
+    "column": 2,
+    "columnSpan": 2,
+    "box": {
+     "x": 0.2257,
+     "y": 0.4357,
+     "width": 0.2514,
+     "height": 0.1286
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Wednesday",
+    "row": 4,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.5643,
+     "width": 0.08,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Art\nA2",
+    "row": 4,
+    "column": 5,
+    "box": {
+     "x": 0.6029,
+     "y": 0.5643,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Thursday",
+    "row": 5,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.6929,
+     "width": 0.08,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Friday",
+    "row": 6,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.8214,
+     "width": 0.08,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Computing\nIT1",
+    "row": 6,
+    "column": 7,
+    "box": {
+     "x": 0.8543,
+     "y": 0.8214,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.95
+   }
+  ]
+ },
+ "expected": {
+  "orientation": "daysAsRows",
+  "days": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "periods": [
+   {
+    "number": 1,
+    "start": "08:00",
+    "end": "08:45"
+   },
+   {
+    "number": 2,
+    "start": "08:55",
+    "end": "09:40"
+   },
+   {
+    "number": 3,
+    "start": "09:50",
+    "end": "10:35"
+   },
+   {
+    "number": 4,
+    "start": "10:55",
+    "end": "11:40"
+   },
+   {
+    "number": 5,
+    "start": "11:50",
+    "end": "12:35"
+   },
+   {
+    "number": 6,
+    "start": "12:45",
+    "end": "13:30"
+   },
+   {
+    "number": 7,
+    "start": "13:35",
+    "end": "14:20"
+   }
+  ],
+  "checkTimes": true,
+  "weekCycleLength": null,
+  "lessons": [
+   {
+    "day": 1,
+    "period": 1,
+    "span": 1,
+    "subject": "Maths",
+    "room": "M1"
+   },
+   {
+    "day": 2,
+    "period": 2,
+    "span": 2,
+    "subject": "Science",
+    "room": "S1"
+   },
+   {
+    "day": 3,
+    "period": 5,
+    "span": 1,
+    "subject": "Art",
+    "room": "A2"
+   },
+   {
+    "day": 5,
+    "period": 7,
+    "span": 1,
+    "subject": "Computing",
+    "room": "IT1"
+   }
+  ]
+ }
+}

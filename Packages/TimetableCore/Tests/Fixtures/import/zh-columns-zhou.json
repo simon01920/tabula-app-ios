@@ -1,0 +1,366 @@
+{
+ "id": "zh-columns-zhou",
+ "description": "Chinese 周一-周五 as columns; loose lines.",
+ "language": "zh-Hans",
+ "mode": "lines",
+ "layout": "columns",
+ "table": {
+  "version": 1,
+  "pageWidth": 2480,
+  "pageHeight": 3508,
+  "languages": [
+   "zh-Hans"
+  ],
+  "lines": [
+   {
+    "text": "1",
+    "box": {
+     "x": 0.1066,
+     "y": 0.1593,
+     "width": 0.016,
+     "height": 0.0072
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "08:00-08:45",
+    "box": {
+     "x": 0.125,
+     "y": 0.1233,
+     "width": 0.016,
+     "height": 0.0792
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "2",
+    "box": {
+     "x": 0.1066,
+     "y": 0.285,
+     "width": 0.016,
+     "height": 0.0072
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "08:55-09:40",
+    "box": {
+     "x": 0.125,
+     "y": 0.249,
+     "width": 0.016,
+     "height": 0.0792
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "3",
+    "box": {
+     "x": 0.1066,
+     "y": 0.4107,
+     "width": 0.016,
+     "height": 0.0072
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "09:50-10:35",
+    "box": {
+     "x": 0.125,
+     "y": 0.3747,
+     "width": 0.016,
+     "height": 0.0792
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "4",
+    "box": {
+     "x": 0.1066,
+     "y": 0.5364,
+     "width": 0.016,
+     "height": 0.0072
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "10:55-11:40",
+    "box": {
+     "x": 0.125,
+     "y": 0.5004,
+     "width": 0.016,
+     "height": 0.0792
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "5",
+    "box": {
+     "x": 0.1066,
+     "y": 0.6621,
+     "width": 0.016,
+     "height": 0.0072
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "11:50-12:35",
+    "box": {
+     "x": 0.125,
+     "y": 0.6261,
+     "width": 0.016,
+     "height": 0.0792
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "6",
+    "box": {
+     "x": 0.1066,
+     "y": 0.7878,
+     "width": 0.016,
+     "height": 0.0072
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "12:45-13:30",
+    "box": {
+     "x": 0.125,
+     "y": 0.7518,
+     "width": 0.016,
+     "height": 0.0792
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "7",
+    "box": {
+     "x": 0.1066,
+     "y": 0.9135,
+     "width": 0.016,
+     "height": 0.0072
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "13:35-14:20",
+    "box": {
+     "x": 0.125,
+     "y": 0.8775,
+     "width": 0.016,
+     "height": 0.0792
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "周一",
+    "box": {
+     "x": 0.2658,
+     "y": 0.046,
+     "width": 0.016,
+     "height": 0.028
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "化学",
+    "box": {
+     "x": 0.2566,
+     "y": 0.1489,
+     "width": 0.016,
+     "height": 0.028
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "实验室1",
+    "box": {
+     "x": 0.275,
+     "y": 0.1383,
+     "width": 0.016,
+     "height": 0.0492
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "周二",
+    "box": {
+     "x": 0.4158,
+     "y": 0.046,
+     "width": 0.016,
+     "height": 0.028
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "历史",
+    "box": {
+     "x": 0.4066,
+     "y": 0.2746,
+     "width": 0.016,
+     "height": 0.028
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "105",
+    "box": {
+     "x": 0.425,
+     "y": 0.2778,
+     "width": 0.016,
+     "height": 0.0216
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "周三",
+    "box": {
+     "x": 0.5658,
+     "y": 0.046,
+     "width": 0.016,
+     "height": 0.028
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "周四",
+    "box": {
+     "x": 0.7158,
+     "y": 0.046,
+     "width": 0.016,
+     "height": 0.028
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "地理",
+    "box": {
+     "x": 0.7066,
+     "y": 0.526,
+     "width": 0.016,
+     "height": 0.028
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "106",
+    "box": {
+     "x": 0.725,
+     "y": 0.5292,
+     "width": 0.016,
+     "height": 0.0216
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "周五",
+    "box": {
+     "x": 0.8658,
+     "y": 0.046,
+     "width": 0.016,
+     "height": 0.028
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "音乐",
+    "box": {
+     "x": 0.8566,
+     "y": 0.1489,
+     "width": 0.016,
+     "height": 0.028
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "音乐室",
+    "box": {
+     "x": 0.875,
+     "y": 0.1419,
+     "width": 0.016,
+     "height": 0.042
+    },
+    "confidence": 0.95
+   }
+  ]
+ },
+ "expected": {
+  "orientation": "daysAsColumns",
+  "days": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "periods": [
+   {
+    "number": 1,
+    "start": "08:00",
+    "end": "08:45"
+   },
+   {
+    "number": 2,
+    "start": "08:55",
+    "end": "09:40"
+   },
+   {
+    "number": 3,
+    "start": "09:50",
+    "end": "10:35"
+   },
+   {
+    "number": 4,
+    "start": "10:55",
+    "end": "11:40"
+   },
+   {
+    "number": 5,
+    "start": "11:50",
+    "end": "12:35"
+   },
+   {
+    "number": 6,
+    "start": "12:45",
+    "end": "13:30"
+   },
+   {
+    "number": 7,
+    "start": "13:35",
+    "end": "14:20"
+   }
+  ],
+  "checkTimes": true,
+  "weekCycleLength": null,
+  "lessons": [
+   {
+    "day": 1,
+    "period": 1,
+    "span": 1,
+    "subject": "化学",
+    "room": "实验室1"
+   },
+   {
+    "day": 2,
+    "period": 2,
+    "span": 1,
+    "subject": "历史",
+    "room": "105"
+   },
+   {
+    "day": 4,
+    "period": 4,
+    "span": 1,
+    "subject": "地理",
+    "room": "106"
+   },
+   {
+    "day": 5,
+    "period": 1,
+    "span": 1,
+    "subject": "音乐",
+    "room": "音乐室"
+   }
+  ]
+ }
+}

@@ -1,0 +1,302 @@
+{
+ "id": "sk-title-row",
+ "description": "A title row above the header ('Rozvrh hodín 3.A 2026/2027') must not become a lesson.",
+ "language": "sk",
+ "mode": "cells",
+ "layout": "rows",
+ "table": {
+  "version": 1,
+  "pageWidth": 2480,
+  "pageHeight": 3508,
+  "languages": [
+   "sk"
+  ],
+  "cells": [
+   {
+    "text": "Rozvrh hodín 3.A 2026/2027",
+    "row": 0,
+    "column": 0,
+    "columnSpan": 8,
+    "box": {
+     "x": 0.02,
+     "y": 0.05,
+     "width": 0.08,
+     "height": 0.1286
+    },
+    "confidence": 0.9
+   },
+   {
+    "text": "1\n08:00-08:45",
+    "row": 1,
+    "column": 1,
+    "box": {
+     "x": 0.1,
+     "y": 0.1786,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "2\n08:55-09:40",
+    "row": 1,
+    "column": 2,
+    "box": {
+     "x": 0.2257,
+     "y": 0.1786,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "3\n09:50-10:35",
+    "row": 1,
+    "column": 3,
+    "box": {
+     "x": 0.3514,
+     "y": 0.1786,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "4\n10:55-11:40",
+    "row": 1,
+    "column": 4,
+    "box": {
+     "x": 0.4771,
+     "y": 0.1786,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "5\n11:50-12:35",
+    "row": 1,
+    "column": 5,
+    "box": {
+     "x": 0.6029,
+     "y": 0.1786,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "6\n12:45-13:30",
+    "row": 1,
+    "column": 6,
+    "box": {
+     "x": 0.7286,
+     "y": 0.1786,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "7\n13:35-14:20",
+    "row": 1,
+    "column": 7,
+    "box": {
+     "x": 0.8543,
+     "y": 0.1786,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Po",
+    "row": 2,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.3071,
+     "width": 0.08,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "MAT\n204",
+    "row": 2,
+    "column": 1,
+    "box": {
+     "x": 0.1,
+     "y": 0.3071,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Ut",
+    "row": 3,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.4357,
+     "width": 0.08,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "SJL\n204",
+    "row": 3,
+    "column": 2,
+    "box": {
+     "x": 0.2257,
+     "y": 0.4357,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "St",
+    "row": 4,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.5643,
+     "width": 0.08,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "ANJ\n112",
+    "row": 4,
+    "column": 3,
+    "columnSpan": 2,
+    "box": {
+     "x": 0.3514,
+     "y": 0.5643,
+     "width": 0.2514,
+     "height": 0.1286
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Št",
+    "row": 5,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.6929,
+     "width": 0.08,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Pi",
+    "row": 6,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.8214,
+     "width": 0.08,
+     "height": 0.1286
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "TSV\nTelocvičňa",
+    "row": 6,
+    "column": 6,
+    "box": {
+     "x": 0.7286,
+     "y": 0.8214,
+     "width": 0.1257,
+     "height": 0.1286
+    },
+    "confidence": 0.95
+   }
+  ]
+ },
+ "expected": {
+  "orientation": "daysAsRows",
+  "days": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "periods": [
+   {
+    "number": 1,
+    "start": "08:00",
+    "end": "08:45"
+   },
+   {
+    "number": 2,
+    "start": "08:55",
+    "end": "09:40"
+   },
+   {
+    "number": 3,
+    "start": "09:50",
+    "end": "10:35"
+   },
+   {
+    "number": 4,
+    "start": "10:55",
+    "end": "11:40"
+   },
+   {
+    "number": 5,
+    "start": "11:50",
+    "end": "12:35"
+   },
+   {
+    "number": 6,
+    "start": "12:45",
+    "end": "13:30"
+   },
+   {
+    "number": 7,
+    "start": "13:35",
+    "end": "14:20"
+   }
+  ],
+  "checkTimes": true,
+  "weekCycleLength": null,
+  "lessons": [
+   {
+    "day": 1,
+    "period": 1,
+    "span": 1,
+    "subject": "MAT",
+    "room": "204"
+   },
+   {
+    "day": 2,
+    "period": 2,
+    "span": 1,
+    "subject": "SJL",
+    "room": "204"
+   },
+   {
+    "day": 3,
+    "period": 3,
+    "span": 2,
+    "subject": "ANJ",
+    "room": "112"
+   },
+   {
+    "day": 5,
+    "period": 6,
+    "span": 1,
+    "subject": "TSV",
+    "room": "Telocvičňa"
+   }
+  ]
+ }
+}

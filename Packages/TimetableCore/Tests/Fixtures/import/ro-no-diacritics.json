@@ -1,0 +1,296 @@
+{
+ "id": "ro-no-diacritics",
+ "description": "Romanian without diacritics, days as columns, '8.00-8.45' headers; loose lines.",
+ "language": "ro",
+ "mode": "lines",
+ "layout": "columns",
+ "table": {
+  "version": 1,
+  "pageWidth": 2480,
+  "pageHeight": 3508,
+  "languages": [
+   "ro"
+  ],
+  "lines": [
+   {
+    "text": "8.00-8.45",
+    "box": {
+     "x": 0.1158,
+     "y": 0.1305,
+     "width": 0.016,
+     "height": 0.0648
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "8.55-9.40",
+    "box": {
+     "x": 0.1158,
+     "y": 0.2562,
+     "width": 0.016,
+     "height": 0.0648
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "9.50-10.35",
+    "box": {
+     "x": 0.1158,
+     "y": 0.3783,
+     "width": 0.016,
+     "height": 0.072
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "10.55-11.40",
+    "box": {
+     "x": 0.1158,
+     "y": 0.5004,
+     "width": 0.016,
+     "height": 0.0792
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "11.50-12.35",
+    "box": {
+     "x": 0.1158,
+     "y": 0.6261,
+     "width": 0.016,
+     "height": 0.0792
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "12.45-13.30",
+    "box": {
+     "x": 0.1158,
+     "y": 0.7518,
+     "width": 0.016,
+     "height": 0.0792
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "13.35-14.20",
+    "box": {
+     "x": 0.1158,
+     "y": 0.8775,
+     "width": 0.016,
+     "height": 0.0792
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Luni",
+    "box": {
+     "x": 0.2658,
+     "y": 0.0456,
+     "width": 0.016,
+     "height": 0.0288
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Matematica",
+    "box": {
+     "x": 0.2566,
+     "y": 0.1269,
+     "width": 0.016,
+     "height": 0.072
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "5",
+    "box": {
+     "x": 0.275,
+     "y": 0.1593,
+     "width": 0.016,
+     "height": 0.0072
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Marti",
+    "box": {
+     "x": 0.4158,
+     "y": 0.042,
+     "width": 0.016,
+     "height": 0.036
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Chimie",
+    "box": {
+     "x": 0.4066,
+     "y": 0.267,
+     "width": 0.016,
+     "height": 0.0432
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "L2",
+    "box": {
+     "x": 0.425,
+     "y": 0.2814,
+     "width": 0.016,
+     "height": 0.0144
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Miercuri",
+    "box": {
+     "x": 0.5658,
+     "y": 0.0312,
+     "width": 0.016,
+     "height": 0.0576
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Biologie",
+    "box": {
+     "x": 0.5566,
+     "y": 0.3855,
+     "width": 0.016,
+     "height": 0.0576
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "B4",
+    "box": {
+     "x": 0.575,
+     "y": 0.4071,
+     "width": 0.016,
+     "height": 0.0144
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Joi",
+    "box": {
+     "x": 0.7158,
+     "y": 0.0492,
+     "width": 0.016,
+     "height": 0.0216
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Vineri",
+    "box": {
+     "x": 0.8658,
+     "y": 0.0384,
+     "width": 0.016,
+     "height": 0.0432
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Engleza",
+    "box": {
+     "x": 0.8566,
+     "y": 0.8919,
+     "width": 0.016,
+     "height": 0.0504
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "E1",
+    "box": {
+     "x": 0.875,
+     "y": 0.9099,
+     "width": 0.016,
+     "height": 0.0144
+    },
+    "confidence": 0.95
+   }
+  ]
+ },
+ "expected": {
+  "orientation": "daysAsColumns",
+  "days": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "periods": [
+   {
+    "number": 1,
+    "start": "08:00",
+    "end": "08:45"
+   },
+   {
+    "number": 2,
+    "start": "08:55",
+    "end": "09:40"
+   },
+   {
+    "number": 3,
+    "start": "09:50",
+    "end": "10:35"
+   },
+   {
+    "number": 4,
+    "start": "10:55",
+    "end": "11:40"
+   },
+   {
+    "number": 5,
+    "start": "11:50",
+    "end": "12:35"
+   },
+   {
+    "number": 6,
+    "start": "12:45",
+    "end": "13:30"
+   },
+   {
+    "number": 7,
+    "start": "13:35",
+    "end": "14:20"
+   }
+  ],
+  "checkTimes": true,
+  "weekCycleLength": null,
+  "lessons": [
+   {
+    "day": 1,
+    "period": 1,
+    "span": 1,
+    "subject": "Matematica",
+    "room": "5"
+   },
+   {
+    "day": 2,
+    "period": 2,
+    "span": 1,
+    "subject": "Chimie",
+    "room": "L2"
+   },
+   {
+    "day": 3,
+    "period": 3,
+    "span": 1,
+    "subject": "Biologie",
+    "room": "B4"
+   },
+   {
+    "day": 5,
+    "period": 7,
+    "span": 1,
+    "subject": "Engleza",
+    "room": "E1"
+   }
+  ]
+ }
+}

@@ -1,0 +1,292 @@
+{
+ "id": "fr-columns",
+ "description": "French collège, days as columns, '8h00-8h55' headers, 55-minute lessons.",
+ "language": "fr",
+ "mode": "cells",
+ "layout": "columns",
+ "table": {
+  "version": 1,
+  "pageWidth": 2480,
+  "pageHeight": 3508,
+  "languages": [
+   "fr"
+  ],
+  "cells": [
+   {
+    "text": "1\n08h00-08h55",
+    "row": 1,
+    "column": 0,
+    "box": {
+     "x": 0.05,
+     "y": 0.1,
+     "width": 0.15,
+     "height": 0.1467
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "2\n08h55-09h50",
+    "row": 2,
+    "column": 0,
+    "box": {
+     "x": 0.05,
+     "y": 0.2467,
+     "width": 0.15,
+     "height": 0.1467
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "3\n10h05-11h00",
+    "row": 3,
+    "column": 0,
+    "box": {
+     "x": 0.05,
+     "y": 0.3933,
+     "width": 0.15,
+     "height": 0.1467
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "4\n11h00-11h55",
+    "row": 4,
+    "column": 0,
+    "box": {
+     "x": 0.05,
+     "y": 0.54,
+     "width": 0.15,
+     "height": 0.1467
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "5\n13h30-14h25",
+    "row": 5,
+    "column": 0,
+    "box": {
+     "x": 0.05,
+     "y": 0.6867,
+     "width": 0.15,
+     "height": 0.1467
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "6\n14h25-15h20",
+    "row": 6,
+    "column": 0,
+    "box": {
+     "x": 0.05,
+     "y": 0.8333,
+     "width": 0.15,
+     "height": 0.1467
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Lundi",
+    "row": 0,
+    "column": 1,
+    "box": {
+     "x": 0.2,
+     "y": 0.02,
+     "width": 0.15,
+     "height": 0.08
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Mathématiques\nSalle 101\nM. Dupont",
+    "row": 1,
+    "column": 1,
+    "box": {
+     "x": 0.2,
+     "y": 0.1,
+     "width": 0.15,
+     "height": 0.1467
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Mardi",
+    "row": 0,
+    "column": 2,
+    "box": {
+     "x": 0.35,
+     "y": 0.02,
+     "width": 0.15,
+     "height": 0.08
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Français\nSalle 12",
+    "row": 2,
+    "column": 2,
+    "box": {
+     "x": 0.35,
+     "y": 0.2467,
+     "width": 0.15,
+     "height": 0.1467
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Mercredi",
+    "row": 0,
+    "column": 3,
+    "box": {
+     "x": 0.5,
+     "y": 0.02,
+     "width": 0.15,
+     "height": 0.08
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Histoire-Géo\nB204",
+    "row": 3,
+    "column": 3,
+    "rowSpan": 2,
+    "box": {
+     "x": 0.5,
+     "y": 0.3933,
+     "width": 0.15,
+     "height": 0.2933
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Jeudi",
+    "row": 0,
+    "column": 4,
+    "box": {
+     "x": 0.65,
+     "y": 0.02,
+     "width": 0.15,
+     "height": 0.08
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "SVT\nLabo 2",
+    "row": 5,
+    "column": 4,
+    "box": {
+     "x": 0.65,
+     "y": 0.6867,
+     "width": 0.15,
+     "height": 0.1467
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Vendredi",
+    "row": 0,
+    "column": 5,
+    "box": {
+     "x": 0.8,
+     "y": 0.02,
+     "width": 0.15,
+     "height": 0.08
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "EPS\nGymnase",
+    "row": 6,
+    "column": 5,
+    "box": {
+     "x": 0.8,
+     "y": 0.8333,
+     "width": 0.15,
+     "height": 0.1467
+    },
+    "confidence": 0.95
+   }
+  ]
+ },
+ "expected": {
+  "orientation": "daysAsColumns",
+  "days": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "periods": [
+   {
+    "number": 1,
+    "start": "08:00",
+    "end": "08:55"
+   },
+   {
+    "number": 2,
+    "start": "08:55",
+    "end": "09:50"
+   },
+   {
+    "number": 3,
+    "start": "10:05",
+    "end": "11:00"
+   },
+   {
+    "number": 4,
+    "start": "11:00",
+    "end": "11:55"
+   },
+   {
+    "number": 5,
+    "start": "13:30",
+    "end": "14:25"
+   },
+   {
+    "number": 6,
+    "start": "14:25",
+    "end": "15:20"
+   }
+  ],
+  "checkTimes": true,
+  "weekCycleLength": null,
+  "lessons": [
+   {
+    "day": 1,
+    "period": 1,
+    "span": 1,
+    "subject": "Mathématiques",
+    "room": "Salle 101",
+    "teacher": "M. Dupont"
+   },
+   {
+    "day": 2,
+    "period": 2,
+    "span": 1,
+    "subject": "Français",
+    "room": "Salle 12"
+   },
+   {
+    "day": 3,
+    "period": 3,
+    "span": 2,
+    "subject": "Histoire-Géo",
+    "room": "B204"
+   },
+   {
+    "day": 4,
+    "period": 5,
+    "span": 1,
+    "subject": "SVT",
+    "room": "Labo 2"
+   },
+   {
+    "day": 5,
+    "period": 6,
+    "span": 1,
+    "subject": "EPS",
+    "room": "Gymnase"
+   }
+  ]
+ }
+}

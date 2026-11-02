@@ -64,7 +64,15 @@ public enum ImportReconciliation {
             if verbatim {
                 lesson[field] = text
                 lesson.alternatives.removeAll { $0.field == field }
-                if field == .subject || field == .room || field == .teacher { lesson.reasons.remove(.ambiguousSplit) }
+                if field == .subject || field == .room || field == .teacher {
+                    lesson.reasons.remove(.ambiguousSplit)
+                    // Text the parser parked in notes now has its field.
+                    if field != .subject, let notes = lesson.notes {
+                        let rest = notes.split(separator: "\n").map(String.init).filter { $0 != text }
+                        lesson.notes = rest.isEmpty ? nil : rest.joined(separator: "\n")
+                        lesson.alternatives.removeAll { $0.kind == .split && $0.values.contains { $0.hasSuffix(" " + text) } }
+                    }
+                }
                 if !lesson.alternatives.contains(where: { $0.kind == .ocrReading }) { lesson.reasons.remove(.ocrConfusion) }
             } else {
                 addAlternative([current ?? "", text], field: field, to: &lesson)
@@ -94,6 +102,6 @@ public enum ImportScoring {
 
     /// `ocr` × the penalty of each reason, clamped to 0…1.
     public static func confidence(ocr: Double, reasons: Set<ImportConfidenceReason>) -> Double {
-        min(1, max(0, reasons.reduce(ocr) { $0 * $1.penalty }))
+        min(1, max(0, reasons.sorted().reduce(ocr) { $0 * $1.penalty })) // sorted: Set order would change the last bits
     }
 }

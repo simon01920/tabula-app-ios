@@ -1,0 +1,279 @@
+{
+ "id": "en-uni-types",
+ "description": "English university, 90-minute ranges, types in brackets.",
+ "language": "en",
+ "mode": "cells",
+ "layout": "rows",
+ "table": {
+  "version": 1,
+  "pageWidth": 2480,
+  "pageHeight": 3508,
+  "languages": [
+   "en"
+  ],
+  "cells": [
+   {
+    "text": "1\n08:00-09:30",
+    "row": 0,
+    "column": 1,
+    "box": {
+     "x": 0.1,
+     "y": 0.05,
+     "width": 0.176,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "2\n09:45-11:15",
+    "row": 0,
+    "column": 2,
+    "box": {
+     "x": 0.276,
+     "y": 0.05,
+     "width": 0.176,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "3\n11:30-13:00",
+    "row": 0,
+    "column": 3,
+    "box": {
+     "x": 0.452,
+     "y": 0.05,
+     "width": 0.176,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "4\n13:30-15:00",
+    "row": 0,
+    "column": 4,
+    "box": {
+     "x": 0.628,
+     "y": 0.05,
+     "width": 0.176,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "5\n15:15-16:45",
+    "row": 0,
+    "column": 5,
+    "box": {
+     "x": 0.804,
+     "y": 0.05,
+     "width": 0.176,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Mon",
+    "row": 1,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.2,
+     "width": 0.08,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Algorithms (Lecture)\nC1.04",
+    "row": 1,
+    "column": 1,
+    "box": {
+     "x": 0.1,
+     "y": 0.2,
+     "width": 0.176,
+     "height": 0.15
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Algorithms (Lab)\nB204",
+    "row": 1,
+    "column": 2,
+    "box": {
+     "x": 0.276,
+     "y": 0.2,
+     "width": 0.176,
+     "height": 0.15
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Tue",
+    "row": 2,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.35,
+     "width": 0.08,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Statistics (Tutorial)\nA12",
+    "row": 2,
+    "column": 3,
+    "box": {
+     "x": 0.452,
+     "y": 0.35,
+     "width": 0.176,
+     "height": 0.15
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Wed",
+    "row": 3,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.5,
+     "width": 0.08,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Databases (Lecture)\nC1.04\nDr Miller",
+    "row": 3,
+    "column": 1,
+    "box": {
+     "x": 0.1,
+     "y": 0.5,
+     "width": 0.176,
+     "height": 0.15
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Thu",
+    "row": 4,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.65,
+     "width": 0.08,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Ethics (Seminar)\nAula",
+    "row": 4,
+    "column": 4,
+    "box": {
+     "x": 0.628,
+     "y": 0.65,
+     "width": 0.176,
+     "height": 0.15
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Fri",
+    "row": 5,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.8,
+     "width": 0.08,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   }
+  ]
+ },
+ "expected": {
+  "orientation": "daysAsRows",
+  "days": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "periods": [
+   {
+    "number": 1,
+    "start": "08:00",
+    "end": "09:30"
+   },
+   {
+    "number": 2,
+    "start": "09:45",
+    "end": "11:15"
+   },
+   {
+    "number": 3,
+    "start": "11:30",
+    "end": "13:00"
+   },
+   {
+    "number": 4,
+    "start": "13:30",
+    "end": "15:00"
+   },
+   {
+    "number": 5,
+    "start": "15:15",
+    "end": "16:45"
+   }
+  ],
+  "checkTimes": true,
+  "weekCycleLength": null,
+  "lessons": [
+   {
+    "day": 1,
+    "period": 1,
+    "span": 1,
+    "subject": "Algorithms",
+    "room": "C1.04",
+    "lessonType": "lecture"
+   },
+   {
+    "day": 1,
+    "period": 2,
+    "span": 1,
+    "subject": "Algorithms",
+    "room": "B204",
+    "lessonType": "lab"
+   },
+   {
+    "day": 2,
+    "period": 3,
+    "span": 1,
+    "subject": "Statistics",
+    "room": "A12",
+    "lessonType": "tutorial"
+   },
+   {
+    "day": 3,
+    "period": 1,
+    "span": 1,
+    "subject": "Databases",
+    "room": "C1.04",
+    "teacher": "Dr Miller",
+    "lessonType": "lecture"
+   },
+   {
+    "day": 4,
+    "period": 4,
+    "span": 1,
+    "subject": "Ethics",
+    "room": "Aula",
+    "lessonType": "seminar"
+   }
+  ]
+ }
+}

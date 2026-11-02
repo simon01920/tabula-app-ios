@@ -1,0 +1,420 @@
+{
+ "id": "en-rows-period",
+ "description": "English, days as rows (Mon-Fri), 'Period 1' over a start time only; loose lines.",
+ "language": "en",
+ "mode": "lines",
+ "layout": "rows",
+ "table": {
+  "version": 1,
+  "pageWidth": 2480,
+  "pageHeight": 3508,
+  "languages": [
+   "en"
+  ],
+  "lines": [
+   {
+    "text": "Period 1",
+    "box": {
+     "x": 0.1341,
+     "y": 0.1066,
+     "width": 0.0576,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "08:00",
+    "box": {
+     "x": 0.1449,
+     "y": 0.125,
+     "width": 0.036,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Period 2",
+    "box": {
+     "x": 0.2598,
+     "y": 0.1066,
+     "width": 0.0576,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "08:55",
+    "box": {
+     "x": 0.2706,
+     "y": 0.125,
+     "width": 0.036,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Period 3",
+    "box": {
+     "x": 0.3855,
+     "y": 0.1066,
+     "width": 0.0576,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "09:50",
+    "box": {
+     "x": 0.3963,
+     "y": 0.125,
+     "width": 0.036,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Period 4",
+    "box": {
+     "x": 0.5112,
+     "y": 0.1066,
+     "width": 0.0576,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "10:55",
+    "box": {
+     "x": 0.522,
+     "y": 0.125,
+     "width": 0.036,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Period 5",
+    "box": {
+     "x": 0.6369,
+     "y": 0.1066,
+     "width": 0.0576,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "11:50",
+    "box": {
+     "x": 0.6477,
+     "y": 0.125,
+     "width": 0.036,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Period 6",
+    "box": {
+     "x": 0.7626,
+     "y": 0.1066,
+     "width": 0.0576,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "12:45",
+    "box": {
+     "x": 0.7734,
+     "y": 0.125,
+     "width": 0.036,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Period 7",
+    "box": {
+     "x": 0.8883,
+     "y": 0.1066,
+     "width": 0.0576,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "13:35",
+    "box": {
+     "x": 0.8991,
+     "y": 0.125,
+     "width": 0.036,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Mon",
+    "box": {
+     "x": 0.0492,
+     "y": 0.2658,
+     "width": 0.0216,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Maths",
+    "box": {
+     "x": 0.1449,
+     "y": 0.2566,
+     "width": 0.036,
+     "height": 0.016
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Rm 4",
+    "box": {
+     "x": 0.1485,
+     "y": 0.275,
+     "width": 0.0288,
+     "height": 0.016
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Chemistry",
+    "box": {
+     "x": 0.2562,
+     "y": 0.2566,
+     "width": 0.0648,
+     "height": 0.016
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "S2",
+    "box": {
+     "x": 0.2814,
+     "y": 0.275,
+     "width": 0.0144,
+     "height": 0.016
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Tue",
+    "box": {
+     "x": 0.0492,
+     "y": 0.4158,
+     "width": 0.0216,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "French",
+    "box": {
+     "x": 0.6441,
+     "y": 0.4066,
+     "width": 0.0432,
+     "height": 0.016
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "L3",
+    "box": {
+     "x": 0.6585,
+     "y": 0.425,
+     "width": 0.0144,
+     "height": 0.016
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Wed",
+    "box": {
+     "x": 0.0492,
+     "y": 0.5658,
+     "width": 0.0216,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Geography",
+    "box": {
+     "x": 0.1933,
+     "y": 0.5566,
+     "width": 0.0648,
+     "height": 0.016
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "H1",
+    "box": {
+     "x": 0.2185,
+     "y": 0.575,
+     "width": 0.0144,
+     "height": 0.016
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Thu",
+    "box": {
+     "x": 0.0492,
+     "y": 0.7158,
+     "width": 0.0216,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Music",
+    "box": {
+     "x": 0.8991,
+     "y": 0.7066,
+     "width": 0.036,
+     "height": 0.016
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "M1",
+    "box": {
+     "x": 0.9099,
+     "y": 0.725,
+     "width": 0.0144,
+     "height": 0.016
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Fri",
+    "box": {
+     "x": 0.0492,
+     "y": 0.8658,
+     "width": 0.0216,
+     "height": 0.016
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Drama",
+    "box": {
+     "x": 0.3963,
+     "y": 0.8566,
+     "width": 0.036,
+     "height": 0.016
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Hall",
+    "box": {
+     "x": 0.3999,
+     "y": 0.875,
+     "width": 0.0288,
+     "height": 0.016
+    },
+    "confidence": 0.95
+   }
+  ]
+ },
+ "expected": {
+  "orientation": "daysAsRows",
+  "days": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "periods": [
+   {
+    "number": 1,
+    "start": "08:00",
+    "end": "08:45"
+   },
+   {
+    "number": 2,
+    "start": "08:55",
+    "end": "09:40"
+   },
+   {
+    "number": 3,
+    "start": "09:50",
+    "end": "10:35"
+   },
+   {
+    "number": 4,
+    "start": "10:55",
+    "end": "11:40"
+   },
+   {
+    "number": 5,
+    "start": "11:50",
+    "end": "12:35"
+   },
+   {
+    "number": 6,
+    "start": "12:45",
+    "end": "13:30"
+   },
+   {
+    "number": 7,
+    "start": "13:35",
+    "end": "14:20"
+   }
+  ],
+  "checkTimes": true,
+  "weekCycleLength": null,
+  "lessons": [
+   {
+    "day": 1,
+    "period": 1,
+    "span": 1,
+    "subject": "Maths",
+    "room": "Rm 4"
+   },
+   {
+    "day": 1,
+    "period": 2,
+    "span": 1,
+    "subject": "Chemistry",
+    "room": "S2"
+   },
+   {
+    "day": 2,
+    "period": 5,
+    "span": 1,
+    "subject": "French",
+    "room": "L3"
+   },
+   {
+    "day": 3,
+    "period": 1,
+    "span": 2,
+    "subject": "Geography",
+    "room": "H1"
+   },
+   {
+    "day": 4,
+    "period": 7,
+    "span": 1,
+    "subject": "Music",
+    "room": "M1"
+   },
+   {
+    "day": 5,
+    "period": 3,
+    "span": 1,
+    "subject": "Drama",
+    "room": "Hall"
+   }
+  ]
+ }
+}

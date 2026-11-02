@@ -1,0 +1,299 @@
+{
+ "id": "sk-teachers-known",
+ "description": "Teachers with Slovak titles (incl. 'PhD.' after the name) and a known-subject abbreviation ('Bio').",
+ "language": "sk",
+ "mode": "cells",
+ "layout": "rows",
+ "options": {
+  "knownSubjects": [
+   "Biológia",
+   "Matematika",
+   "Dejepis"
+  ]
+ },
+ "table": {
+  "version": 1,
+  "pageWidth": 2480,
+  "pageHeight": 3508,
+  "languages": [
+   "sk"
+  ],
+  "cells": [
+   {
+    "text": "1\n08:00-08:45",
+    "row": 0,
+    "column": 1,
+    "box": {
+     "x": 0.1,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "2\n08:55-09:40",
+    "row": 0,
+    "column": 2,
+    "box": {
+     "x": 0.2257,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "3\n09:50-10:35",
+    "row": 0,
+    "column": 3,
+    "box": {
+     "x": 0.3514,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "4\n10:55-11:40",
+    "row": 0,
+    "column": 4,
+    "box": {
+     "x": 0.4771,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "5\n11:50-12:35",
+    "row": 0,
+    "column": 5,
+    "box": {
+     "x": 0.6029,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "6\n12:45-13:30",
+    "row": 0,
+    "column": 6,
+    "box": {
+     "x": 0.7286,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "7\n13:35-14:20",
+    "row": 0,
+    "column": 7,
+    "box": {
+     "x": 0.8543,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Po",
+    "row": 1,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.2,
+     "width": 0.08,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Bio\nLab B\nMgr. Lukáč",
+    "row": 1,
+    "column": 1,
+    "box": {
+     "x": 0.1,
+     "y": 0.2,
+     "width": 0.1257,
+     "height": 0.15
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Ut",
+    "row": 2,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.35,
+     "width": 0.08,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Matematika\n201\nRNDr. Novák",
+    "row": 2,
+    "column": 2,
+    "box": {
+     "x": 0.2257,
+     "y": 0.35,
+     "width": 0.1257,
+     "height": 0.15
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "St",
+    "row": 3,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.5,
+     "width": 0.08,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Fyzika\nLab F\nMgr. Horváth, PhD.",
+    "row": 3,
+    "column": 3,
+    "box": {
+     "x": 0.3514,
+     "y": 0.5,
+     "width": 0.1257,
+     "height": 0.15
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Št",
+    "row": 4,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.65,
+     "width": 0.08,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Dejepis\n105\nPhDr. Varga",
+    "row": 4,
+    "column": 4,
+    "box": {
+     "x": 0.4771,
+     "y": 0.65,
+     "width": 0.1257,
+     "height": 0.15
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Pi",
+    "row": 5,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.8,
+     "width": 0.08,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   }
+  ]
+ },
+ "expected": {
+  "orientation": "daysAsRows",
+  "days": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "periods": [
+   {
+    "number": 1,
+    "start": "08:00",
+    "end": "08:45"
+   },
+   {
+    "number": 2,
+    "start": "08:55",
+    "end": "09:40"
+   },
+   {
+    "number": 3,
+    "start": "09:50",
+    "end": "10:35"
+   },
+   {
+    "number": 4,
+    "start": "10:55",
+    "end": "11:40"
+   },
+   {
+    "number": 5,
+    "start": "11:50",
+    "end": "12:35"
+   },
+   {
+    "number": 6,
+    "start": "12:45",
+    "end": "13:30"
+   },
+   {
+    "number": 7,
+    "start": "13:35",
+    "end": "14:20"
+   }
+  ],
+  "checkTimes": true,
+  "weekCycleLength": null,
+  "lessons": [
+   {
+    "day": 1,
+    "period": 1,
+    "span": 1,
+    "subject": "Bio",
+    "room": "Lab B",
+    "teacher": "Mgr. Lukáč"
+   },
+   {
+    "day": 2,
+    "period": 2,
+    "span": 1,
+    "subject": "Matematika",
+    "room": "201",
+    "teacher": "RNDr. Novák"
+   },
+   {
+    "day": 3,
+    "period": 3,
+    "span": 1,
+    "subject": "Fyzika",
+    "room": "Lab F",
+    "teacher": "Mgr. Horváth, PhD."
+   },
+   {
+    "day": 4,
+    "period": 4,
+    "span": 1,
+    "subject": "Dejepis",
+    "room": "105",
+    "teacher": "PhDr. Varga"
+   }
+  ]
+ }
+}
