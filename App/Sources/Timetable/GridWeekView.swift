@@ -1,4 +1,5 @@
-// Classic periods × days grid (route `timetable.grid`), drawn from `GridLayout`:
+// The periods × days grid (`GridLayoutStyle.periodsAsRows`, the second Grid option since 2026-11; screenshot route
+// `timetable.grid-periods`), drawn from `GridLayout`; `TimetableGridView` picks it or `DayPeriodGridView`:
 // - day headers pinned above the scroll view (aligned with the columns; today's header tinted, change symbol), the
 //   period column on the leading edge with lesson numbers and times (no horizontal scrolling: 5/6/7 columns share the
 //   width, so the period column is always visible); the current period's number gets the highlighter;

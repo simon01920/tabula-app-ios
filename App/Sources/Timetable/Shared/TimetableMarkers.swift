@@ -84,12 +84,15 @@ struct CellBadgeView: View {
 
 // MARK: Free slot
 
-/// Empty grid slots stay quiet (Opus M14): plain background; the dashed outline and "+" appear only while pressed.
+/// Empty grid slots stay quiet (Opus M14): plain background, or with `filled` a faint neutral fill (the aSc grid's grey
+/// free cells, days × periods layout); the dashed outline and "+" appear only while pressed.
 /// The outline uses the secondary label colour (≥ 3:1 on the background, unlike the old 1.7:1 dashes, Opus C2).
 struct QuietFreeSlotButtonStyle: ButtonStyle {
+    var filled = false
+
     func makeBody(configuration: Configuration) -> some View {
         RoundedRectangle(cornerRadius: 8, style: .continuous)
-            .fill(Color.clear)
+            .fill(filled ? Color.secondary.opacity(0.08) : Color.clear)
             .overlay {
                 if configuration.isPressed {
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
