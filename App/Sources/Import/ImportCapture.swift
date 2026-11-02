@@ -65,6 +65,11 @@ enum ImportImageLoader {
         return await normalise(image)
     }
 
+    /// The number of pages (`nil` when the bytes are not a PDF).
+    static func pageCount(pdf data: Data) -> Int? {
+        PDFDocument(data: data)?.pageCount
+    }
+
     /// Small page previews for the page picker.
     @concurrent
     static func thumbnails(pdf data: Data, side: CGFloat) async -> [UIImage] {
@@ -102,7 +107,9 @@ struct DocumentCameraView: UIViewControllerRepresentable {
 
     func updateUIViewController(_ controller: VNDocumentCameraViewController, context: Context) {}
 
-    final class Coordinator: NSObject, VNDocumentCameraViewControllerDelegate {
+    // The delegate is called on the main thread; `@preconcurrency` checks that at run time.
+    @MainActor
+    final class Coordinator: NSObject, @preconcurrency VNDocumentCameraViewControllerDelegate {
         let onScan: @MainActor (UIImage) -> Void
         let onCancel: @MainActor (Bool) -> Void
 
@@ -113,17 +120,15 @@ struct DocumentCameraView: UIViewControllerRepresentable {
 
         func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
             let image = scan.pageCount > 0 ? scan.imageOfPage(at: 0) : nil
-            MainActor.assumeIsolated {
-                if let image { onScan(image) } else { onCancel(false) }
-            }
+            if let image { onScan(image) } else { onCancel(false) }
         }
 
         func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
-            MainActor.assumeIsolated { onCancel(false) }
+            onCancel(false)
         }
 
         func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFailWithError error: any Error) {
-            MainActor.assumeIsolated { onCancel(true) }
+            onCancel(true)
         }
     }
 }
