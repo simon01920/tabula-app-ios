@@ -24,6 +24,7 @@ enum SettingsRoutes: RouteProvider {
             AppRoute("settings.live-activities", .tabRoot(.settings)) { NavigationStack { SettingsLiveActivitiesView() } },
             AppRoute("settings.backup", .tabRoot(.settings)) { NavigationStack { SettingsBackupView() } },
             AppRoute("settings.timetable-new", .sheet(over: .settings)) { NewTimetableSheet() },
+            AppRoute("settings.import-model", .tabRoot(.settings)) { NavigationStack { SettingsImportView() } },
         ]
     }
 }

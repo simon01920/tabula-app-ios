@@ -43,6 +43,7 @@ struct TimetablesManagerView: View {
     @State private var deleting: TimetableTarget?
     @State private var resetting: TimetableTarget?
     @State private var adding = false
+    @State private var importingPhoto = false
     @State private var failure: ApplyResult?
     /// Reorder mode, driven by our own toggle like the subjects list: the system EditButton would turn into a second
     /// "Done" next to the sheet's Done (QA C1), so the sheet's Done is hidden while reordering.
@@ -106,6 +107,7 @@ struct TimetablesManagerView: View {
         }
         .sheet(item: $editing) { target in TimetableEditorView(timetableID: target.id) }
         .sheet(isPresented: $adding) { NewTimetableSheet() }
+        .sheet(isPresented: $importingPhoto) { PhotoImportView() }
         .sheet(item: $deleting) { target in deleteConfirmation(target.id) }
         .sheet(item: $resetting) { target in resetConfirmation(target.id) }
     }
@@ -125,6 +127,13 @@ struct TimetablesManagerView: View {
                         Text(verbatim: model.renderer.format(key: "editor.timetables.limit", arguments: [.integer(Int64(limit))]))
                     }
                 }
+            }
+            // Phase 9 I2: the photo / PDF import (its sheet hangs on the list content, not on this Section: RISKS #99).
+            Section {
+                Button { importingPhoto = true } label: {
+                    Label { Text("import.entry.photoOrPDF") } icon: { Image(systemName: "doc.viewfinder") }
+                }
+                .disabled(model.isReadOnly || database == nil)
             }
         }
     }

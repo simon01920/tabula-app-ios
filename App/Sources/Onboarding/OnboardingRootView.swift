@@ -167,6 +167,7 @@ struct StartStepView: View {
     @Environment(AppModel.self) private var model
     @Environment(SampleContentController.self) private var samples
     @Environment(AppNavigation.self) private var navigation
+    @State private var importingPhoto = false
 
     private var isSample: Bool { flow.draft.start == .sample }
 
@@ -200,7 +201,17 @@ struct StartStepView: View {
             }
             .padding(.horizontal, 4)
             .accessibilityHint(Text("onboarding.start.import.detail"))
+            // Phase 9 I2: the photo / PDF import, also an action; approving it finishes onboarding like the share import.
+            Button { importingPhoto = true } label: {
+                Label { Text("onboarding.start.importPhoto") } icon: { Image(systemName: "doc.viewfinder") }
+                    .font(.subheadline)
+                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                    .contentShape(Rectangle())
+            }
+            .padding(.horizontal, 4)
+            .accessibilityHint(Text("onboarding.start.importPhoto.detail"))
         }
+        .sheet(isPresented: $importingPhoto) { PhotoImportView(profile: flow.draft.profile) }
     }
 }
 

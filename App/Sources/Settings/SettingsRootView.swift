@@ -200,6 +200,9 @@ struct SettingsRootView: View {
                     SettingsRowLabel("settings.colors.title", symbol: "paintpalette.fill", color: .pink)
                 }
             }
+            NavigationLink { SettingsImportView() } label: {
+                SettingsRowLabel("settings.import.title", symbol: "doc.viewfinder.fill", color: .orange)
+            }
             Button {
                 if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
             } label: {
