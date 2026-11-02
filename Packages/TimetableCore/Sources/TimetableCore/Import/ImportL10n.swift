@@ -1,7 +1,7 @@
 import Foundation
 
-/// String Catalog keys of the import review (Phase 9). Not part of `CoreL10n.allKeys` yet: the app stage (I2) adds
-/// the 12-language entries to `Resources/Localizable.xcstrings` and then appends `ImportL10n.allKeys` there.
+/// String Catalog keys of the import review (Phase 9), part of `CoreL10n.allKeys` (DOMAIN_MODEL Appendix A.10;
+/// the 12-language entries came with stage I2).
 public enum ImportL10n {
     /// `"%1$@: “%2$@” or “%3$@”?"` — field name (nested `import.field.*`), current reading, other reading.
     public static let questionOCRReading = "import.question.ocrReading"
