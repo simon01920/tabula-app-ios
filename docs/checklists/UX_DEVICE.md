@@ -403,6 +403,53 @@ is "Week B" (the sample's own A/B labels); university seed: this week is "Even w
 - [ ] AX-XXXL: the grid becomes the day-by-day list (kept); the current lesson row shows the "NOW" tag; today's header
       tag is ink, not red.
 
+### Grid layout option (human decision 2026-11-01/02)
+Default layout: days in rows (the Slovak aSc timetable). Settings › General › Grid layout switches to periods in rows
+(the U4.2 lines above then apply unchanged). The Week view is unchanged in both.
+- [ ] Fresh install and an existing install (update over the previous build): the Grid opens in **days in rows**;
+      Settings › General › Grid layout shows "Days in rows" with a checkmark.
+- [ ] Settings › Grid layout: two rows, each with a small schematic (5 rows × 7 columns / 7 rows × 5 columns, one
+      double lesson), a bold name and one grey line; tap "Periods in rows" → checkmark moves, Back, the root row says
+      "Periods in rows", the Timetable tab shows the old layout. Switch back → days in rows. Kill and relaunch: kept.
+- [ ] `timetable.grid-periods` route: the old layout although the setting says days in rows; the setting is unchanged.
+- [ ] Portrait, `timetable.grid` (secondary): rows PO–PI, columns 1–8 with start times (e.g. 8:00) in the device's
+      12/24-hour format; all 8 periods visible without scrolling; the header stays put while the rows scroll; no break
+      columns.
+- [ ] Cells: subject colour, short name bold and centred, room small bottom-right; badge bottom-left (task ☑ count,
+      exam cap, change symbol, red ⊗ on a cancelled lesson, which is dimmed and struck through). A timetable with
+      Room hidden: no room anywhere, no gap or dash. An empty room: absent.
+- [ ] Spans: Wed INF covers periods 4–5 as one cell; tapping it opens the lesson. A schedule with a lunch period:
+      no lunch column, a double period across it is still one cell.
+- [ ] Now (`-TabulaNow` Tue 10:20): the current cell has the highlighter outline, its period number has the
+      highlighter, the TUE label is ink-tinted. VoiceOver on the cell adds "in progress".
+- [ ] Free periods are quiet grey cells with no outline; press shows the dashed "+", release opens quick add for
+      that day and period (the sheet is opaque and says "Every Tuesday · Period 7").
+- [ ] Long day: give a timetable 12+ periods → portrait scrolls horizontally; the day column stays pinned, the
+      header scrolls with the cells and stays aligned; landscape shows more (or all) periods.
+- [ ] Landscape (secondary, 5 days): all periods fit; rows ≥ 50 pt; no clipped names. 7-day timetable in landscape:
+      the rows scroll vertically (with horizontal scrolling too, the header scrolls with them; note if that bothers).
+- [ ] Holiday week (26–30 Oct): Thu and Fri rows are one shaded band with the umbrella and the holiday name.
+- [ ] Lessons outside the bell schedule (a free-form time on a bell-schedule timetable) are listed below the grid.
+- [ ] University (`timetable.grid@university`): columns are the week's start times with end times below; no period
+      numbers; a slot inside a running lecture is not offered as free.
+- [ ] Empty timetable (`timetable.grid@blank`): only grey free cells; tapping one opens quick add.
+- [ ] Long text: a subject without a short name ("Občianska náuka") shrinks, then wraps to 2 lines; never overlaps
+      the room or badge.
+- [ ] VoiceOver: swipe through the grid → Monday's cells and free periods left to right, then Tuesday, …; a cell reads
+      "Monday, 12 October: Slovenský jazyk, period 1, …"; a free period reads "…, period 7, 13:40 to 14:25, free";
+      a holiday row reads the day sentence with "holiday". Settings rows read name and description; the schematic is
+      silent. The Pro row reads "Tabula Pro, Active, All features unlocked" once.
+- [ ] Dynamic Type XXL: columns widen and scroll sooner; names shrink before truncating. AX sizes: the list (kept), in
+      both layouts. Settings › Grid layout at AX: the schematic sits beside wrapped text, nothing clipped.
+- [ ] Dark mode and Increase Contrast: free cells still visible but quiet; today's ink label readable; the schematic's
+      ink cells and grey labels both visible.
+- [ ] German / Slovak / Japanese / Chinese: weekday labels (MO, PO, 月, 周一) fit the day column; "Periods in rows" /
+      "Stunden in Zeilen" and the footer wrap without clipping.
+- [ ] Export (`export.preview`, Share → PDF/Image): the Grid page follows the setting — days in rows shows every
+      period at fixed widths, no scroll cut-off, no today/now markers; switch to periods in rows → the old page.
+- [ ] Settings › Tabula Pro row: star tile, "Tabula Pro" with the Pro badge, grey "All features unlocked" below,
+      "Active" on the right; no prices, no buttons; the row is not tappable.
+
 ### U4.3 Symbol legend (TipKit)
 - [ ] Fresh install (delete and reinstall the app to reset TipKit):
       open the Timetable tab on the secondary seed WITHOUT `-TabulaNow` → an inline card "Symbols in the timetable"

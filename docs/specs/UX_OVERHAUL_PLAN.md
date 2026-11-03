@@ -43,6 +43,20 @@ Defaults the orchestrator took (listed for the gate, the human can reverse them)
 - **Settings:** a user switch for the Grid layout. The current periods × days layout stays as the other option. Add the new layout next to `GridLayout`/`GridWeekView`; do not delete or rewrite them. The Week view is unchanged.
 - **Starting point:** `wip/grid-transpose` (`89ce03a`, pure `DayPeriodGrid` maths with Linux tests; not QA'd or merged).
 - **Persistence:** the setting is persisted, so ask the human before changing the schema (CLAUDE.md).
+- **Decision 2026-11-02 (human):** both layouts stay, stored app-wide in `AppSettings.gridLayout` (approved schema
+  change: one optional open-vocabulary field `GridLayoutStyle`, `daysAsRows` default, `periodsAsRows`; absent in old
+  stores and backups = default, so existing users get the Slovak layout; older builds keep the key as an unknown
+  settings field). Settings › General › Grid layout (inline picker with schematics, as Colors). The export Grid page
+  follows the setting. A quiet "Tabula Pro · Active · All features unlocked" row replaces the "Current plan" row.
+- **Implemented on `wip/grid-option`:** `DayPeriodGridView` (new) next to the untouched `GridWeekView`;
+  `TimetableGridView` picks one. Maths reused from `wip/grid-transpose` (which had replaced the old view; not merged):
+  `DayPeriodGrid` + new `GridMode` overloads in TimetableUI, `GridTransposeTests`; the old `GridMode.choose` and its
+  44 pt column minimum are kept for periods in rows. Rows = days, columns = the bell schedule's lesson periods
+  (header "number / start time"); break columns are dropped (a double period across a break is one cell); columns
+  share the width at ≥ 46 pt (scaled), otherwise scroll horizontally with the header while the day column stays
+  pinned; when all fit, the header is pinned above the vertical scroll. Free-form (university) timetables get one
+  column per start–end pair without period numbers. Holidays shade their row; free periods are quiet grey cells.
+  VoiceOver row by row. AX sizes keep `GridListView`. Routes: `timetable.grid-periods`, `settings.grid-layout`.
 
 ## 1. Stages, tiers, ownership
 | Stage | Agent (tier) | Findings |

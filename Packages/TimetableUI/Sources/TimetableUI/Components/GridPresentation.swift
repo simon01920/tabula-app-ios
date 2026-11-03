@@ -120,11 +120,12 @@ public enum GridPresentation {
         return text
     }
 
-    /// VoiceOver sentence of a free slot: "Tuesday, 13 October, period 3, 9:50 to 10:35, free".
+    /// VoiceOver sentence of a free slot: "Tuesday, 13 October, period 3, 9:50 to 10:35, free". Free-form slots
+    /// (no bell-schedule period, so no real period number) read "Tuesday, 13 October, 9:00 to 10:30, free".
     public static func freeSlotAccessibilityLabel(column: GridLayout.Column, row: GridLayout.Row,
                                                   renderer: LocalizedTextRenderer) -> String {
         var parts = [renderer.formatter.date(column.date, style: .full)]
-        if let number = row.lessonNumber {
+        if row.periodID != nil, let number = row.lessonNumber {
             parts.append(renderer.format(key: "a11y.lesson.period", arguments: [.integer(Int64(number))]))
         } else if let label = TodayState.nonBlank(row.label) {
             parts.append(renderer.format(key: "a11y.lesson.periodLabel", arguments: [.text(label)]))

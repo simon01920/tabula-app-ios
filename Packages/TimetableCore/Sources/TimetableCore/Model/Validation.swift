@@ -296,6 +296,7 @@ private struct Validator {
         unknown(settings.profile, me, field: "profile")
         unknown(settings.hourCycle, me, field: "hourCycle")
         unknown(settings.appearance, me, field: "appearance")
+        unknown(settings.gridLayout, me, field: "gridLayout")
         if let quiet = settings.globalQuietHours, quiet.start == quiet.end {
             add(.warning, .invalidTimeRange, me, field: "globalQuietHours")
         }

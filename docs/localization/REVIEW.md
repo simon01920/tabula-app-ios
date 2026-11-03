@@ -302,3 +302,10 @@ iCloud; the message names the Merge button by its exact title). "iCloud" and "iP
 model-authored for 11 languages (`sr-Latn` derived), all `needs_review`. Check: the path "Settings › Backup › Automatic
 copies" in `settings.backup.replace.message` must use the translated tab name, `settings.backup.title` and
 `settings.backup.automatic.header`; "Merge" / "Replace" in `settings.backup.mode.message` must match the button names.
+### Grid layout option (2026-11-02)
+8 new keys, model-authored for 11 languages (`sr-Latn` derived), all `needs_review`: `settings.gridLayout.*` (Settings ›
+General › Grid layout: title, the options "Days in rows" / "Periods in rows" with a one-line description each, footer)
+and `settings.pro.active`, `settings.pro.active.detail` (the Tabula Pro status row). Removed: `settings.pro.plan`,
+`settings.pro.tier.pro`, `settings.pro.unlocked` (the old "Current plan" row and its "during development" footer).
+Check: "period" uses the catalog's school word (sk/cs "hodina", pl "lekcja", hu "óra", ja "時限", zh "节次"); the
+footer's view name must match `timetable.view.grid`.

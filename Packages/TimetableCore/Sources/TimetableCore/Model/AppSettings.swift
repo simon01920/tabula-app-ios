@@ -43,6 +43,11 @@ public struct AppSettings: SyncEntity {
     public var alarmPolicy: AlarmPolicy
     /// iCloud sync switch (default on).
     public var syncEnabled: Bool
+    /// Grid view layout; `nil` (absent in stores written before 2026-11) = `.daysAsRows`. Use `effectiveGridLayout`.
+    public var gridLayout: GridLayoutStyle?
+
+    /// The Grid layout to draw: the stored choice when known, else `.daysAsRows`.
+    public var effectiveGridLayout: GridLayoutStyle { gridLayout?.effective ?? .daysAsRows }
 
     /// Creates settings. `id` defaults to `singletonID`.
     public init(id: ID = AppSettings.singletonID, meta: EntityMeta, profile: UserProfile = .other,
@@ -51,7 +56,8 @@ public struct AppSettings: SyncEntity {
                 timeZoneMode: TimeZoneMode = .followDevice, appearance: Appearance = .auto,
                 palettePackID: PalettePackID = .classic, globalQuietHours: QuietHours? = nil,
                 timeSensitivePolicy: TimeSensitivePolicy = TimeSensitivePolicy(),
-                alarmPolicy: AlarmPolicy = AlarmPolicy(), syncEnabled: Bool = true) {
+                alarmPolicy: AlarmPolicy = AlarmPolicy(), syncEnabled: Bool = true,
+                gridLayout: GridLayoutStyle? = nil) {
         self.id = id
         self.meta = meta
         self.profile = profile
@@ -66,6 +72,7 @@ public struct AppSettings: SyncEntity {
         self.timeSensitivePolicy = timeSensitivePolicy
         self.alarmPolicy = alarmPolicy
         self.syncEnabled = syncEnabled
+        self.gridLayout = gridLayout
     }
 }
 

@@ -51,12 +51,14 @@ settings.colours@secondary
 settings.calendar@secondary
 settings.about@secondary
 settings.backup@secondary
+settings.grid-layout@secondary
 share.sheet@secondary
 share.import@secondary
 share.import-preview@secondary
 settings.reminders@university
 timetable.grid-next-week@secondary
 timetable.grid-legend@secondary
+timetable.grid-periods@secondary
 timetable.week@university
 timetable.day@secondary
 timetable.tiles@elementary
