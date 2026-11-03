@@ -1,86 +1,41 @@
-// DEBUG fixtures of the photo import (Phase 9 I2): the Slovak aSc-style table (days as rows Po–Pi, periods 1–8 with
-// start–end times, rooms under the subject, one double lesson) as a `RecognizedTable` with realistic OCR flaws
-// ("2O4", a low-confidence cell, an unsplit cell, abbreviations of known subjects), and a picture of it drawn from the
-// same cell boxes, so the review's highlights line up. Used by the `import.*` screenshot routes and the developer
-// screen's "Run import on the sample picture" (the real Vision → parser pipeline on this picture).
+// DEBUG fixtures of the photo import (Phase 9 I2): I1's Slovak aSc fixture with OCR noise
+// (`Packages/TimetableCore/Tests/Fixtures/import/sk-asc-human-noisy.json`, its `table`, copied verbatim: Po–Pi rows,
+// periods 1–13 with start times, multi-period spans, 'St' for 'Št', 'lS1', 'H4PI', low-confidence cells) and a picture
+// drawn from the same cell boxes, so the review's highlights line up with it. Used by the `import.*` screenshot routes
+// and the capture screen's "Use Sample Picture (Debug)" (the real Vision → parser pipeline on this picture, on device).
+// Re-copy the JSON when I1 changes the fixture.
 #if DEBUG
 import SwiftUI
 import TimetableCore
 import TimetableUI
 
 enum ImportFixtures {
-    static let knownSubjects = ["Matematika", "Biológia", "Fyzika"]
+    /// The picture's size in pixels (landscape, like a screenshot of the aSc export).
+    static let page = CGSize(width: 2400, height: 1150)
 
-    static let periodTimes = ["8:00 - 8:45", "8:55 - 9:40", "10:00 - 10:45", "10:55 - 11:40", "11:50 - 12:35",
-                              "12:45 - 13:30", "13:40 - 14:25", "14:30 - 15:15"]
+    /// `sk-asc-human-noisy.json` › `table`.
+    static let ascNoisyJSON = #"""
+    {"version":1,"pageWidth":2480,"pageHeight":3508,"languages":["sk"],"cells":[{"text":"1\n7.00","row":0,"column":1,"box":{"x":0.1,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"2\n7.50","row":0,"column":2,"box":{"x":0.1677,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"3\n8.40","row":0,"column":3,"box":{"x":0.2354,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"4\n9.30","row":0,"column":4,"box":{"x":0.3031,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"5\n10.20","row":0,"column":5,"box":{"x":0.3708,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"6\n11.10","row":0,"column":6,"box":{"x":0.4385,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"7\n12.00","row":0,"column":7,"box":{"x":0.5062,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"8\n12.50","row":0,"column":8,"box":{"x":0.5738,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"9\n13.50","row":0,"column":9,"box":{"x":0.6415,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"10\n14.40","row":0,"column":10,"box":{"x":0.7092,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"11\n15.30","row":0,"column":11,"box":{"x":0.7769,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"12\n16.20","row":0,"column":12,"box":{"x":0.8446,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"13\n17.10","row":0,"column":13,"box":{"x":0.9123,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"Po","row":1,"column":0,"box":{"x":0.02,"y":0.2,"width":0.08,"height":0.15},"confidence":0.97},{"text":"prax\naaa","row":1,"column":2,"columnSpan":6,"box":{"x":0.1677,"y":0.2,"width":0.4062,"height":0.15},"confidence":0.95},{"text":"Ut","row":2,"column":0,"box":{"x":0.02,"y":0.35,"width":0.08,"height":0.15},"confidence":0.97},{"text":"SPAJ\n3P1","row":2,"column":1,"box":{"x":0.1,"y":0.35,"width":0.0677,"height":0.15},"confidence":0.95},{"text":"SAL\n3S1","row":2,"column":3,"columnSpan":2,"box":{"x":0.2354,"y":0.35,"width":0.1354,"height":0.15},"confidence":0.95},{"text":"SPAJ\nAula","row":2,"column":5,"box":{"x":0.3708,"y":0.35,"width":0.0677,"height":0.15},"confidence":0.95},{"text":"TPVAJ1\nAula","row":2,"column":8,"columnSpan":2,"box":{"x":0.5738,"y":0.35,"width":0.1354,"height":0.15},"confidence":0.95},{"text":"TPVAJ1\n3S1","row":2,"column":10,"box":{"x":0.7092,"y":0.35,"width":0.0677,"height":0.15},"confidence":0.95},{"text":"St","row":3,"column":0,"box":{"x":0.02,"y":0.5,"width":0.08,"height":0.15},"confidence":0.97},{"text":"MPV\nlS1","row":3,"column":1,"box":{"x":0.1,"y":0.5,"width":0.0677,"height":0.15},"confidence":0.41},{"text":"ZaExk\n3P1","row":3,"column":3,"box":{"x":0.2354,"y":0.5,"width":0.0677,"height":0.15},"confidence":0.95},{"text":"Muzejna pedagogika\nH5S1","row":3,"column":8,"columnSpan":2,"box":{"x":0.5738,"y":0.5,"width":0.1354,"height":0.15},"confidence":0.55},{"text":"St","row":4,"column":0,"box":{"x":0.02,"y":0.65,"width":0.08,"height":0.15},"confidence":0.97},{"text":"Teor. a prax vyuc. hist. I\nH4PI","row":4,"column":3,"columnSpan":3,"box":{"x":0.2354,"y":0.65,"width":0.2031,"height":0.15},"confidence":0.48},{"text":"Reg. dej. vo vyuč. dej. str.\nH4P1","row":4,"column":6,"columnSpan":2,"box":{"x":0.4385,"y":0.65,"width":0.1354,"height":0.15},"confidence":0.95},{"text":"Pi","row":5,"column":0,"box":{"x":0.02,"y":0.8,"width":0.08,"height":0.15},"confidence":0.97},{"text":"MPV\nAula","row":5,"column":9,"box":{"x":0.6415,"y":0.8,"width":0.0677,"height":0.15},"confidence":0.95},{"text":"SAL\nAula","row":5,"column":12,"box":{"x":0.8446,"y":0.8,"width":0.0677,"height":0.15},"confidence":0.95}]}
+    """#
 
-    /// One row per day: (cell text, column span, OCR confidence).
-    static let rows: [(day: String, cells: [(String, Int, Double)])] = [
-        ("Po", [("SJL\n204", 1, 0.97), ("MAT\n204", 1, 0.96), ("ANJ\n31", 1, 0.95), ("DEJ\n204", 1, 0.94),
-                ("TSV\nTel", 1, 0.9), ("FYZ\n112", 1, 0.95), ("", 1, 1), ("", 1, 1)]),
-        ("Ut", [("MAT\n204", 1, 0.96), ("CHE\n108", 1, 0.95), ("SJL\n204", 1, 0.96), ("GEO\n204", 1, 0.93),
-                ("INF\nUč3", 2, 0.91), ("NBV\n204", 1, 0.9), ("", 1, 1)]),
-        ("St", [("ANJ\n31", 1, 0.95), ("MAT\n204", 1, 0.96), ("FYZ\n2O4", 1, 0.48), ("Bio\n105", 1, 0.93),
-                ("SJL\n204", 1, 0.95), ("TSV\nTel", 1, 0.9), ("", 1, 1), ("", 1, 1)]),
-        ("Št", [("DEJ\n204", 1, 0.94), ("Bio\n105", 1, 0.92), ("MAT\n204", 1, 0.96), ("CHE\n108", 1, 0.94),
-                ("ANJ Ko 31", 1, 0.52), ("GEO\n204", 1, 0.93), ("UMK\nAula", 1, 0.88), ("", 1, 1)]),
-        ("Pi", [("SJL\n204", 1, 0.96), ("FYZ\n112", 1, 0.95), ("MAT\n204", 1, 0.96), ("INF\nUč3", 1, 0.92),
-                ("ANJ\n31", 1, 0.95), ("", 1, 1), ("", 1, 1), ("", 1, 1)]),
-    ]
-
-    // Page layout (pixels): a header column for the days and one column per period.
-    static let page = CGSize(width: 1800, height: 900)
-    static let margin: CGFloat = 60
-    static let dayColumn: CGFloat = 120
-    static let headerRow: CGFloat = 110
-
-    static var periodColumn: CGFloat { (page.width - 2 * margin - dayColumn) / CGFloat(periodTimes.count) }
-    static var dayRow: CGFloat { (page.height - 2 * margin - headerRow) / CGFloat(rows.count) }
-
-    /// The pixel rectangle of grid cell (row, column) spanning `span` columns (row 0 / column 0 = headers).
-    static func rect(row: Int, column: Int, span: Int = 1) -> CGRect {
-        let x = column == 0 ? margin : margin + dayColumn + CGFloat(column - 1) * periodColumn
-        let y = row == 0 ? margin : margin + headerRow + CGFloat(row - 1) * dayRow
-        let width = column == 0 ? dayColumn : periodColumn * CGFloat(span)
-        return CGRect(x: x, y: y, width: width, height: row == 0 ? headerRow : dayRow)
-    }
-
-    /// What Vision would report for the picture.
+    /// What Vision would report for the picture (the fixture's boxes are page-normalised, so they fit `page` too).
     static var table: RecognizedTable {
-        var cells: [RecognizedCell] = [cell("", row: 0, column: 0)]
-        for (index, time) in periodTimes.enumerated() {
-            cells.append(cell("\(index + 1)\n\(time)", row: 0, column: index + 1, confidence: 0.95))
-        }
-        for (rowIndex, row) in rows.enumerated() {
-            cells.append(cell(row.day, row: rowIndex + 1, column: 0, confidence: 0.97))
-            var column = 1
-            for (text, span, confidence) in row.cells {
-                cells.append(cell(text, row: rowIndex + 1, column: column, span: span, confidence: confidence))
-                column += span
-            }
-        }
-        return RecognizedTable(pageWidth: page.width, pageHeight: page.height, languages: ["sk"], cells: cells)
-    }
-
-    private static func cell(_ text: String, row: Int, column: Int, span: Int = 1, confidence: Double = 1) -> RecognizedCell {
-        let r = rect(row: row, column: column, span: span)
-        return RecognizedCell(text: text, row: row, column: column, columnSpan: span,
-                              box: NormalizedRect(x: r.minX / page.width, y: r.minY / page.height,
-                                                  width: r.width / page.width, height: r.height / page.height),
-                              confidence: confidence)
+        var table = (try? JSONDecoder().decode(RecognizedTable.self, from: Data(ascNoisyJSON.utf8))) ?? RecognizedTable()
+        table.pageWidth = page.width
+        table.pageHeight = page.height
+        return table
     }
 
     /// The picture of the table (black on white, like a printed aSc export).
     @MainActor static var image: UIImage {
-        let renderer = ImageRenderer(content: FixturePage().frame(width: page.width, height: page.height))
+        let renderer = ImageRenderer(content: FixturePage(table: table).frame(width: page.width, height: page.height))
         renderer.scale = 1
         return renderer.uiImage ?? UIImage()
     }
 
     /// The parsed review (the real parser on the fixture table).
     static var review: ImportReview {
-        let candidate = TimetableImportParser.parse(table, options: ImportParserOptions(knownSubjects: knownSubjects))
-        return ImportReview(candidate: candidate, timetableName: "Rozvrh 2.A")
+        ImportReview(candidate: TimetableImportParser.parse(table), timetableName: "Rozvrh 2024/25")
     }
 
     @MainActor static func model(stage: PhotoImportModel.Stage, step: ImportStep = .reading,
@@ -102,27 +57,31 @@ struct ImportSampleSection: View {
                 Label { Text(verbatim: "Use Sample Picture (Debug)") } icon: { Image(systemName: "ladybug") }
             }
         } footer: {
-            Text(verbatim: "Developer check: the fixture aSc timetable picture through Vision, the parser and (if available) Apple Intelligence.")
+            Text(verbatim: "Developer check: the I1 aSc fixture drawn as a picture, through Vision, the parser and (if available) Apple Intelligence.")
         }
     }
 }
 
-/// The fixture page, drawn from `ImportFixtures` cell boxes.
+/// The fixture page, drawn from the table's cell boxes: grid lines, the first line top-leading (wrapping), the
+/// second line (room / time) bottom-trailing.
 private struct FixturePage: View {
+    let table: RecognizedTable
+
     var body: some View {
-        Canvas { context, _ in
-            for cell in ImportFixtures.table.cells {
+        Canvas { context, size in
+            for cell in table.cells {
                 guard let box = cell.box else { continue }
-                let rect = CGRect(x: box.x * ImportFixtures.page.width, y: box.y * ImportFixtures.page.height,
-                                  width: box.width * ImportFixtures.page.width, height: box.height * ImportFixtures.page.height)
+                let rect = CGRect(x: box.x * size.width, y: box.y * size.height,
+                                  width: box.width * size.width, height: box.height * size.height)
                 context.stroke(Path(rect), with: .color(.black), lineWidth: 2)
                 let lines = cell.text.split(separator: "\n").map(String.init)
                 guard let first = lines.first else { continue }
-                context.draw(Text(verbatim: first).font(.system(size: cell.row == 0 ? 34 : 38, weight: .bold)).foregroundColor(.black),
-                             at: CGPoint(x: rect.minX + 14, y: rect.minY + 12), anchor: .topLeading)
+                let inset = rect.insetBy(dx: 10, dy: 8)
+                context.draw(Text(verbatim: first).font(.system(size: 30, weight: .bold)).foregroundColor(.black),
+                             in: CGRect(x: inset.minX, y: inset.minY, width: inset.width, height: inset.height * 0.62))
                 if lines.count > 1 {
                     context.draw(Text(verbatim: lines[1]).font(.system(size: 26)).foregroundColor(.black),
-                                 at: CGPoint(x: rect.maxX - 12, y: rect.maxY - 10), anchor: .bottomTrailing)
+                                 at: CGPoint(x: inset.maxX, y: inset.maxY), anchor: .bottomTrailing)
                 }
             }
         }
