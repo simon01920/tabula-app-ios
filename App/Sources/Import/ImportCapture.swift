@@ -83,7 +83,7 @@ enum ImportImageLoader {
     static func readPicked(_ url: URL) -> Data? {
         let scoped = url.startAccessingSecurityScopedResource()
         defer { if scoped { url.stopAccessingSecurityScopedResource() } }
-        return try? Data(contentsOf: url, options: .mappedIfSafe)
+        return try? Data(contentsOf: url)   // QA: read fully while the security scope is open
     }
 }
 

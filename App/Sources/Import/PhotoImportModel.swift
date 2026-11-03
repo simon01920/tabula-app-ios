@@ -106,6 +106,7 @@ final class PhotoImportModel {
         } catch is CancellationError {
             return
         } catch {
+            guard !Task.isCancelled else { return }   // QA: a cancelled import must not raise an alert
             return fail("import.error.noText")
         }
         guard !Task.isCancelled else { return }

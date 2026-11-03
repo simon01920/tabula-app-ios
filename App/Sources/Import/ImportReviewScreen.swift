@@ -137,7 +137,8 @@ struct ImportReviewScreen: View {
     }
 
     private func approve() {
-        guard let review = flow.review else { return }
+        guard let review = flow.review,
+              review.candidate.weekCycleLength == nil || flow.weekAIsThisWeek != nil else { return }   // QA: A/B gate
         do throws(ShareError) {
             var payload = try review.approve(bellScheduleName: model.renderer.string(forKey: "import.review.bellScheduleName"))
             // A/B weeks: the core anchors them on ISO-week parity; the user's answer pins week A to a real week.

@@ -50,6 +50,7 @@ struct PhotoImportView: View {
                 }
         }
         .interactiveDismissDisabled(flow.stage == .review || flow.stage == .processing)
+        .onDisappear { if flow.stage == .processing { flow.cancel() } }   // QA: a deep link closing the sheet stops Vision
         .protectsUnsavedWork(flow.stage == .review)
         .fullScreenCover(isPresented: $scanning) {
             DocumentCameraView { image in
