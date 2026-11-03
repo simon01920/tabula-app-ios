@@ -159,52 +159,60 @@ private struct ImportCaptureChoices<Extra: View>: View {
     let chooseFile: () -> Void
     @ViewBuilder let extra: Extra
     @State private var aiStatus = AppleIntelligenceStatus.current
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
         Form {
-            Section {
-                VStack(spacing: 12) {
-                    Image(systemName: "tablecells")
-                        .font(.system(size: 44, weight: .regular))
-                        .foregroundStyle(Color.ink)
-                        .accessibilityHidden(true)
-                    Text("import.capture.headline")
-                        .font(.title2.bold())
-                        .multilineTextAlignment(.center)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .accessibilityAddTraits(.isHeader)
-                    Text("import.capture.message")
-                        .font(.body)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 8)
-                .listRowBackground(Color.clear)
-            }
-
-            Section {
-                if DocumentCameraView.isSupported {
-                    Button(action: scan) {
-                        Label { Text("import.capture.scan") } icon: { Image(systemName: "doc.viewfinder") }
-                    }
-                }
-                Button(action: choosePhoto) {
-                    Label { Text("import.capture.photo") } icon: { Image(systemName: "photo.on.rectangle") }
-                }
-                Button(action: chooseFile) {
-                    Label { Text("import.capture.file") } icon: { Image(systemName: "folder") }
-                }
-            } footer: {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("import.capture.footer")
-                    if aiStatus == .available {
-                        Label { Text("import.capture.ai") } icon: { Image(systemName: "sparkles") }
-                    }
-                }
-            }
+            // At accessibility sizes the sources come first: the intro alone would fill the screen.
+            if typeSize.isAccessibilitySize { sources; intro } else { intro; sources }
             extra
+        }
+    }
+
+    private var intro: some View {
+        Section {
+            VStack(spacing: 12) {
+                Image(systemName: "tablecells")
+                    .font(.system(size: 44, weight: .regular))
+                    .foregroundStyle(Color.ink)
+                    .accessibilityHidden(true)
+                Text("import.capture.headline")
+                    .font(.title2.bold())
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityAddTraits(.isHeader)
+                Text("import.capture.message")
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 8)
+            .listRowBackground(Color.clear)
+        }
+    }
+
+    private var sources: some View {
+        Section {
+            if DocumentCameraView.isSupported {
+                Button(action: scan) {
+                    Label { Text("import.capture.scan") } icon: { Image(systemName: "doc.viewfinder") }
+                }
+            }
+            Button(action: choosePhoto) {
+                Label { Text("import.capture.photo") } icon: { Image(systemName: "photo.on.rectangle") }
+            }
+            Button(action: chooseFile) {
+                Label { Text("import.capture.file") } icon: { Image(systemName: "folder") }
+            }
+        } footer: {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("import.capture.footer")
+                if aiStatus == .available {
+                    Label { Text("import.capture.ai") } icon: { Image(systemName: "sparkles") }
+                }
+            }
         }
     }
 }
