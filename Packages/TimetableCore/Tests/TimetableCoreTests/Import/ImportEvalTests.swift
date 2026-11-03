@@ -255,7 +255,7 @@ struct ImportEvalTests {
         let total = scores.map(\.expectedLessons).reduce(0, +)
         let subjects = scores.map { $0.exact["subject"] ?? 0 }.reduce(0, +)
         let all = scores.flatMap(\.calibration)
-        // Measured 2026-11-02: structure 39/39, subject 96.1 %, recall 5/10 (docs/eval/IMPORT_EVAL.md).
+        // Measured 2026-11-03: structure 40/40, subject 96.2 %, recall 5/10 (docs/eval/IMPORT_EVAL.md).
         #expect(Double(scores.filter(\.structureExact).count) / Double(scores.count) >= 0.9)
         #expect(Double(subjects) / Double(total) >= 0.9)
         #expect(Double(all.filter { $0.wrong && $0.flagged }.count) / Double(max(1, all.filter(\.wrong).count)) >= 0.4)

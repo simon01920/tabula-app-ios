@@ -54,7 +54,19 @@ HEADERS = {
     "zh": lambda n, s, e: "第%d节\n%s-%s" % (n, s, e),
     "fr": lambda n, s, e: "%d\n%s-%s" % (n, s.replace(":", "h"), e.replace(":", "h")),
     "start": lambda n, s, e: s,
+    "us12": lambda n, s, e: "Period %d\n%s–%s%s" % (n, h12(s), h12(e), meridiem(n, s, e)),
 }
+
+
+def h12(hhmm):  # "13:00" -> "1:00"
+    h, mm = hhmm.split(":")
+    return "%d:%s" % ((int(h) - 1) % 12 + 1, mm)
+
+
+def meridiem(n, s, e):  # only on the end time, the way US schools print it; noon has none
+    if int(e[:2]) >= 13:
+        return " p.m." if n % 2 else " PM"
+    return " a.m." if int(s[:2]) < 12 else ""
 
 
 class Cell:
@@ -416,6 +428,13 @@ add(id="de-ab-blocks", language="de", layout="rows", mode="cells", header="num_r
     cells=[simple(0, 1, "Mathe", "R1"), simple(1, 2, "Deutsch", "R2"), simple(4, 3, "Kunst", "K1"),
            simple(0, 1, "Physik", "P1", block=1), simple(2, 2, "Chemie", "C1", block=1), simple(4, 3, "Musik", "M1", block=1)],
     description="German A/B weeks as two runs of days (Mo-Fr, Mo-Fr).")
+
+add(id="en-us-12-hour", language="en", layout="columns", mode="cells", header="us12",
+    periods=[(1, "10:00", "10:50"), (2, "11:00", "11:50"), (3, "12:00", "12:50"), (4, "13:00", "13:50"), (5, "14:00", "14:50")],
+    days=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    cells=[simple(0, 1, "Algebra", "Rm 101"), simple(1, 3, "Lunch Club", "Hall"), simple(2, 4, "Biology", "Lab 2"),
+           simple(3, 5, "Spanish", "Rm 12"), simple(4, 4, "Chorus", "Rm 7", span=2)],
+    description="US 12-hour times: '10:00–10:50 a.m.', '12:00–12:50', then '1:00–1:50 p.m.' and '2:00–2:50 PM'.")
 
 # 30–36 Structure and noise edge cases.
 add(id="sk-no-header", language="sk", layout="rows", mode="cells", header="none", periods=SCHOOL, check_times=False,

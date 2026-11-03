@@ -135,8 +135,49 @@ public struct RecognizedTable: Hashable, Sendable, Codable {
         lines = try c.decodeIfPresent([RecognizedLine].self, forKey: .lines) ?? []
     }
 
-    /// The grid the parser reads: `cells`, or cells clustered from `lines` (`LineClustering`).
+    /// The grid the parser reads: `cells`, or cells clustered from `lines` (`LineClustering`), within `Bounds`.
     public var gridCells: [RecognizedCell] {
-        cells.isEmpty ? LineClustering.cells(from: lines) : cells
+        Bounds.cells(cells.isEmpty ? LineClustering.cells(from: Bounds.lines(lines)) : cells)
+    }
+
+    /// Limits on untrusted input (a page never comes near them): the parser's work stays small and nothing traps.
+    public enum Bounds {
+        /// Rows and columns outside 0..<maxIndex are dropped.
+        public static let maxIndex = 256
+        /// Spans are clamped to 1...maxSpan.
+        public static let maxSpan = 64
+        /// Cells and lines beyond this many are dropped.
+        public static let maxItems = 4000
+        /// Text is cut to this many characters.
+        public static let maxText = 1000
+
+        /// In-range cells, one per (row, column) (the first wins), spans and confidence clamped, text cut.
+        public static func cells(_ cells: [RecognizedCell]) -> [RecognizedCell] {
+            var seen: Set<Int> = []
+            var result: [RecognizedCell] = []
+            for var cell in cells where result.count < maxItems {
+                guard (0..<maxIndex).contains(cell.row), (0..<maxIndex).contains(cell.column),
+                      seen.insert(cell.row * maxIndex + cell.column).inserted else { continue }
+                cell.rowSpan = min(max(cell.rowSpan, 1), maxSpan)
+                cell.columnSpan = min(max(cell.columnSpan, 1), maxSpan)
+                cell.confidence = clamp(cell.confidence)
+                if cell.text.count > maxText { cell.text = String(cell.text.prefix(maxText)) }
+                result.append(cell)
+            }
+            return result
+        }
+
+        /// Lines with a finite box, at most `maxItems`, confidence clamped, text cut.
+        public static func lines(_ lines: [RecognizedLine]) -> [RecognizedLine] {
+            lines.lazy.filter { [$0.box.x, $0.box.y, $0.box.width, $0.box.height].allSatisfy(\.isFinite) }
+                .prefix(maxItems).map { line in
+                    var line = line
+                    line.confidence = clamp(line.confidence)
+                    if line.text.count > maxText { line.text = String(line.text.prefix(maxText)) }
+                    return line
+                }
+        }
+
+        private static func clamp(_ value: Double) -> Double { value.isFinite ? min(max(value, 0), 1) : 0 }
     }
 }

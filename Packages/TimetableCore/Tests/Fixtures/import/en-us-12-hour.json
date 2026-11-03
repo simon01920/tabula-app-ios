@@ -1,0 +1,274 @@
+{
+ "id": "en-us-12-hour",
+ "description": "US 12-hour times: '10:00–10:50 a.m.', '12:00–12:50', then '1:00–1:50 p.m.' and '2:00–2:50 PM'.",
+ "language": "en",
+ "mode": "cells",
+ "layout": "columns",
+ "table": {
+  "version": 1,
+  "pageWidth": 2480,
+  "pageHeight": 3508,
+  "languages": [
+   "en"
+  ],
+  "cells": [
+   {
+    "text": "Period 1\n10:00–10:50 a.m.",
+    "row": 1,
+    "column": 0,
+    "box": {
+     "x": 0.05,
+     "y": 0.1,
+     "width": 0.15,
+     "height": 0.176
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Period 2\n11:00–11:50 a.m.",
+    "row": 2,
+    "column": 0,
+    "box": {
+     "x": 0.05,
+     "y": 0.276,
+     "width": 0.15,
+     "height": 0.176
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Period 3\n12:00–12:50",
+    "row": 3,
+    "column": 0,
+    "box": {
+     "x": 0.05,
+     "y": 0.452,
+     "width": 0.15,
+     "height": 0.176
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Period 4\n1:00–1:50 PM",
+    "row": 4,
+    "column": 0,
+    "box": {
+     "x": 0.05,
+     "y": 0.628,
+     "width": 0.15,
+     "height": 0.176
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Period 5\n2:00–2:50 p.m.",
+    "row": 5,
+    "column": 0,
+    "box": {
+     "x": 0.05,
+     "y": 0.804,
+     "width": 0.15,
+     "height": 0.176
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Monday",
+    "row": 0,
+    "column": 1,
+    "box": {
+     "x": 0.2,
+     "y": 0.02,
+     "width": 0.15,
+     "height": 0.08
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Algebra\nRm 101",
+    "row": 1,
+    "column": 1,
+    "box": {
+     "x": 0.2,
+     "y": 0.1,
+     "width": 0.15,
+     "height": 0.176
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Tuesday",
+    "row": 0,
+    "column": 2,
+    "box": {
+     "x": 0.35,
+     "y": 0.02,
+     "width": 0.15,
+     "height": 0.08
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Lunch Club\nHall",
+    "row": 3,
+    "column": 2,
+    "box": {
+     "x": 0.35,
+     "y": 0.452,
+     "width": 0.15,
+     "height": 0.176
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Wednesday",
+    "row": 0,
+    "column": 3,
+    "box": {
+     "x": 0.5,
+     "y": 0.02,
+     "width": 0.15,
+     "height": 0.08
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Biology\nLab 2",
+    "row": 4,
+    "column": 3,
+    "box": {
+     "x": 0.5,
+     "y": 0.628,
+     "width": 0.15,
+     "height": 0.176
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Thursday",
+    "row": 0,
+    "column": 4,
+    "box": {
+     "x": 0.65,
+     "y": 0.02,
+     "width": 0.15,
+     "height": 0.08
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Spanish\nRm 12",
+    "row": 5,
+    "column": 4,
+    "box": {
+     "x": 0.65,
+     "y": 0.804,
+     "width": 0.15,
+     "height": 0.176
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Friday",
+    "row": 0,
+    "column": 5,
+    "box": {
+     "x": 0.8,
+     "y": 0.02,
+     "width": 0.15,
+     "height": 0.08
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Chorus\nRm 7",
+    "row": 4,
+    "column": 5,
+    "rowSpan": 2,
+    "box": {
+     "x": 0.8,
+     "y": 0.628,
+     "width": 0.15,
+     "height": 0.352
+    },
+    "confidence": 0.95
+   }
+  ]
+ },
+ "expected": {
+  "orientation": "daysAsColumns",
+  "days": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "periods": [
+   {
+    "number": 1,
+    "start": "10:00",
+    "end": "10:50"
+   },
+   {
+    "number": 2,
+    "start": "11:00",
+    "end": "11:50"
+   },
+   {
+    "number": 3,
+    "start": "12:00",
+    "end": "12:50"
+   },
+   {
+    "number": 4,
+    "start": "13:00",
+    "end": "13:50"
+   },
+   {
+    "number": 5,
+    "start": "14:00",
+    "end": "14:50"
+   }
+  ],
+  "checkTimes": true,
+  "weekCycleLength": null,
+  "lessons": [
+   {
+    "day": 1,
+    "period": 1,
+    "span": 1,
+    "subject": "Algebra",
+    "room": "Rm 101"
+   },
+   {
+    "day": 2,
+    "period": 3,
+    "span": 1,
+    "subject": "Lunch Club",
+    "room": "Hall"
+   },
+   {
+    "day": 3,
+    "period": 4,
+    "span": 1,
+    "subject": "Biology",
+    "room": "Lab 2"
+   },
+   {
+    "day": 4,
+    "period": 5,
+    "span": 1,
+    "subject": "Spanish",
+    "room": "Rm 12"
+   },
+   {
+    "day": 5,
+    "period": 4,
+    "span": 2,
+    "subject": "Chorus",
+    "room": "Rm 7"
+   }
+  ]
+ }
+}
