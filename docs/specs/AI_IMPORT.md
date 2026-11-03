@@ -31,3 +31,22 @@ Not in the app binary. User-initiated, Wi-Fi-preferred download with progress, r
 
 ## Tests
 Parser + reconciliation on Linux from `RecognizedTable` JSON fixtures; Vision adapter and model runner verified on the physical iPhone with a debug screen and a manual checklist.
+
+## Implementation (Phase 9 I1, 2026-11-02)
+Code in `Packages/TimetableCore/Sources/TimetableCore/Import/` (Linux-tested) and `Packages/TimetableUI/Sources/TimetableUI/Import/ImportReview.swift` (pure).
+- **Seam:** `RecognizedTable` (JSON v1): `cells` (text, row/column, spans, `NormalizedRect` box with a top-left origin, confidence 0–1), or loose `lines` used only when `cells` is empty; plus page size and languages. `LineClustering` turns lines into cells. Day labels are the anchors, header lines give the columns, and lines of one cell are grouped by their shared centre. Limit: merged-cell spans in line mode come from the text width only (see docs/eval/IMPORT_EVAL.md).
+- **Parser:** `TimetableImportParser.parse(_:options:) -> ImportCandidate`. Options: `ImportParserOptions(enabledFields:knownSubjects:)`.
+  - Orientation is the axis with the most day labels; days as columns is transposed.
+  - Ambiguous day abbreviations are resolved by order: "St, St" is Wednesday, Thursday; "So" is Saturday after Friday and Sunday after Saturday. A second run of days is week B.
+  - Header rows above the first day give period numbers and times. Bell schedule: printed ranges; otherwise the standard length that fits the smallest gap (gap 50 gives 45 min, gap 100 gives 90 min); otherwise 08:00 + 45/10 with the notice `.timesAssumed`.
+  - Every non-empty, non-header cell becomes one lesson, or one per A/B marker. Nothing is invented.
+- **Confidence:** OCR confidence × the penalty of each `ImportConfidenceReason`: `ocrLow`, `ocrConfusion`, `ambiguousSplit`, `abbreviation`, `unknownDay`, `unknownPeriod`, `timeConflict`, `timeInferred`, `normaliser`. Lessons below 0.6 (`ImportCandidate.reviewThreshold`) need review. `ImportAlternative` holds the other readings ("204" or "2O4", "Bio" or "Biológia", split variants, model suggestions).
+- **LLM seam:** `CellNormaliser` (`async throws`, `Sendable`). Input: `NormalisationRequest`, the low-confidence cells as JSON. Output: `[NormalisationSuggestion]`, each field `.value` or `.unknown(alternatives:)`. `DeterministicNormaliser` is tier D. `ImportReconciliation.normalise(_:using:)` does three things:
+  - It ignores IDs that are not low-confidence cells.
+  - It applies a value only when the value is verbatim in the cell. Anything else becomes a question.
+  - A throwing normaliser keeps the deterministic result.
+- **Review and approve:** `ImportReview` holds:
+  - the lessons, `questions` (merged across identical cells), `counts` and `notices`;
+  - the edits `setValue(_:field:lesson:applyToIdentical:)`, `answer`, `dismiss`, `confirm`, `removeLesson`, `move` and `setPeriodTimes`;
+  - `approve(bellScheduleName:) -> SharePayloadV1`, which goes through `ImportPayloadBuilder` to `DatabaseMutation.importShared`. Add as new and Replace with backup work the same as for a shared timetable.
+- **Strings:** `ImportL10n.allKeys` covers `import.question.*`, `import.field.*`, `import.reason.*` and `import.notice.*`. I2 adds them to the catalog and to `DynamicL10nKeys.allKeys`.
