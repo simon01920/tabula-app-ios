@@ -113,7 +113,7 @@ struct ImportReviewScreen: View {
         }
         .buttonStyle(.borderedProminent)
         .disabled(review.lessons.isEmpty || review.timetableName.trimmingCharacters(in: .whitespaces).isEmpty
-                  || model.isReadOnly)
+                  || (review.candidate.weekCycleLength != nil && flow.weekAIsThisWeek == nil) || model.isReadOnly)
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .background(.bar)
@@ -139,7 +139,12 @@ struct ImportReviewScreen: View {
     private func approve() {
         guard let review = flow.review else { return }
         do throws(ShareError) {
-            let payload = try review.approve(bellScheduleName: model.renderer.string(forKey: "import.review.bellScheduleName"))
+            var payload = try review.approve(bellScheduleName: model.renderer.string(forKey: "import.review.bellScheduleName"))
+            // A/B weeks: the core anchors them on ISO-week parity; the user's answer pins week A to a real week.
+            if let length = review.candidate.weekCycleLength, let thisWeek = flow.weekAIsThisWeek {
+                payload.timetable.rotation = .weekCycle(WeekCycle(length: length, anchor: .referenceWeek(
+                    date: model.today.adding(days: thisWeek ? 0 : 7), cycleWeek: 1)))
+            }
             resolved = ResolvedShare(payload: payload,
                                      summary: try ShareImportSummary(payload: payload, context: model.calendarContext))
             showsPreview = true
@@ -194,8 +199,9 @@ private struct ImportReviewList: View {
             }
 
             let questions = review.questions
-            if !questions.isEmpty {
+            if !questions.isEmpty || review.candidate.weekCycleLength != nil {
                 Section {
+                    if review.candidate.weekCycleLength != nil { ImportWeekAQuestion(answer: $flow.weekAIsThisWeek) }
                     ForEach(questions) { question in
                         ImportQuestionRow(question: question) { option in
                             withAnimation { flow.review?.answer(question.id, with: option) }

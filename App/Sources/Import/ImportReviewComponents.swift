@@ -86,6 +86,44 @@ struct ImportQuestionRow: View {
     }
 }
 
+/// "Which week is A: this week or next week?" for A/B timetables (the parser cannot know); Approve waits for it.
+struct ImportWeekAQuestion: View {
+    @Binding var answer: Bool?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("import.question.weekA")
+                .font(.body)
+                .fixedSize(horizontal: false, vertical: true)
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 8) { buttons }
+                VStack(alignment: .leading, spacing: 8) { buttons }
+            }
+            if answer == nil {
+                Text("import.question.weekA.footer").font(.footnote).foregroundStyle(.secondary)
+            }
+        }
+        .padding(.vertical, 4)
+    }
+
+    @ViewBuilder private var buttons: some View {
+        option(true, "import.question.weekA.this")
+        option(false, "import.question.weekA.next")
+    }
+
+    private func option(_ value: Bool, _ title: LocalizedStringKey) -> some View {
+        Button { answer = value } label: {
+            Label { Text(title) } icon: {
+                if answer == value { Image(systemName: "checkmark") }
+            }
+            .frame(minHeight: 32)
+        }
+        .buttonStyle(.bordered)
+        .tint(answer == value ? Color.ink : .secondary)
+        .accessibilityAddTraits(answer == value ? .isSelected : [])
+    }
+}
+
 // MARK: - Grid
 
 /// Days as rows, periods across (the aSc layout); a lesson spanning periods spans columns. Cycle-week lessons in one

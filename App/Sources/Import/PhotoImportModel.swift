@@ -37,6 +37,8 @@ final class PhotoImportModel {
     private(set) var usedAppleIntelligence = false
     /// Catalog key of a problem to show (the capture screen stays).
     var problemKey: String?
+    /// A/B weeks: the user's answer to "Which week is A?" (`true` = this week); `nil` until answered. Approve needs it.
+    var weekAIsThisWeek: Bool?
     /// Review section to scroll to when the review first appears (`"grid"`, `"questions"`; screenshot routes).
     @ObservationIgnored var initialAnchor: String?
 
