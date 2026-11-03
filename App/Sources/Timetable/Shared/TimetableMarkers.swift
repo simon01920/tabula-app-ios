@@ -92,7 +92,8 @@ struct QuietFreeSlotButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         RoundedRectangle(cornerRadius: 8, style: .continuous)
-            .fill(filled ? Color.secondary.opacity(0.08) : Color.clear)
+            // The system fill is stronger in dark mode (a fixed 8 % grey vanished on black in CI screenshots).
+            .fill(filled ? Color(uiColor: .tertiarySystemFill) : Color.clear)
             .overlay {
                 if configuration.isPressed {
                     RoundedRectangle(cornerRadius: 8, style: .continuous)

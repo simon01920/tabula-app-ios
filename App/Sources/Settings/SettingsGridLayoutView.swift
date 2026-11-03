@@ -3,7 +3,8 @@
 // up to Phase 8). The Grid view and the Grid export page follow it. An inline `Picker` in a Form, as in Colors: system
 // checkmarks, one row per option with a small schematic of the layout, its name and one line on what it looks like.
 // The schematic is decorative (hidden from VoiceOver): the name and the line carry the meaning.
-// APIs: Picker(.inline), Canvas, GraphicsContext.fill(_:with:), Path(roundedRect:cornerRadius:).
+// APIs: Picker(.inline), Canvas, GraphicsContext.fill(_:with:), Path(roundedRect:cornerRadius:), AnyLayout
+//       (HStackLayout / VStackLayout, iOS 16+).
 import SwiftUI
 import TimetableCore
 import TimetableUI
@@ -52,9 +53,13 @@ enum GridLayoutStrings {
 
 private struct GridLayoutOptionRow: View {
     let style: GridLayoutStyle
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
-        HStack(spacing: 12) {
+        // At accessibility sizes the schematic sits above the text, so words never break (seen in CI at AX-XXXL).
+        let layout = typeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 8)) : AnyLayout(HStackLayout(spacing: 12))
+        layout {
             GridLayoutSchematic(style: style)
             VStack(alignment: .leading, spacing: 2) {
                 Text(LocalizedStringKey(GridLayoutStrings.nameKey(style))).font(.body.weight(.semibold))
@@ -111,7 +116,7 @@ private struct GridLayoutSchematic: View {
                 : rect(gutter + cellWidth, header + cellHeight, cellWidth, 2 * cellHeight)
             context.fill(double, with: lesson)
         }
-        .frame(width: width, height: width * 0.7)
+        .frame(width: min(width, 96), height: min(width, 96) * 0.7)
         .accessibilityHidden(true)
     }
 }
