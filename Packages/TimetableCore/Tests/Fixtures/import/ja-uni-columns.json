@@ -1,0 +1,274 @@
+{
+ "id": "ja-uni-columns",
+ "description": "Japanese university, 月-金 as columns, '1限' over 90-minute ranges.",
+ "language": "ja",
+ "mode": "cells",
+ "layout": "columns",
+ "table": {
+  "version": 1,
+  "pageWidth": 2480,
+  "pageHeight": 3508,
+  "languages": [
+   "ja"
+  ],
+  "cells": [
+   {
+    "text": "1限\n08:00-09:30",
+    "row": 1,
+    "column": 0,
+    "box": {
+     "x": 0.05,
+     "y": 0.1,
+     "width": 0.15,
+     "height": 0.176
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "2限\n09:45-11:15",
+    "row": 2,
+    "column": 0,
+    "box": {
+     "x": 0.05,
+     "y": 0.276,
+     "width": 0.15,
+     "height": 0.176
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "3限\n11:30-13:00",
+    "row": 3,
+    "column": 0,
+    "box": {
+     "x": 0.05,
+     "y": 0.452,
+     "width": 0.15,
+     "height": 0.176
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "4限\n13:30-15:00",
+    "row": 4,
+    "column": 0,
+    "box": {
+     "x": 0.05,
+     "y": 0.628,
+     "width": 0.15,
+     "height": 0.176
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "5限\n15:15-16:45",
+    "row": 5,
+    "column": 0,
+    "box": {
+     "x": 0.05,
+     "y": 0.804,
+     "width": 0.15,
+     "height": 0.176
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "月",
+    "row": 0,
+    "column": 1,
+    "box": {
+     "x": 0.2,
+     "y": 0.02,
+     "width": 0.15,
+     "height": 0.08
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "線形代数\n301\n田中先生",
+    "row": 1,
+    "column": 1,
+    "box": {
+     "x": 0.2,
+     "y": 0.1,
+     "width": 0.15,
+     "height": 0.176
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "火",
+    "row": 0,
+    "column": 2,
+    "box": {
+     "x": 0.35,
+     "y": 0.02,
+     "width": 0.15,
+     "height": 0.08
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "英語\n205",
+    "row": 2,
+    "column": 2,
+    "box": {
+     "x": 0.35,
+     "y": 0.276,
+     "width": 0.15,
+     "height": 0.176
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "水",
+    "row": 0,
+    "column": 3,
+    "box": {
+     "x": 0.5,
+     "y": 0.02,
+     "width": 0.15,
+     "height": 0.08
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "物理学\n401",
+    "row": 3,
+    "column": 3,
+    "box": {
+     "x": 0.5,
+     "y": 0.452,
+     "width": 0.15,
+     "height": 0.176
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "木",
+    "row": 0,
+    "column": 4,
+    "box": {
+     "x": 0.65,
+     "y": 0.02,
+     "width": 0.15,
+     "height": 0.08
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "経済学\n102",
+    "row": 1,
+    "column": 4,
+    "box": {
+     "x": 0.65,
+     "y": 0.1,
+     "width": 0.15,
+     "height": 0.176
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "金",
+    "row": 0,
+    "column": 5,
+    "box": {
+     "x": 0.8,
+     "y": 0.02,
+     "width": 0.15,
+     "height": 0.08
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "情報科学\n501",
+    "row": 4,
+    "column": 5,
+    "box": {
+     "x": 0.8,
+     "y": 0.628,
+     "width": 0.15,
+     "height": 0.176
+    },
+    "confidence": 0.95
+   }
+  ]
+ },
+ "expected": {
+  "orientation": "daysAsColumns",
+  "days": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "periods": [
+   {
+    "number": 1,
+    "start": "08:00",
+    "end": "09:30"
+   },
+   {
+    "number": 2,
+    "start": "09:45",
+    "end": "11:15"
+   },
+   {
+    "number": 3,
+    "start": "11:30",
+    "end": "13:00"
+   },
+   {
+    "number": 4,
+    "start": "13:30",
+    "end": "15:00"
+   },
+   {
+    "number": 5,
+    "start": "15:15",
+    "end": "16:45"
+   }
+  ],
+  "checkTimes": true,
+  "weekCycleLength": null,
+  "lessons": [
+   {
+    "day": 1,
+    "period": 1,
+    "span": 1,
+    "subject": "線形代数",
+    "room": "301",
+    "teacher": "田中先生"
+   },
+   {
+    "day": 2,
+    "period": 2,
+    "span": 1,
+    "subject": "英語",
+    "room": "205"
+   },
+   {
+    "day": 3,
+    "period": 3,
+    "span": 1,
+    "subject": "物理学",
+    "room": "401"
+   },
+   {
+    "day": 4,
+    "period": 1,
+    "span": 1,
+    "subject": "経済学",
+    "room": "102"
+   },
+   {
+    "day": 5,
+    "period": 4,
+    "span": 1,
+    "subject": "情報科学",
+    "room": "501"
+   }
+  ]
+ }
+}

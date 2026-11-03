@@ -89,6 +89,7 @@ public enum DynamicL10nKeys {
         keys += widgetKeys
         keys += liveActivityKeys
         keys += ModificationReason.allCases.map(\.l10nKey)
+        keys += ImportL10n.allKeys   // Phase 9: photo import questions, fields, reasons, notices
         return Array(Set(keys)).sorted()
     }
 

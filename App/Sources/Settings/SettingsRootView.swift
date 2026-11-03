@@ -207,6 +207,9 @@ struct SettingsRootView: View {
                     SettingsRowLabel("settings.gridLayout.title", symbol: "square.grid.3x3.fill", color: .orange)
                 }
             }
+            NavigationLink { SettingsImportView() } label: {
+                SettingsRowLabel("settings.import.title", symbol: "doc.viewfinder.fill", color: .cyan)
+            }
             Button {
                 if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
             } label: {

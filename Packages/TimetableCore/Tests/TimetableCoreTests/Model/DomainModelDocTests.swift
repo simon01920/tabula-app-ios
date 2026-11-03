@@ -13,6 +13,7 @@ struct DomainModelDocTests {
             ("A.8 ReminderL10n.allKeys", ReminderL10n.allKeys),
             ("A.9 ShareError.allL10nKeys", ShareError.allL10nKeys),
             ("A.9 ShareWarning.allL10nKeys", ShareWarning.allL10nKeys),
+            ("A.10 ImportL10n.allKeys", ImportL10n.allKeys),
         ]
     }
 

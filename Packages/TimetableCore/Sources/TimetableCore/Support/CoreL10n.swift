@@ -20,8 +20,9 @@ public enum CoreL10n {
     /// Share codec keys (Stage 2D) — Appendix A.9.
     public static var shareKeys: [String] { ShareError.allL10nKeys + ShareWarning.allL10nKeys }
 
-    /// Every key, in Appendix A order: model (A.1–A.6), schedule (A.7), reminders (A.8), share (A.9).
+    /// Every key, in Appendix A order: model (A.1–A.6), schedule (A.7), reminders (A.8), share (A.9),
+    /// photo import (A.10).
     public static var allKeys: [String] {
-        modelKeys + ScheduleL10n.allKeys + ReminderL10n.allKeys + shareKeys
+        modelKeys + ScheduleL10n.allKeys + ReminderL10n.allKeys + shareKeys + ImportL10n.allKeys
     }
 }

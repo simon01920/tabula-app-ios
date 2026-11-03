@@ -1,0 +1,307 @@
+{
+ "id": "hu-letters",
+ "description": "Hungarian one/two-letter day labels (H K Sze Cs P), period numbers only: times are assumed.",
+ "language": "hu",
+ "mode": "cells",
+ "layout": "rows",
+ "table": {
+  "version": 1,
+  "pageWidth": 2480,
+  "pageHeight": 3508,
+  "languages": [
+   "hu"
+  ],
+  "cells": [
+   {
+    "text": "1",
+    "row": 0,
+    "column": 1,
+    "box": {
+     "x": 0.1,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "2",
+    "row": 0,
+    "column": 2,
+    "box": {
+     "x": 0.2257,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "3",
+    "row": 0,
+    "column": 3,
+    "box": {
+     "x": 0.3514,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "4",
+    "row": 0,
+    "column": 4,
+    "box": {
+     "x": 0.4771,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "5",
+    "row": 0,
+    "column": 5,
+    "box": {
+     "x": 0.6029,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "6",
+    "row": 0,
+    "column": 6,
+    "box": {
+     "x": 0.7286,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "7",
+    "row": 0,
+    "column": 7,
+    "box": {
+     "x": 0.8543,
+     "y": 0.05,
+     "width": 0.1257,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "H",
+    "row": 1,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.2,
+     "width": 0.08,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Matek\n104",
+    "row": 1,
+    "column": 1,
+    "box": {
+     "x": 0.1,
+     "y": 0.2,
+     "width": 0.1257,
+     "height": 0.15
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "K",
+    "row": 2,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.35,
+     "width": 0.08,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Angol\n11",
+    "row": 2,
+    "column": 1,
+    "box": {
+     "x": 0.1,
+     "y": 0.35,
+     "width": 0.1257,
+     "height": 0.15
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Sze",
+    "row": 3,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.5,
+     "width": 0.08,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Kémia\nK2",
+    "row": 3,
+    "column": 2,
+    "box": {
+     "x": 0.2257,
+     "y": 0.5,
+     "width": 0.1257,
+     "height": 0.15
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "Cs",
+    "row": 4,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.65,
+     "width": 0.08,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Biológia\nB1",
+    "row": 4,
+    "column": 3,
+    "box": {
+     "x": 0.3514,
+     "y": 0.65,
+     "width": 0.1257,
+     "height": 0.15
+    },
+    "confidence": 0.95
+   },
+   {
+    "text": "P",
+    "row": 5,
+    "column": 0,
+    "box": {
+     "x": 0.02,
+     "y": 0.8,
+     "width": 0.08,
+     "height": 0.15
+    },
+    "confidence": 0.97
+   },
+   {
+    "text": "Ének\nE1",
+    "row": 5,
+    "column": 4,
+    "box": {
+     "x": 0.4771,
+     "y": 0.8,
+     "width": 0.1257,
+     "height": 0.15
+    },
+    "confidence": 0.95
+   }
+  ]
+ },
+ "expected": {
+  "orientation": "daysAsRows",
+  "days": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "periods": [
+   {
+    "number": 1,
+    "start": "08:00",
+    "end": "08:45"
+   },
+   {
+    "number": 2,
+    "start": "08:55",
+    "end": "09:40"
+   },
+   {
+    "number": 3,
+    "start": "09:50",
+    "end": "10:35"
+   },
+   {
+    "number": 4,
+    "start": "10:55",
+    "end": "11:40"
+   },
+   {
+    "number": 5,
+    "start": "11:50",
+    "end": "12:35"
+   },
+   {
+    "number": 6,
+    "start": "12:45",
+    "end": "13:30"
+   },
+   {
+    "number": 7,
+    "start": "13:35",
+    "end": "14:20"
+   }
+  ],
+  "checkTimes": false,
+  "weekCycleLength": null,
+  "lessons": [
+   {
+    "day": 1,
+    "period": 1,
+    "span": 1,
+    "subject": "Matek",
+    "room": "104"
+   },
+   {
+    "day": 2,
+    "period": 1,
+    "span": 1,
+    "subject": "Angol",
+    "room": "11"
+   },
+   {
+    "day": 3,
+    "period": 2,
+    "span": 1,
+    "subject": "Kémia",
+    "room": "K2"
+   },
+   {
+    "day": 4,
+    "period": 3,
+    "span": 1,
+    "subject": "Biológia",
+    "room": "B1"
+   },
+   {
+    "day": 5,
+    "period": 4,
+    "span": 1,
+    "subject": "Ének",
+    "room": "E1"
+   }
+  ]
+ }
+}

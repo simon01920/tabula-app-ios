@@ -41,6 +41,7 @@ struct TimetableRootView: View {
     @State private var management: ManagementSheet?
     @State private var sharing: ShareTarget?
     @State private var showsExport = false
+    @State private var importingPhoto = false
 
     init() {
         initialView = nil
@@ -98,8 +99,10 @@ struct TimetableRootView: View {
         .sheet(item: $management) { item in item.route.makeView() }
         .sheet(item: $sharing) { target in ShareTimetableSheet(timetableID: target.id) }
         .sheet(isPresented: $showsExport) { ExportSheet() }
+        .sheet(isPresented: $importingPhoto) { PhotoImportView() }
         .closesForDeepLink {   // QA fix Q6: a notification tap needs the screen
             showsExport = false
+            importingPhoto = false
             detail = nil
             quickAdd = nil
             management = nil
@@ -352,6 +355,11 @@ struct TimetableRootView: View {
                     Label { Text("share.menu.share") } icon: { Image(systemName: "square.and.arrow.up") }
                 }
                 exportMenuItem
+                // Phase 9 I2: the photo / PDF import (Add as new by default, never saved without approval).
+                Button { importingPhoto = true } label: {
+                    Label { Text("import.menu.photo") } icon: { Image(systemName: "doc.viewfinder") }
+                }
+                .disabled(model.isReadOnly)
             }
         } label: {
             // One stable glyph whatever the current view (Opus H4); VoiceOver and long-press read "View Options".

@@ -944,7 +944,36 @@ A.1–A.6 are Stage 1 (A.2 gained `validation.cycleWeekOutOfRange` and `validati
 | `share.warning.skippedLessons` | 1 count | one: %lld lesson without a subject or period was left out.<br>other: %lld lessons without a subject or period were left out. |
 | `share.warning.valuesDropped` | 1 count | one: %lld detail that can't be shared was left out.<br>other: %lld details that can't be shared were left out. |
 
-Total: 193 keys (A.1–A.6: 105 = 11 + 13 + 5 + 2 + 52 + 22 · A.7: 18 · A.8: 43 · A.9: 27).
+### A.10 Photo import (Phase 9, `ImportL10n.allKeys`)
+
+| Key | Args | English |
+|---|---|---|
+| `import.question.ocrReading` | 3: field name, current, other reading | %1$@: “%2$@” or “%3$@”? |
+| `import.question.abbreviation` | 2: abbreviation, subject | Is “%1$@” %2$@? |
+| `import.question.split` | 1: cell text | Which is the subject in “%1$@”? |
+| `import.question.suggestion` | 2: field name, cell text | %1$@ in “%2$@”: which is right? |
+| `import.field.subject` | — | Subject |
+| `import.field.room` | — | Room |
+| `import.field.teacher` | — | Teacher |
+| `import.field.building` | — | Building |
+| `import.field.lessonType` | — | Type |
+| `import.field.notes` | — | Notes |
+| `import.reason.ocrLow` | — | The text was hard to read. |
+| `import.reason.ocrConfusion` | — | Letters and digits that look alike may be mixed up. |
+| `import.reason.ambiguousSplit` | — | The text could not be split into subject, room and teacher. |
+| `import.reason.abbreviation` | — | The subject may be an abbreviation. |
+| `import.reason.unknownDay` | — | The day was unreadable; it comes from the row. |
+| `import.reason.unknownPeriod` | — | The period was unreadable; it comes from the column. |
+| `import.reason.timeConflict` | — | It overlaps another lesson or does not fit the times. |
+| `import.reason.timeInferred` | — | The times were worked out, not printed. |
+| `import.reason.normaliser` | — | Apple Intelligence suggested a change. Check it. |
+| `import.notice.emptyInput` | — | No text was recognized. |
+| `import.notice.noDaysFound` | — | No day names were found, so nothing could be imported. |
+| `import.notice.timesAssumed` | — | No lesson times were printed, so default times from 8:00 were used. Check them. |
+| `import.notice.endTimesInferred` | — | End times were worked out from the start times. |
+| `import.notice.weekRotationDetected` | — | The days repeat, so this was read as Week A and Week B. Check which week is A. |
+
+Total: 217 keys (A.1–A.6: 105 = 11 + 13 + 5 + 2 + 52 + 22 · A.7: 18 · A.8: 43 · A.9: 27 · A.10: 24).
 
 ---
 

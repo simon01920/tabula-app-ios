@@ -65,6 +65,12 @@ timetable.tiles@elementary
 timetable.quick-add@secondary
 export.sheet@secondary
 export.preview@secondary
+import.capture@secondary
+import.processing@secondary
+import.review@secondary
+import.review-questions@secondary
+import.review@secondary@sk
+settings.import-model@secondary
 onboarding@empty
 onboarding.school-type@empty
 onboarding.start@empty
