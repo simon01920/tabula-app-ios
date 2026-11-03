@@ -163,6 +163,7 @@ private struct ImportReviewList: View {
 
     @Environment(AppModel.self) private var model
     @Environment(\.dynamicTypeSize) private var typeSize
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         ScrollViewReader { proxy in
@@ -204,13 +205,12 @@ private struct ImportReviewList: View {
                     if review.candidate.weekCycleLength != nil { ImportWeekAQuestion(answer: $flow.weekAIsThisWeek) }
                     ForEach(questions) { question in
                         ImportQuestionRow(question: question) { option in
-                            withAnimation { flow.review?.answer(question.id, with: option) }
+                            withAnimation(reduceMotion ? nil : .default) { flow.review?.answer(question.id, with: option) }
                         }
                     }
                 } header: {
                     Text("import.review.questions")
                 }
-                .id("questions")
             }
 
             if typeSize.isAccessibilitySize {
@@ -219,12 +219,12 @@ private struct ImportReviewList: View {
                 Section {
                     ImportReviewGrid(review: review, edit: edit)
                         .listRowInsets(EdgeInsets())
+                        .id("grid")
                 } header: {
                     Text("import.review.grid")
                 } footer: {
                     Text("import.review.grid.footer")
                 }
-                .id("grid")
             }
 
             let flagged = review.lessons.filter(\.needsReview)
