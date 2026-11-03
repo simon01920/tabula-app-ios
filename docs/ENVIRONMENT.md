@@ -723,3 +723,15 @@ Design: a "T" for Tabula drawn as a day's timetable column. The top bar is the h
 | `icon.json` schema (`fill-specializations` + `appearance`, `automatic-gradient`, layer `glass`/`image-name`/`position`, group `shadow`/`translucency`/`specular`, `supported-platforms.circles: [watchOS]`) | REVERSE-ENGINEERED (Apple publishes no schema) | copied from Icon Composer output in IceCubesApp, mastodon-ios, yattee |
 | Asset-catalog dark/tinted icon keys: `"appearances": [{"appearance": "luminosity", "value": "dark" \| "tinted"}]` | VERIFIED (real Contents.json) | yattee `Yattee/Assets.xcassets/AppIcon.appiconset` |
 | xtool installs show only the flattened light `AppIcon.png` (`CFBundleIconFile`); iOS generates its own dark/tinted variants | DESIGN | `xtool.yml` `iconPath` |
+
+
+## 39. Phase 9 I2 — photo import in the app (swiftui-engineer, 2026-11-03)
+
+API names checked in the installed iPhoneOS27.0.sdk (`.swiftinterface` / headers) on 2026-11-02.
+
+| Fact | Status | Evidence |
+|---|---|---|
+| VisionKit `VNDocumentCameraViewController` (`class var isSupported`, delegate `documentCameraViewController(_:didFinishWith:)`, `…DidCancel(_:)`, `…(_:didFailWithError:)`), `VNDocumentCameraScan.pageCount` / `imageOfPage(at:)`. The ObjC delegate is not main-actor annotated: a `@MainActor` coordinator needs `@preconcurrency` conformance (a plain one failed with "sending 'self' risks causing data races") | VERIFIED (SDK + xtool build, 0 warnings); runtime UNVERIFIED (PHASE9_DEVICE P9.2) | `App/Sources/Import/ImportCapture.swift` |
+| Vision `RecognizeDocumentsRequest` → `[DocumentObservation]`, `.document.tables`, `Table.rows [[Cell]]`, `Cell.rowRange/columnRange`, `Cell.content.text.lines/.transcript/.boundingRegion.boundingBox` (lower-left origin); fallback `RecognizeTextRequest` (`.accurate`, `usesLanguageCorrection = false`) | VERIFIED (SDK + build); quality UNVERIFIED (P9.8–P9.14) | `App/Sources/Import/VisionTableReader.swift` |
+| FoundationModels on iOS 26: `LanguageModelSession.GenerationError.unsupportedLanguageOrLocale` (deprecated in 27 for `LanguageModelError`, which is iOS 27+ only); `GenerationOptions(samplingMode:temperature:maximumResponseTokens:)`; `respond(to:generating:options:)`; `SystemLanguageModel.supportsLocale(_:)` is synchronous | VERIFIED (SDK + build, `@Generable` in the base variant); runtime UNVERIFIED (P9.23–P9.25) | `App/Sources/Import/FoundationModelsNormaliser.swift`; errors propagate to `ImportReconciliation.normalise` (`try?` → Tier D) |
+| PDFKit `PDFDocument(data:)`, `page(at:)`, `PDFPage.bounds(for: .mediaBox)`, `thumbnail(of:for:)` | VERIFIED (SDK + build) | `ImportImageLoader` |
