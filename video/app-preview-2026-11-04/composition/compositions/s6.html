@@ -1,0 +1,24 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; }
+    #s6-cap { position: absolute; left: 89px; width: 708px; top: 60px; height: 232px;
+      display: flex; align-items: center; justify-content: center; text-align: center; }
+    #s6-text { font-family: Inter, sans-serif; font-weight: 700; font-size: 62px; line-height: 1.12;
+      letter-spacing: -0.012em; color: var(--color-ink, #2541B2); }
+    #s6-text .w { display: inline-block; }
+    #s6-text .hl { background-image: linear-gradient(transparent 58%, var(--color-accent, #FFE04A) 58%, var(--color-accent, #FFE04A) 94%, transparent 94%);
+      background-repeat: no-repeat; background-size: 0% 100%; }
+  </style>
+  <div id="root" data-composition-id="s6" data-width="886" data-height="1920">
+    <div id="s6-cap" class="clip" data-start="0" data-duration="2.5666">
+      <div id="s6-text"><span class="w">Week,</span> <span class="w">day</span> <span class="w">or</span> <span class="w">tiles.</span></div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#s6-text .w", { opacity: 0, filter: "blur(6px)" },
+      { opacity: 1, filter: "blur(0px)", duration: 0.15, ease: "power4.out", stagger: 0.067 }, 0.12);
+    tl.to("#s6-text", { opacity: 0, filter: "blur(6px)", duration: 0.18, ease: "power3.in" }, 2.35);
+    window.__timelines["s6"] = tl;
+  </script>
+</template>

@@ -1,0 +1,35 @@
+# Encoding evidence — tabula-app-preview-en-iphone-29s.mp4 (2026-11-04T03:43Z, ffprobe version 9.0.2-full_build-www.gyan.dev)
+
+## ffprobe streams + format
+stream|index=0|codec_name=h264|profile=High|codec_type=video|width=886|height=1920|sample_aspect_ratio=1:1|pix_fmt=yuv420p|level=40|color_space=bt709|color_transfer=bt709|color_primaries=bt709|field_order=progressive|r_frame_rate=30/1|avg_frame_rate=30/1|duration=29.000000|bit_rate=10984836|nb_frames=870
+stream|index=1|codec_name=aac|profile=LC|codec_type=audio|sample_rate=48000|channels=2|channel_layout=stereo|r_frame_rate=0/0|avg_frame_rate=0/0|duration=29.000000|bit_rate=245505|nb_frames=1361
+format|duration=29.000000|size=40741779|bit_rate=11239111
+
+## rotation / display-matrix side data (expect none)
+none
+
+## fast start
+moov offset 36 < mdat offset 31132
+
+## full decode
+exit=0, no decode errors
+
+## loudness (EBU R128, true peak)
+    I:         -15.9 LUFS
+    LRA:         9.4 LU
+    Peak:       -1.5 dBFS
+
+## audio edges (RMS dB)
+first 0.3 s: -12.543403
+last 0.3 s: -98.857180
+
+## black frames (blackdetect d>=0.05 s, pix_th 0.10)
+count: 0
+
+## static holds >= 1.5 s (freezedetect n=0.001): deliberate real-UI holds, listed for review
+freeze_start: 9.366667	freeze_end: 11.666667
+freeze_start: 12.633333	freeze_end: 14.433333
+freeze_start: 26.6	
+
+## AAC note
+Native ffmpeg AAC at -b:a 256k reports avg ~245.5 kbps (btrt max 256000) for the stream. Apple: AAC 256 kbps; ABR within normal encoder tolerance.

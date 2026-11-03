@@ -1,0 +1,24 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; }
+    #s5-cap { position: absolute; left: 89px; width: 708px; top: 60px; height: 232px;
+      display: flex; align-items: center; justify-content: center; text-align: center; }
+    #s5-text { font-family: Inter, sans-serif; font-weight: 700; font-size: 56px; line-height: 1.12;
+      letter-spacing: -0.012em; color: var(--color-ink, #2541B2); }
+    #s5-text .w { display: inline-block; }
+    #s5-text .hl { background-image: linear-gradient(transparent 58%, var(--color-accent, #FFE04A) 58%, var(--color-accent, #FFE04A) 94%, transparent 94%);
+      background-repeat: no-repeat; background-size: 0% 100%; }
+  </style>
+  <div id="root" data-composition-id="s5" data-width="886" data-height="1920">
+    <div id="s5-cap" class="clip" data-start="0" data-duration="4.6">
+      <div id="s5-text"><span class="w">Reminders.</span> <span class="w">Notifications.</span><br><span class="w">Alarms.</span></div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#s5-text .w", { opacity: 0, filter: "blur(6px)" },
+      { opacity: 1, filter: "blur(0px)", duration: 0.15, ease: "power4.out", stagger: 0.067 }, 0.12);
+    tl.to("#s5-text", { opacity: 0, filter: "blur(6px)", duration: 0.18, ease: "power3.in" }, 4.38);
+    window.__timelines["s5"] = tl;
+  </script>
+</template>

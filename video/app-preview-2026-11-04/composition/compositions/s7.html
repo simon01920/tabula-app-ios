@@ -1,0 +1,30 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; }
+    #s7-cap { position: absolute; left: 89px; width: 708px; top: 48px; height: 256px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; }
+    #s7-brand { display: flex; align-items: center; gap: 22px; }
+    #s7-icon { width: 104px; height: 104px; border-radius: 23px; display: block; }
+    #s7-name { font-family: Inter, sans-serif; font-weight: 700; font-size: 72px; letter-spacing: -0.02em;
+      color: var(--color-ink, #2541B2); line-height: 1; }
+    #s7-tag { font-family: Inter, sans-serif; font-weight: 700; font-size: 44px; letter-spacing: -0.01em;
+      color: #1C1C1E; line-height: 1.15; }
+  </style>
+  <div id="root" data-composition-id="s7" data-width="886" data-height="1920">
+    <div id="s7-cap" class="clip" data-start="0" data-duration="2.9">
+      <div id="s7-brand">
+        <img id="s7-icon" src="assets/brand/AppIcon.png" alt="Tabula app icon">
+        <div id="s7-name">Tabula</div>
+      </div>
+      <div id="s7-tag">Ready for your next lesson.</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#s7-brand", { opacity: 0, filter: "blur(8px)" },
+      { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 0.1);
+    tl.fromTo("#s7-tag", { opacity: 0, filter: "blur(6px)" },
+      { opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "power4.out" }, 0.45);
+    window.__timelines["s7"] = tl;
+  </script>
+</template>

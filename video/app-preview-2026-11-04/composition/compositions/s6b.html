@@ -1,0 +1,29 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; }
+    /* Text-only mention (owner decision 2026-11-04). These surfaces live outside the app, so there is no footage of
+       them. Plain editorial text, no chips (so it can't be mistaken for app controls) and no highlight. */
+    #s6b-cap { position: absolute; left: 89px; width: 708px; top: 56px; height: 240px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; }
+    #s6b-title { font-family: Inter, sans-serif; font-weight: 700; font-size: 58px; line-height: 1.1;
+      letter-spacing: -0.012em; color: var(--color-ink, #2541B2); }
+    .s6b-line { font-family: Inter, sans-serif; font-weight: 700; font-size: 44px; line-height: 1.15;
+      letter-spacing: -0.01em; color: #1C1C1E; }
+  </style>
+  <div id="root" data-composition-id="s6b" data-width="886" data-height="1920">
+    <div id="s6b-cap" class="clip" data-start="0" data-duration="3.2667">
+      <div id="s6b-title">Also in Tabula:</div>
+      <div class="s6b-line" id="s6b-l1">widgets, Live Activities</div>
+      <div class="s6b-line" id="s6b-l2">and Apple Watch.</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#s6b-title", { opacity: 0, filter: "blur(6px)" },
+      { opacity: 1, filter: "blur(0px)", duration: 0.16, ease: "power4.out" }, 0.1);
+    tl.fromTo(".s6b-line", { opacity: 0, filter: "blur(6px)" },
+      { opacity: 1, filter: "blur(0px)", duration: 0.16, ease: "power4.out", stagger: 0.15 }, 0.4);
+    tl.to("#s6b-cap", { opacity: 0, filter: "blur(6px)", duration: 0.18, ease: "power3.in" }, 3.05);
+    window.__timelines["s6b"] = tl;
+  </script>
+</template>

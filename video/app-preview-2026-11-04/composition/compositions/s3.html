@@ -1,0 +1,26 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; }
+    #s3-cap { position: absolute; left: 89px; width: 708px; top: 60px; height: 232px;
+      display: flex; align-items: center; justify-content: center; text-align: center; }
+    #s3-text { font-family: Inter, sans-serif; font-weight: 700; font-size: 62px; line-height: 1.12;
+      letter-spacing: -0.012em; color: var(--color-ink, #2541B2); }
+    #s3-text .w { display: inline-block; }
+    #s3-text .hl { background-image: linear-gradient(transparent 58%, var(--color-accent, #FFE04A) 58%, var(--color-accent, #FFE04A) 94%, transparent 94%);
+      background-repeat: no-repeat; background-size: 0% 100%; }
+  </style>
+  <div id="root" data-composition-id="s3" data-width="886" data-height="1920">
+    <div id="s3-cap" class="clip" data-start="0" data-duration="3.9667">
+      <div id="s3-text"><span class="w">Keep</span> <span class="w">homework</span><br><span class="w hl">with</span> <span class="w hl">each</span> <span class="w hl">lesson.</span></div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#s3-text .w", { opacity: 0, filter: "blur(6px)" },
+      { opacity: 1, filter: "blur(0px)", duration: 0.15, ease: "power4.out", stagger: 0.067 }, 0.12);
+    tl.fromTo("#s3-text .hl", { backgroundSize: "0% 100%" },
+      { backgroundSize: "100% 100%", duration: 0.32, ease: "power2.inOut", stagger: 0.12 }, 0.7);
+    tl.to("#s3-text", { opacity: 0, filter: "blur(6px)", duration: 0.18, ease: "power3.in" }, 3.75);
+    window.__timelines["s3"] = tl;
+  </script>
+</template>

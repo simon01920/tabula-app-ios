@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en"
+  data-composition-variables='[
+    {"id":"color-ground","type":"color","label":"Paper","default":"#FBFAF7"},
+    {"id":"color-ink","type":"color","label":"Ink (headlines)","default":"#2541B2"},
+    {"id":"color-accent","type":"color","label":"Highlighter","default":"#FFE04A"},
+    {"id":"color-rule","type":"color","label":"Ruled lines","default":"rgba(37,65,178,0.12)"}
+  ]'>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=886, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      :root { --color-ground: #FBFAF7; --color-ink: #2541B2; --color-accent: #FFE04A; --color-rule: rgba(37,65,178,0.12); }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 886px; height: 1920px; overflow: hidden; background: var(--color-ground); }
+      #root { position: relative; width: 100%; height: 100%; }
+      /* Exercise-book page: plain paper with faint ink-blue rules (decorative, never over the app screen). */
+      #paper { position: absolute; inset: 0; background-color: var(--color-ground);
+        background-image: repeating-linear-gradient(to bottom, transparent 0 46px, var(--color-rule) 46px 48px); }
+      /* The real app screen: native 1320x2868 capture pre-scaled to 712x1548 (54 %, same aspect, no crop, no device frame). */
+      #screen { position: absolute; left: 87px; top: 332px; width: 712px; height: 1548px; overflow: hidden;
+        border-radius: 64px; background: #F2F2F7; z-index: 2;
+        box-shadow: 0 0 0 2px rgba(28,28,30,0.08), 0 24px 64px rgba(37,65,178,0.14); }
+      #screen video { position: absolute; left: 0; top: 0; width: 712px; height: 1548px; object-fit: cover; }
+      .cap-host { z-index: 5; }
+    </style>
+  </head>
+  <body>
+    <!-- Seams on the music's beats (audio/beats-D.json): 7.8 / 11.7667 / 15.6667 / 20.2667 / 22.8333 / 26.1 s. -->
+    <div id="root" data-composition-id="main" data-start="0" data-duration="29" data-fps="30"
+         data-width="886" data-height="1920">
+      <div id="paper" data-layout-ignore></div>
+
+      <div id="screen" data-layout-allow-overflow>
+        <!-- Real simulator recordings, cut by video/tools/prep_clips.py (trim record: capture-manifest.md). Each dissolves in over 0.3 s. -->
+        <video id="v1a" class="clip" data-start="0" data-duration="1.9" data-track-index="1" style="z-index:1" muted playsinline src="assets/clips/c1a_today.mp4"></video>
+        <video id="v1b" class="clip" data-start="1.6" data-duration="1.7" data-track-index="1" style="z-index:2" muted playsinline src="assets/clips/c1b_week.mp4"></video>
+        <video id="v2b" class="clip" data-start="3.0" data-duration="2.435" data-track-index="1" style="z-index:3" muted playsinline src="assets/clips/c2b_reading.mp4"></video>
+        <video id="v2c" class="clip" data-start="5.235" data-duration="1.7" data-track-index="1" style="z-index:4" muted playsinline src="assets/clips/c2c_review.mp4"></video>
+        <video id="v2d" class="clip" data-start="6.735" data-duration="1.365" data-track-index="1" style="z-index:5" muted playsinline src="assets/clips/c2d_week.mp4"></video>
+        <video id="v3a" class="clip" data-start="7.8" data-duration="1.6" data-track-index="1" style="z-index:6" muted playsinline src="assets/clips/c3a_lesson.mp4"></video>
+        <video id="v3b" class="clip" data-start="9.1" data-duration="2.9667" data-track-index="1" style="z-index:7" muted playsinline src="assets/clips/c3b_task.mp4"></video>
+        <video id="v4" class="clip" data-start="11.7667" data-duration="4.2" data-track-index="1" style="z-index:8" muted playsinline src="assets/clips/c4_exams.mp4"></video>
+        <video id="v5a" class="clip" data-start="15.6667" data-duration="1.8" data-track-index="1" style="z-index:9" muted playsinline src="assets/clips/c5a_exam_reminder.mp4"></video>
+        <video id="v5b" class="clip" data-start="17.1667" data-duration="3.4" data-track-index="1" style="z-index:10" muted playsinline src="assets/clips/c5b_reminders.mp4"></video>
+        <video id="v6a" class="clip" data-start="20.2667" data-duration="1.6333" data-track-index="1" style="z-index:11" muted playsinline src="assets/clips/c6a_day.mp4"></video>
+        <video id="v6b" class="clip" data-start="21.6" data-duration="1.5333" data-track-index="1" style="z-index:12" muted playsinline src="assets/clips/c6b_tiles.mp4"></video>
+        <video id="v6c" class="clip" data-start="22.8333" data-duration="3.5667" data-track-index="1" style="z-index:13" muted playsinline src="assets/clips/c6c_week.mp4"></video>
+        <video id="v7" class="clip" data-start="26.1" data-duration="2.9" data-track-index="1" style="z-index:14" muted playsinline src="assets/clips/c7_today.mp4"></video>
+      </div>
+
+      <div id="s1" class="cap-host" data-composition-id="s1" data-composition-src="compositions/s1.html" data-start="0" data-duration="3" data-track-index="2" data-track-kind="graphics" data-width="886" data-height="1920"></div>
+      <div id="s2" class="cap-host" data-composition-id="s2" data-composition-src="compositions/s2.html" data-start="3" data-duration="4.8" data-track-index="2" data-track-kind="graphics" data-width="886" data-height="1920"></div>
+      <div id="s3" class="cap-host" data-composition-id="s3" data-composition-src="compositions/s3.html" data-start="7.8" data-duration="3.9667" data-track-index="2" data-track-kind="graphics" data-width="886" data-height="1920"></div>
+      <div id="s4" class="cap-host" data-composition-id="s4" data-composition-src="compositions/s4.html" data-start="11.7667" data-duration="3.9" data-track-index="2" data-track-kind="graphics" data-width="886" data-height="1920"></div>
+      <div id="s5" class="cap-host" data-composition-id="s5" data-composition-src="compositions/s5.html" data-start="15.6667" data-duration="4.6" data-track-index="2" data-track-kind="graphics" data-width="886" data-height="1920"></div>
+      <div id="s6" class="cap-host" data-composition-id="s6" data-composition-src="compositions/s6.html" data-start="20.2667" data-duration="2.5666" data-track-index="2" data-track-kind="graphics" data-width="886" data-height="1920"></div>
+      <div id="s6b" class="cap-host" data-composition-id="s6b" data-composition-src="compositions/s6b.html" data-start="22.8333" data-duration="3.2667" data-track-index="2" data-track-kind="graphics" data-width="886" data-height="1920"></div>
+      <div id="s7" class="cap-host" data-composition-id="s7" data-composition-src="compositions/s7.html" data-start="26.1" data-duration="2.9" data-track-index="2" data-track-kind="graphics" data-width="886" data-height="1920"></div>
+
+      <audio id="music" class="clip" data-start="0" data-duration="29" data-track-index="3" data-volume="0.85" data-fade-out="0.8" src="assets/music/tabula-bed.mp3"></audio>
+    </div>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      // Simple dissolves between real recordings (Apple: "straightforward transitions, like dissolves and fades").
+      // beat-locked: 5.235 (drums enter as the import review appears)
+      [["#v1b", 1.6, 0.3], ["#v2b", 3.0, 0.3], ["#v2c", 5.235, 0.25], ["#v2d", 6.735, 0.25], ["#v3a", 7.8, 0.3], ["#v3b", 9.1, 0.3], ["#v4", 11.7667, 0.3], ["#v5a", 15.6667, 0.3], ["#v5b", 17.1667, 0.3], ["#v6a", 20.2667, 0.3], ["#v6b", 21.6, 0.3], ["#v6c", 22.8333, 0.3], ["#v7", 26.1, 0.3]].forEach(([id, t, d]) => {
+        tl.fromTo(id, { opacity: 0 }, { opacity: 1, duration: d, ease: "power2.inOut" }, t);
+      });
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

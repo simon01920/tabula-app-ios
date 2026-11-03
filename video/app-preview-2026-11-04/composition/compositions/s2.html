@@ -1,0 +1,26 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; }
+    #s2-cap { position: absolute; left: 89px; width: 708px; top: 60px; height: 232px;
+      display: flex; align-items: center; justify-content: center; text-align: center; }
+    #s2-text { font-family: Inter, sans-serif; font-weight: 700; font-size: 62px; line-height: 1.12;
+      letter-spacing: -0.012em; color: var(--color-ink, #2541B2); }
+    #s2-text .w { display: inline-block; }
+    #s2-text .hl { background-image: linear-gradient(transparent 58%, var(--color-accent, #FFE04A) 58%, var(--color-accent, #FFE04A) 94%, transparent 94%);
+      background-repeat: no-repeat; background-size: 0% 100%; }
+  </style>
+  <div id="root" data-composition-id="s2" data-width="886" data-height="1920">
+    <div id="s2-cap" class="clip" data-start="0" data-duration="4.8">
+      <div id="s2-text"><span class="w">Import</span> <span class="w">your</span> <span class="w">timetable</span><br><span class="w hl">from</span> <span class="w hl">a</span> <span class="w hl">photo.</span></div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#s2-text .w", { opacity: 0, filter: "blur(6px)" },
+      { opacity: 1, filter: "blur(0px)", duration: 0.15, ease: "power4.out", stagger: 0.067 }, 0.12);
+    tl.fromTo("#s2-text .hl", { backgroundSize: "0% 100%" },
+      { backgroundSize: "100% 100%", duration: 0.32, ease: "power2.inOut", stagger: 0.12 }, 0.7);
+    tl.to("#s2-text", { opacity: 0, filter: "blur(6px)", duration: 0.18, ease: "power3.in" }, 4.58);
+    window.__timelines["s2"] = tl;
+  </script>
+</template>
