@@ -509,9 +509,9 @@ private struct TimetableContent: View {
         default:
             // Grid (and the week view at accessibility sizes, which the grid shows as a list).
             let layout = TimetableCore.GridLayout.week(containing: selection.weekStart, resolver: resolver)
-            GridWeekView(layout: layout, strip: strip, timetable: timetable,
-                         reasons: reasons(for: layout.columns.map(\.date)), today: today, nowMinute: nowMinute,
-                         onOpen: onOpen, onAdd: onAdd)
+            TimetableGridView(layout: layout, strip: strip, timetable: timetable,
+                              reasons: reasons(for: layout.columns.map(\.date)), today: today, nowMinute: nowMinute,
+                              onOpen: onOpen, onAdd: onAdd)
         }
     }
 

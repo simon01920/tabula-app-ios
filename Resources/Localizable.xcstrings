@@ -104035,6 +104035,510 @@
         }
       }
     },
+    "settings.gridLayout.daysAsRows" : {
+      "comment" : "Grid layout option (default): each row is a school day (Mon, Tue, ...), each column a lesson period.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dny v řádcích"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tage in Zeilen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Days in rows"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Jours en lignes"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Napok sorokban"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "曜日を行に表示"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dni w wierszach"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zile pe rânduri"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dni v riadkoch"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Дани у редовима"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dani u redovima"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Дні в рядках"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "按行显示日期"
+          }
+        }
+      }
+    },
+    "settings.gridLayout.daysAsRows.detail" : {
+      "comment" : "One-line description under the 'Days in rows' Grid layout option.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hodiny jdou zleva doprava, jako na vytištěném školním rozvrhu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Die Stunden laufen oben quer, wie auf einem gedruckten Stundenplan."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Periods run across the top, like a printed school timetable."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Les heures de cours défilent en haut, comme sur un emploi du temps imprimé."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Az órák felül, vízszintesen futnak, mint a nyomtatott órarenden."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "印刷された時間割のように、時限を上に横に並べます。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Lekcje biegną poziomo u góry, jak w wydrukowanym planie lekcji."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Orele sunt pe orizontală, sus, ca într-un orar școlar tipărit."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hodiny idú zľava doprava, ako na vytlačenom školskom rozvrhu."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Часови иду водоравно при врху, као на штампаном школском распореду."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Časovi idu vodoravno pri vrhu, kao na štampanom školskom rasporedu."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Уроки йдуть угорі зліва направо, як у надрукованому шкільному розкладі."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "节次横排在顶部，就像打印的课程表。"
+          }
+        }
+      }
+    },
+    "settings.gridLayout.footer" : {
+      "comment" : "Footer under the Grid layout options in Settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Platí pro zobrazení Mřížka i pro export mřížky. Při největších velikostech textu se mřížka zobrazí jako seznam."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Gilt für die Rasteransicht und für Raster-Exporte. Bei den größten Textgrößen wird das Raster als Liste angezeigt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Used by the Grid view and by Grid exports. At the largest text sizes the Grid is shown as a list."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "S’applique à la vue Grille et aux exports en grille. Aux plus grandes tailles de texte, la grille s’affiche sous forme de liste."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A Rács nézetre és a rácsos exportra vonatkozik. A legnagyobb szövegméreteknél a rács listaként jelenik meg."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "グリッド表示とグリッドの書き出しに使われます。最大の文字サイズでは、グリッドはリストで表示されます。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dotyczy widoku Siatka i eksportu siatki. Przy największych rozmiarach tekstu siatka jest wyświetlana jako lista."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Se aplică vizualizării Grilă și exporturilor de tip grilă. La cele mai mari dimensiuni de text, grila este afișată ca listă."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Platí pre zobrazenie Mriežka aj pre export mriežky. Pri najväčších veľkostiach textu sa mriežka zobrazí ako zoznam."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Важи за приказ Мрежа и за извоз мреже. При највећим величинама текста мрежа се приказује као листа."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Važi za prikaz Mreža i za izvoz mreže. Pri najvećim veličinama teksta mreža se prikazuje kao lista."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Діє для подання «Сітка» та для експорту сітки. За найбільших розмірів тексту сітка показується списком."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "用于网格视图和网格导出。在最大文字尺寸下，网格以列表显示。"
+          }
+        }
+      }
+    },
+    "settings.gridLayout.periodsAsRows" : {
+      "comment" : "Grid layout option: each row is a lesson period (1, 2, 3, ...), each column a school day.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hodiny v řádcích"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Stunden in Zeilen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Periods in rows"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Heures en lignes"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Órák sorokban"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "時限を行に表示"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Lekcje w wierszach"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ore pe rânduri"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hodiny v riadkoch"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Часови у редовима"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Časovi u redovima"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Уроки в рядках"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "按行显示节次"
+          }
+        }
+      }
+    },
+    "settings.gridLayout.periodsAsRows.detail" : {
+      "comment" : "One-line description under the 'Periods in rows' Grid layout option.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dny jdou zleva doprava, hodiny shora dolů."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Die Tage laufen oben quer, die Stunden nach unten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Days run across the top, periods down the side."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Les jours défilent en haut, les heures vers le bas."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A napok felül futnak, az órák lefelé."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "曜日を上に横に並べ、時限を縦に並べます。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dni biegną poziomo u góry, lekcje w dół."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zilele sunt pe orizontală, sus, iar orele pe verticală."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dni idú zľava doprava, hodiny zhora nadol."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Дани иду водоравно при врху, часови надоле."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dani idu vodoravno pri vrhu, časovi nadole."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Дні йдуть угорі зліва направо, уроки — згори донизу."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "日期横排在顶部，节次竖排。"
+          }
+        }
+      }
+    },
+    "settings.gridLayout.title" : {
+      "comment" : "Settings row and page title: how the Grid view of the timetable arranges a week (days in rows or periods in rows).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Rozložení mřížky"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Raster-Layout"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grid layout"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Disposition de la grille"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Rács elrendezése"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "グリッドのレイアウト"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Układ siatki"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Aspectul grilei"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Rozloženie mriežky"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Распоред мреже"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Raspored mreže"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Макет сітки"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "网格布局"
+          }
+        }
+      }
+    },
     "settings.icloud.status.iCloudDataDeleted" : {
       "comment" : "iCloud status line after the user deleted the app's iCloud data in iOS Settings; sync was switched off. 'iCloud Sync' = the switch title above.",
       "extractionState" : "manual",
@@ -106807,86 +107311,170 @@
         }
       }
     },
-    "settings.pro.plan" : {
-      "comment" : "Row label; the value is Free or Pro.",
+    "settings.pro.active" : {
+      "comment" : "Settings, Tabula Pro row: status value when the Pro features are available.",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Aktuální plán"
+            "value" : "Aktivní"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Aktueller Tarif"
+            "value" : "Aktiv"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Current plan"
+            "value" : "Active"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Formule actuelle"
+            "value" : "Actif"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Jelenlegi csomag"
+            "value" : "Aktív"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "現在のプラン"
+            "value" : "有効"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Obecny plan"
+            "value" : "Aktywny"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Planul curent"
+            "value" : "Activ"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Aktuálny plán"
+            "value" : "Aktívne"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Тренутни план"
+            "value" : "Активан"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Trenutni plan"
+            "value" : "Aktivan"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Поточний план"
+            "value" : "Активний"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "当前方案"
+            "value" : "已启用"
+          }
+        }
+      }
+    },
+    "settings.pro.active.detail" : {
+      "comment" : "Settings, Tabula Pro row: subtitle under 'Tabula Pro' when every feature is available.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Všechny funkce jsou odemčené"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Alle Funktionen freigeschaltet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All features unlocked"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Toutes les fonctionnalités sont débloquées"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Minden funkció elérhető"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "すべての機能が利用可能"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wszystkie funkcje odblokowane"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Toate funcțiile sunt deblocate"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Všetky funkcie sú odomknuté"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Све функције су откључане"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sve funkcije su otključane"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Усі функції розблоковано"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "所有功能均已解锁"
           }
         }
       }
@@ -106975,90 +107563,6 @@
         }
       }
     },
-    "settings.pro.tier.pro" : {
-      "comment" : "Plan name: paid tier.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Pro"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Pro"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pro"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Pro"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Pro"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Pro"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Pro"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Pro"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Pro"
-          }
-        },
-        "sr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Pro"
-          }
-        },
-        "sr-Latn" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Pro"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Pro"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Pro"
-          }
-        }
-      }
-    },
     "settings.pro.title" : {
       "comment" : "Settings section header for the paid plan.",
       "extractionState" : "manual",
@@ -107139,90 +107643,6 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Tabula Pro"
-          }
-        }
-      }
-    },
-    "settings.pro.unlocked" : {
-      "comment" : "Footer shown while every feature is available without purchase.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Během vývoje jsou odemčeny všechny funkce."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Während der Entwicklung sind alle Funktionen freigeschaltet."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "All features are unlocked during development."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Toutes les fonctionnalités sont déverrouillées pendant le développement."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "A fejlesztés ideje alatt minden funkció elérhető."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "開発中は、すべての機能が利用できます。"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Podczas tworzenia aplikacji wszystkie funkcje są odblokowane."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Toate funcțiile sunt deblocate în timpul dezvoltării."
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Počas vývoja sú odomknuté všetky funkcie."
-          }
-        },
-        "sr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Током развоја све функције су откључане."
-          }
-        },
-        "sr-Latn" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Tokom razvoja sve funkcije su otključane."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Під час розробки всі функції розблоковано."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "开发期间所有功能均已解锁。"
           }
         }
       }

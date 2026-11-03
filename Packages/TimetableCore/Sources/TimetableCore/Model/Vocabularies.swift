@@ -210,6 +210,23 @@ public struct HourCycle: OpenVocabulary {
     public var effective: HourCycle { isKnown ? self : .auto }
 }
 
+/// How the Grid view arranges a week (human decision 2026-11-01). Open; an unknown value is shown as `.daysAsRows`
+/// (`effective`).
+public struct GridLayoutStyle: OpenVocabulary {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+
+    /// Rows are days, columns are periods (the Slovak aSc layout). The default.
+    public static let daysAsRows = GridLayoutStyle(rawValue: "daysAsRows")
+    /// Rows are periods, columns are days (the classic layout up to Phase 8).
+    public static let periodsAsRows = GridLayoutStyle(rawValue: "periodsAsRows")
+
+    public static let knownValues: [GridLayoutStyle] = [.daysAsRows, .periodsAsRows]
+
+    /// The layout to draw: `self` when known, else the default `.daysAsRows`.
+    public var effective: GridLayoutStyle { isKnown ? self : .daysAsRows }
+}
+
 /// Light/dark appearance preference. Open; an unknown value follows the system like `.auto` (`effective`).
 public struct Appearance: OpenVocabulary {
     public let rawValue: String

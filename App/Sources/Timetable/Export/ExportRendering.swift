@@ -174,9 +174,9 @@ private struct ExportPageView: View {
         switch view {
         case .grid:
             let layout = TimetableCore.GridLayout.week(containing: weekStart, resolver: resolver)
-            GridWeekView(layout: layout, strip: strip, timetable: timetable,
-                         reasons: reasons(layout.columns.map(\.date)), today: .earliest, nowMinute: -1,
-                         onOpen: { _ in }, onAdd: { _ in })
+            TimetableGridView(layout: layout, strip: strip, timetable: timetable,
+                              reasons: reasons(layout.columns.map(\.date)), today: .earliest, nowMinute: -1,
+                              onOpen: { _ in }, onAdd: { _ in })
         case .week:
             TimeBlockWeekView(layout: TimeBlockLayout.week(containing: weekStart, resolver: resolver), strip: strip,
                               timetable: timetable, reasons: reasons(strip.days.map(\.date)), today: .earliest,

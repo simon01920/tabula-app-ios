@@ -163,6 +163,7 @@ that settings created independently on two devices merge field by field. It is n
 | `timeSensitivePolicy` | `{"isEnabled":Bool,"maxLeadMinutes":Int}` | | defaults `true`, `60` (decision D6) |
 | `alarmPolicy` | `{"allowsPresetRules":Bool,"isEnabled":Bool}` | | defaults `false`, `false` (decision D7: alarms only from user rules) |
 | `syncEnabled` | Bool | | default `true` |
+| `gridLayout` | `GridLayoutStyle` | opt | `daysAsRows` · `periodsAsRows` (open; absent or unknown → `daysAsRows`). Added 2026-11-02 (human-approved schema change); older builds keep it as an unknown key |
 
 Example (encoder output, pretty-printed; `meta` abbreviated):
 ```json
@@ -612,6 +613,7 @@ unknown case as follows; each is also reported by validation as `unknownValue`:
 | `Density` | `comfortable` (`Density.effective`) | info | UI; share export keeps a well-formed value (the recipient warns) |
 | `HourCycle` | `auto` — follow the locale (`HourCycle.effective`) | info | UI |
 | `Appearance` | `auto` — follow the system (`Appearance.effective`) | info | UI |
+| `GridLayoutStyle` | `daysAsRows` (`GridLayoutStyle.effective`, `AppSettings.effectiveGridLayout`) | info | UI |
 | `DeliveryTier` (rule or `ReminderOverride.tier`) | `standard` (`DeliveryTier.effective`): never escalates; the plan keeps the raw value in `requestedTier` and records `TierChangeReason.unknownTier` | info | `ReminderPlanner` |
 | `ISOWeekParityPolicy` | `strict` (`ISOWeekParityPolicy.effective`): the printed ISO week number | info | `WeekParity`; share import keeps it with an `unknownValue` warning |
 | `FollowUp` (rule or override `custom`) | no follow-up; reported as dropped `unsupportedOffset` | info | `ReminderPlanner` |
