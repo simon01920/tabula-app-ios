@@ -18,24 +18,33 @@ enum ImportFixtures {
     {"version":1,"pageWidth":2480,"pageHeight":3508,"languages":["sk"],"cells":[{"text":"1\n7.00","row":0,"column":1,"box":{"x":0.1,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"2\n7.50","row":0,"column":2,"box":{"x":0.1677,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"3\n8.40","row":0,"column":3,"box":{"x":0.2354,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"4\n9.30","row":0,"column":4,"box":{"x":0.3031,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"5\n10.20","row":0,"column":5,"box":{"x":0.3708,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"6\n11.10","row":0,"column":6,"box":{"x":0.4385,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"7\n12.00","row":0,"column":7,"box":{"x":0.5062,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"8\n12.50","row":0,"column":8,"box":{"x":0.5738,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"9\n13.50","row":0,"column":9,"box":{"x":0.6415,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"10\n14.40","row":0,"column":10,"box":{"x":0.7092,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"11\n15.30","row":0,"column":11,"box":{"x":0.7769,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"12\n16.20","row":0,"column":12,"box":{"x":0.8446,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"13\n17.10","row":0,"column":13,"box":{"x":0.9123,"y":0.05,"width":0.0677,"height":0.15},"confidence":0.97},{"text":"Po","row":1,"column":0,"box":{"x":0.02,"y":0.2,"width":0.08,"height":0.15},"confidence":0.97},{"text":"prax\naaa","row":1,"column":2,"columnSpan":6,"box":{"x":0.1677,"y":0.2,"width":0.4062,"height":0.15},"confidence":0.95},{"text":"Ut","row":2,"column":0,"box":{"x":0.02,"y":0.35,"width":0.08,"height":0.15},"confidence":0.97},{"text":"SPAJ\n3P1","row":2,"column":1,"box":{"x":0.1,"y":0.35,"width":0.0677,"height":0.15},"confidence":0.95},{"text":"SAL\n3S1","row":2,"column":3,"columnSpan":2,"box":{"x":0.2354,"y":0.35,"width":0.1354,"height":0.15},"confidence":0.95},{"text":"SPAJ\nAula","row":2,"column":5,"box":{"x":0.3708,"y":0.35,"width":0.0677,"height":0.15},"confidence":0.95},{"text":"TPVAJ1\nAula","row":2,"column":8,"columnSpan":2,"box":{"x":0.5738,"y":0.35,"width":0.1354,"height":0.15},"confidence":0.95},{"text":"TPVAJ1\n3S1","row":2,"column":10,"box":{"x":0.7092,"y":0.35,"width":0.0677,"height":0.15},"confidence":0.95},{"text":"St","row":3,"column":0,"box":{"x":0.02,"y":0.5,"width":0.08,"height":0.15},"confidence":0.97},{"text":"MPV\nlS1","row":3,"column":1,"box":{"x":0.1,"y":0.5,"width":0.0677,"height":0.15},"confidence":0.41},{"text":"ZaExk\n3P1","row":3,"column":3,"box":{"x":0.2354,"y":0.5,"width":0.0677,"height":0.15},"confidence":0.95},{"text":"Muzejna pedagogika\nH5S1","row":3,"column":8,"columnSpan":2,"box":{"x":0.5738,"y":0.5,"width":0.1354,"height":0.15},"confidence":0.55},{"text":"St","row":4,"column":0,"box":{"x":0.02,"y":0.65,"width":0.08,"height":0.15},"confidence":0.97},{"text":"Teor. a prax vyuc. hist. I\nH4PI","row":4,"column":3,"columnSpan":3,"box":{"x":0.2354,"y":0.65,"width":0.2031,"height":0.15},"confidence":0.48},{"text":"Reg. dej. vo vyuč. dej. str.\nH4P1","row":4,"column":6,"columnSpan":2,"box":{"x":0.4385,"y":0.65,"width":0.1354,"height":0.15},"confidence":0.95},{"text":"Pi","row":5,"column":0,"box":{"x":0.02,"y":0.8,"width":0.08,"height":0.15},"confidence":0.97},{"text":"MPV\nAula","row":5,"column":9,"box":{"x":0.6415,"y":0.8,"width":0.0677,"height":0.15},"confidence":0.95},{"text":"SAL\nAula","row":5,"column":12,"box":{"x":0.8446,"y":0.8,"width":0.0677,"height":0.15},"confidence":0.95}]}
     """#
 
+    /// Subjects the user already has: "MPV" and "SAL" are their initials, so the review asks (abbreviation questions).
+    static let knownSubjects = ["Metodika primárneho vzdelávania", "Seminár anglickej literatúry"]
+
     /// What Vision would report for the picture (the fixture's boxes are page-normalised, so they fit `page` too).
-    static var table: RecognizedTable {
+    static let table: RecognizedTable = {
         var table = (try? JSONDecoder().decode(RecognizedTable.self, from: Data(ascNoisyJSON.utf8))) ?? RecognizedTable()
         table.pageWidth = page.width
         table.pageHeight = page.height
         return table
-    }
+    }()
 
-    /// The picture of the table (black on white, like a printed aSc export).
+    /// The picture of the table (black on white, like a printed aSc export); rendered once.
     @MainActor static var image: UIImage {
+        if let cachedImage { return cachedImage }
         let renderer = ImageRenderer(content: FixturePage(table: table).frame(width: page.width, height: page.height))
         renderer.scale = 1
-        return renderer.uiImage ?? UIImage()
+        let image = renderer.uiImage ?? UIImage()
+        cachedImage = image
+        return image
     }
+
+    @MainActor private static var cachedImage: UIImage?
 
     /// The parsed review (the real parser on the fixture table).
     static var review: ImportReview {
-        ImportReview(candidate: TimetableImportParser.parse(table), timetableName: "Rozvrh 2024/25")
+        ImportReview(candidate: TimetableImportParser.parse(table, options: ImportParserOptions(knownSubjects: knownSubjects)),
+                     timetableName: "Rozvrh 2024/25")
     }
 
     @MainActor static func model(stage: PhotoImportModel.Stage, step: ImportStep = .reading,

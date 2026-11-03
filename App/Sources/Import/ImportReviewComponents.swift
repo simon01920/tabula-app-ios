@@ -8,36 +8,25 @@ import TimetableUI
 
 // MARK: - Counts
 
-/// "32 lessons" · "12 subjects" · "3 need checking" (or "All checked"): one localized plural string each.
-struct ImportCountsRow: View {
+/// "32 lessons" · "12 subjects" · "3 need checking" (or "All checked"): one localized plural string each, one list
+/// row each (like the share import preview), so every text size and language fits.
+struct ImportCountsRows: View {
     let counts: ImportReviewCounts
     @Environment(AppModel.self) private var model
 
     var body: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: 8) { chips }
-            VStack(alignment: .leading, spacing: 6) { chips }
-        }
-    }
-
-    @ViewBuilder private var chips: some View {
-        chip(count("import.review.count.lessons", counts.lessons), symbol: "square.grid.3x3", tint: .secondary)
-        chip(count("import.review.count.subjects", counts.subjects), symbol: "books.vertical", tint: .secondary)
+        row(count("import.review.count.lessons", counts.lessons), symbol: "square.grid.3x3", tint: Color.ink)
+        row(count("import.review.count.subjects", counts.subjects), symbol: "books.vertical", tint: Color.ink)
         if counts.needsReview > 0 {
-            chip(count("import.review.count.needsReview", counts.needsReview), symbol: AppSymbol.warning.rawValue,
-                 tint: Color.changed)
+            row(count("import.review.count.needsReview", counts.needsReview), symbol: AppSymbol.warning.rawValue,
+                tint: Color.changed)
         } else {
-            chip(model.renderer.string(forKey: "import.review.count.allChecked"), symbol: "checkmark.circle", tint: Color.ink)
+            row(model.renderer.string(forKey: "import.review.count.allChecked"), symbol: "checkmark.circle", tint: Color.ink)
         }
     }
 
-    private func chip(_ text: String, symbol: String, tint: some ShapeStyle) -> some View {
-        Label { Text(verbatim: text).foregroundStyle(.primary) } icon: { Image(systemName: symbol).foregroundStyle(tint) }
-            .font(.subheadline)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(.fill.tertiary, in: Capsule())
-            .fixedSize()
+    private func row(_ text: String, symbol: String, tint: Color) -> some View {
+        Label { Text(verbatim: text) } icon: { Image(systemName: symbol).foregroundStyle(tint) }
     }
 
     private func count(_ key: String, _ value: Int) -> String {
@@ -250,7 +239,8 @@ private struct ImportCellLabel: View {
         }
         .padding(6)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(.background, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        // Lessons carry a light ink tint so they stand out from the quiet grey free slots in light and dark.
+        .background(Color.ink.opacity(0.12), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .strokeBorder(lesson.needsReview ? AnyShapeStyle(Color.changed) : AnyShapeStyle(.separator),

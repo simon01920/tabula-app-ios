@@ -193,23 +193,25 @@ struct StartStepView: View {
             }
             // Phase 7 H1: not a third start mode (no radio circle) but an action: the import screen; importing finishes
             // onboarding and the shell switches to the tabs on its own.
-            Button { navigation.openImport(nil) } label: {
-                Label { Text("onboarding.start.import") } icon: { Image(systemName: "qrcode.viewfinder") }
-                    .font(.subheadline)
-                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-                    .contentShape(Rectangle())
+            VStack(spacing: 0) {   // the two import actions sit together, without the step spacing
+                Button { navigation.openImport(nil) } label: {
+                    Label { Text("onboarding.start.import") } icon: { Image(systemName: "qrcode.viewfinder") }
+                        .font(.subheadline)
+                        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                        .contentShape(Rectangle())
+                }
+                .padding(.horizontal, 4)
+                .accessibilityHint(Text("onboarding.start.import.detail"))
+                // Phase 9 I2: the photo / PDF import, also an action; approving it finishes onboarding like the share import.
+                Button { importingPhoto = true } label: {
+                    Label { Text("onboarding.start.importPhoto") } icon: { Image(systemName: "doc.viewfinder") }
+                        .font(.subheadline)
+                        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                        .contentShape(Rectangle())
+                }
+                .padding(.horizontal, 4)
+                .accessibilityHint(Text("onboarding.start.importPhoto.detail"))
             }
-            .padding(.horizontal, 4)
-            .accessibilityHint(Text("onboarding.start.import.detail"))
-            // Phase 9 I2: the photo / PDF import, also an action; approving it finishes onboarding like the share import.
-            Button { importingPhoto = true } label: {
-                Label { Text("onboarding.start.importPhoto") } icon: { Image(systemName: "doc.viewfinder") }
-                    .font(.subheadline)
-                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-                    .contentShape(Rectangle())
-            }
-            .padding(.horizontal, 4)
-            .accessibilityHint(Text("onboarding.start.importPhoto.detail"))
         }
         .sheet(isPresented: $importingPhoto) { PhotoImportView(profile: flow.draft.profile) }
     }

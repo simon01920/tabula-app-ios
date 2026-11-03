@@ -179,12 +179,14 @@ private struct ImportReviewList: View {
         List {
             Section {
                 TextField(text: Binding(get: { flow.review?.timetableName ?? "" },
-                                        set: { flow.review?.timetableName = $0 })) {
+                                        // wraps at large text sizes; a name stays one line
+                                        set: { flow.review?.timetableName = $0.replacingOccurrences(of: "\n", with: "") }),
+                          axis: .vertical) {
                     Text("import.review.name")
                 }
                 .font(.title3.weight(.semibold))
                 .submitLabel(.done)
-                ImportCountsRow(counts: review.counts)
+                ImportCountsRows(counts: review.counts)
             } footer: {
                 if flow.usedAppleIntelligence {
                     Label { Text("import.capture.ai") } icon: { Image(systemName: "sparkles") }

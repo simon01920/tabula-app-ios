@@ -59,6 +59,7 @@ struct SettingsImportView: View {
                 }
                 Button {} label: {
                     Label { Text("settings.import.model.download") } icon: { Image(systemName: "arrow.down.circle") }
+                        .foregroundStyle(.secondary)   // visibly unavailable, not just inert
                 }
                 .disabled(true)
                 .accessibilityHint(Text("settings.import.model.status.later"))
