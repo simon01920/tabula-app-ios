@@ -8,19 +8,36 @@ enum ImportBellInference {
         var end: LocalTime?
     }
 
-    private static var timePattern: Regex<(Substring, Substring, Substring)> { /(\d{1,2})[:.h](\d{2})(?!\d)/ } // Regex is not Sendable; "8h00" is French
+    // Regex is not Sendable, hence computed. "8h00" is French; "1:00 p.m." / "1:00PM" is 12-hour.
+    private static var timePattern: Regex<(Substring, Substring, Substring, Substring?)> {
+        /(\d{1,2})[:.h](\d{2})(?!\d)(?:\s?([AaPp])\.?\s?[Mm]\b\.?)?/
+    }
     /// Words that may accompany a period number; a cell of only these, numbers and times is a header, not a lesson.
     private static let periodWords: Set<String> = Set([
         "hod", "hodina", "h", "period", "lesson", "hour", "std", "stunde", "lekcja", "lekce", "lekc", "ora", "heure",
         "cours", "ura", "урок", "час", "пара", "节", "節", "限", "時限", "时", "第", "óra", "tiet",
     ].map(ImportText.fold))
 
-    /// The times in `text`, in order (hour 0…23, minute 0…59).
-    static func times(in text: String) -> [LocalTime] {
+    /// The times in `text`, in order, with their a.m./p.m. marker ("a", "p") when printed.
+    private static func clockTimes(in text: String) -> [(hour: Int, minute: Int, meridiem: String?)] {
         text.matches(of: timePattern).compactMap { match in
             guard let hour = Int(match.output.1), let minute = Int(match.output.2) else { return nil }
-            return LocalTime(hour: hour, minute: minute)
+            return (hour, minute, match.output.3.map { $0.lowercased() })
         }
+    }
+
+    /// A 12-hour reading in 24 hours: 1 p.m. → 13, 12 a.m. → 0; without a marker the hour is taken as printed.
+    private static func time(_ hour: Int, _ minute: Int, _ meridiem: String?) -> LocalTime? {
+        guard meridiem == nil || (1...12).contains(hour) else { return nil }
+        var hour = hour
+        if meridiem == "p", hour < 12 { hour += 12 }
+        if meridiem == "a", hour == 12 { hour = 0 }
+        return LocalTime(hour: hour, minute: minute)
+    }
+
+    /// The times in `text`, in order (24-hour).
+    static func times(in text: String) -> [LocalTime] {
+        clockTimes(in: text).compactMap { time($0.hour, $0.minute, $0.meridiem) }
     }
 
     /// `text` with its times removed.
@@ -28,13 +45,28 @@ enum ImportBellInference {
 
     /// Number, start and end printed in a header cell.
     static func header(_ text: String) -> Header {
-        let found = times(in: text)
+        let clocks = clockTimes(in: text)
         let rest = withoutTimes(text)
         let number = rest.split(whereSeparator: { !($0.isASCII && $0.isNumber) }).lazy.compactMap { Int($0) }
             .first { (0...20).contains($0) }
-        var header = Header(number: number, start: found.first, end: nil)
-        if found.count >= 2, found[0] < found[1] { header.end = found[1] }
-        return header
+        guard let first = clocks.first else { return Header(number: number) }
+        var start = time(first.hour, first.minute, first.meridiem)
+        var end: LocalTime?
+        if clocks.count >= 2 {
+            let second = clocks[1]
+            end = time(second.hour, second.minute, second.meridiem)
+            // "1:00–1:50 p.m.": the end's marker also applies to the start when that keeps start < end.
+            if first.meridiem == nil, let marked = time(first.hour, first.minute, second.meridiem), let end, marked < end {
+                start = marked
+            }
+            // "11:30–12:20" is fine; "12:30–1:15" means 1:15 p.m.
+            if let start, let value = end, value <= start, value.minuteOfDay < 720, let later = value.adding(minutes: 720),
+               start < later {
+                end = later
+            }
+            if let start, let value = end, value <= start { end = nil }
+        }
+        return Header(number: number, start: start, end: end)
     }
 
     /// `true` when `text` holds only period numbers, times and period words (a header, never a lesson).
@@ -59,21 +91,21 @@ enum ImportBellInference {
     static func periods(numbers: [Int], headers: [Header]) -> (periods: [ImportPeriod], notices: [ImportNotice]) {
         var starts = headers.map(\.start)
         var ends = headers.map(\.end)
-        // Drop starts that break the order (misread digits); they are interpolated below.
+        // A start just after noon printed in 12 hours ("12:00" then "1:00") moves on by 12 h; any other start
+        // before the previous one is a misread, dropped and interpolated below.
         var last: LocalTime?
         for index in starts.indices {
-            guard let start = starts[index] else { continue }
-            if let last, start <= last { starts[index] = nil; ends[index] = nil } else { last = start }
+            guard var start = starts[index] else { continue }
+            if let previous = last, start <= previous, previous.minuteOfDay >= 660, start.minuteOfDay < 720,
+               let later = start.adding(minutes: 720), previous < later, previous.minutes(to: later) <= 180 {
+                start = later
+                starts[index] = later
+                if let end = ends[index], end.minuteOfDay < 720 { ends[index] = end.adding(minutes: 720) }
+            }
+            if let previous = last, start <= previous { starts[index] = nil; ends[index] = nil } else { last = start }
         }
         let known = starts.indices.filter { starts[$0] != nil }
-        guard !known.isEmpty else {
-            let periods = numbers.indices.map { index in
-                let start = LocalTime(minuteOfDay: min(8 * 60 + index * 55, 1380))!
-                return ImportPeriod(number: numbers[index], start: start, end: start.adding(minutes: 45) ?? start,
-                                    timeSource: .assumed)
-            }
-            return (periods, [.timesAssumed])
-        }
+        guard !known.isEmpty else { return (assumed(numbers), [.timesAssumed]) }
         var gaps: [Int] = []
         for (a, b) in zip(known, known.dropFirst()) { gaps.append(starts[a]!.minutes(to: starts[b]!) / (b - a)) }
         let printedLengths = starts.indices.compactMap { index in ends[index].map { starts[index]!.minutes(to: $0) } }
@@ -107,9 +139,32 @@ enum ImportBellInference {
             if end <= start { end = start.adding(minutes: 1) ?? start } // keeps one period per column
             periods.append(ImportPeriod(number: numbers[index], start: start, end: end, timeSource: source[index]))
         }
+        // Interpolated starts can run into a printed one or past midnight: push them back to back, and when the day
+        // is too short for that, fall back to the assumed schedule (never duplicate or overlapping periods).
+        var previousEnd = -1
+        for index in periods.indices {
+            var start = periods[index].start.minuteOfDay, end = periods[index].end.minuteOfDay
+            if start < previousEnd { start = previousEnd; periods[index].timeSource = .assumed }
+            if end <= start { end = start + 1 }
+            guard end < LocalTime.minutesPerDay else { return (assumed(numbers), [.timesAssumed]) }
+            periods[index].start = LocalTime(minuteOfDay: start)!
+            periods[index].end = LocalTime(minuteOfDay: end)!
+            previousEnd = end
+        }
         if periods.contains(where: { $0.timeSource == .inferredEnd }) { notices.append(.endTimesInferred) }
         if periods.contains(where: { $0.timeSource == .assumed }) { notices.append(.timesAssumed) }
         return (periods, notices)
+    }
+
+    /// No usable times: 08:00, 45-minute lessons with 10-minute breaks, squeezed so that up to
+    /// `ShareLimits.maxPeriodsPerSchedule` periods still end before midnight.
+    static func assumed(_ numbers: [Int]) -> [ImportPeriod] {
+        let step = max(2, min(55, (LocalTime.minutesPerDay - 1 - 8 * 60) / max(1, numbers.count)))
+        let length = max(1, min(45, step - 10))
+        return numbers.indices.compactMap { index in
+            guard let start = LocalTime(minuteOfDay: 8 * 60 + index * step), let end = start.adding(minutes: length) else { return nil }
+            return ImportPeriod(number: numbers[index], start: start, end: end, timeSource: .assumed)
+        }
     }
 
     private static func mostCommon(_ values: [Int]) -> Int? {

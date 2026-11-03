@@ -15,8 +15,10 @@ public enum TimetableImportParser {
     public static func parse(_ table: RecognizedTable, options: ImportParserOptions = .init()) -> ImportCandidate {
         let cells = table.gridCells.filter { !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
         guard !cells.isEmpty else { return ImportCandidate(notices: [.emptyInput], languages: table.languages) }
-        let (column, columnHits) = bestAxis(cells.map { ($0.column, $0) })
-        let (row, rowHits) = bestAxis(cells.map { ($0.row, $0) })
+        // Day labels lead their row (days as rows) or column (days as columns): only the first non-header cell of
+        // each row or column counts, so one-letter lessons ("K", "P") never outvote the label column.
+        let (column, columnHits) = bestAxis(leading(cells, along: \.row, at: \.column))
+        let (row, rowHits) = bestAxis(leading(cells, along: \.column, at: \.row))
         guard max(columnHits, rowHits) > 0 else { return ImportCandidate(notices: [.noDaysFound], languages: table.languages) }
         let asRows = columnHits >= rowHits
         let grid = asRows ? cells : cells.map(transposed)
@@ -29,6 +31,17 @@ public enum TimetableImportParser {
             }
         }
         return candidate
+    }
+
+    /// The first non-header cell of each row (`along: \.row`) or column, keyed by its index on the other axis.
+    private static func leading(_ cells: [RecognizedCell], along line: KeyPath<RecognizedCell, Int>,
+                                at index: KeyPath<RecognizedCell, Int>) -> [(Int, RecognizedCell)] {
+        var first: [Int: RecognizedCell] = [:]
+        for cell in cells where !ImportBellInference.isHeaderLike(cell.text) {
+            if let current = first[cell[keyPath: line]], current[keyPath: index] <= cell[keyPath: index] { continue }
+            first[cell[keyPath: line]] = cell
+        }
+        return first.values.map { ($0[keyPath: index], $0) }
     }
 
     /// The axis index with the most day labels, and the count.
@@ -91,7 +104,9 @@ public enum TimetableImportParser {
         // (empty columns in between are periods nobody has, e.g. period 5 when the header row is missing).
         let headerCells = cells.filter { $0.row < firstDayRow && $0.column > dayColumn && ImportBellInference.isHeaderLike($0.text) }
         let lastColumn = (headerCells + content).map { $0.column + max(1, $0.columnSpan) - 1 }.max() ?? dayColumn
-        let periodColumns = lastColumn > dayColumn ? Array((dayColumn + 1)...lastColumn) : []
+        // At most the share format's periods per schedule; cells further right are not imported.
+        let periodColumns = lastColumn > dayColumn
+            ? Array(((dayColumn + 1)...lastColumn).prefix(ShareLimits.maxPeriodsPerSchedule)) : []
         let headers = periodColumns.map { column in
             ImportBellInference.header(headerCells.filter { $0.column <= column && column < $0.column + max(1, $0.columnSpan) }
                 .sorted { $0.row < $1.row }.map(\.text).joined(separator: "\n"))
@@ -114,28 +129,29 @@ public enum TimetableImportParser {
         // Lessons.
         var lessons: [ImportLesson] = []
         let blocks = (groups.map(\.block).max() ?? 0) + 1
-        for group in groups {
-            let groupCells = content.filter { group.rows.contains($0.row) && !ImportBellInference.isHeaderLike($0.text) }
-                .sorted { ($0.row, $0.column) < ($1.row, $1.column) }
-            for cell in groupCells {
-                let columns = periodColumns.filter { cell.column <= $0 && $0 < cell.column + max(1, cell.columnSpan) }
-                guard let first = columns.first, let number = numberOfColumn[first] else { continue }
-                for part in ImportCellSplitter.split(cell.text, options: options, languages: languages) {
-                    var reasons = part.reasons
-                    if cell.confidence < ImportScoring.lowOCR { reasons.insert(.ocrLow) }
-                    if group.unknown { reasons.insert(.unknownDay) }
-                    if columns.contains(where: unnumbered.contains) { reasons.insert(.unknownPeriod) }
-                    if columns.contains(where: { column in periods.first { $0.number == numberOfColumn[column] }?.timeSource == .assumed }) {
-                        reasons.insert(.timeInferred)
-                    }
-                    let weeks = part.weeks ?? (blocks > 1 ? [group.block + 1] : nil)
-                    lessons.append(ImportLesson(
-                        id: lessons.count, day: group.day, period: number, span: columns.count, cycleWeeks: weeks,
-                        subject: part.subject, room: part.room, teacher: part.teacher, lessonType: part.lessonType,
-                        notes: part.notes.isEmpty ? nil : part.notes.joined(separator: "\n"), sourceText: cell.text,
-                        source: ImportCellRef(row: cell.row, column: cell.column), ocrConfidence: cell.confidence,
-                        reasons: reasons, alternatives: part.alternatives))
+        // Group rows ascend in group order, so one pass in (row, column) order visits the groups in order.
+        var groupOfRow: [Int: Int] = [:]
+        for (index, group) in groups.enumerated() { for row in group.rows { groupOfRow[row] = index } }
+        for cell in content.sorted(by: { ($0.row, $0.column) < ($1.row, $1.column) }) {
+            guard let groupIndex = groupOfRow[cell.row], !ImportBellInference.isHeaderLike(cell.text) else { continue }
+            let group = groups[groupIndex]
+            let columns = periodColumns.filter { cell.column <= $0 && $0 < cell.column + max(1, cell.columnSpan) }
+            guard let first = columns.first, let number = numberOfColumn[first] else { continue }
+            for part in ImportCellSplitter.split(cell.text, options: options, languages: languages) {
+                var reasons = part.reasons
+                if cell.confidence < ImportScoring.lowOCR { reasons.insert(.ocrLow) }
+                if group.unknown { reasons.insert(.unknownDay) }
+                if columns.contains(where: unnumbered.contains) { reasons.insert(.unknownPeriod) }
+                if columns.contains(where: { column in periods.first { $0.number == numberOfColumn[column] }?.timeSource == .assumed }) {
+                    reasons.insert(.timeInferred)
                 }
+                let weeks = part.weeks ?? (blocks > 1 ? [group.block + 1] : nil)
+                lessons.append(ImportLesson(
+                    id: lessons.count, day: group.day, period: number, span: columns.count, cycleWeeks: weeks,
+                    subject: part.subject, room: part.room, teacher: part.teacher, lessonType: part.lessonType,
+                    notes: part.notes.isEmpty ? nil : part.notes.joined(separator: "\n"), sourceText: cell.text,
+                    source: ImportCellRef(row: cell.row, column: cell.column), ocrConfidence: cell.confidence,
+                    reasons: reasons, alternatives: part.alternatives))
             }
         }
         markConflicts(&lessons)
@@ -159,14 +175,15 @@ public enum TimetableImportParser {
                                notices: allNotices, languages: languages)
     }
 
-    /// Marks lessons that overlap another lesson on the same day and week with `.timeConflict`.
+    /// Marks lessons that overlap another lesson on the same day and week with `.timeConflict`. Sweep over lessons
+    /// sorted by (day, period): each one is compared only with those starting before it ends.
     private static func markConflicts(_ lessons: inout [ImportLesson]) {
-        for a in lessons.indices {
-            for b in lessons.indices where b > a && lessons[a].day == lessons[b].day {
+        let order = lessons.indices.sorted { (lessons[$0].day, lessons[$0].period, $0) < (lessons[$1].day, lessons[$1].period, $1) }
+        for (position, a) in order.enumerated() {
+            for b in order[(position + 1)...] {
                 let x = lessons[a], y = lessons[b]
-                let sameWeek = x.cycleWeeks == nil || y.cycleWeeks == nil || !x.cycleWeeks!.isDisjoint(with: y.cycleWeeks!)
-                let overlap = x.period < y.period + y.span && y.period < x.period + x.span
-                if sameWeek, overlap {
+                guard y.day == x.day, y.period < x.period + x.span else { break }
+                if x.cycleWeeks == nil || y.cycleWeeks == nil || !x.cycleWeeks!.isDisjoint(with: y.cycleWeeks!) {
                     lessons[a].reasons.insert(.timeConflict)
                     lessons[b].reasons.insert(.timeConflict)
                 }

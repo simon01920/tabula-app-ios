@@ -4,9 +4,10 @@ import Foundation
 ///
 /// Rules (so a model can never invent data):
 /// - Suggestions for IDs that are not low-confidence cells of the candidate are ignored; no lesson is ever added.
-/// - A suggested `.value` is **applied** only when it is a verbatim part of the cell's OCR text (case, diacritics and
-///   O/0, l/1 look-alikes ignored) — or a known `LessonType` for `lessonType`. Anything else (an expansion such as
-///   "Bio" → "Biology") is only offered as an alternative, which the review screen turns into a question.
+/// - A suggested `.value` of at least 2 characters is **applied** only when it is part of the cell's OCR text (case,
+///   diacritics and O/0, l/1 look-alikes ignored), and what is stored is the cell's own spelling of that part — or a
+///   known `LessonType` for `lessonType`. Anything else (an expansion such as "Bio" → "Biology", a single character)
+///   is only offered as an alternative, which the review screen turns into a question.
 /// - `.unknown(alternatives)` adds the alternatives as a question and keeps the deterministic value.
 /// - Confidence is recomputed from the remaining reasons (`.normaliser` replaces resolved split/OCR reasons).
 public enum ImportReconciliation {
@@ -56,12 +57,16 @@ public enum ImportReconciliation {
         let current = lesson[field]
         switch value {
         case .value(let raw):
-            let text = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+            let suggested = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+            // The model agrees with the current value (maybe in another spelling): keep it as it is.
+            if let current, ImportText.lookAlikeFold(current) == ImportText.lookAlikeFold(suggested) { return false }
+            // Applied text is the cell's own spelling of the matched span, never the model's.
+            let applied = field == .lessonType
+                ? (LessonType.knownValues.map(\.rawValue).contains(suggested) ? suggested : nil)
+                : ImportText.verbatimSpan(of: suggested, in: lesson.sourceText)?.trimmingCharacters(in: .whitespacesAndNewlines)
+            let text = applied ?? suggested
             guard !text.isEmpty, text != current else { return false }
-            let verbatim = field == .lessonType
-                ? LessonType.knownValues.map(\.rawValue).contains(text)
-                : ImportText.lookAlikeFold(lesson.sourceText).contains(ImportText.lookAlikeFold(text))
-            if verbatim {
+            if applied != nil {
                 lesson[field] = text
                 lesson.alternatives.removeAll { $0.field == field }
                 if field == .subject || field == .room || field == .teacher {

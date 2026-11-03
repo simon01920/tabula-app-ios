@@ -26,7 +26,6 @@ enum ImportCellSplitter {
     // MARK: Week markers
 
     private static var prefixMarker: Regex<(Substring, Substring, Substring)> { /^\s*[\(\[]?\s*([ABab])\s*[\)\]:]\s*(.*)$/ } // Regex is not Sendable
-    private static var suffixMarker: Regex<(Substring, Substring, Substring)> { /^(.*?)\s*[\(\[]([ABab])[\)\]]\s*$/ } // Regex is not Sendable
 
     private static func weekGroups(_ text: String) -> [(Set<Int>?, [String])] {
         var lines: [String] = []
@@ -63,8 +62,11 @@ enum ImportCellSplitter {
         if let match = line.wholeMatch(of: prefixMarker) {
             return (match.output.1.uppercased() == "A" ? 1 : 2, String(match.output.2).trimmingCharacters(in: .whitespaces))
         }
-        if let match = line.wholeMatch(of: suffixMarker) {
-            return (match.output.2.uppercased() == "A" ? 1 : 2, String(match.output.1).trimmingCharacters(in: .whitespaces))
+        // "MAT 204 (A)": checked by hand, a lazy-prefix regex is quadratic on long text.
+        let chars = Array(line.trimmingCharacters(in: .whitespaces).suffix(3))
+        if chars.count == 3, "([".contains(chars[0]), ")]".contains(chars[2]), "ABab".contains(chars[1]) {
+            let rest = line.trimmingCharacters(in: .whitespaces).dropLast(3)
+            return (chars[1].uppercased() == "A" ? 1 : 2, rest.trimmingCharacters(in: .whitespaces))
         }
         return nil
     }
