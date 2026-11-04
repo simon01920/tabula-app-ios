@@ -12,8 +12,9 @@ public enum DemoData {
     /// The scenario's database moved to the week of `today`, with onboarding finished at `now` and its first timetable
     /// active. `nil` for kinds without a database (`.empty`).
     public static func database(_ kind: SeedKind, today: LocalDate, now: Date) -> TabulaDatabase? {
-        guard var database = SampleScenarios.make(kind).database else { return nil }
-        database = shifted(database, days: 7 * weeks(from: SampleScenarios.today, to: today))
+        let scenario = SampleScenarios.make(kind)
+        guard var database = scenario.database else { return nil }
+        database = shifted(database, days: 7 * weeks(from: scenario.today, to: today), timeZone: scenario.timeZone)
         database.settings.onboardingCompletedAt = now
         database.settings.activeTimetableID = ActiveTimetable.resolve(database)?.id
         return database
@@ -25,10 +26,10 @@ public enum DemoData {
     }
 
     /// Every stored date of `database` moved by `days` (wall-clock dates; instants keep their local time).
-    static func shifted(_ database: TabulaDatabase, days: Int) -> TabulaDatabase {
+    static func shifted(_ database: TabulaDatabase, days: Int, timeZone: TimeZone = SampleScenarios.timeZone) -> TabulaDatabase {
         guard days != 0 else { return database }
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = SampleScenarios.timeZone
+        calendar.timeZone = timeZone
         func date(_ value: LocalDate) -> LocalDate { value.adding(days: days) }
         func range(_ value: LocalDateRange) -> LocalDateRange {
             LocalDateRange(start: date(value.start), end: date(value.end))

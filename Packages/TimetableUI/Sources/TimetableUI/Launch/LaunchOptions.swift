@@ -2,7 +2,7 @@
 // Pure Swift + Foundation (no SwiftUI): builds and is unit-tested on Linux (Tests/TimetableUITests).
 //
 //   -TabulaScreen <route id>                      first screen (route registry, App/Sources/Routing)
-//   -TabulaSeed empty|blank|elementary|secondary|university
+//   -TabulaSeed empty|blank|elementary|secondary|university|preview
 //                                                 in-memory repository with deterministic sample data
 //   -TabulaNow <ISO-8601 instant> | live          fixed clock ("live" = real clock); only together with -TabulaSeed
 //   -TabulaTimeZone <IANA id>                     device time zone override, only with -TabulaSeed (default: the
@@ -27,6 +27,8 @@ public enum SeedKind: String, CaseIterable, Sendable, Equatable {
     case secondary
     /// University (free-form times, lectures/seminars/labs, buildings).
     case university
+    /// English App Store preview data: UK class 11B, one plain week, Europe/London, Tue 2026-11-10 10:20.
+    case preview
 }
 
 /// How the app gets the current instant.
