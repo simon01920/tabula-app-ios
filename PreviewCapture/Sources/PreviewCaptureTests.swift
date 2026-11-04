@@ -20,9 +20,15 @@ final class PreviewCaptureTests: XCTestCase {
         hold(3.5)
     }
 
-    func test_S2_photo_import() {
-        // Blank store on the preview clock + zone, so the imported week is the same Tue 10 Nov week as the other shots.
-        let app = launch(seed: "blank", extra: ["-TabulaNow", "2026-11-10T10:20:00Z", "-TabulaTimeZone", "Europe/London"])
+    /// The workflow adds video/assets/import-source.png (phone-style photo) to Photos before this test.
+    func test_S2_photo_import() { photoImport() }
+
+    /// Same as S2; the workflow adds video/assets/import-source-flat.png instead (does Vision read the flat sheet?).
+    func test_S2b_photo_import_flat() { photoImport() }
+
+    private func photoImport() {
+        // previewBlank: English empty start (Class 11B, same bells, London, Tue 10 Nov 10:20).
+        let app = launch(seed: "previewBlank")
         wait(app.tabBars.buttons["Today"], app)
         hold(1.5)
         tab("Timetable", app)
@@ -49,7 +55,7 @@ final class PreviewCaptureTests: XCTestCase {
         hold(2)
         tap(app.buttons["Add as New Timetable"], app)
         wait(app.tabBars.buttons["Timetable"], app)
-        hold(4)
+        hold(3)
     }
 
     func test_S3_lesson_homework() {

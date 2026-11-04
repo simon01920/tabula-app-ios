@@ -19,7 +19,7 @@ on:
   workflow_dispatch:
     inputs:
       shots:
-        description: "Space-separated shots (test_<shot> methods): S1_today_to_week S2_photo_import S3_lesson_homework S4_exam S5_reminders S6_widgets_live S7_watch S8a_day S8b_tiles"
+        description: "Space-separated shots (test_<shot> methods): S1_today_to_week S2_photo_import S2b_photo_import_flat S3_lesson_homework S4_exam S5_reminders S6_widgets_live S7_watch S8a_day S8b_tiles"
         type: string
         default: ""
       seed:
@@ -42,10 +42,10 @@ env:
   XCODE_APP: /Applications/Xcode_27.app
   XCODEGEN_VERSION: "2.46.0"
   XCODEGEN_SHA256: 4d9e34b62172d645eed6457cac13fc222569974098ef4ee9c3368bedf0196806
-  # All shots: S1_today_to_week S8a_day S8b_tiles S3_lesson_homework S4_exam S5_reminders S2_photo_import S6_widgets_live S7_watch
-  # (~5 min each incl. erase/boot/install: all nine + the build exceed 60 min, run 41748424916). Push default = the
-  # shots still being worked on; the rest are in run 41748424916.
-  SHOTS: ${{ inputs.shots || 'S7_watch S2_photo_import S3_lesson_homework S6_widgets_live' }}
+  # All shots: S1_today_to_week S8a_day S8b_tiles S3_lesson_homework S4_exam S5_reminders S2_photo_import
+  # S2b_photo_import_flat S6_widgets_live S7_watch (~5 min each incl. erase/boot/install: all + the build exceed 60 min,
+  # run 41748424916). Push default = the shots still being worked on; S1/S4/S5/S8 are in run 41748424916.
+  SHOTS: ${{ inputs.shots || 'S2_photo_import S2b_photo_import_flat S3_lesson_homework S6_widgets_live' }}
   SEED: ${{ inputs.seed || 'preview' }}
   IMPORT_IMAGE: ${{ inputs.import_image || 'import-source.png' }}
   OUT: video-out
@@ -193,7 +193,7 @@ jobs:
             dir="$OUT/$shot"; mkdir -p "$dir"
             launch="-TabulaSeed $SEED -AppleLanguages (en) -AppleLocale en_GB"
             case "$shot" in
-              S2_*) launch="-TabulaSeed blank -AppleLanguages (en) -AppleLocale en_GB -TabulaNow 2026-11-10T10:20:00Z -TabulaTimeZone Europe/London" ;;
+              S2_*|S2b_*) launch="-TabulaSeed previewBlank -AppleLanguages (en) -AppleLocale en_GB" ;;
               S6_*|S7_*) launch="(real store, no seed) -AppleLanguages (en) -AppleLocale en_GB" ;;
               S8a_*) launch="$launch -TabulaScreen timetable.day" ;;
               S8b_*) launch="$launch -TabulaScreen timetable.tiles" ;;
@@ -208,6 +208,7 @@ jobs:
             fi
             prep "$phone"; look "$phone"
             [[ "$shot" == S2_* ]] && xcrun simctl addmedia "$phone" "video/assets/$IMPORT_IMAGE"
+            [[ "$shot" == S2b_* ]] && xcrun simctl addmedia "$phone" "video/assets/import-source-flat.png"
             if [ -n "$WUDID" ]; then
               xcrun simctl install "$WUDID" "$APP/Watch/TabulaWatch.app"
               WBUNDLE="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Watch/TabulaWatch.app/Info.plist")"
