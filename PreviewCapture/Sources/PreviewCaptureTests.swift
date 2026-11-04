@@ -53,8 +53,10 @@ final class PreviewCaptureTests: XCTestCase {
         hold(3)
         tap(app.buttons["Approve"], app)
         hold(2)
-        tap(app.buttons["Add as New Timetable"], app)
-        wait(app.tabBars.buttons["Timetable"], app)
+        let addNew = app.buttons["Add as New Timetable"]
+        tap(addNew, app)
+        // The tab bar exists under the sheet, so wait for the sheet to go: the week was on screen only ~1 s (run 41761857082).
+        _ = addNew.waitForNonExistence(timeout: 10)
         hold(3)
     }
 
