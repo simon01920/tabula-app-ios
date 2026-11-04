@@ -9,8 +9,13 @@ struct SampleScenarioTests {
     func deterministicAndValid(kind: SeedKind) throws {
         let first = SampleScenarios.make(kind)
         let second = SampleScenarios.make(kind)
-        #expect(first.referenceNow == Date(timeIntervalSince1970: 1_791_879_600))   // Tue 2026-10-13 10:20 CEST
-        #expect(first.timeZone.identifier == "Europe/Bratislava")
+        if kind == .preview {
+            #expect(first.referenceNow == Date(timeIntervalSince1970: 1_794_306_000))   // Tue 2026-11-10 10:20 GMT
+            #expect(first.timeZone.identifier == "Europe/London")
+        } else {
+            #expect(first.referenceNow == Date(timeIntervalSince1970: 1_791_879_600))   // Tue 2026-10-13 10:20 CEST
+            #expect(first.timeZone.identifier == "Europe/Bratislava")
+        }
         guard let database = first.database else {
             #expect(kind == .empty)
             return
@@ -60,6 +65,23 @@ struct SampleScenarioTests {
         let nowNext = resolver.nowAndNext(at: SampleScenarios.referenceNow)
         #expect(nowNext.current?.subject.shortName == "DBS")   // Tue 09:00–10:30 lecture
         #expect(nowNext.next?.subject.shortName == "PS")
+    }
+
+    @Test func previewReferenceMomentIsMathsThenBiology() throws {
+        let scenario = SampleScenarios.make(.preview)
+        let database = try #require(scenario.database)
+        let context = CalendarContext(timeZone: scenario.timeZone, firstWeekday: .monday)
+        let resolver = try #require(ScheduleResolver(database: database, timetableID: database.timetables[0].id,
+                                                     context: context))
+        let nowNext = resolver.nowAndNext(at: scenario.referenceNow)
+        #expect(nowNext.current?.subject.name == "Mathematics")
+        #expect(nowNext.next?.subject.name == "Biology")
+        let maths = try #require(database.subjects.first { $0.name == "Mathematics" })
+        let task = try #require(database.tasks.first { $0.title == "Finish algebra exercises" })
+        #expect(task.subjectID == maths.id && task.subtasks.count == 2)
+        let quiz = try #require(database.exams.first { $0.title == "Biology quiz" })
+        #expect(scenario.today.days(to: quiz.date) == 3)
+        #expect(quiz.reminderOverride != nil)
     }
 
     @Test func blankHasATimetableButNoSubjects() {
