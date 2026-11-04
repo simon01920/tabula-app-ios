@@ -37,7 +37,8 @@ final class PreviewCaptureTests: XCTestCase {
         // app's own "photo.on.rectangle" icon matched). shortcut: a real tap at the first grid cell (newest first = the
         // `simctl addmedia` photo, below the "Private Access to Photos" card of a fresh simulator, 440x956 pt);
         // upgrade if the picker layout changes.
-        print("PICKER TREE:\n\(app.debugDescription)")
+        // The picker shows "Loading…" for ~5–10 s on a fresh simulator (run 41756161098): tap once the grid is up.
+        hold(12)
         app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: 72, dy: 388)).tap()
         let add = app.buttons["Add"]
         if add.waitForExistence(timeout: 2) { add.tap() }
@@ -82,7 +83,7 @@ final class PreviewCaptureTests: XCTestCase {
             ?? app.textViews["Task title"]
         tap(field, app)
         for character in "Practice worksheet" {
-            field.typeText(String(character))
+            app.typeText(String(character))   // the field's query stops matching once it has text (run 41756161098)
             hold(0.08)
         }
         hold(1.5)
@@ -153,7 +154,8 @@ final class PreviewCaptureTests: XCTestCase {
         hold(1.5)
         tap(springboard.cells["Tabula"], springboard)   // not `label == 'Tabula'`: that is the Home Screen icon behind
         hold(2)
-        tap(springboard.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Add Widget'")).firstMatch, springboard)
+        // Label is " Add Widget" (leading glyph space, run 41756161098).
+        tap(springboard.buttons.matching(NSPredicate(format: "label CONTAINS 'Add Widget'")).firstMatch, springboard)
         hold(1.5)
         tap(springboard.buttons["Done"], springboard)
         hold(5)
