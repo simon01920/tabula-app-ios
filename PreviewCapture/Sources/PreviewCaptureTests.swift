@@ -21,7 +21,8 @@ final class PreviewCaptureTests: XCTestCase {
     }
 
     func test_S2_photo_import() {
-        let app = launch(seed: "blank")
+        // Blank store on the preview clock + zone, so the imported week is the same Tue 10 Nov week as the other shots.
+        let app = launch(seed: "blank", extra: ["-TabulaNow", "2026-11-10T10:20:00Z", "-TabulaTimeZone", "Europe/London"])
         wait(app.tabBars.buttons["Today"], app)
         hold(1.5)
         tab("Timetable", app)
@@ -32,14 +33,12 @@ final class PreviewCaptureTests: XCTestCase {
         hold(2)
         tap(app.buttons["Choose Photo"], app)
         hold(2.5)
-        // PHPicker runs out of process, but its grid is reachable through the app's hierarchy (labels "Photo, <date>").
-        let photos = app.images.matching(NSPredicate(format: "label BEGINSWITH 'Photo'"))
-        wait(photos.firstMatch, app, timeout: 20)
-        let all = photos.allElementsBoundByIndex
-        print("PICKER PHOTOS: \(all.map(\.label))")
-        let year = String(Calendar(identifier: .gregorian).component(.year, from: Date()))
-        let pick = all.last { $0.label.contains(year) } ?? all.last!   // `simctl addmedia` = newest, dated today
-        pick.tap()
+        // The PHPicker grid runs out of process and is not in the app's accessibility tree (run 41748424916: only the
+        // app's own "photo.on.rectangle" icon matched). shortcut: a real tap at the first grid cell (newest first = the
+        // `simctl addmedia` photo, below the "Private Access to Photos" card of a fresh simulator, 440x956 pt);
+        // upgrade if the picker layout changes.
+        print("PICKER TREE:\n\(app.debugDescription)")
+        app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: 72, dy: 388)).tap()
         let add = app.buttons["Add"]
         if add.waitForExistence(timeout: 2) { add.tap() }
         // Processing → review ("Check Timetable"). Vision on the simulator can take a while.
@@ -72,7 +71,10 @@ final class PreviewCaptureTests: XCTestCase {
         } else {
             print("S3: no open subtask on the task; skipping the tick")
         }
-        tap(app.buttons["Close"], app)
+        // Lesson detail and task detail are both sheets with a Close button: the top one is the last in the tree.
+        let closes = app.buttons.matching(identifier: "Close")
+        wait(closes.firstMatch, app)
+        closes.element(boundBy: closes.count - 1).tap()
         hold(1.5)
         tap(app.buttons["Add Homework"], app)
         hold(1.5)
@@ -149,7 +151,7 @@ final class PreviewCaptureTests: XCTestCase {
         tap(search, springboard)
         search.typeText("Tabula")
         hold(1.5)
-        tap(springboard.descendants(matching: .any).matching(NSPredicate(format: "label == 'Tabula'")).element(boundBy: 0), springboard)
+        tap(springboard.cells["Tabula"], springboard)   // not `label == 'Tabula'`: that is the Home Screen icon behind
         hold(2)
         tap(springboard.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Add Widget'")).firstMatch, springboard)
         hold(1.5)
@@ -181,12 +183,14 @@ final class PreviewCaptureTests: XCTestCase {
     // MARK: Helpers
 
     /// `-TabulaSeed <seed>` (default TABULA_SEED), or the real on-disk store when `realStore`.
-    private func launch(seed: String? = nil, realStore: Bool = false, screen: String? = nil) -> XCUIApplication {
+    private func launch(seed: String? = nil, realStore: Bool = false, screen: String? = nil,
+                        extra: [String] = []) -> XCUIApplication {
         continueAfterFailure = false
         let app = XCUIApplication()
         var arguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_GB"]
         if !realStore { arguments = ["-TabulaSeed", seed ?? self.seed] + arguments }
         if let screen { arguments += ["-TabulaScreen", screen] }
+        arguments += extra
         app.launchArguments = arguments
         print("LAUNCH ARGUMENTS: \(arguments)")
         app.launch()

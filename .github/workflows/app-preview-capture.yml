@@ -42,7 +42,10 @@ env:
   XCODE_APP: /Applications/Xcode_27.app
   XCODEGEN_VERSION: "2.46.0"
   XCODEGEN_SHA256: 4d9e34b62172d645eed6457cac13fc222569974098ef4ee9c3368bedf0196806
-  SHOTS: ${{ inputs.shots || 'S1_today_to_week S8a_day S8b_tiles S3_lesson_homework S4_exam S5_reminders S2_photo_import S6_widgets_live S7_watch' }}
+  # All shots: S1_today_to_week S8a_day S8b_tiles S3_lesson_homework S4_exam S5_reminders S2_photo_import S6_widgets_live S7_watch
+  # (~5 min each incl. erase/boot/install: all nine + the build exceed 60 min, run 41748424916). Push default = the
+  # shots still being worked on; the rest are in run 41748424916.
+  SHOTS: ${{ inputs.shots || 'S7_watch S2_photo_import S3_lesson_homework S6_widgets_live' }}
   SEED: ${{ inputs.seed || 'preview' }}
   IMPORT_IMAGE: ${{ inputs.import_image || 'import-source.png' }}
   OUT: video-out
@@ -128,6 +131,8 @@ jobs:
             xcrun simctl shutdown "$1" >/dev/null 2>&1 || true
             xcrun simctl erase "$1"
             xcrun simctl boot "$1"; xcrun simctl bootstatus "$1" -b >/dev/null
+            # The first keyboard shows a "slide to type" intro sheet over everything (run 41748424916, S6).
+            xcrun simctl spawn "$1" defaults write com.apple.keyboard.preferences DidShowContinuousPathIntroduction -bool true || true
             sleep 5
           }
           look() { # look <iphone udid>
@@ -139,14 +144,18 @@ jobs:
           rec_start() { # rec_start <udid> <mp4>  -> REC_PID
             xcrun simctl io "$1" recordVideo --codec=h264 --force "$2" 2> "$2.log" &
             REC_PID=$!
-            for _ in $(seq 1 40); do grep -q "Recording started" "$2.log" 2>/dev/null && return 0; sleep 0.5; done
+            for _ in $(seq 1 40); do
+              grep -q "Recording started" "$2.log" 2>/dev/null && { REC_T0="$(python3 -c 'import time; print(time.time())')"; return 0; }
+              sleep 0.5
+            done
+            REC_T0="$(python3 -c 'import time; print(time.time())')"
             echo "::warning::no 'Recording started' for $2"; cat "$2.log"
           }
           rec_stop() { # rec_stop <pid>: SIGINT finalises the file
             kill -INT "$1" 2>/dev/null; wait "$1" 2>/dev/null || true
           }
-          check_clip() { # check_clip <mp4> <keyframe dir> -> prints ffprobe line; 1 if empty/undecodable
-            local f="$1" kd="$2" dur
+          check_clip() { # check_clip <mp4> <keyframe dir> [offset s] -> prints ffprobe line; 1 if empty/undecodable
+            local f="$1" kd="$2" off="${3:-0}" dur
             [ -s "$f" ] || { echo "EMPTY"; return 1; }
             ffmpeg -v error -i "$f" -f null - > "$f.decode.txt" 2>&1 || { echo "UNDECODABLE"; return 1; }
             # recordVideo writes variable-frame-rate h264; the null muxer's "non monotonically increasing dts" lines are
@@ -156,8 +165,9 @@ jobs:
             fi
             dur="$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$f")"
             mkdir -p "$kd"
+            # Keyframes over the test's part of the clip (offset = test start; before it: install + runner launch).
             for pct in 15 50 85; do
-              ffmpeg -v error -y -ss "$(python3 -c "print($dur*$pct/100)")" -i "$f" -frames:v 1 -vf scale=660:-2 \
+              ffmpeg -v error -y -ss "$(python3 -c "print($off + ($dur - $off) * $pct / 100)")" -i "$f" -frames:v 1 -vf scale=660:-2 \
                 "$kd/$(basename "$f" .mp4)-$pct.png"
             done
             ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,width,height,avg_frame_rate,nb_frames:format=duration \
@@ -171,7 +181,8 @@ jobs:
                      "git_sha": os.environ["SHA"], "run_url": os.environ["RUN_URL"], "xcode": os.environ["XCODE"],
                      "runtime": os.environ.get("SIM_RUNTIME_NAME"), "device": device, "signing": os.environ.get("SIGNING"),
                      "seed": os.environ.get("SEED"), "locale": "en_GB", "languages": "(en)", "launch": launch,
-                     "start_utc": start, "end_utc": end}, open(os.path.join(d, "manifest.json"), "w"), indent=2)
+                     "start_utc": start, "end_utc": end, "test_start_offset_s": float(os.environ.get("TEST_OFFSET") or 0)},
+                    open(os.path.join(d, "manifest.json"), "w"), indent=2)
           PY
           }
           export SHA RUN_URL XCODE
@@ -182,7 +193,7 @@ jobs:
             dir="$OUT/$shot"; mkdir -p "$dir"
             launch="-TabulaSeed $SEED -AppleLanguages (en) -AppleLocale en_GB"
             case "$shot" in
-              S2_*) launch="-TabulaSeed blank -AppleLanguages (en) -AppleLocale en_GB" ;;
+              S2_*) launch="-TabulaSeed blank -AppleLanguages (en) -AppleLocale en_GB -TabulaNow 2026-11-10T10:20:00Z -TabulaTimeZone Europe/London" ;;
               S6_*|S7_*) launch="(real store, no seed) -AppleLanguages (en) -AppleLocale en_GB" ;;
               S8a_*) launch="$launch -TabulaScreen timetable.day" ;;
               S8b_*) launch="$launch -TabulaScreen timetable.tiles" ;;
@@ -204,7 +215,7 @@ jobs:
               rec_start "$WUDID" "$dir/$shot-watch.mp4"; WREC=$REC_PID
             fi
             start="$(date -u +%FT%TZ)"
-            rec_start "$phone" "$dir/$shot.mp4"; PREC=$REC_PID
+            rec_start "$phone" "$dir/$shot.mp4"; PREC=$REC_PID; PHONE_T0=$REC_T0
             xcodebuild test-without-building -xctestrun "$XCTESTRUN" -destination "platform=iOS Simulator,id=$phone" \
               -only-testing "TabulaPreviewCapture/PreviewCaptureTests/test_$shot" -resultBundlePath "$dir/$shot.xcresult" \
               > "$dir/xcodebuild.log" 2>&1
@@ -217,7 +228,15 @@ jobs:
             sleep 1
             rec_stop "$PREC"; [ -n "$WUDID" ] && rec_stop "$WREC"
             end="$(date -u +%FT%TZ)"
-            probe="$(check_clip "$dir/$shot.mp4" "$dir/keyframes")"; clip=$?
+            # Seconds into the clip where the test started ("Selected tests' started at <local time>" in the log).
+            export TEST_OFFSET="$(python3 - "$dir/xcodebuild.log" "$PHONE_T0" <<'PY'
+          import re, sys, time
+          m = re.search(r"Selected tests' started at (\d{4}-\d\d-\d\d \d\d:\d\d:\d\d)(\.\d+)?", open(sys.argv[1]).read())
+          print(round(max(0.0, time.mktime(time.strptime(m[1], "%Y-%m-%d %H:%M:%S")) + float(m[2] or 0) - float(sys.argv[2])), 1)
+                if m else 0)
+          PY
+          )"
+            probe="$(check_clip "$dir/$shot.mp4" "$dir/keyframes" "$TEST_OFFSET")"; clip=$?
             [ -n "$WUDID" ] && { echo "watch: $(check_clip "$dir/$shot-watch.mp4" "$dir/keyframes")" | tee "$dir/watch-ffprobe.txt"; }
             manifest "$dir" "$shot" "$device" "$launch" "$start" "$end" "$rc" "$clip" "$probe"
             xcrun xcresulttool get test-results summary --path "$dir/$shot.xcresult" --compact > "$dir/xcresult-summary.json" 2>&1 || true
