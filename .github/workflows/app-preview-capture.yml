@@ -42,7 +42,7 @@ env:
   XCODE_APP: /Applications/Xcode_27.app
   XCODEGEN_VERSION: "2.46.0"
   XCODEGEN_SHA256: 4d9e34b62172d645eed6457cac13fc222569974098ef4ee9c3368bedf0196806
-  SHOTS: ${{ inputs.shots || 'S1_today_to_week' }}
+  SHOTS: ${{ inputs.shots || 'S1_today_to_week S8a_day S8b_tiles S3_lesson_homework S4_exam S5_reminders S2_photo_import S6_widgets_live S7_watch' }}
   SEED: ${{ inputs.seed || 'preview' }}
   IMPORT_IMAGE: ${{ inputs.import_image || 'import-source.png' }}
   OUT: video-out
@@ -60,7 +60,8 @@ jobs:
           set -eo pipefail
           sudo xcode-select -s "$XCODE_APP"
           xcodebuild -version | tee xcode-version.txt
-          xcrun simctl help io | tee simctl-io-help.txt
+          xcrun simctl help io > simctl-io-help.txt 2>&1 || true   # `help` exits non-zero (run 41747128681)
+          grep -A12 'recordVideo \[' simctl-io-help.txt || true
           grep -q -- '--codec' simctl-io-help.txt && grep -q -- '--force' simctl-io-help.txt \
             || { echo "::error::simctl io recordVideo lacks --codec/--force on this Xcode"; exit 1; }
           command -v ffprobe >/dev/null || brew install ffmpeg
