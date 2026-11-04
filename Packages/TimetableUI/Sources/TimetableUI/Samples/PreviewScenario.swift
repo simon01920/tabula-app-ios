@@ -26,7 +26,8 @@ extension SampleScenarios {
 
     /// Builds the preview database (deterministic).
     // swiftlint:disable:next function_body_length
-    public static func preview() -> TabulaDatabase {
+    /// `blank: true` stops after onboarding + the bell grid (the photo-import starting point).
+    public static func preview(blank: Bool = false) -> TabulaDatabase {
         let context = CalendarContext(timeZone: previewTimeZone, firstWeekday: .monday)
         let onboardingInstant = context.date(d(2026, 9, 1), t(18))
         let editInstant = context.date(d(2026, 11, 9), t(19))
@@ -45,6 +46,7 @@ extension SampleScenarios {
         let times = [(8, 0, 8, 45), (8, 55, 9, 40), (9, 55, 10, 40), (10, 50, 11, 35), (11, 45, 12, 30), (13, 15, 14, 0)]
         let periods = times.map { Period(id: ids.next(), label: nil, start: t($0.0, $0.1), end: t($0.2, $0.3), kind: .lesson) }
         db.bellSchedules[0].periods = periods
+        if blank { return db }
 
         struct Seed { let short, name, emoji, room, teacher: String }
         let seeds = [

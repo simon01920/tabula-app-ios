@@ -9,7 +9,7 @@ struct SampleScenarioTests {
     func deterministicAndValid(kind: SeedKind) throws {
         let first = SampleScenarios.make(kind)
         let second = SampleScenarios.make(kind)
-        if kind == .preview {
+        if kind == .preview || kind == .previewBlank {
             #expect(first.referenceNow == Date(timeIntervalSince1970: 1_794_306_000))   // Tue 2026-11-10 10:20 GMT
             #expect(first.timeZone.identifier == "Europe/London")
         } else {
@@ -82,6 +82,17 @@ struct SampleScenarioTests {
         let quiz = try #require(database.exams.first { $0.title == "Biology quiz" })
         #expect(scenario.today.days(to: quiz.date) == 3)
         #expect(quiz.reminderOverride != nil)
+    }
+
+    @Test func previewBlankIsEnglishWithTheSameBellGridAndNoContent() throws {
+        let database = try #require(SampleScenarios.make(.previewBlank).database)
+        let full = try #require(SampleScenarios.make(.preview).database)
+        #expect(database.lessons.isEmpty && database.subjects.isEmpty && database.tasks.isEmpty && database.exams.isEmpty)
+        #expect(database.timetables[0].name == "Class 11B")
+        #expect(database.bellSchedules[0].name == "Regular day")
+        #expect(database.terms.map(\.name) == ["Autumn term 2026"])
+        let grid = { (db: TabulaDatabase) in db.bellSchedules[0].periods.map { [$0.start, $0.end] } }
+        #expect(grid(database).count == 6 && grid(database) == grid(full))
     }
 
     @Test func blankHasATimetableButNoSubjects() {
