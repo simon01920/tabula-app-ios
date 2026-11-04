@@ -110,13 +110,17 @@ jobs:
             echo "BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist")"; } >> "$GITHUB_ENV"
           { echo "## app"; codesign -d --entitlements - "$APP" 2>&1
             echo "## widget"; codesign -d --entitlements - "$APP/PlugIns/TabulaWidgets.appex" 2>&1
-            echo "## watch"; codesign -d --entitlements - "$APP/Watch/TabulaWatch.app" 2>&1; } | tee "$OUT/entitlements.txt" || true
+            echo "## watch"; codesign -d --entitlements - "$APP/Watch/TabulaWatch.app" 2>&1
+            # Simulator builds carry entitlements in the __TEXT,__entitlements section (linker -sectcreate), not in the
+            # signature, so codesign prints an empty [Dict]; these are the embedded files (run 41747334469).
+            for x in build/DD/Build/Intermediates.noindex/Tabula.build/Debug-*simulator/*.build/*-Simulated.xcent; do
+              echo "## $x"; cat "$x"; done; } | tee "$OUT/entitlements.txt" || true
 
       - name: Record shots
         env:
           TEST_RUNNER_TABULA_SEED: ${{ inputs.seed || 'preview' }}
         run: |
-          set -uo pipefail
+          set +e -uo pipefail   # the default shell is `bash -e`: one failed shot must not stop the others
           SHA="$(git rev-parse HEAD)"; RUN_URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
           XCODE="$(head -1 xcode-version.txt) ($(sed -n 2p xcode-version.txt))"
 
@@ -145,7 +149,11 @@ jobs:
             local f="$1" kd="$2" dur
             [ -s "$f" ] || { echo "EMPTY"; return 1; }
             ffmpeg -v error -i "$f" -f null - > "$f.decode.txt" 2>&1 || { echo "UNDECODABLE"; return 1; }
-            [ -s "$f.decode.txt" ] && { echo "DECODE ERRORS: $(head -3 "$f.decode.txt")"; return 1; }
+            # recordVideo writes variable-frame-rate h264; the null muxer's "non monotonically increasing dts" lines are
+            # not decode errors (run 41747334469). Anything else is.
+            if grep -v -e "non monotonically increasing dts" -e "Last message repeated" "$f.decode.txt" | grep -q .; then
+              echo "DECODE ERRORS: $(grep -v -e 'non monotonically' -e 'Last message' "$f.decode.txt" | head -3)"; return 1
+            fi
             dur="$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$f")"
             mkdir -p "$kd"
             for pct in 15 50 85; do
