@@ -1,0 +1,234 @@
+# App Preview capture: real screen-recorded video of the real Tabula simulator build driven by real taps (XCUITest
+# target TabulaPreviewCapture, PreviewCapture/Sources). Capture only: nothing here builds for release, signs with an
+# Apple account or uploads anywhere but this run's artifact. Per shot: erase + boot the simulator, fixed status bar
+# (10:20 = the seed clock), light appearance, Large text, `simctl io recordVideo` around ONE test
+# (`test-without-building -only-testing`), SIGINT to finalise the mp4, ffprobe/ffmpeg decode check, 3 keyframes,
+# manifest JSON. docs/ENVIRONMENT.md §40.
+name: App Preview capture (iOS Simulator video)
+
+on:
+  push:
+    branches: [video/app-preview]
+    paths:
+      - ".github/workflows/app-preview-capture.yml"
+      - "PreviewCapture/**"
+      - "project.yml"
+      - "App/**"
+      - "Packages/TimetableUI/Sources/**"
+      - "video/assets/**"
+  workflow_dispatch:
+    inputs:
+      shots:
+        description: "Space-separated shots (test_<shot> methods): S1_today_to_week S2_photo_import S3_lesson_homework S4_exam S5_reminders S6_widgets_live S7_watch S8a_day S8b_tiles"
+        type: string
+        default: ""
+      seed:
+        description: "-TabulaSeed for the seeded shots"
+        type: string
+        default: ""
+      import_image:
+        description: "Image in video/assets/ added to Photos for S2"
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: app-preview-capture-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  XCODE_APP: /Applications/Xcode_27.app
+  XCODEGEN_VERSION: "2.46.0"
+  XCODEGEN_SHA256: 4d9e34b62172d645eed6457cac13fc222569974098ef4ee9c3368bedf0196806
+  SHOTS: ${{ inputs.shots || 'S1_today_to_week' }}
+  SEED: ${{ inputs.seed || 'secondary' }}
+  IMPORT_IMAGE: ${{ inputs.import_image || 'import-source.png' }}
+  OUT: video-out
+
+jobs:
+  capture:
+    name: Record App Preview clips
+    runs-on: xcode-27
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Select Xcode, check recordVideo options, ffmpeg
+        run: |
+          set -eo pipefail
+          sudo xcode-select -s "$XCODE_APP"
+          xcodebuild -version | tee xcode-version.txt
+          xcrun simctl help io | tee simctl-io-help.txt
+          grep -q -- '--codec' simctl-io-help.txt && grep -q -- '--force' simctl-io-help.txt \
+            || { echo "::error::simctl io recordVideo lacks --codec/--force on this Xcode"; exit 1; }
+          command -v ffprobe >/dev/null || brew install ffmpeg
+          ffprobe -version | head -1
+
+      - name: Install XcodeGen (pinned + SHA-256)
+        run: |
+          curl -fsSL -o xcodegen.zip "https://github.com/yonaskolb/XcodeGen/releases/download/${XCODEGEN_VERSION}/xcodegen.zip"
+          echo "${XCODEGEN_SHA256}  xcodegen.zip" | shasum -a 256 -c -
+          unzip -q xcodegen.zip -d "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/xcodegen/bin" >> "$GITHUB_PATH"
+
+      - name: Generate project
+        run: xcodegen generate --spec project.yml
+
+      - name: Pick + create simulators (largest Pro Max, newest iOS; watch for S7)
+        run: |
+          set -eo pipefail
+          xcrun simctl list -j > "$RUNNER_TEMP/simctl.json"
+          python3 scripts/sim_pick.py "$RUNNER_TEMP/simctl.json" --platform iOS > "$RUNNER_TEMP/pick.env"
+          python3 scripts/sim_pick.py "$RUNNER_TEMP/simctl.json" --platform watchOS > "$RUNNER_TEMP/watch.env" || true
+          cat "$RUNNER_TEMP/pick.env" "$RUNNER_TEMP/watch.env" | tee -a "$GITHUB_ENV"
+          SIM_TYPE="$(sed -n 's/^SIM_TYPE=//p' "$RUNNER_TEMP/pick.env")"
+          SIM_RUNTIME="$(sed -n 's/^SIM_RUNTIME=//p' "$RUNNER_TEMP/pick.env")"
+          echo "SIM_UDID=$(xcrun simctl create "Tabula Preview" "$SIM_TYPE" "$SIM_RUNTIME")" | tee -a "$GITHUB_ENV"
+
+      - name: Build for testing once (ad-hoc simulator signing, entitlements embedded; fallback unsigned)
+        run: |
+          set -o pipefail
+          mkdir -p build "$OUT"
+          common=(-project Tabula.xcodeproj -scheme TabulaPreviewCapture -configuration Debug
+                  -destination "platform=iOS Simulator,id=$SIM_UDID" -derivedDataPath build/DD)
+          if xcodebuild build-for-testing "${common[@]}" CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM= \
+               PROVISIONING_PROFILE_SPECIFIER= 2>&1 | tee build/build-for-testing.log | xcbeautify --renderer github-actions; then
+            echo "SIGNING=adhoc" >> "$GITHUB_ENV"
+          else
+            echo "::warning::ad-hoc signed build failed; rebuilding with CODE_SIGNING_ALLOWED=NO (no App Group in the app)"
+            xcodebuild build-for-testing "${common[@]}" CODE_SIGNING_ALLOWED=NO 2>&1 \
+              | tee build/build-for-testing-unsigned.log | xcbeautify --renderer github-actions
+            echo "SIGNING=unsigned" >> "$GITHUB_ENV"
+          fi
+          APP="build/DD/Build/Products/Debug-iphonesimulator/TabulaApp.app"
+          XCTESTRUN="$(ls build/DD/Build/Products/*.xctestrun | head -1)"
+          [ -d "$APP" ] && [ -f "$XCTESTRUN" ] || { echo "::error::app or xctestrun missing"; exit 1; }
+          { echo "APP=$APP"; echo "XCTESTRUN=$XCTESTRUN"
+            echo "BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist")"; } >> "$GITHUB_ENV"
+          { echo "## app"; codesign -d --entitlements - "$APP" 2>&1
+            echo "## widget"; codesign -d --entitlements - "$APP/PlugIns/TabulaWidgets.appex" 2>&1
+            echo "## watch"; codesign -d --entitlements - "$APP/Watch/TabulaWatch.app" 2>&1; } | tee "$OUT/entitlements.txt" || true
+
+      - name: Record shots
+        env:
+          TEST_RUNNER_TABULA_SEED: ${{ inputs.seed || 'secondary' }}
+        run: |
+          set -uo pipefail
+          SHA="$(git rev-parse HEAD)"; RUN_URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          XCODE="$(head -1 xcode-version.txt) ($(sed -n 2p xcode-version.txt))"
+
+          prep() { # prep <udid>: erased, booted, deterministic look
+            xcrun simctl shutdown "$1" >/dev/null 2>&1 || true
+            xcrun simctl erase "$1"
+            xcrun simctl boot "$1"; xcrun simctl bootstatus "$1" -b >/dev/null
+            sleep 5
+          }
+          look() { # look <iphone udid>
+            xcrun simctl status_bar "$1" override --time "10:20" --dataNetwork wifi --wifiMode active --wifiBars 3 \
+              --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100 || true
+            xcrun simctl ui "$1" appearance light
+            xcrun simctl ui "$1" content_size large || true
+          }
+          rec_start() { # rec_start <udid> <mp4>  -> REC_PID
+            xcrun simctl io "$1" recordVideo --codec=h264 --force "$2" 2> "$2.log" &
+            REC_PID=$!
+            for _ in $(seq 1 40); do grep -q "Recording started" "$2.log" 2>/dev/null && return 0; sleep 0.5; done
+            echo "::warning::no 'Recording started' for $2"; cat "$2.log"
+          }
+          rec_stop() { # rec_stop <pid>: SIGINT finalises the file
+            kill -INT "$1" 2>/dev/null; wait "$1" 2>/dev/null || true
+          }
+          check_clip() { # check_clip <mp4> <keyframe dir> -> prints ffprobe line; 1 if empty/undecodable
+            local f="$1" kd="$2" dur
+            [ -s "$f" ] || { echo "EMPTY"; return 1; }
+            ffmpeg -v error -i "$f" -f null - > "$f.decode.txt" 2>&1 || { echo "UNDECODABLE"; return 1; }
+            [ -s "$f.decode.txt" ] && { echo "DECODE ERRORS: $(head -3 "$f.decode.txt")"; return 1; }
+            dur="$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$f")"
+            mkdir -p "$kd"
+            for pct in 15 50 85; do
+              ffmpeg -v error -y -ss "$(python3 -c "print($dur*$pct/100)")" -i "$f" -frames:v 1 -vf scale=660:-2 \
+                "$kd/$(basename "$f" .mp4)-$pct.png"
+            done
+            ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,width,height,avg_frame_rate,nb_frames:format=duration \
+              -of compact=p=0 "$f" | tr '\n' ' '
+          }
+          manifest() { # manifest <dir> <shot> <udid/device> <launch> <start> <end> <test rc> <clip check> <ffprobe>
+            python3 - "$@" <<'PY'
+          import json, os, sys
+          d, shot, device, launch, start, end, rc, clip, probe = sys.argv[1:10]
+          json.dump({"shot": shot, "test": f"test_{shot}", "test_exit": int(rc), "clip_ok": clip == "0", "ffprobe": probe,
+                     "git_sha": os.environ["SHA"], "run_url": os.environ["RUN_URL"], "xcode": os.environ["XCODE"],
+                     "runtime": os.environ.get("SIM_RUNTIME_NAME"), "device": device, "signing": os.environ.get("SIGNING"),
+                     "seed": os.environ.get("SEED"), "locale": "en_GB", "languages": "(en)", "launch": launch,
+                     "start_utc": start, "end_utc": end}, open(os.path.join(d, "manifest.json"), "w"), indent=2)
+          PY
+          }
+          export SHA RUN_URL XCODE
+
+          failed=0
+          for shot in $SHOTS; do
+            echo "::group::$shot"
+            dir="$OUT/$shot"; mkdir -p "$dir"
+            launch="-TabulaSeed $SEED -AppleLanguages (en) -AppleLocale en_GB"
+            case "$shot" in
+              S2_*) launch="-TabulaSeed blank -AppleLanguages (en) -AppleLocale en_GB" ;;
+              S6_*|S7_*) launch="(real store, no seed) -AppleLanguages (en) -AppleLocale en_GB" ;;
+              S8a_*) launch="$launch -TabulaScreen timetable.day" ;;
+              S8b_*) launch="$launch -TabulaScreen timetable.tiles" ;;
+            esac
+            phone="$SIM_UDID"; device="$SIM_NAME"; WUDID=""
+            if [[ "$shot" == S7_* ]]; then
+              phone="$(xcrun simctl create "Tabula Paired" "$SIM_TYPE" "$SIM_RUNTIME")"
+              WUDID="$(xcrun simctl create "Tabula Watch" "$WATCH_TYPE" "$WATCH_RUNTIME")"
+              xcrun simctl pair "$WUDID" "$phone" | tee "$dir/pair.txt"
+              device="$SIM_NAME + $WATCH_NAME ($WATCH_RUNTIME_NAME)"
+              prep "$WUDID"
+            fi
+            prep "$phone"; look "$phone"
+            [[ "$shot" == S2_* ]] && xcrun simctl addmedia "$phone" "video/assets/$IMPORT_IMAGE"
+            if [ -n "$WUDID" ]; then
+              xcrun simctl install "$WUDID" "$APP/Watch/TabulaWatch.app"
+              WBUNDLE="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Watch/TabulaWatch.app/Info.plist")"
+              xcrun simctl launch "$WUDID" "$WBUNDLE" || true
+              rec_start "$WUDID" "$dir/$shot-watch.mp4"; WREC=$REC_PID
+            fi
+            start="$(date -u +%FT%TZ)"
+            rec_start "$phone" "$dir/$shot.mp4"; PREC=$REC_PID
+            xcodebuild test-without-building -xctestrun "$XCTESTRUN" -destination "platform=iOS Simulator,id=$phone" \
+              -only-testing "TabulaPreviewCapture/PreviewCaptureTests/test_$shot" -resultBundlePath "$dir/$shot.xcresult" \
+              > "$dir/xcodebuild.log" 2>&1
+            rc=$?
+            if [ -n "$WUDID" ]; then
+              xcrun simctl launch "$WUDID" "$WBUNDLE" || true   # bring it to the front again after the phone run
+              sleep 20
+              xcrun simctl io "$WUDID" screenshot "$dir/$shot-watch.png" || true
+            fi
+            sleep 1
+            rec_stop "$PREC"; [ -n "$WUDID" ] && rec_stop "$WREC"
+            end="$(date -u +%FT%TZ)"
+            probe="$(check_clip "$dir/$shot.mp4" "$dir/keyframes")"; clip=$?
+            [ -n "$WUDID" ] && { echo "watch: $(check_clip "$dir/$shot-watch.mp4" "$dir/keyframes")" | tee "$dir/watch-ffprobe.txt"; }
+            manifest "$dir" "$shot" "$device" "$launch" "$start" "$end" "$rc" "$clip" "$probe"
+            xcrun xcresulttool get test-results summary --path "$dir/$shot.xcresult" --compact > "$dir/xcresult-summary.json" 2>&1 || true
+            grep -E "error:|failed|passed|HIERARCHY|PICKER|S3:|LAUNCH" "$dir/xcodebuild.log" | head -40 || true
+            rm -rf "$dir/$shot.xcresult"   # summary + full log kept; the bundle is large
+            echo "$shot: test rc=$rc clip=$clip $probe" | tee -a "$OUT/summary.txt"
+            [ "$rc" -eq 0 ] && [ "$clip" -eq 0 ] || failed=1
+            [ -n "$WUDID" ] && { xcrun simctl shutdown "$WUDID" "$phone" || true; }
+            echo "::endgroup::"
+          done
+          cat "$OUT/summary.txt" >> "$GITHUB_STEP_SUMMARY"
+          exit "$failed"
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: app-preview-${{ github.run_number }}
+          path: |
+            video-out/
+            build/build-for-testing*.log
+            simctl-io-help.txt
+          if-no-files-found: warn
+          retention-days: 14
