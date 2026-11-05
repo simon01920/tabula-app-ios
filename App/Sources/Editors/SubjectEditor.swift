@@ -64,6 +64,8 @@ private struct SubjectEditorBody: View {
     let embedded: Bool
     let onSaved: ((Subject.ID) -> Void)?
     @Environment(AppModel.self) private var model
+    /// U16: the symbol cells grow with Dynamic Type so a .title3 glyph is never clipped at AX5.
+    @ScaledMetric(relativeTo: .title3) private var symbolSide: CGFloat = 48
 
     var body: some View {
         EmbeddableEditorScaffold(
@@ -233,7 +235,7 @@ private struct SubjectFormContent: View {
             } label: {
                 Text("editor.subject.symbol")
             }
-            .pickerStyle(.segmented)
+            .adaptiveSegmentedPicker()
             switch draft.symbolKind {
             case .none:
                 EmptyView()
@@ -246,7 +248,7 @@ private struct SubjectFormContent: View {
                 // The suggestions, plus a symbol stored by an older version that is not among them (stays selectable).
                 let names = SubjectDraft.symbolSuggestions.contains(draft.systemImage) || EditorText.trimmedOrNil(draft.systemImage) == nil
                     ? SubjectDraft.symbolSuggestions : SubjectDraft.symbolSuggestions + [draft.systemImage]
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 48), spacing: 8)], spacing: 8) {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: symbolSide), spacing: 8)], spacing: 8) {
                     ForEach(names, id: \.self) { name in
                         let selected = draft.systemImage == name
                         Button {
@@ -254,14 +256,14 @@ private struct SubjectFormContent: View {
                         } label: {
                             Image(systemName: name)
                                 .font(.title3)
-                                .frame(width: 48, height: 48)
+                                .frame(width: symbolSide, height: symbolSide)
                                 .background(RoundedRectangle(cornerRadius: 10, style: .continuous)
                                     .fill(selected ? Color.accentColor.opacity(0.2) : Color.clear))
                                 .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous)
                                     .strokeBorder(selected ? Color.accentColor : Color.secondary.opacity(0.3), lineWidth: selected ? 2 : 1))
                         }
                         .buttonStyle(.plain)
-                        .accessibilityLabel(Text(verbatim: name.replacingOccurrences(of: ".", with: " ")))
+                        .accessibilityLabel(symbolAccessibilityLabel(name))
                         .accessibilityAddTraits(selected ? .isSelected : [])
                     }
                 }
@@ -270,6 +272,12 @@ private struct SubjectFormContent: View {
         } header: {
             Text("editor.subject.icon")
         }
+    }
+
+    /// U10: a spoken name per suggested symbol; a symbol from older data (not suggested) falls back to its raw name.
+    private func symbolAccessibilityLabel(_ name: String) -> Text {
+        if let key = DynamicL10nKeys.subjectSymbol(name) { return Text(LocalizedStringKey(key)) }
+        return Text(verbatim: name.replacingOccurrences(of: ".", with: " "))
     }
 
     // MARK: Defaults (D10: offered whatever the display setting)

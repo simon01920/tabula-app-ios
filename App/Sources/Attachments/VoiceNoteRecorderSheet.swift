@@ -15,6 +15,8 @@ struct VoiceNoteRecorderSheet: View {
     @State private var showDenied = false
     @State private var showFailed = false
     @State private var isStarting = false
+    /// B6: recording again deletes the previous take, so it asks first.
+    @State private var confirmsReplace = false
 
     var body: some View {
         NavigationStack {
@@ -44,6 +46,14 @@ struct VoiceNoteRecorderSheet: View {
                 .buttonStyle(.borderedProminent)
                 .tint(recorder.isRecording ? Color.correction : Color.ink)
                 .disabled(isStarting)
+                // On the button, not a Form Section (RISKS #99); the previous take is only deleted after "Record Again".
+                .confirmationDialog(Text("attachments.voice.replace.title"), isPresented: $confirmsReplace,
+                                    titleVisibility: .visible) {
+                    Button("attachments.voice.replace.confirm", role: .destructive) { startRecording() }
+                    Button("editor.common.cancel", role: .cancel) {}
+                } message: {
+                    Text("attachments.voice.replace.message")
+                }
                 if let autoStop = recorder.autoStop {
                     Label {
                         Text(autoStopKey(autoStop))
@@ -108,6 +118,14 @@ struct VoiceNoteRecorderSheet: View {
             recorder.stop()
             return
         }
+        if recorder.recordedURL != nil {
+            confirmsReplace = true
+            return
+        }
+        startRecording()
+    }
+
+    private func startRecording() {
         isStarting = true
         Task {
             let failure = await recorder.start()

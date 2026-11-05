@@ -18,6 +18,12 @@ public enum DynamicL10nKeys {
     public static func attachmentKind(_ value: AttachmentKind) -> String {
         AttachmentKind.knownValues.contains(value) ? "attachments.kind." + value.rawValue : "attachments.kind.unknown"
     }
+    /// Spoken name of a suggested subject symbol (Phase 10 U10: VoiceOver read the raw SF Symbol name). A symbol
+    /// outside the suggestions (stored by an older version) has no key: the caller shows the raw name.
+    public static func subjectSymbol(_ name: String) -> String? {
+        SubjectDraft.symbolSuggestions.contains(name) ? "editor.subject.symbol.name." + name : nil
+    }
+
     /// Catalog key of a lesson field's name in the lesson detail list (`LessonDetailView`).
     public static func lessonDetailField(_ field: LessonField) -> String {
         switch field {
@@ -85,6 +91,7 @@ public enum DynamicL10nKeys {
         keys += ReminderRuleDefaults.targets.map { ReminderKindList.titleKey($0, terminology: .classLecture) }
         keys += IntentL10nKeys.allKeys   // Phase 4 B3: App Intent titles / parameters, checkbox + alarm "Done"
         keys += TaskL10nKeys.allKeys
+        keys += SubjectDraft.symbolSuggestions.compactMap(subjectSymbol)   // Phase 10 U10
         keys += AttachmentKind.knownValues.map(attachmentKind) + [attachmentKind(AttachmentKind(rawValue: "future"))]
         keys += widgetKeys
         keys += liveActivityKeys

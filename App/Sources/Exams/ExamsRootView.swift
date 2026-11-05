@@ -88,7 +88,7 @@ struct ExamsRootView: View {
                     } label: {
                         Text("exams.segment.label")
                     }
-                    .pickerStyle(.segmented)
+                    .adaptiveSegmentedPicker()
                     .listRowBackground(Color.clear)
                     .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
                 }

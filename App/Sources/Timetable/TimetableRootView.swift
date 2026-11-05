@@ -74,13 +74,7 @@ struct TimetableRootView: View {
                         }
                     }
                 } else {
-                    ContentUnavailableView {
-                        Label { Text("timetable.empty.noTimetable") } icon: { Image(systemName: "calendar.badge.exclamationmark") }
-                    } description: {
-                        EmptyView()
-                    } actions: {
-                        EmptyView()
-                    }
+                    NoTimetableView(titleKey: "timetable.empty.noTimetable", messageKey: "timetable.empty.noTimetable.message")
                 }
             }
             .navigationTitle(title)

@@ -176,7 +176,12 @@ final class VoiceNotePlayer {
     @ObservationIgnored private let delegate = PlaybackDelegate()
 
     init() {
-        delegate.onFinish = { [weak self] in self?.stop() }
+        delegate.onFinish = { [weak self] finished in
+            // B15: only the CURRENT player may stop playback; a stopped player's late callback (delivered after another
+            // note started) must not end the new one.
+            guard let self, let current = self.player, current === finished.player else { return }
+            self.stop()
+        }
     }
 
     /// Plays `url` for `id`, or stops when `id` is already playing.
@@ -242,18 +247,27 @@ private final class RecorderDelegate: NSObject, AVAudioRecorderDelegate, @unchec
     }
 }
 
+/// The player a delegate callback is about (held strongly until the main actor compared it, like `FinishedRecorder`).
+private final class FinishedPlayer: @unchecked Sendable {
+    // Immutable; only compared by identity on the main actor.
+    let player: AVAudioPlayer
+    init(_ player: AVAudioPlayer) { self.player = player }
+}
+
 /// AVAudioPlayer's delegate (callbacks may arrive on any thread; forwarded to the main actor).
 private final class PlaybackDelegate: NSObject, AVAudioPlayerDelegate, @unchecked Sendable {
     // Written once on the main actor before any playback starts; read in the callbacks.
-    var onFinish: (@MainActor @Sendable () -> Void)?
+    var onFinish: (@MainActor @Sendable (FinishedPlayer) -> Void)?
 
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         let finish = onFinish
-        Task { @MainActor in finish?() }
+        let finished = FinishedPlayer(player)
+        Task { @MainActor in finish?(finished) }
     }
 
     func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: (any Error)?) {
         let finish = onFinish
-        Task { @MainActor in finish?() }
+        let finished = FinishedPlayer(player)
+        Task { @MainActor in finish?(finished) }
     }
 }

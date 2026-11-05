@@ -88,7 +88,7 @@ private struct ExamFactLines: View {
         if let time = texts.time(row.exam) {
             Label { Text(verbatim: time) } icon: { Image(AppSymbol.time) }
         }
-        if let location = facts.location {
+        if let location = texts.location(facts) {
             Label { Text(verbatim: location) } icon: { Image(AppSymbol.room) }
         }
         if let topics = texts.topicsPreview(facts.topics) {
@@ -158,7 +158,7 @@ struct ExamFeaturedCard: View {
                 }
             }
             Spacer(minLength: 0)
-            Image(systemName: "chevron.right")
+            Image(systemName: "chevron.forward")
                 .font(.footnote.weight(.semibold))
                 .foregroundStyle(.tertiary)
                 .padding(.top, 6)

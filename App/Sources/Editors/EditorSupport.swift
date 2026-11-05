@@ -347,7 +347,8 @@ struct TimeRow: View {
             Text(titleKey)
         }
         .environment(\.timeZone, LocalDateBridge.timeZone)
-        .environment(\.calendar, LocalDateBridge.calendar(locale: model.formatter.locale))
+        .environment(\.calendar, LocalDateBridge.calendar(locale: model.formatter.locale,
+                                                                  firstWeekday: model.calendarContext.firstWeekday))
         .hourCycleLocale(model.formatter.locale)   // D4 / H1: the picker shows the app's 12/24-hour clock
     }
 }
@@ -366,7 +367,8 @@ struct DateRow: View {
             Text(titleKey)
         }
         .environment(\.timeZone, LocalDateBridge.timeZone)
-        .environment(\.calendar, LocalDateBridge.calendar(locale: model.formatter.locale))
+        .environment(\.calendar, LocalDateBridge.calendar(locale: model.formatter.locale,
+                                                                  firstWeekday: model.calendarContext.firstWeekday))
     }
 }
 
@@ -408,7 +410,7 @@ struct SlotEditorRows: View {
             } label: {
                 Text("editor.slot.mode")
             }
-            .pickerStyle(.segmented)
+            .adaptiveSegmentedPicker()
         }
         switch slot.mode {
         case .period:
