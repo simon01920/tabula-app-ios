@@ -57247,6 +57247,90 @@
         }
       }
     },
+    "import.error.pdfLocked" : {
+      "comment" : "Import Timetable: alert message when the chosen PDF file is locked with a password.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Toto PDF je chráněné heslem. Odstraňte heslo, nebo pořiďte snímek obrazovky rozvrhu a vyberte ho."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dieses PDF ist passwortgeschützt. Entferne das Passwort oder mache ein Bildschirmfoto vom Stundenplan und wähle es aus."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This PDF is password-protected. Remove the password, or take a screenshot of the timetable and choose that."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ce PDF est protégé par un mot de passe. Supprimez le mot de passe, ou faites une capture d’écran de l’emploi du temps et choisissez-la."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ez a PDF jelszóval védett. Távolítsd el a jelszót, vagy készíts képernyőképet az órarendről, és azt válaszd."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このPDFはパスワードで保護されています。パスワードを解除するか、時間割のスクリーンショットを撮ってそれを選択してください。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ten plik PDF jest chroniony hasłem. Usuń hasło albo zrób zrzut ekranu planu lekcji i wybierz go."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Acest PDF este protejat cu parolă. Elimină parola sau fă o captură de ecran a orarului și alege-o pe aceea."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Toto PDF je chránené heslom. Odstráňte heslo alebo urobte snímku obrazovky rozvrhu a vyberte ju."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Овај PDF је заштићен лозинком. Уклоните лозинку или направите снимак екрана распореда и изаберите њега."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ovaj PDF je zaštićen lozinkom. Uklonite lozinku ili napravite snimak ekrana rasporeda i izaberite njega."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Цей PDF захищено паролем. Зніміть пароль або зробіть знімок екрана розкладу й виберіть його."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "此 PDF 受密码保护。请移除密码，或截取课程表的屏幕快照并选择它。"
+          }
+        }
+      }
+    },
     "import.error.title" : {
       "comment" : "Alert title for photo import problems.",
       "extractionState" : "manual",
@@ -58587,6 +58671,258 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "第 %lld 页"
+          }
+        }
+      }
+    },
+    "import.pdf.pages.failed.action" : {
+      "comment" : "Import Timetable, page picker for a PDF: button that goes back to the import choices to pick a different file.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vybrat jiný soubor"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Andere Datei auswählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose Another File"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Choisir un autre fichier"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Másik fájl kiválasztása"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "別のファイルを選択"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wybierz inny plik"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Alege alt fișier"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vybrať iný súbor"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Изабери други фајл"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Izaberi drugi fajl"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Вибрати інший файл"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "选择其他文件"
+          }
+        }
+      }
+    },
+    "import.pdf.pages.failed.message" : {
+      "comment" : "Import Timetable, page picker for a PDF: explanation under 'Can’t Show the Pages'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Toto PDF se nepodařilo otevřít. Může být poškozené nebo chráněné heslem."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dieses PDF konnte nicht geöffnet werden. Es ist eventuell beschädigt oder passwortgeschützt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This PDF couldn’t be opened. It may be damaged or password-protected."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ce PDF n’a pas pu être ouvert. Il est peut-être endommagé ou protégé par un mot de passe."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ezt a PDF-et nem sikerült megnyitni. Lehet, hogy sérült vagy jelszóval védett."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このPDFを開けませんでした。破損しているか、パスワードで保護されている可能性があります。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nie udało się otworzyć tego pliku PDF. Może być uszkodzony lub chroniony hasłem."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Acest PDF nu a putut fi deschis. Poate fi deteriorat sau protejat cu parolă."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Toto PDF sa nepodarilo otvoriť. Môže byť poškodené alebo chránené heslom."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Овај PDF није могао да се отвори. Можда је оштећен или заштићен лозинком."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ovaj PDF nije mogao da se otvori. Možda je oštećen ili zaštićen lozinkom."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Не вдалося відкрити цей PDF. Можливо, він пошкоджений або захищений паролем."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "无法打开此 PDF。它可能已损坏或受密码保护。"
+          }
+        }
+      }
+    },
+    "import.pdf.pages.failed.title" : {
+      "comment" : "Import Timetable, page picker for a PDF: title of the empty state when the PDF's pages cannot be read.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Stránky nelze zobrazit"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Seiten nicht darstellbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Can’t Show the Pages"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Impossible d’afficher les pages"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Az oldalak nem jeleníthetők meg"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ページを表示できません"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nie można pokazać stron"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Paginile nu pot fi afișate"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Strany sa nedajú zobraziť"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Странице не могу да се прикажу"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Stranice ne mogu da se prikažu"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Не вдається показати сторінки"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "无法显示页面"
           }
         }
       }
@@ -119739,6 +120075,90 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "课程表“%@”的二维码"
+          }
+        }
+      }
+    },
+    "share.sheet.qr.failed" : {
+      "comment" : "Share Timetable sheet: shown in place of the QR code when it could not be drawn. The 'Share Link' button below still works.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "QR kód se nepodařilo vytvořit. Sdílejte raději odkaz."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Der QR-Code konnte nicht erstellt werden. Teile stattdessen den Link."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The QR code couldn’t be created. Share the link instead."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Le code QR n’a pas pu être créé. Partagez plutôt le lien."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A QR-kódot nem sikerült létrehozni. Oszd meg inkább a linket."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "QRコードを作成できませんでした。代わりにリンクを共有してください。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nie udało się utworzyć kodu QR. Udostępnij zamiast tego link."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Codul QR nu a putut fi creat. Partajează linkul în schimb."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "QR kód sa nepodarilo vytvoriť. Zdieľajte radšej odkaz."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "QR код није могао да се направи. Поделите линк уместо тога."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "QR kod nije mogao da se napravi. Podelite link umesto toga."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Не вдалося створити QR-код. Поділіться натомість посиланням."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "无法生成二维码。请改为共享链接。"
           }
         }
       }

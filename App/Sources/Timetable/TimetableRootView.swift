@@ -482,7 +482,13 @@ private struct TimetableContent: View {
         case .timeBlocks where !typeSize.isAccessibilitySize:
             TimeBlockWeekView(layout: TimeBlockLayout.week(containing: selection.weekStart, resolver: resolver),
                               strip: strip, timetable: timetable, reasons: reasons(for: strip.days.map(\.date)),
-                              today: today, nowMinute: nowMinute, onOpen: onOpen)
+                              today: today, nowMinute: nowMinute, onOpen: onOpen) {
+                // U9: columns or overlap lanes too narrow (TimeBlockFit) → the grid, as at accessibility sizes.
+                let layout = TimetableCore.GridLayout.week(containing: selection.weekStart, resolver: resolver)
+                TimetableGridView(layout: layout, strip: strip, timetable: timetable,
+                                  reasons: reasons(for: layout.columns.map(\.date)), today: today, nowMinute: nowMinute,
+                                  onOpen: onOpen, onAdd: onAdd)
+            }
         case .day, .tiles:
             let resolution = resolver.resolution(for: selection.selectedDate)
             if resolution.schedule.entries.isEmpty {

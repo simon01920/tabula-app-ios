@@ -3,6 +3,8 @@
 // `ImportReview` (TimetableUI). One task at a time; Cancel cancels it and returns to the capture choices. Nothing is
 // written here: the review's Approve hands a payload to the share import path (ShareImportPreview).
 // Main actor state only; Vision, decoding and parsing run in `@concurrent` helpers.
+// Phase 10 WP3 (P10): a file from Files is read and, for a PDF, inspected off the main actor (`open(file:)`); the same
+// task slot as the pipeline, so Cancel, a new source or the sheet closing stops it. `isOpeningFile` shows a spinner.
 import Foundation
 import Observation
 import TimetableCore
@@ -15,7 +17,7 @@ final class PhotoImportModel {
     enum Stage: Equatable {
         case capture
         /// A multi-page PDF: which page?
-        case choosingPage(Data)
+        case choosingPage(Data, pageCount: Int)
         case processing
         case review
     }
@@ -37,6 +39,8 @@ final class PhotoImportModel {
     private(set) var usedAppleIntelligence = false
     /// Catalog key of a problem to show (the capture screen stays).
     var problemKey: String?
+    /// A picked file is being read or inspected (capture screen spinner).
+    private(set) var isOpeningFile = false
     /// A/B weeks: the user's answer to "Which week is A?" (`true` = this week); `nil` until answered. Approve needs it.
     var weekAIsThisWeek: Bool?
     /// Review section to scroll to when the review first appears (`"grid"`, `"questions"`; screenshot routes).
@@ -58,6 +62,7 @@ final class PhotoImportModel {
     /// The import's own pipeline; `knownSubjects` are the user's subject names (abbreviation questions).
     func start(_ source: Source, knownSubjects: [String], defaultName: String) {
         task?.cancel()
+        isOpeningFile = false
         problemKey = nil
         step = .reading
         image = nil
@@ -69,22 +74,43 @@ final class PhotoImportModel {
         }
     }
 
-    /// A PDF file: one page goes straight on; several pages ask first.
-    func open(pdf data: Data, knownSubjects: [String], defaultName: String) {
-        guard let count = ImportImageLoader.pageCount(pdf: data), count > 0 else {
-            problemKey = "import.error.unreadable"
-            return
+    /// A file picked in Files: read (and for a PDF inspected) off the main actor; an image or a one-page PDF goes
+    /// straight on, several pages ask first.
+    func open(file url: URL, isPDF: Bool, knownSubjects: [String], defaultName: String) {
+        task?.cancel()
+        problemKey = nil
+        isOpeningFile = true
+        task = Task {
+            guard let data = await ImportImageLoader.readPicked(url) else {
+                guard !Task.isCancelled else { return }
+                return failOpening("import.error.unreadable")
+            }
+            guard !Task.isCancelled else { return }
+            guard isPDF else {
+                return start(.imageData(data), knownSubjects: knownSubjects, defaultName: defaultName)
+            }
+            let inspection = await ImportImageLoader.inspect(pdf: data)
+            guard !Task.isCancelled else { return }
+            switch inspection {
+            case .unreadable: failOpening("import.error.unreadable")
+            case .locked: failOpening("import.error.pdfLocked")
+            case .pages(1): start(.pdf(data, page: 0), knownSubjects: knownSubjects, defaultName: defaultName)
+            case .pages(let count):
+                isOpeningFile = false
+                stage = .choosingPage(data, pageCount: count)
+            }
         }
-        if count == 1 {
-            start(.pdf(data, page: 0), knownSubjects: knownSubjects, defaultName: defaultName)
-        } else {
-            stage = .choosingPage(data)
-        }
+    }
+
+    private func failOpening(_ key: String) {
+        isOpeningFile = false
+        problemKey = key
     }
 
     func cancel() {
         task?.cancel()
         task = nil
+        isOpeningFile = false
         stage = .capture
     }
 

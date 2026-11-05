@@ -8,6 +8,8 @@
 // APIs: View.photosPicker(isPresented:selection:matching:), PhotosPickerItem.loadTransferable(type: Data.self),
 //   View.fileImporter(isPresented:allowedContentTypes:onCompletion:), View.fullScreenCover(isPresented:),
 //   AVCaptureDevice.authorizationStatus(for: .video).
+// Phase 10 WP3 (P10): the picked file is read and inspected off the main actor (`PhotoImportModel.open(file:)`); a
+// spinner covers the capture choices meanwhile, and Cancel or closing the sheet stops it.
 import AVFoundation
 import PhotosUI
 import SwiftUI
@@ -44,13 +46,20 @@ struct PhotoImportView: View {
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
                         Button {
-                            if flow.stage == .processing { flow.cancel() } else { dismiss() }
+                            if flow.stage == .processing {
+                                flow.cancel()
+                            } else {
+                                if flow.isOpeningFile { flow.cancel() }
+                                dismiss()
+                            }
                         } label: { Text("editor.common.cancel") }
                     }
                 }
         }
         .interactiveDismissDisabled(flow.stage == .review || flow.stage == .processing)
-        .onDisappear { if flow.stage == .processing { flow.cancel() } }   // QA: a deep link closing the sheet stops Vision
+        .onDisappear {   // QA: a deep link closing the sheet stops Vision (and a file still being read)
+            if flow.stage == .processing || flow.isOpeningFile { flow.cancel() }
+        }
         .protectsUnsavedWork(flow.stage == .review)
         .fullScreenCover(isPresented: $scanning) {
             DocumentCameraView { image in
@@ -75,14 +84,12 @@ struct PhotoImportView: View {
             }
         }
         .fileImporter(isPresented: $choosingFile, allowedContentTypes: [.image, .pdf]) { result in
-            guard case .success(let url) = result, let data = ImportImageLoader.readPicked(url) else {
-                if case .failure = result { flow.problemKey = "import.error.unreadable" }
-                return
-            }
-            if UTType(filenameExtension: url.pathExtension)?.conforms(to: .pdf) == true {
-                flow.open(pdf: data, knownSubjects: knownSubjects, defaultName: defaultName)
-            } else {
-                start(.imageData(data))
+            switch result {
+            case .success(let url):
+                let isPDF = UTType(filenameExtension: url.pathExtension)?.conforms(to: .pdf) == true
+                flow.open(file: url, isPDF: isPDF, knownSubjects: knownSubjects, defaultName: defaultName)
+            case .failure:
+                flow.problemKey = "import.error.unreadable"
             }
         }
         .alert(Text("import.error.title"), isPresented: Binding(get: { flow.problemKey != nil },
@@ -118,8 +125,14 @@ struct PhotoImportView: View {
                 ImportSampleSection { start(.image($0)) }
                 #endif
             }
-        case .choosingPage(let data):
-            ImportPDFPagePicker(data: data) { page in start(.pdf(data, page: page)) }
+            .disabled(flow.isOpeningFile)
+            .overlay { if flow.isOpeningFile { ProgressView().controlSize(.large) } }
+        case .choosingPage(let data, let pageCount):
+            ImportPDFPagePicker(data: data, pageCount: pageCount) { page in
+                start(.pdf(data, page: page))
+            } onBack: {
+                flow.stage = .capture
+            }
         case .processing:
             ImportProcessingView(image: flow.image, step: flow.step, usesAppleIntelligence: flow.usedAppleIntelligence)
         case .review:
