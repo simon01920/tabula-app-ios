@@ -450,21 +450,66 @@ check(pj["targets"]["TabulaApp"]["settings"]["base"].get("INFOPLIST_FILE") == "C
       "TabulaApp Info.plist differs between xtool.yml and project.yml")
 
 # --- privacy manifests + export compliance --------------------------------------------------------------------
-VALID_UD_REASONS = {"CA92.1", "1C8F.1", "C56D.1", "AC6B.1"}   # NSPrivacyAccessedAPITypeReasons doc (2026-10-04)
+# Required-reason API declarations. Reason codes: developer.apple.com NSPrivacyAccessedAPIType page (verified 2026-11-05):
+# UserDefaults CA92.1 (app-only data) / 1C8F.1 (App Group data); FileTimestamp C617.1 (app / app-group / CloudKit container
+# files), 3B52.1 (files the user granted access to, e.g. document picker), DDA9.1 (shown to the user), 0A2A.1 (SDK wrapper only).
+# Each manifest must declare EXACTLY the expected categories and reasons: a missing one risks an App Store Connect
+# ITMS-91053 rejection, an extra one is an undeclared claim. TimetableUI (FileAttachmentStore reads modificationDate inside the
+# app container, C617.1) is linked into the app, widgets and watch, so all of them declare C617.1; only the app imports
+# user-picked files (3B52.1).
+UD, FT = "NSPrivacyAccessedAPICategoryUserDefaults", "NSPrivacyAccessedAPICategoryFileTimestamp"
+EXPECTED_APIS = {
+    "app": {UD: {"CA92.1", "1C8F.1"}, FT: {"C617.1", "3B52.1"}},
+    "widget": {UD: {"CA92.1", "1C8F.1"}, FT: {"C617.1"}},
+}
 for label, path, xt_res, pj_target in (
         ("app", "Config/Privacy/App/PrivacyInfo.xcprivacy", xt.get("resources", []), "TabulaApp"),
         ("widget", "Config/Privacy/Widgets/PrivacyInfo.xcprivacy", ext.get("resources", []), "TabulaWidgets")):
     p = plistlib.load(open(ROOT / path, "rb"))
     apis = {a["NSPrivacyAccessedAPIType"]: set(a["NSPrivacyAccessedAPITypeReasons"]) for a in p.get("NSPrivacyAccessedAPITypes", [])}
+    dup = len(apis) != len(p.get("NSPrivacyAccessedAPITypes", []))
     good = (p.get("NSPrivacyTracking") is False and p.get("NSPrivacyTrackingDomains") == []
-            and p.get("NSPrivacyCollectedDataTypes") == []
-            and apis.get("NSPrivacyAccessedAPICategoryUserDefaults", set()) >= {"CA92.1", "1C8F.1"}
-            and apis["NSPrivacyAccessedAPICategoryUserDefaults"] <= VALID_UD_REASONS)
-    check(good, f"{label} privacy manifest: no tracking, no collected data, UserDefaults CA92.1 + 1C8F.1",
-          f"{label} privacy manifest content wrong: {p}")
+            and p.get("NSPrivacyCollectedDataTypes") == [] and not dup and apis == EXPECTED_APIS[label])
+    shown = {k.replace("NSPrivacyAccessedAPICategory", ""): sorted(v) for k, v in EXPECTED_APIS[label].items()}
+    check(good, f"{label} privacy manifest: no tracking, no collected data, required-reason APIs exactly {shown}",
+          f"{label} privacy manifest content wrong (expected APIs {EXPECTED_APIS[label]}, got {apis}, duplicates={dup}): {p}")
     check(path in xt_res, f"{label} privacy manifest wired into xtool.yml resources", f"{path} missing from xtool.yml")
     check(path in srcs[pj_target], f"{label} privacy manifest wired into project.yml {pj_target}",
           f"{path} missing from project.yml {pj_target}")
+
+# Source scan: a required-reason API category used in any shipped target's code must be declared in the APP manifest (the
+# widget and watch manifests are identical and the app is the superset). Heuristic grep, not a substitute for Apple's own
+# static analysis; it catches the common additions (dates, uptime, disk space, active keyboards).
+RR_SCAN = {
+    FT: r"\.(modificationDate|creationDate)\b|fileModificationDate|contentModificationDateKey|creationDateKey|"
+        r"\b(f|l)?stat\(|\bfstatat\(|getattrlist",
+    "NSPrivacyAccessedAPICategorySystemBootTime": r"\bsystemUptime\b|mach_absolute_time",
+    "NSPrivacyAccessedAPICategoryDiskSpace": r"volume(Available|Total)Capacity|\bsystemFreeSize\b|\bsystemSize\b|\bstatv?fs\(",
+    "NSPrivacyAccessedAPICategoryActiveKeyboards": r"\bactiveInputModes\b",
+    UD: r"\bUserDefaults\b|@AppStorage",
+}
+scan_dirs = ("App/Sources", "WidgetExtension", "WatchApp", "Packages/TimetableUI/Sources")
+src_files = [f for d in scan_dirs for f in (ROOT / d).rglob("*.swift")]
+undeclared = {}
+for cat, rx in RR_SCAN.items():
+    pat = re.compile(rx)
+    for f in src_files:
+        hit = any(pat.search(re.sub(r"//.*", "", line)) for line in f.read_text(encoding="utf-8").splitlines())
+        if hit and cat not in EXPECTED_APIS["app"]:
+            undeclared.setdefault(cat, []).append(str(f.relative_to(ROOT)))
+check(not undeclared, "no required-reason API category used in code that the privacy manifests do not declare",
+      f"required-reason APIs used but not declared in a privacy manifest: {undeclared}")
+
+# P10-3 (warning only): placeholder domain/email still in shipped sources. Must be a real domain before Phase 12.
+placeholder_rx = re.compile(r"https?://[^\s\"')]*\.invalid\b|@[\w.-]+\.invalid\b|\{\{DOMAIN\}\}")
+placeholders = sorted({f"{f.relative_to(ROOT)}:{n}" for f in (ROOT / "App/Sources").rglob("*.swift")
+                       for n, line in enumerate(f.read_text(encoding="utf-8").splitlines(), 1) if placeholder_rx.search(line)})
+if placeholders:
+    warn(f"placeholder domain in App/Sources (.invalid URL/email or {{{{DOMAIN}}}}): {', '.join(placeholders)}. "
+         "Decision P10-3: a real domain for share links, privacy policy and support email is needed before Phase 12.")
+else:
+    ok("no .invalid / {{DOMAIN}} placeholders left in App/Sources (P10-3)")
+
 # Watch app + complications (CI path only): one manifest, the widget extension's content, in both watch targets.
 watch_privacy = "Config/Privacy/Watch/PrivacyInfo.xcprivacy"
 check(plistlib.load(open(ROOT / watch_privacy, "rb")) == plistlib.load(open(ROOT / "Config/Privacy/Widgets/PrivacyInfo.xcprivacy", "rb"))

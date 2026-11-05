@@ -30,11 +30,19 @@ on:
       screens:
         description: "Space-separated entries id[@seed[@lang]] — id = -TabulaScreen route, seed = -TabulaSeed (empty|blank|elementary|secondary|university), lang = -AppleLanguages code (e.g. sk, de)"
         type: string
-        default: "today@secondary today.after-school@secondary timetable.grid@secondary timetable.week@university timetable.tiles@elementary tasks@secondary tasks.quick-add@secondary exams@secondary settings@secondary settings.reminders@secondary settings.backup@secondary onboarding@empty widgets.gallery@secondary widgets.gallery-live@secondary today@secondary@sk"
+        default: "today@secondary today.after-school@secondary timetable.grid@secondary timetable.week@university timetable.tiles@elementary tasks@secondary tasks.quick-add@secondary exams@secondary settings@secondary settings.reminders@secondary settings.backup@secondary onboarding@empty widgets.gallery@secondary widgets.gallery-live@secondary today@secondary@sk settings@secondary@hu"
       device:
-        description: "Simulator device type name, e.g. 'iPhone 17 Pro Max' (empty = largest available Pro Max)"
+        description: "Simulator device type name, e.g. 'iPhone 17 Pro Max' (empty = largest available Pro Max). Smallest-screen check (SE class): 'iPhone SE (3rd generation)' if an available runtime offers it (the picker searches runtimes newest-first), else 'iPhone 16e'; pair with a short `screens` list. Names: the first step prints `simctl list devicetypes`."
         type: string
         default: ""
+      increase_contrast:
+        description: "Extra variant per screen with Increase Contrast on (xcrun simctl ui <device> increase_contrast enabled; UNVERIFIED on the runner Xcode: the step warns and skips the variant if simctl rejects it). Adds 1 screenshot per screen."
+        type: boolean
+        default: false
+      double_length:
+        description: "Extra variant per screen with every localized string doubled (-NSDoubleLocalizedStrings YES, Apple's long-string test; whether SwiftUI catalog lookups honour it is UNVERIFIED, so compare against the light shot). Adds 1 screenshot per screen."
+        type: boolean
+        default: false
       watch:
         description: "Also screenshot the watch app on an Apple Watch simulator (~+3 min)"
         type: boolean
@@ -52,8 +60,10 @@ env:
   XCODEGEN_VERSION: "2.46.0"
   XCODEGEN_SHA256: 4d9e34b62172d645eed6457cac13fc222569974098ef4ee9c3368bedf0196806
   # Core set only (fits the 45-min job); full list for UX reviews: scripts/ui-screens-full.txt, dispatch in batches.
-  SCREENS: ${{ inputs.screens || 'today@secondary today.after-school@secondary timetable.grid@secondary timetable.week@university timetable.tiles@elementary tasks@secondary tasks.quick-add@secondary exams@secondary settings@secondary settings.reminders@secondary settings.backup@secondary onboarding@empty widgets.gallery@secondary widgets.gallery-live@secondary today@secondary@sk' }}
+  SCREENS: ${{ inputs.screens || 'today@secondary today.after-school@secondary timetable.grid@secondary timetable.week@university timetable.tiles@elementary tasks@secondary tasks.quick-add@secondary exams@secondary settings@secondary settings.reminders@secondary settings.backup@secondary onboarding@empty widgets.gallery@secondary widgets.gallery-live@secondary today@secondary@sk settings@secondary@hu' }}
   DEVICE_OVERRIDE: ${{ inputs.device || '' }}
+  EXTRA_CONTRAST: ${{ inputs.increase_contrast && '1' || '0' }}
+  EXTRA_DOUBLE: ${{ inputs.double_length && '1' || '0' }}
   OUT: screenshots
 
 jobs:
@@ -125,10 +135,11 @@ jobs:
             --wifiBars 3 --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100 || true
           xcrun simctl install "$SIM_UDID" "$APP"
 
-          shoot() { # shoot <screen> <variant>
+          shoot() { # shoot <screen> <variant> [extra launch args...]
             local entry="$1" variant="$2" pid screen seed lang
+            shift 2
             IFS='@' read -r screen seed lang <<< "$entry"
-            local args=(-TabulaScreen "$screen")
+            local args=(-TabulaScreen "$screen" "$@")
             [ -n "$seed" ] && args+=(-TabulaSeed "$seed")
             [ -n "$lang" ] && args+=(-AppleLanguages "($lang)" -AppleLocale "$lang")
             local name="${entry//@/_}"
@@ -155,6 +166,18 @@ jobs:
             xcrun simctl ui "$SIM_UDID" appearance light; shoot "$screen" light || failed=1
             xcrun simctl ui "$SIM_UDID" appearance dark;  shoot "$screen" dark  || failed=1
             xcrun simctl ui "$SIM_UDID" appearance light
+            # Optional extra variants (workflow_dispatch inputs; off by default). A simctl failure only warns.
+            if [ "$EXTRA_CONTRAST" = 1 ]; then
+              if xcrun simctl ui "$SIM_UDID" increase_contrast enabled; then
+                shoot "$screen" light-increased-contrast || failed=1
+                xcrun simctl ui "$SIM_UDID" increase_contrast disabled || true
+              else
+                echo "::warning::simctl ui increase_contrast not supported on this Xcode; variant skipped"
+              fi
+            fi
+            if [ "$EXTRA_DOUBLE" = 1 ]; then
+              shoot "$screen" double-length -NSDoubleLocalizedStrings YES || failed=1
+            fi
             # Widget gallery pages (Phase 4): fixed widget point sizes, so the AX variant is skipped (optional per plan).
             case "$screen" in widgets.*) continue ;; esac
             if xcrun simctl ui "$SIM_UDID" content_size accessibility-extra-extra-extra-large; then
