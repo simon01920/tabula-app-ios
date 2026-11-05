@@ -112,6 +112,18 @@ public struct ValidationIssue: Hashable, Sendable, Codable, CustomStringConverti
         [entityType.rawValue, entityID.uuidString, field ?? "", code.rawValue, childID?.uuidString ?? "",
          relatedID?.uuidString ?? "", value ?? ""]
     }
+
+    /// `issues` in the deterministic order of `validate()`: lexicographic by (entity type, entity ID, field, code,
+    /// child ID, related ID, value) as strings.
+    ///
+    /// Phase 10 P13: each key (seven strings, three `uuidString`s) is built once per issue, not twice per
+    /// comparison (decorate–sort–undecorate). Same comparisons on the same input order, so the same output as
+    /// sorting with the key computed in the comparator, ties included.
+    static func canonicallyOrdered(_ issues: [ValidationIssue]) -> [ValidationIssue] {
+        issues.map { (key: $0.sortKey, issue: $0) }
+            .sorted { $0.key.lexicographicallyPrecedes($1.key) }
+            .map(\.issue)
+    }
 }
 
 extension TabulaDatabase {
@@ -120,7 +132,7 @@ extension TabulaDatabase {
     public func validate() -> [ValidationIssue] {
         var validator = Validator(db: self)
         validator.run()
-        return validator.issues.sorted { $0.sortKey.lexicographicallyPrecedes($1.sortKey) }
+        return ValidationIssue.canonicallyOrdered(validator.issues)
     }
 
     /// `true` when `validate()` reports no `.error` issue.
