@@ -22,8 +22,10 @@ Verify with evidence: WSL Swift + `xtool setup` + hello-world on iPhone; widget 
 
 **Phase 9 — AI import.** Eval harness → model selection → pipeline → review UI → model download/hosting. Gate includes the accuracy report.
 
-**Phase 10 — Monetisation.** `Entitlements`, StoreKit 2, paywall, gating, TestFlight sandbox plan.
+**Phase 10 — Polish, bug fixes & performance** (human decision, 2026-11-05: polish comes before monetisation). Performance pass for the slowest supported devices (A13 iPhones, iPhone SE screens, Apple Watch Series 6/7-class, the widget memory limit), bug fixes from an audit of the whole app and the open gate items, empty/error states, accessibility audit, small-screen and Dynamic Type layout, localisation review log, privacy manifest. Plan: `docs/specs/PHASE10_PLAN.md`.
 
-**Phase 11 — Polish & release.** Accessibility audit, localisation review log, empty/error states, performance pass, privacy manifest, App Store assets/metadata drafts, final CI release run, TestFlight beta checklist.
+**Phase 11 — Monetisation.** `Entitlements`, StoreKit 2, paywall, gating, TestFlight sandbox plan. Needs the paid account; the human declined a paywall for now (P9-3, "most features are free").
+
+**Phase 12 — Release.** App Store assets/metadata drafts, final CI release run, TestFlight beta checklist, CloudKit schema deploy (needs the paid account).
 
 Localisation and accessibility are continuous: strings go into catalogs as they are written, not at the end.
