@@ -80,3 +80,10 @@ onboarding.times@empty
 onboarding.times-individual@empty
 onboarding.school-type@empty@sk
 onboarding.sample-banner@secondary
+settings@secondary@hu
+settings.reminders@secondary@hu
+editor.subject@secondary@hu
+exams@secondary@hu
+exams.editor@secondary@hu
+onboarding@empty@hu
+onboarding.times@empty@hu

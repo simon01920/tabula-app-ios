@@ -15,7 +15,8 @@ Usage
 Rules: newest *available* runtime of the platform; device types from that runtime's `supportedDeviceTypes`
 (fallback: `devicetypes` filtered by product family and min/max runtime version). iOS default = the "Pro Max" with
 the highest model number (else the highest-numbered iPhone); watchOS default = highest model number, then size.
-An explicit --device must be supported by the chosen runtime. Stdlib only.
+An explicit --device selects the newest available runtime that supports it (U6, 2026-11-05); it errors, listing the
+newest runtime's devices, only if no available runtime has it. Stdlib only.
 """
 import argparse
 import json
@@ -62,7 +63,10 @@ def pick(data, platform, device=""):
     # devices (iOS 27.1 on the runner image offered only "iPhone Duo"); `simctl io screenshot` fails on those.
     runtimes.sort(key=lambda r: version_tuple(r.get("version")), reverse=True)
     runtime = runtimes[0]
-    if platform == "iOS" and not device:
+    if device:
+        # Explicit device: the newest runtime that offers it (an older runtime may be the only one with e.g. the SE).
+        runtime = next((r for r in runtimes if any(t["name"] == device for t in candidates_of(r))), runtime)
+    elif platform == "iOS":
         runtime = next((r for r in runtimes if any(not MULTI_DISPLAY.search(t["name"]) for t in candidates_of(r))), runtime)
     candidates = candidates_of(runtime)
     if not candidates:
@@ -151,6 +155,18 @@ def self_test():
     expect("unavailable iOS 27.2 runtime (and its iPhone 18 Pro Max) ignored", lambda: pick(sample, "iOS")["SIM_NAME"],
            "iPhone 17 Pro Max")
     expect("override honoured", lambda: pick(sample, "iOS", "iPhone 16 Pro Max")["SIM_NAME"], "iPhone 16 Pro Max")
+    # U6: a device only an older runtime offers (iPhone SE (3rd generation) on iOS 26.4, absent from 27.0).
+    se = _dt("iPhone SE (3rd generation)", "iPhone", hi="26.9")
+    older_only = json.loads(json.dumps(sample))
+    older_only["devicetypes"].append(se)
+    for r in older_only["runtimes"]:
+        if r["name"] == "iOS 26.4":
+            r["supportedDeviceTypes"].append(_short(se))
+    expect("device only on an older runtime picks that runtime", lambda: pick(older_only, "iOS", "iPhone SE (3rd generation)"),
+           lambda g: isinstance(g, dict) and g["SIM_RUNTIME_NAME"] == "iOS 26.4" and g["SIM_NAME"] == "iPhone SE (3rd generation)")
+    expect("device on both runtimes still prefers the newest", lambda: pick(older_only, "iOS", "iPhone 17 Pro Max")["SIM_RUNTIME_NAME"],
+           "iOS 27.0")
+    expect("no-device default unaffected by the older-only SE", lambda: pick(older_only, "iOS")["SIM_NAME"], "iPhone 17 Pro Max")
     expect("unknown override fails loudly", lambda: pick(sample, "iOS", "iPhone 99"),
            lambda g: isinstance(g, str) and "not supported by iOS 27.0" in g)
     expect("watchOS = newest runtime, highest model then size", lambda: pick(sample, "watchOS"),
