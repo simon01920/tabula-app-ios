@@ -160,9 +160,15 @@ public struct DayResolution: Hashable, Sendable, Codable {
     /// The `useBellSchedule` override in effect, if any.
     public var bellScheduleOverrideID: ScheduleOverride.ID?
     /// Modification reasons of `.modified` (and patched `.cancelled`) occurrences, ascending by occurrence ID.
-    public var changes: [OccurrenceChanges]
+    public var changes: [OccurrenceChanges] {
+        didSet { reasonsByOccurrence = Self.index(changes) }
+    }
     /// Problems met, in a deterministic order.
     public var warnings: [ResolutionWarning]
+    /// `changes` by occurrence ID (the first record wins, as the former linear search did), so `reasons(for:)`
+    /// is a lookup instead of a scan: the export asks once per occurrence (Phase 10 C5). Derived from `changes`
+    /// (rebuilt whenever it is set), so it takes no part in equality, hashing or coding.
+    private var reasonsByOccurrence: [OccurrenceID: [ModificationReason]]
 
     /// Creates a resolution.
     public init(schedule: DaySchedule, naturalDayKey: DayKey? = nil, naturalCycleWeek: Int? = nil,
@@ -175,11 +181,64 @@ public struct DayResolution: Hashable, Sendable, Codable {
         self.bellScheduleOverrideID = bellScheduleOverrideID
         self.changes = changes
         self.warnings = warnings
+        self.reasonsByOccurrence = Self.index(changes)
     }
 
     /// The modification reasons of `occurrenceID` (empty when unchanged).
     public func reasons(for occurrenceID: OccurrenceID) -> [ModificationReason] {
-        changes.first { $0.occurrenceID == occurrenceID }?.reasons ?? []
+        reasonsByOccurrence[occurrenceID] ?? []
+    }
+
+    private static func index(_ changes: [OccurrenceChanges]) -> [OccurrenceID: [ModificationReason]] {
+        var index: [OccurrenceID: [ModificationReason]] = [:]
+        for change in changes where index[change.occurrenceID] == nil { index[change.occurrenceID] = change.reasons }
+        return index
+    }
+
+    // MARK: Hashable and Codable over the stored fields only (the index is derived)
+
+    private enum CodingKeys: String, CodingKey {
+        case schedule, naturalDayKey, naturalCycleWeek, followDayOverrideID, bellScheduleOverrideID, changes, warnings
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(schedule: try container.decode(DaySchedule.self, forKey: .schedule),
+                  naturalDayKey: try container.decodeIfPresent(DayKey.self, forKey: .naturalDayKey),
+                  naturalCycleWeek: try container.decodeIfPresent(Int.self, forKey: .naturalCycleWeek),
+                  followDayOverrideID: try container.decodeIfPresent(ScheduleOverride.ID.self, forKey: .followDayOverrideID),
+                  bellScheduleOverrideID: try container.decodeIfPresent(ScheduleOverride.ID.self,
+                                                                        forKey: .bellScheduleOverrideID),
+                  changes: try container.decode([OccurrenceChanges].self, forKey: .changes),
+                  warnings: try container.decode([ResolutionWarning].self, forKey: .warnings))
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(schedule, forKey: .schedule)
+        try container.encodeIfPresent(naturalDayKey, forKey: .naturalDayKey)
+        try container.encodeIfPresent(naturalCycleWeek, forKey: .naturalCycleWeek)
+        try container.encodeIfPresent(followDayOverrideID, forKey: .followDayOverrideID)
+        try container.encodeIfPresent(bellScheduleOverrideID, forKey: .bellScheduleOverrideID)
+        try container.encode(changes, forKey: .changes)
+        try container.encode(warnings, forKey: .warnings)
+    }
+
+    public static func == (lhs: DayResolution, rhs: DayResolution) -> Bool {
+        lhs.schedule == rhs.schedule && lhs.naturalDayKey == rhs.naturalDayKey
+            && lhs.naturalCycleWeek == rhs.naturalCycleWeek && lhs.followDayOverrideID == rhs.followDayOverrideID
+            && lhs.bellScheduleOverrideID == rhs.bellScheduleOverrideID && lhs.changes == rhs.changes
+            && lhs.warnings == rhs.warnings
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(schedule)
+        hasher.combine(naturalDayKey)
+        hasher.combine(naturalCycleWeek)
+        hasher.combine(followDayOverrideID)
+        hasher.combine(bellScheduleOverrideID)
+        hasher.combine(changes)
+        hasher.combine(warnings)
     }
 }
 

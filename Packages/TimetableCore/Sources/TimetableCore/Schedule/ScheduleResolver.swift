@@ -55,6 +55,8 @@ public struct ScheduleResolver: Sendable {
     let ownTerms: [Term]
     /// Live breaks that apply to this timetable, ascending by (start, end, id).
     let breaks: [CalendarBreak]
+    /// Live overrides of this timetable by date, each list ascending by (`meta.updatedAt`, `id`) (sorted once
+    /// here, not per resolved date: Phase 10 C8).
     let overridesByDate: [LocalDate: [ScheduleOverride]]
 
     /// Creates a resolver from entity collections. Tombstones are skipped; lessons, bell schedules,
@@ -97,6 +99,7 @@ public struct ScheduleResolver: Sendable {
         self.breaks = ownBreaks
         self.overridesByDate = Dictionary(grouping: overrides.filter { !$0.isDeleted && $0.timetableID == ttID },
                                           by: \.date)
+            .mapValues { $0.sorted(by: Self.overridePrecedence) }
         self.rotation = RotationResolver(scheme: timetable.rotation, firstWeekday: timetable.rotationWeekStart,
                                          breaks: ownBreaks.map(\.range))
     }
@@ -410,9 +413,14 @@ public struct ScheduleResolver: Sendable {
         var adds: [(override: ScheduleOverride, lesson: OneOffLesson)] = []
     }
 
+    /// "Later wins" order of the overrides of one date: ascending (`meta.updatedAt`, `id`).
+    static func overridePrecedence(_ lhs: ScheduleOverride, _ rhs: ScheduleOverride) -> Bool {
+        (lhs.meta.updatedAt, lhs.id) < (rhs.meta.updatedAt, rhs.id)
+    }
+
     func classifiedOverrides(on date: LocalDate, warnings: inout [ResolutionWarning]) -> DayOverrides {
         var result = DayOverrides()
-        let ordered = (overridesByDate[date] ?? []).sorted { ($0.meta.updatedAt, $0.id) < ($1.meta.updatedAt, $1.id) }
+        let ordered = overridesByDate[date] ?? []  // already in precedence order (init)
         var supersededFollow: [ScheduleOverride] = []
         var supersededBell: [ScheduleOverride] = []
         for override in ordered {
