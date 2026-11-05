@@ -18,11 +18,15 @@ public enum CSVExport {
         // Subjects can come from someone else's share code: a leading = + - @ TAB CR would run as a spreadsheet
         // formula (CSV injection), so it gets a leading apostrophe (OWASP); XLSX inline strings never evaluate.
         var value = value
-        // Also a leading space (some apps trim it first) and the full-width ＝＋－＠ (Excel normalises them).
-        if let first = value.unicodeScalars.first, "=+-@\t\r \u{FF1D}\u{FF0B}\u{FF0D}\u{FF20}".unicodeScalars.contains(first) {
-            value = "'" + value
-        }
+        if startsLikeFormula(value) { value = "'" + value }
         guard value.contains(where: { $0 == "," || $0 == "\"" || $0.isNewline }) else { return value }
         return "\"" + value.replacingOccurrences(of: "\"", with: "\"\"") + "\""
+    }
+
+    /// `true` when a spreadsheet could read `value` as a formula: it starts with = + - @ TAB CR, a space (some
+    /// apps trim it first) or the full-width ＝＋－＠ (Excel normalises them). Shared with `XLSXExport`.
+    static func startsLikeFormula(_ value: String) -> Bool {
+        guard let first = value.unicodeScalars.first else { return false }
+        return "=+-@\t\r \u{FF1D}\u{FF0B}\u{FF0D}\u{FF20}".unicodeScalars.contains(first)
     }
 }

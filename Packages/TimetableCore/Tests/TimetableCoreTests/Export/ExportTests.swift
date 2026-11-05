@@ -221,7 +221,7 @@ struct ExportTests {
         let data = XLSXExport.data(rows: rows, labels: Self.labels, sheetName: "Rozvrh: 2026/27 [A]")
         let entries = try ZipReader.entries(Array(data))
         #expect(entries.map(\.name) == ["[Content_Types].xml", "_rels/.rels", "xl/workbook.xml",
-                                        "xl/_rels/workbook.xml.rels", "xl/worksheets/sheet1.xml"])
+                                        "xl/_rels/workbook.xml.rels", "xl/worksheets/sheet1.xml", "xl/styles.xml"])
         for entry in entries {
             let xml = try #require(String(bytes: entry.bytes, encoding: .utf8))
             #expect(xml.hasPrefix("<?xml"))
@@ -274,7 +274,7 @@ struct ExportTests {
         let ics = ICSExport.data(rows: rows, labels: Self.labels, timeZone: world.context.timeZone, stamp: Fixture.now)
         let xlsx = XLSXExport.data(rows: rows, labels: Self.labels)
         #expect(csv.count < 60_000 && ics.count < 300_000 && xlsx.count < 40_000)
-        #expect(try ZipReader.entries(Array(xlsx)).count == 5)
+        #expect(try ZipReader.entries(Array(xlsx)).count == 6)
     }
 }
 
