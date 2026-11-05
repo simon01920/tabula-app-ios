@@ -78,7 +78,7 @@ struct ImportReviewScreen: View {
                 } label: {
                     Text("import.review.pane")
                 }
-                .pickerStyle(.segmented)
+                .adaptiveSegmentedPicker()
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
                 switch pane {

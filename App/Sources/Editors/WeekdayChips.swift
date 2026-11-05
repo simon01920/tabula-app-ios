@@ -18,25 +18,37 @@ struct WeekdayChips: View {
     @Environment(AppModel.self) private var model
     @Environment(\.dynamicTypeSize) private var typeSize
 
-    private var columns: [GridItem] {
-        if typeSize.isAccessibilitySize {
-            return [GridItem(.adaptive(minimum: 140), spacing: 8)]
-        }
-        return Array(repeating: GridItem(.flexible(), spacing: 6), count: max(1, days.count))
-    }
+    /// Phase 10 U8: one row of chips only when every chip keeps the 44 pt minimum target (seven chips are ~38 pt
+    /// wide at 375 pt); otherwise a 4-column grid (two rows). At accessibility sizes the chips wrap adaptively.
+    private let rowSpacing: CGFloat = 6
+    private let wrappedColumns = Array(repeating: GridItem(.flexible(), spacing: 6), count: 4)
 
     var body: some View {
-        LazyVGrid(columns: columns, alignment: .leading, spacing: 8) {
-            ForEach(days, id: \.self) { day in
-                Toggle(isOn: Binding(get: { isOn(day) }, set: { setOn(day, $0) })) {
-                    // Abbreviated at every size ("Wed"): the full name truncated to "Wednes…" at AX sizes (D10).
-                    Text(verbatim: model.formatter.weekdayName(day, width: .abbreviated))
+        Group {
+            if typeSize.isAccessibilitySize {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: 8)], alignment: .leading, spacing: 8) {
+                    chips
                 }
-                .toggleStyle(WeekdayChipStyle())
-                .accessibilityLabel(Text(verbatim: model.formatter.weekdayName(day)))
+            } else {
+                // The first option whose ideal width (each chip at least 44 pt) fits the row; else the grid.
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: rowSpacing) { chips }
+                    LazyVGrid(columns: wrappedColumns, alignment: .leading, spacing: 8) { chips }
+                }
             }
         }
         .padding(.vertical, 4)
+    }
+
+    private var chips: some View {
+        ForEach(days, id: \.self) { day in
+            Toggle(isOn: Binding(get: { isOn(day) }, set: { setOn(day, $0) })) {
+                // Abbreviated at every size ("Wed"): the full name truncated to "Wednes…" at AX sizes (D10).
+                Text(verbatim: model.formatter.weekdayName(day, width: .abbreviated))
+            }
+            .toggleStyle(WeekdayChipStyle())
+            .accessibilityLabel(Text(verbatim: model.formatter.weekdayName(day)))
+        }
     }
 }
 
@@ -52,7 +64,7 @@ private struct WeekdayChipStyle: ToggleStyle {
                 .lineLimit(1)
                 .minimumScaleFactor(0.75)
                 .padding(.horizontal, 4)
-                .frame(maxWidth: .infinity, minHeight: 44)
+                .frame(minWidth: 44, maxWidth: .infinity, minHeight: 44)
                 .foregroundStyle(configuration.isOn ? Color.onInk : Color.primary)
                 .background {
                     Capsule().fill(configuration.isOn ? Color.ink : Color.clear)

@@ -29,10 +29,11 @@ public struct ExamFacts: Equatable, Sendable {
         topics = EditorText.cleanedList(exam.topics)
     }
 
-    /// "A214, FIIT" (user text only), or the one that exists, or `nil`.
-    public var location: String? {
+    /// "A214, FIIT" (user text only), or the one that exists, or `nil`. `separator` is the language's list separator
+    /// (`ExamTexts.location(_:)` passes the catalog's `a11y.separator`: "、" in Japanese, never a hard-coded Latin comma).
+    public func location(separator: String) -> String? {
         let parts = [room, building].compactMap { $0 }
-        return parts.isEmpty ? nil : parts.joined(separator: ", ")
+        return parts.isEmpty ? nil : parts.joined(separator: separator)
     }
 
     /// The visibility that applies to `exam`: its timetable's, else the active timetable's, else everything.
@@ -107,6 +108,11 @@ public struct ExamTexts: Sendable {
         section.examCount == 0
             ? renderer.string(forKey: "exams.period.none")
             : renderer.format(key: "exams.period.count", arguments: [.integer(Int64(section.examCount))])
+    }
+
+    /// "A214, FIIT" with the language's separator (Phase 10 U15), or the one that exists, or `nil`.
+    public func location(_ facts: ExamFacts) -> String? {
+        facts.location(separator: renderer.string(forKey: "a11y.separator"))
     }
 
     /// First three topics ("limits, derivatives and series"), with an ellipsis when there are more; `nil` without topics.

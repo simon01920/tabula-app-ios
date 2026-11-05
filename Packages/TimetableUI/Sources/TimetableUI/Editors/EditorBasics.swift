@@ -61,9 +61,12 @@ public enum LocalDateBridge {
     }
 
     /// The same calendar with `locale` (for `.environment(\.calendar, …)` so the picker formats like the app).
-    public static func calendar(locale: Locale) -> Calendar {
+    /// `firstWeekday` is the app's week start (`CalendarContext.firstWeekday`, which includes the user's override);
+    /// without it the locale's own first weekday applies and the picker's weeks disagree with the app (Phase 10 B10).
+    public static func calendar(locale: Locale, firstWeekday: Weekday? = nil) -> Calendar {
         var calendar = Self.calendar
         calendar.locale = locale
+        if let firstWeekday { calendar.firstWeekday = firstWeekday.foundationWeekday }
         return calendar
     }
 

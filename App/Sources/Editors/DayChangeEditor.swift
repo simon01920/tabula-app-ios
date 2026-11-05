@@ -77,6 +77,8 @@ private struct DayChangeFormContent: View {
     let timetable: Timetable
     @Binding var editingBell: Bool
     @Environment(AppModel.self) private var model
+    /// B5: the existing change whose "Undo" awaits confirmation.
+    @State private var undoingChangeID: ScheduleOverride.ID?
 
     private var database: TabulaDatabase? { model.database }
     private var labels: EditorLabels { EditorLabels(model: model) }
@@ -328,14 +330,29 @@ private struct DayChangeFormContent: View {
                             Image(systemName: symbol(of: item.change))
                         }
                         Spacer(minLength: 8)
-                        // A labelled button (no icon-only arrow that needed a footer to explain it, M5). It applies at
-                        // once, like the undo it is; the draft of this sheet is not affected.
+                        // A labelled button (no icon-only arrow that needed a footer to explain it, M5). It applies after
+                        // a confirmation (B5: it deleted at once); the draft of this sheet is not affected. The dialog is
+                        // attached to the button, never to the Section (RISKS #99).
                         Button {
-                            model.apply(.delete(item.id))
+                            undoingChangeID = item.id
                         } label: {
                             Text("editor.dayChange.existing.remove").frame(minHeight: 44)
                         }
                         .buttonStyle(.borderless)
+                        .confirmationDialog(
+                            Text("editor.dayChange.existing.confirm.title"),
+                            isPresented: Binding(get: { undoingChangeID == item.id },
+                                                 set: { if !$0 && undoingChangeID == item.id { undoingChangeID = nil } }),
+                            titleVisibility: .visible
+                        ) {
+                            Button("editor.dayChange.existing.remove", role: .destructive) {
+                                model.apply(.delete(item.id))
+                                undoingChangeID = nil
+                            }
+                            Button("editor.common.cancel", role: .cancel) {}
+                        } message: {
+                            Text("editor.dayChange.existing.confirm.message")
+                        }
                     }
                     .accessibilityElement(children: .contain)
                 }

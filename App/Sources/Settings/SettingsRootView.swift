@@ -27,6 +27,8 @@ struct SettingsRootView: View {
     @Environment(\.openURL) private var openURL
     @State private var addingTimetable = false
     @State private var importing = false
+    /// U16: the timetable emoji's frame grows with Dynamic Type (a fixed 29 pt clipped it at AX5).
+    @ScaledMetric(relativeTo: .body) private var emojiSide: CGFloat = 29
 
     var body: some View {
         NavigationStack {
@@ -80,7 +82,7 @@ struct SettingsRootView: View {
                             Text(verbatim: timetable.name)
                         } icon: {
                             if let emoji = timetable.emoji {
-                                Text(verbatim: emoji).frame(width: 29, height: 29).accessibilityHidden(true)
+                                Text(verbatim: emoji).frame(width: emojiSide, height: emojiSide).accessibilityHidden(true)
                             } else {
                                 SettingsIconTile(symbol: "rectangle.stack.fill", color: .blue)
                             }
