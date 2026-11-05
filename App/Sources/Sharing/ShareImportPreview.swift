@@ -5,6 +5,9 @@
 // (destructive role → an alert that names what goes and where the backup copy is kept).
 // APIs: View.safeAreaInset(edge:), Button(role: .destructive), View.alert(_:isPresented:actions:message:),
 //       LabeledContent, Label(title:icon:).
+// Phase 10 WP3 (B4): one import at a time. `isImporting` is set before the backup copy and the apply, both buttons
+// are disabled while it is set, and a second tap (or the Replace alert confirming late) does nothing; it is cleared
+// only when the import fails, so the sheet closing after a success cannot be followed by a duplicate.
 import SwiftUI
 import TimetableCore
 import TimetableUI
@@ -18,6 +21,7 @@ struct ShareImportPreview: View {
     @Environment(AppModel.self) private var model
     @State private var confirmingReplace = false
     @State private var problemKey: String?
+    @State private var isImporting = false
 
     private var summary: ShareImportSummary { resolved.summary }
 
@@ -115,14 +119,14 @@ struct ShareImportPreview: View {
                     .onInkLabel()
             }
             .buttonStyle(.borderedProminent)
-            .disabled(!canAdd || model.isReadOnly)
+            .disabled(!canAdd || model.isReadOnly || isImporting)
             if let target = replaceTarget {
                 Button(role: .destructive) { confirmingReplace = true } label: {
                     Text(verbatim: model.renderer.format(key: "share.preview.replace", arguments: [.text(target.name)]))
                         .frame(maxWidth: .infinity, minHeight: 44)
                 }
                 .buttonStyle(.bordered)
-                .disabled(model.isReadOnly)
+                .disabled(model.isReadOnly || isImporting)
             }
             if !canAdd, let target = replaceTarget {
                 Text(verbatim: model.renderer.format(key: "share.preview.freeLimit", arguments: [.text(target.name)]))
@@ -140,12 +144,15 @@ struct ShareImportPreview: View {
     // MARK: Import
 
     private func importShared(replacing: Timetable.ID?) {
+        guard !isImporting else { return }   // B4: a second tap must not add a second copy
+        isImporting = true
         if replacing != nil {
             // The automatic copy comes first; no copy → nothing is replaced (same rule as Settings › Backup).
             guard let current = model.database,
                   (try? BackupFolder.write(.make(from: current, createdAt: model.now), label: "pre-import",
                                            in: model.environment.backupDirectory)) != nil else {
                 problemKey = "settings.backup.error.copyFailed"
+                isImporting = false
                 return
             }
         }
@@ -153,9 +160,10 @@ struct ShareImportPreview: View {
                                                      startsFromScratch: model.database == nil)
         switch model.apply(mutation) {
         case .applied:
-            onFinish(true)
+            onFinish(true)   // stays `isImporting`: the sheet is closing
         case .rejected, .readOnly, .failed:
             problemKey = "share.preview.error.apply"
+            isImporting = false
         }
     }
 

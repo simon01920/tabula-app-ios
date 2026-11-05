@@ -9,6 +9,13 @@
 // APIs: SwiftUI.ShareLink(item:subject:message:label:) (URL is Transferable, iOS 16), Image(uiImage:).interpolation(.none),
 //       Text.speechSpellsOutCharacters() (iOS 15), View.textSelection(.enabled), View.task(id:), Form, Toggle.
 // Note: `ShareLink` alone is ambiguous here (SwiftUI's view and TimetableCore's link type), so both are qualified.
+// Phase 10 WP3:
+// - B9: a code is uploaded once per envelope for the sheet's lifetime (`uploadedCodes`): flipping "Include open tasks"
+//   back and forth reuses the code of the same envelope instead of spending another KV write (RISKS #14). A failed
+//   upload is not cached (Try Again uploads). Reopening the sheet still uploads again (a cache across sheets needs a
+//   home in the dependency container; not in this WP).
+// - P8/U12: the QR code is rendered once per link text in `.task(id:)`, off the main actor, and kept in `@State`
+//   (it was re-rendered with a new CIContext on every body pass); a failed render says so and points to the link.
 import SwiftUI
 import TimetableCore
 import TimetableUI
@@ -21,6 +28,8 @@ struct ShareTimetableSheet: View {
     @State private var state: ShareSheetState = .preparing
     @State private var warnings: [ShareWarning] = []
     @State private var attempt = 0
+    /// Short codes already uploaded in this sheet, by envelope text (B9).
+    @State private var uploadedCodes: [String: ShortCode] = [:]
 
     private var timetableName: String {
         model.timetables.first { $0.id == timetableID }?.name ?? ""
@@ -149,10 +158,15 @@ struct ShareTimetableSheet: View {
         case .inline(let link):
             state = .ready(link, code: nil)
         case .upload(let envelope):
+            if let code = uploadedCodes[envelope] {
+                state = .ready(.shortCode(code), code: code)
+                return
+            }
             let result = await ShareServiceClient.upload(envelope: envelope)
             guard !Task.isCancelled else { return }
             switch result {
             case .success(let code):
+                uploadedCodes[envelope] = code
                 state = .ready(.shortCode(code), code: code)
             case .failure(let problem):
                 state = .uploadFailed(messageKey: problem.messageKey, fallback: SharePlan.fallback(envelope: envelope))
@@ -174,23 +188,50 @@ private enum ShareSheetState {
 }
 
 /// The QR code on a white card (codes need dark modules on a light ground in dark mode too), scaled without smoothing.
+/// Rendered once per `text` (P8/U12); while rendering a small spinner holds the space, a failed render shows a note.
 struct QRCodeView: View {
     let text: String
     let timetableName: String
     @Environment(AppModel.self) private var model
+    @State private var rendered: Rendered?
+
+    /// The QR image of one text (`image == nil`: the render failed).
+    private struct Rendered {
+        let text: String
+        let image: UIImage?
+    }
 
     var body: some View {
-        if let image = QRCodeRenderer.image(for: text) {
-            Image(uiImage: image)
-                .interpolation(.none)
-                .resizable()
-                .scaledToFit()
-                .padding(16)
-                .background(Color.white, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-                .frame(maxWidth: 280, maxHeight: 280)
-                .accessibilityLabel(Text(verbatim: model.renderer.format(key: "share.sheet.qr.a11y",
-                                                                         arguments: [.text(timetableName)])))
-                .accessibilityAddTraits(.isImage)
+        Group {
+            if let rendered, rendered.text == text {
+                if let image = rendered.image {
+                    Image(uiImage: image)
+                        .interpolation(.none)
+                        .resizable()
+                        .scaledToFit()
+                        .padding(16)
+                        .background(Color.white, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .frame(maxWidth: 280, maxHeight: 280)
+                        .accessibilityLabel(Text(verbatim: model.renderer.format(key: "share.sheet.qr.a11y",
+                                                                                 arguments: [.text(timetableName)])))
+                        .accessibilityAddTraits(.isImage)
+                } else {
+                    Label {
+                        Text("share.sheet.qr.failed")
+                    } icon: {
+                        Image(AppSymbol.warning).foregroundStyle(Color.correction)
+                    }
+                    .fixedSize(horizontal: false, vertical: true)
+                }
+            } else {
+                ProgressView()
+                    .frame(maxWidth: 280, minHeight: 120)
+            }
+        }
+        .task(id: text) {
+            let image = await QRCodeRenderer.image(for: text)
+            guard !Task.isCancelled else { return }
+            rendered = Rendered(text: text, image: image.map { UIImage(cgImage: $0) })
         }
     }
 }

@@ -11,6 +11,17 @@
 //   documentCameraViewController(_:didFinishWith:), …DidCancel(_:), …(_:didFailWithError:)), VNDocumentCameraScan
 //   (pageCount, imageOfPage(at:)); PDFDocument(data:), pageCount, page(at:), PDFPage.bounds(for:),
 //   PDFPage.thumbnail(of:for:); UIGraphicsImageRenderer (thread-safe, iOS 10).
+// Phase 10 WP3:
+// - P9: a picked photo is decoded straight to at most `maxPixels` with `CGImageSourceCreateThumbnailAtIndex`
+//   (`kCGImageSourceThumbnailMaxPixelSize`, orientation applied), as AttachmentRow does: `UIImage(data:)` + `draw(in:)`
+//   decoded a 48 MP photo in full (≈ 190 MB) first.
+// - P10: reading the picked file and inspecting a PDF run off the main actor (`@concurrent`).
+// - U11: the page picker knows the page count up front (`PDFInspection`); it shows a spinner while the document opens,
+//   a `ContentUnavailableView` when it cannot (damaged or locked), and renders each preview lazily as its cell appears
+//   (`PDFPageThumbnailer`, one actor-isolated `PDFDocument`) instead of every page before showing any.
+// APIs checked in Apple's documentation JSON (2026-11-05): CGImageSourceCreateWithData(_:_:) (iOS 4),
+//   PDFDocument.isLocked (iOS 11).
+import ImageIO
 import PDFKit
 import SwiftUI
 import UIKit
@@ -46,11 +57,20 @@ enum ImportImageLoader {
         return ImportImage(image: upright)
     }
 
-    /// An image file's bytes (`nil` when they are not an image).
+    /// An image file's bytes (`nil` when they are not an image), decoded at most `maxPixels` on the long side
+    /// (never the full-size bitmap), upright, then drawn on white.
     @concurrent
     static func image(from data: Data) async -> ImportImage? {
-        guard let image = UIImage(data: data) else { return nil }
-        return await normalise(image)
+        let sourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
+        guard let source = CGImageSourceCreateWithData(data as CFData, sourceOptions) else { return nil }
+        let options: [CFString: Any] = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceShouldCacheImmediately: true,
+            kCGImageSourceThumbnailMaxPixelSize: maxPixels,
+        ]
+        guard let decoded = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else { return nil }
+        return await normalise(UIImage(cgImage: decoded))
     }
 
     /// Renders one PDF page on white, `maxPixels` on its long side.
@@ -65,25 +85,56 @@ enum ImportImageLoader {
         return await normalise(image)
     }
 
-    /// The number of pages (`nil` when the bytes are not a PDF).
-    static func pageCount(pdf data: Data) -> Int? {
-        PDFDocument(data: data)?.pageCount
-    }
-
-    /// Small page previews for the page picker.
+    /// What a PDF holds, off the main actor.
     @concurrent
-    static func thumbnails(pdf data: Data, side: CGFloat) async -> [UIImage] {
-        guard let document = PDFDocument(data: data) else { return [] }
-        return (0..<document.pageCount).compactMap { index in
-            document.page(at: index)?.thumbnail(of: CGSize(width: side, height: side), for: .mediaBox)
-        }
+    static func inspect(pdf data: Data) async -> PDFInspection {
+        guard let document = PDFDocument(data: data) else { return .unreadable }
+        if document.isLocked { return .locked }
+        return document.pageCount > 0 ? .pages(document.pageCount) : .unreadable
     }
 
-    /// Reads a file the user picked in Files (security-scoped while reading).
-    static func readPicked(_ url: URL) -> Data? {
+    /// Reads a file the user picked in Files (security-scoped while reading), off the main actor.
+    @concurrent
+    static func readPicked(_ url: URL) async -> Data? {
         let scoped = url.startAccessingSecurityScopedResource()
         defer { if scoped { url.stopAccessingSecurityScopedResource() } }
         return try? Data(contentsOf: url)   // QA: read fully while the security scope is open
+    }
+}
+
+/// A picked PDF: not a PDF (or damaged), password-protected, or its page count.
+enum PDFInspection: Equatable, Sendable {
+    case unreadable
+    case locked
+    case pages(Int)
+}
+
+/// Page previews of one PDF, one at a time: the document is parsed once, on first use, and only touched inside the
+/// actor (`PDFDocument` is not Sendable).
+actor PDFPageThumbnailer {
+    private let data: Data
+    private var document: PDFDocument?
+    private var opened = false
+
+    init(data: Data) { self.data = data }
+
+    /// Whether the document opens with pages (unlocked).
+    func open() -> Bool {
+        guard let document = load() else { return false }
+        return !document.isLocked && document.pageCount > 0
+    }
+
+    /// A preview of page `index` that fits `side` × `side` points, or `nil` when the page is missing.
+    func thumbnail(page index: Int, side: CGFloat) -> UIImage? {
+        load()?.page(at: index)?.thumbnail(of: CGSize(width: side, height: side), for: .mediaBox)
+    }
+
+    private func load() -> PDFDocument? {
+        if !opened {
+            document = PDFDocument(data: data)
+            opened = true
+        }
+        return document
     }
 }
 
@@ -135,48 +186,108 @@ struct DocumentCameraView: UIViewControllerRepresentable {
 
 // MARK: - PDF page picker
 
-/// "Which page has the timetable?" for a multi-page PDF: a grid of page previews.
+/// "Which page has the timetable?" for a multi-page PDF: a grid of page previews, each rendered when its cell
+/// appears. States: opening (spinner), failed (`ContentUnavailableView` with "Choose Another File" → `onBack`),
+/// ready (the grid; a page whose preview fails shows a page symbol and stays selectable).
 struct ImportPDFPagePicker: View {
-    let data: Data
+    let pageCount: Int
     let onPick: (Int) -> Void
+    let onBack: () -> Void
     @Environment(AppModel.self) private var model
-    @State private var thumbnails: [UIImage] = []
+    @State private var thumbnailer: PDFPageThumbnailer
+    @State private var readable: Bool?
+
+    init(data: Data, pageCount: Int, onPick: @escaping (Int) -> Void, onBack: @escaping () -> Void) {
+        self.pageCount = pageCount
+        self.onPick = onPick
+        self.onBack = onBack
+        _thumbnailer = State(initialValue: PDFPageThumbnailer(data: data))
+    }
 
     var body: some View {
-        ScrollView {
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: 16)], spacing: 16) {
-                ForEach(Array(thumbnails.enumerated()), id: \.offset) { index, thumbnail in
-                    Button { onPick(index) } label: {
-                        VStack(spacing: 6) {
-                            Image(uiImage: thumbnail)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(maxHeight: 200)
-                                .background(Color.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
-                                .overlay {
-                                    RoundedRectangle(cornerRadius: 6, style: .continuous).strokeBorder(.separator)
-                                }
-                            Text(verbatim: pageLabel(index))
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityElement(children: .ignore)
-                    .accessibilityLabel(Text(verbatim: pageLabel(index)))
-                    .accessibilityAddTraits(.isButton)
-                }
+        content
+            .navigationTitle(Text("import.pdf.pages.title"))
+            .navigationBarTitleDisplayMode(.inline)
+            .task { readable = await thumbnailer.open() }
+    }
+
+    @ViewBuilder private var content: some View {
+        switch readable {
+        case nil:
+            ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
+        case false?:
+            ContentUnavailableView {
+                Label { Text("import.pdf.pages.failed.title") } icon: { Image(systemName: "doc.questionmark") }
+            } description: {
+                Text("import.pdf.pages.failed.message")
+            } actions: {
+                Button(action: onBack) { Text("import.pdf.pages.failed.action") }
+                    .buttonStyle(.borderedProminent)
             }
-            .padding(16)
+        case true?:
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: 16)], spacing: 16) {
+                    ForEach(0..<pageCount, id: \.self) { index in
+                        Button { onPick(index) } label: {
+                            VStack(spacing: 6) {
+                                PDFPagePreview(thumbnailer: thumbnailer, index: index)
+                                Text(verbatim: pageLabel(index))
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel(Text(verbatim: pageLabel(index)))
+                        .accessibilityAddTraits(.isButton)
+                    }
+                }
+                .padding(16)
+            }
         }
-        .overlay { if thumbnails.isEmpty { ProgressView() } }
-        .navigationTitle(Text("import.pdf.pages.title"))
-        .navigationBarTitleDisplayMode(.inline)
-        .task { thumbnails = await ImportImageLoader.thumbnails(pdf: data, side: 400) }
     }
 
     private func pageLabel(_ index: Int) -> String {
         model.renderer.format(key: "import.pdf.page", arguments: [.integer(Int64(index + 1))])
+    }
+}
+
+/// One page preview: a spinner until rendered, then the page, or a page symbol when the page cannot be drawn.
+private struct PDFPagePreview: View {
+    let thumbnailer: PDFPageThumbnailer
+    let index: Int
+    @State private var image: UIImage?
+    @State private var failed = false
+
+    var body: some View {
+        Group {
+            if let image {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxHeight: 200)
+                    .background(Color.white)
+            } else {
+                ZStack {
+                    Color.white
+                    if failed {
+                        Image(systemName: "doc").font(.largeTitle).foregroundStyle(Color.secondary)
+                    } else {
+                        ProgressView()
+                    }
+                }
+                .frame(width: 140, height: 190)
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 6, style: .continuous).strokeBorder(.separator)
+        }
+        .task {
+            let rendered = await thumbnailer.thumbnail(page: index, side: 400)
+            guard !Task.isCancelled else { return }
+            image = rendered
+            failed = rendered == nil
+        }
     }
 }
