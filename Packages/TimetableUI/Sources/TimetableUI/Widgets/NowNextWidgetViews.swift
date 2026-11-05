@@ -184,13 +184,6 @@ struct WidgetSubjectMark: View {
     }
 }
 
-/// Separator between the parts of a lesson's detail line ("time, room"): the catalog's `a11y.separator` (Phase 10 U15:
-/// a hard-coded " · " is wrong for Japanese and Chinese, which use "、" / "，"). Read from the extension's bundle in the
-/// device language; the presenter's renderer (app-language override) is not reachable from the views.
-private var widgetDetailSeparator: String {
-    Bundle.main.localizedString(forKey: "a11y.separator", value: ", ", table: nil)
-}
-
 /// The progress tint: ink in full-colour rendering, as the app's Today hero (Opus H3.5, verification D19: a red subject
 /// must not read as an alarm); the system's accent elsewhere.
 private enum ProgressTint {
@@ -210,7 +203,7 @@ struct NowNextLessonRow: View {
                 Text(verbatim: line.name)
                     .font(.caption.weight(.semibold))
                     .lineLimit(1)
-                Text(verbatim: [line.whenText, line.room].compactMap { $0 }.joined(separator: widgetDetailSeparator))
+                Text(verbatim: [line.whenText, line.room].compactMap { $0 }.joined(separator: " · "))
                     .font(.caption2)
                     .monospacedDigit()
                     .foregroundStyle(.secondary)
@@ -268,7 +261,7 @@ struct NowNextMainColumn: View {
                         .lineLimit(2)
                         .minimumScaleFactor(0.8)
                 }
-                Text(verbatim: [lesson.timeRange, lesson.room].compactMap { $0 }.joined(separator: widgetDetailSeparator))
+                Text(verbatim: [lesson.timeRange, lesson.room].compactMap { $0 }.joined(separator: " · "))
                     .font(.caption)
                     .monospacedDigit()
                     .foregroundStyle(.secondary)
@@ -398,7 +391,7 @@ struct NowNextRectangularView: View {
                     .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .widgetAccentable()
-                Text(verbatim: [lesson.shortName, lesson.room].compactMap { $0 }.joined(separator: widgetDetailSeparator))
+                Text(verbatim: [lesson.shortName, lesson.room].compactMap { $0 }.joined(separator: " · "))
                     .font(.body.weight(.semibold))
                     .lineLimit(1)
                 if let next = display.nextCompact {
@@ -410,7 +403,7 @@ struct NowNextRectangularView: View {
                     .monospacedDigit()
                     .lineLimit(1)
                     .widgetAccentable()
-                Text(verbatim: [lesson.name, lesson.room].compactMap { $0 }.joined(separator: widgetDetailSeparator))
+                Text(verbatim: [lesson.name, lesson.room].compactMap { $0 }.joined(separator: " · "))
                     .font(.caption)
                     .lineLimit(2)
             case let .status(_, title, _):
