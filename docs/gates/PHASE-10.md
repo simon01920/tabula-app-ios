@@ -45,6 +45,7 @@ CI found the Sonnet work's only compile error, and I reverted one of its design 
   - XcodeGen unsigned iOS + watchOS build, with bundle layout verified (embedding, compiled catalogs, privacy manifests, arm64_32 watch).
   - The CloudKit variant compiles.
 - **xtool/SwiftPM path:** the build passes. Bundle: app 13 `InfoPlist.strings`, widget 0; widget appex keeps `__text`/`__swift5_entry`.
+- **Final head (`e2cae07`, with the QA fix pass and the double-launch fix): iOS CI run 42313737371, every job green.** Linux tests and validate, macOS core tests, XcodeGen iOS + watchOS build, CloudKit variant, xtool path. The test counts above are from `0ba1e8e`; the final head adds the QA fix tests, and all pass.
 - **First CI run (`0197a5e`, four packages):** failed on one compile error and one validate rule. Both were fixed in `2c7b8a6`.
 - **Not measured:** the compiler warning count (the CI log tail does not show it). Phase 9 reported 0.
 
