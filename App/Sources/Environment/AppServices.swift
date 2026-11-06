@@ -48,7 +48,8 @@ final class AppServices {
         reminders.attach()
         AttachmentMaintenance.install(on: model)   // orphan attachment cleanup after load + changes (B3); chains onChange
         widgets = WidgetSnapshotWriter.install(on: model)   // widget snapshot after load + changes (Phase 4 A); chains onChange
-        let liveActivities = LiveActivityController.install(on: model)   // Live Activities (Phase 4 B2); chains onChange
+        // Live Activities (Phase 4 B2); chains onChange; shares the widget snapshot build (Phase 10 WP2)
+        let liveActivities = LiveActivityController.install(on: model, snapshots: widgets.source)
         self.liveActivities = liveActivities
         #if TABULA_CLOUDKIT
         cloudSync = CloudSyncController.install(on: model)   // fetch/send after load + changes; chains onChange

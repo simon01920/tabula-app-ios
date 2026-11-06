@@ -23,9 +23,16 @@ public enum WidgetSnapshotStore {
 
     /// The encoded snapshot (stable key order, so unchanged content gives identical bytes).
     public static func encode(_ snapshot: WidgetSnapshot) throws -> Data {
+        try makeEncoder().encode(snapshot)
+    }
+
+    /// The one encoder configuration of the snapshot format: sorted keys, no whitespace. `WidgetSnapshotBuilder`'s exact
+    /// size accounting (Phase 10 WP2) encodes snapshot parts with the same configuration, so a part's bytes are the
+    /// bytes it has inside the whole file.
+    static func makeEncoder() -> JSONEncoder {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]
-        return try encoder.encode(snapshot)
+        return encoder
     }
 
     /// The snapshot in `data`, or `nil` when it is not a snapshot this version can read.

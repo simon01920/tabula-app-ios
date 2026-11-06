@@ -7,9 +7,10 @@
 //   .environment  scene active (foreground), day change / DST / clock change (significantTimeChangeNotification),
 //                 time-zone change, locale change (AppModel.refreshEnvironment)
 //   flushNow()    the scene leaves `active` (TabulaApp), so a change made just before going home is not lost
-// Debounced (`debounce`), built on the main actor from the model's current state (pure `WidgetSnapshotBuilder`),
-// written atomically off the main actor (`WidgetSnapshotStore.write`), then `WidgetCenter.shared.reloadAllTimelines()`
-// and, since Phase 5 W1, sent to the Apple Watch (`WatchSnapshotSender`, WatchConnectivity application context).
+// Debounced (`debounce`), built on the main actor from the model's current state (pure `WidgetSnapshotBuilder`; since
+// Phase 10 WP2 one build per change, shared with the Live Activity controller and carrying its encoded bytes:
+// `WidgetSnapshotSource`), written atomically off the main actor (`WidgetSnapshotStore.write`), then
+// `WidgetCenter.shared.reloadAllTimelines()` and, since Phase 5 W1, sent to the Apple Watch (`WatchSnapshotSender`, WatchConnectivity application context).
 // Unchanged content (ignoring `generatedAt`) is neither written nor reloaded, so foregrounding does not spend the
 // widgets' reload budget (reloads while the app is in the foreground do not count anyway: WidgetKit docs). The
 // comparison starts from the file already in the App Group, so a cold or background launch with unchanged data writes
@@ -44,27 +45,56 @@ final class BackgroundAssertion {
     }
 }
 
+/// The snapshot already in the App Group, read once off the main actor at launch (Phase 10 WP2, P18: it used to be
+/// read and decoded synchronously in `AppServices.init`). `take()` returns it; if the background read has not finished
+/// yet (a write in the first moments after launch), it reads the file itself. Nothing is written before the first
+/// `take()`, so both reads see the same file.
+final class PreviousSnapshotRead: @unchecked Sendable {   // @unchecked: `value` is only touched under `lock`
+    private let lock = NSLock()
+    private let container: URL
+    private var value: WidgetSnapshot??   // .none = not read yet
+
+    init(container: URL) {
+        self.container = container
+        Task.detached(priority: .utility) { [self] in
+            let read = WidgetSnapshotStore.read(container: container)
+            lock.withLock { if value == nil { value = .some(read) } }
+        }
+    }
+
+    func take() -> WidgetSnapshot? {
+        if let read = lock.withLock({ value }) { return read }
+        let read = WidgetSnapshotStore.read(container: container)
+        lock.withLock { if value == nil { value = .some(read) } }
+        return read
+    }
+}
+
 @MainActor
 final class WidgetSnapshotWriter {
-    private weak var model: AppModel?
     private let container: URL?
     private let debounce: Duration
     private var pending: Task<Void, Never>?
     private var lastWritten: WidgetSnapshot?
+    /// What the widgets already have, until the first write consumes it (`lastWritten` from then on).
+    private var previous: PreviousSnapshotRead?
     private var writeChain: Task<Void, Never>?
+    /// The snapshot build shared with the Live Activity controller (Phase 10 WP2).
+    let source: WidgetSnapshotSource
     /// Phase 5 W1: every written snapshot also goes to the Apple Watch.
     let watch: WatchSnapshotSender?
     /// Developer diagnostics: the last write (time, size) or failure.
     private(set) var lastResult: String = "not written yet"
 
     init(model: AppModel, container: URL?, debounce: Duration = .milliseconds(800)) {
-        self.model = model
         self.container = container
         self.debounce = debounce
+        source = WidgetSnapshotSource(model: model)
         watch = container.flatMap { WatchSnapshotSender(container: $0) }
         // What the widgets already have (a cold or background launch with unchanged data then writes and reloads
-        // nothing). A small file (< 20 KB), read once at launch.
-        lastWritten = container.flatMap { WidgetSnapshotStore.read(container: $0) }
+        // nothing). A small file (< 20 KB), read once off the main actor (the first write reads it itself if that
+        // read has not finished yet).
+        previous = container.map { PreviousSnapshotRead(container: $0) }
     }
 
     /// Chains the writer onto `model.onChange`. Call once, after every other `onChange` owner attached.
@@ -108,17 +138,24 @@ final class WidgetSnapshotWriter {
 
     private func writeIfChanged() {
         pending = nil
-        guard let model, let container, !model.isLoading, model.problem == nil else { return }
-        let snapshot = WidgetSnapshotBuilder.make(
-            database: model.database, now: model.now, context: model.calendarContext, tier: model.entitlements.tier,
-            locale: model.environment.locale(), languageCode: Bundle.main.preferredLocalizations.first)
+        // The build (and its encoded bytes) the Live Activity controller may already have made for this change.
+        guard let container, let build = source.current() else { return }
+        if let previous {
+            lastWritten = previous.take()
+            self.previous = nil
+        }
+        let snapshot = build.snapshot
         guard snapshot.contentOnly != lastWritten?.contentOnly else { return }
         let data: Data
-        do {
-            data = try WidgetSnapshotStore.encode(snapshot)
-        } catch {
-            lastResult = "encode failed: \(error)"
-            return
+        if let built = build.data {
+            data = built
+        } else {
+            do {
+                data = try WidgetSnapshotStore.encode(snapshot)
+            } catch {
+                lastResult = "encode failed: \(error)"
+                return
+            }
         }
         lastWritten = snapshot
         let previous = writeChain

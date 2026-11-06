@@ -69,6 +69,8 @@ final class LiveActivityController {
     private(set) var hasRunningActivity = false
 
     @ObservationIgnored private weak var model: AppModel?
+    /// The widget snapshot build shared with the widget writer (Phase 10 WP2, P3): one build per change.
+    @ObservationIgnored private let snapshots: WidgetSnapshotSource
     @ObservationIgnored private let store: any LiveActivityPreferenceStore
     @ObservationIgnored private let isLive: Bool
     @ObservationIgnored private let debounce: Duration
@@ -79,8 +81,10 @@ final class LiveActivityController {
     @ObservationIgnored private var rerunRequested = false
     @ObservationIgnored private var idleWaiters: [CheckedContinuation<Void, Never>] = []
 
-    init(model: AppModel, dependencies: LiveActivityDependencies, debounce: Duration = .milliseconds(600)) {
+    init(model: AppModel, dependencies: LiveActivityDependencies, snapshots: WidgetSnapshotSource,
+         debounce: Duration = .milliseconds(600)) {
         self.model = model
+        self.snapshots = snapshots
         store = dependencies.store
         isLive = dependencies.isLive
         self.debounce = debounce
@@ -88,9 +92,11 @@ final class LiveActivityController {
         systemEnabled = dependencies.isLive ? ActivityAuthorizationInfo().areActivitiesEnabled : true
     }
 
-    /// Chains the controller onto `model.onChange` and observes the system permission. Call once.
-    static func install(on model: AppModel) -> LiveActivityController {
-        let controller = LiveActivityController(model: model, dependencies: model.environment.liveActivities)
+    /// Chains the controller onto `model.onChange` and observes the system permission. Call once. `snapshots`: the
+    /// widget writer's `source`, so both share one snapshot build per change.
+    static func install(on model: AppModel, snapshots: WidgetSnapshotSource) -> LiveActivityController {
+        let controller = LiveActivityController(model: model, dependencies: model.environment.liveActivities,
+                                                snapshots: snapshots)
         let previous = model.onChange
         model.onChange = { change in
             previous?(change)
@@ -194,11 +200,12 @@ final class LiveActivityController {
     // MARK: One run
 
     private func runOnce() async {
-        guard isLive, let model, !model.isLoading, model.problem == nil else { return }
+        guard isLive, let model, !model.isLoading, model.problem == nil, let build = snapshots.current() else { return }
         applySystemEnabled(ActivityAuthorizationInfo().areActivitiesEnabled)
         let now = model.now
-        let sources = LiveActivitySourceBuilder.make(database: model.database, now: now, context: model.calendarContext,
-                                                     locale: model.environment.locale(),
+        // The shared build (the writer reuses it ~200 ms later instead of building the same snapshot again).
+        let sources = LiveActivitySourceBuilder.make(snapshot: build.snapshot, database: model.database, now: now,
+                                                     context: model.calendarContext, locale: model.environment.locale(),
                                                      languageCode: Bundle.main.preferredLocalizations.first)
         let input = LiveActivityPlanInput(
             sources: sources, now: now, canStart: UIApplication.shared.applicationState == .active,
