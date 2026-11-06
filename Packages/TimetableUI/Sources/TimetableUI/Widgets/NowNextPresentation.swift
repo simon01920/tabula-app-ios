@@ -86,6 +86,10 @@ public struct NowNextDisplay: Equatable, Sendable {
     /// "8:00": the start of the next lesson when the status has one (circular family, L9: tomorrow's first start instead
     /// of a check mark).
     public var nextStartText: String?
+    /// Joins a lesson's details ("8:00–8:45 · 214", "SJL · 214") in the snapshot's language: the separator of its
+    /// inline format (`widget.nowNext.inline.current`: " · ", Japanese "・"). Widget strings follow the snapshot's
+    /// `languageCode`, never the extension bundle's device language (RISKS #69).
+    public var detailSeparator: String = NowNextPresenter.defaultDetailSeparator
 
     /// Fraction of the current lesson elapsed at `instant` (0…1), for static (paused) progress views.
     public func progress(at instant: Date) -> Double {
@@ -120,6 +124,8 @@ public struct NowNextPresenter: Sendable {
     /// The display of `entry`.
     public func display(_ entry: NowNextTimelineEntry) -> NowNextDisplay {
         var result = content(entry)
+        result.detailSeparator = Self.separator(
+            inFormat: renderer.string(forKey: "widget.nowNext.inline.current %@ %@"))
         result.nextCompact = result.next.map(nextCompact)
         result.nextStartText = result.next?.startText
         if let timer = result.timer {
@@ -134,6 +140,17 @@ public struct NowNextPresenter: Sendable {
         case .unavailable: break
         }
         return result
+    }
+
+    /// The detail separator when the catalog has no inline format (the lookup echoes the key).
+    public static let defaultDetailSeparator = " · "
+
+    /// The text between `%1$@` and `%2$@` in `format` ("%1$@ · %2$@" → " · ", "%1$@・%2$@" → "・"); the default when
+    /// the format lacks either placeholder, has them reversed or has nothing between them.
+    static func separator(inFormat format: String) -> String {
+        guard let first = format.range(of: "%1$@"), let second = format.range(of: "%2$@"),
+              first.upperBound < second.lowerBound else { return defaultDetailSeparator }
+        return String(format[first.upperBound..<second.lowerBound])
     }
 
     /// Texts of the Pro placeholder: "Available in Tabula Pro" and the short "Pro" (accessoryCircular).

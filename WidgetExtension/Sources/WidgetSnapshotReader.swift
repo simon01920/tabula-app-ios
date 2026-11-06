@@ -34,11 +34,11 @@ enum WidgetSnapshotReader {
     }
 
     /// Catalog lookup in the app's UI language (`languageCode` = an .lproj of this bundle), else the system's.
+    /// The bundle is resolved once per lookup, not per string (Phase 10 WP2, P15; `Bundle` is `Sendable`, Apple docs
+    /// checked 2026-11-05).
     static func lookup(language: String?) -> LocalizedTextRenderer.Lookup {
-        let path = language.flatMap { Bundle.main.path(forResource: $0, ofType: "lproj") }
-        return { key in
-            let bundle = path.flatMap { Bundle(path: $0) } ?? Bundle.main
-            return bundle.localizedString(forKey: key, value: nil, table: nil)
-        }
+        let bundle = language.flatMap { Bundle.main.path(forResource: $0, ofType: "lproj") }.flatMap { Bundle(path: $0) }
+            ?? Bundle.main
+        return { key in bundle.localizedString(forKey: key, value: nil, table: nil) }
     }
 }
