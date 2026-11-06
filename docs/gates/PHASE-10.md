@@ -28,7 +28,7 @@
 | Docs | orchestrator · Opus | RISKS #100–#113, ENVIRONMENT §41, device checklist (90 rows), PHASE8_PLAN XLSX note, NOTIFICATIONS trigger table (WP1) | `11ee901`, `b7989ba` |
 | QA fix pass | swiftui-engineer · **Opus** | Backup retention: newest 5 per label plus anything younger than 30 days (P10-6), footer in 12 languages; forced context/formatter rebuild on a locale change and a real foreground; a pending launch re-plan runs when the app goes to the background; "Mark done" whose save fails posts the notice; `ReminderEngine.run` coalesces concurrent calls; visible picker label at AX sizes | `dc739a3`, merged; 3 test files |
 | Delta QA (fix pass) | qa-reviewer · **Opus** | **Ready, 0 blocking, 0 major.** Minors kept as notes: (1) every return from the background now rebuilds context and formatter (redraws views that read them; blips still skip it); (2) the launch re-plan could run twice on back-forward-back, fixed by the orchestrator; (3) when a "Mark done" save fails, the item is done in memory and a save-failed banner shows, while the notice says "Couldn't Mark as Done"; (4) the App-target parts of the fix pass are device rows H1–H6 | read-only |
-| Fix: double launch re-plan | orchestrator · Opus | The background Task re-checks `launchReplanPending` | see below |
+| Fix: double launch re-plan | orchestrator · Opus | The background Task re-checks `launchReplanPending` | `d438306` |
 
 **Tier split.** Opus did all four audits, WP1–WP5 (state, concurrency, sync, time zones, persistence) and the QA review. Sonnet did WP6 (UI polish on existing screens) and WP7 (config and CI wiring).
 
