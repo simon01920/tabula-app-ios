@@ -85,9 +85,15 @@ public enum BackupImport {
 
 // MARK: - Automatic backups folder
 
-/// `<store directory>/Backups`: archives Tabula writes before it replaces or moves data. Never pruned.
-/// shortcut: no pruning, each copy is small and only written on a Replace restore or the one-time migration.
+/// `<store directory>/Backups`: archives Tabula writes before it replaces, merges or moves data (labels: pre-restore,
+/// pre-import, pre-migration-fallback, pre-migration-group, pre-demo). Every `write` keeps the newest `keepPerLabel`
+/// archives of its label and deletes older ones (Phase 10 B11: copies are written on every restore, Merge included,
+/// and every share-code Replace, so the folder used to grow without bound). The archive just written is never
+/// deleted; other labels and files that are not archives are never touched.
 public enum BackupFolder {
+    /// Archives kept per label.
+    public static let keepPerLabel = 5
+
     /// One archive in the folder.
     public struct Entry: Hashable, Sendable, Identifiable {
         public var url: URL
@@ -103,10 +109,60 @@ public enum BackupFolder {
         directory.appendingPathComponent("Backups", isDirectory: true)
     }
 
-    /// Writes `archive` as `<UTC yyyyMMddTHHmmssZ>-<label>[-n].tabulabackup` (never overwrites; temp file + rename).
+    /// Writes `archive` as `<UTC yyyyMMddTHHmmssZ>-<label>[-n].tabulabackup` (never overwrites; temp file + rename),
+    /// then prunes older archives of `label` (`prune`, best effort: a failed delete never fails the write).
     @discardableResult
     public static func write(_ archive: BackupArchive, label: String, in folder: URL,
                              fileSystem: any RepositoryFileSystem = FoundationFileSystem()) throws -> URL {
+        let url = try writeArchive(archive, label: label, in: folder, fileSystem: fileSystem)
+        prune(label: label, in: folder, protecting: url, fileSystem: fileSystem)
+        return url
+    }
+
+    /// Deletes all but the newest `keep` archives of `label` in `folder`; `protecting` (the archive just written) is
+    /// always kept and counts as one of them. Best effort: unreadable folders and failed deletes are ignored.
+    public static func prune(label: String, in folder: URL, keep: Int = keepPerLabel, protecting: URL,
+                             fileSystem: any RepositoryFileSystem = FoundationFileSystem()) {
+        let names = (try? FileManager.default.contentsOfDirectory(atPath: folder.path)) ?? []
+        for name in prunable(names: names, label: label, keep: keep, protecting: protecting.lastPathComponent) {
+            try? fileSystem.removeItem(at: folder.appendingPathComponent(name))
+        }
+    }
+
+    /// The pruning policy (pure): the names among `names` to delete so that at most `keep` (at least 1) archives
+    /// labelled `label` remain, newest first by (UTC stamp, `-n` counter). `protecting` is never returned and always
+    /// counts as kept when present. Names of other labels, temporary files (`.…tmp`) and anything that is not an
+    /// archive name written by `write` are never returned.
+    public static func prunable(names: [String], label: String, keep: Int, protecting: String) -> [String] {
+        let matching = names.compactMap { name -> (name: String, stamp: String, counter: Int)? in
+            guard let parsed = archiveName(name, label: label) else { return nil }
+            return (name, parsed.stamp, parsed.counter)
+        }
+        .sorted { ($0.stamp, $0.counter, $0.name) > ($1.stamp, $1.counter, $1.name) }
+        var remaining = max(keep, 1) - (matching.contains { $0.name == protecting } ? 1 : 0)
+        var deletable: [String] = []
+        for entry in matching where entry.name != protecting {
+            if remaining > 0 { remaining -= 1 } else { deletable.append(entry.name) }
+        }
+        return deletable
+    }
+
+    /// (stamp, counter) when `name` is `<stamp>-<label>.tabulabackup` (counter 1) or `<stamp>-<label>-<n>.tabulabackup`.
+    private static func archiveName(_ name: String, label: String) -> (stamp: String, counter: Int)? {
+        let suffix = ".\(fileExtension)"
+        guard !name.hasPrefix("."), name.hasSuffix(suffix), name.count > 17 + suffix.count else { return nil }
+        let stamp = String(name.prefix(16))
+        guard stampFormatter.date(from: stamp) != nil, name.dropFirst(16).first == "-" else { return nil }
+        let rest = String(name.dropFirst(17).dropLast(suffix.count))
+        if rest == label { return (stamp, 1) }
+        guard rest.hasPrefix("\(label)-") else { return nil }
+        let digits = rest.dropFirst(label.count + 1)
+        guard !digits.isEmpty, digits.allSatisfy({ $0.isASCII && $0.isNumber }), let counter = Int(digits) else { return nil }
+        return (stamp, counter)
+    }
+
+    private static func writeArchive(_ archive: BackupArchive, label: String, in folder: URL,
+                                     fileSystem: any RepositoryFileSystem) throws -> URL {
         try fileSystem.createDirectory(at: folder)
         let stem = "\(stampFormatter.string(from: archive.manifest.createdAt))-\(label)"
         var url = folder.appendingPathComponent("\(stem).\(fileExtension)")

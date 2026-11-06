@@ -74,7 +74,9 @@ struct EditorScaffold<Draft: Equatable, Content: View, Presentations: View>: Vie
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button {
-                        if isDirty { confirmingDiscard = true } else { dismiss() }
+                        // B3 (Phase 10): while work is still running (an attachment copy), Cancel asks first, like
+                        // unsaved edits do; Discard then closes the sheet and the copy is cleaned up when it finishes.
+                        if isDirty || isBusy { confirmingDiscard = true } else { dismiss() }
                     } label: {
                         Text("editor.common.cancel")
                     }
@@ -93,7 +95,11 @@ struct EditorScaffold<Draft: Equatable, Content: View, Presentations: View>: Vie
                 Button("editor.common.discard", role: .destructive) { dismiss() }
                 Button("editor.common.keepEditing", role: .cancel) {}
             } message: {
-                Text("editor.common.discard.message")
+                if isBusy {
+                    Text("editor.common.discard.busyMessage")
+                } else {
+                    Text("editor.common.discard.message")
+                }
             }
         }
         .background { presentations(binding) }
