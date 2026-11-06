@@ -1030,6 +1030,8 @@ reminder.lesson.inDaysAt,other,"Lesson reminder body; plural on arg 1 (days), ar
 reminder.lesson.title,,Notification title: the subject's name (user text). Args: 1 subject name.,%@,%@,,
 reminder.lesson.todayAt,,Lesson reminder body; arg = start time. Args: 1 time.,Starts at %@,Začíná v %@,,
 reminder.lesson.tomorrowAt,,Lesson reminder body; arg = start time. Args: 1 time.,Tomorrow at %@,Zítra v %@,,
+reminder.markDoneFailed.body,,Body of the notification shown when 'Mark as Done' on a reminder notification could not be saved. Tabula is the app name.,Open Tabula to try again.,Otevřete Tabulu a zkuste to znovu.,,
+reminder.markDoneFailed.title,,Title of a notification shown right after the user pressed 'Mark as Done' on a reminder notification but the app could not save it (e.g. the data is read-only). The subtitle is the original reminder's title.,Couldn't Mark as Done,Nepodařilo se označit jako hotové,,
 reminder.notice.alarmLimit,one,In-app notice when too many loud alarms are set; plural on the count. Args: 1 count.,%lld alarm will arrive as a notification instead.,%lld budík místo toho přijde jako oznámení.,,
 reminder.notice.alarmLimit,few,In-app notice when too many loud alarms are set; plural on the count. Args: 1 count.,%lld alarms will arrive as notifications instead.,%lld budíky místo toho přijdou jako oznámení.,,
 reminder.notice.alarmLimit,many,In-app notice when too many loud alarms are set; plural on the count. Args: 1 count.,%lld alarms will arrive as notifications instead.,%lld budíku místo toho přijde jako oznámení.,,

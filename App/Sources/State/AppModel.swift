@@ -76,7 +76,9 @@ final class AppModel {
     /// What the one-time stranded-data migration did this launch (`nil` when it did not run; RISKS #47).
     private(set) var strandedMigration: StrandedStoreMigration.Outcome?
 
-    // MARK: Derived state (rebuilt on every change of data, settings, time zone or locale)
+    // MARK: Derived state (rebuilt when data, settings, time zone or locale change what it depends on)
+    // Phase 10 P2: each value is assigned only when its inputs changed (`DerivedStateRebuild`), because Observation
+    // notifies readers on every assignment, also of an equal value (that re-rendered every tab after each change).
 
     private(set) var calendarContext: CalendarContext
     private(set) var formatter: TimetableFormatter
@@ -97,6 +99,13 @@ final class AppModel {
     @ObservationIgnored private var saveTask: Task<Void, Never>?
     @ObservationIgnored private var observers: [any NSObjectProtocol] = []
     @ObservationIgnored private var loadTask: Task<Void, Never>?
+    /// The inputs the derived state was last built from (`nil` before the first build).
+    @ObservationIgnored private var derivedInputs: DerivedStateInputs?
+    /// Environment at the last derived-state build, and when the environment was last refreshed (Phase 10 P5).
+    @ObservationIgnored private var derivedFingerprint: EnvironmentFingerprint?
+    @ObservationIgnored private var lastEnvironmentRefreshAt: Date?
+    /// The scene went to the background since it was last active (`true` until the first activation).
+    @ObservationIgnored private var sceneWasInBackground = true
     /// Called after the store loaded, after every accepted change and after every environment refresh (time zone,
     /// locale, day change, scene activation). The reminder coordinator re-plans from it (debounced).
     @ObservationIgnored var onChange: (@MainActor (AppModelChange) -> Void)?
@@ -203,7 +212,7 @@ final class AppModel {
     func apply(_ mutation: DatabaseMutation, origin: ApplyOrigin = .other) -> ApplyResult {
         guard !isReadOnly, problem == nil, !isLoading else { return .readOnly }
         guard database != nil || mutation.replacesDatabase else { return .readOnly }
-        lastMutationLabel = mutation.label
+        if lastMutationLabel != mutation.label { lastMutationLabel = mutation.label }
         let base = database ?? DatabaseMutation.emptyBase
         var candidateClock = clock
         let candidate: TabulaDatabase
@@ -226,7 +235,7 @@ final class AppModel {
             environment.clockStore.save(clock)
             database = candidate
             issues = candidateIssues
-            lastWarnings = warnings
+            if lastWarnings != warnings { lastWarnings = warnings }
             generation += 1
             rebuildDerived()
             scheduleSave()
@@ -275,29 +284,64 @@ final class AppModel {
         }
     }
 
+    /// Rebuilds (and assigns) only what changed: context, formatter + renderer, resolvers (`DerivedStateRebuild`).
     private func rebuildDerived() {
+        let settings = self.settings
+        let deviceTimeZone = environment.deviceTimeZone()
         let locale = environment.locale()
-        calendarContext = CalendarEnvironment.context(settings: settings, deviceTimeZone: environment.deviceTimeZone(),
-                                                      locale: locale)
-        formatter = TimetableFormatter(settings: settings, context: calendarContext, locale: locale)
-        renderer = LocalizedTextRenderer(formatter: formatter, lookup: environment.catalogLookup)
-        let newToday = calendarContext.localDate(of: now)
+        let inputs = DerivedStateInputs(settings: settings, database: database, deviceTimeZone: deviceTimeZone,
+                                        locale: locale)
+        let rebuild = DerivedStateRebuild.needed(from: derivedInputs, to: inputs)
+        derivedInputs = inputs
+        derivedFingerprint = EnvironmentFingerprint(settings: settings, deviceTimeZone: deviceTimeZone, locale: locale,
+                                                    now: now)
+        if rebuild.context { calendarContext = inputs.context }
+        if rebuild.formatter {
+            formatter = TimetableFormatter(settings: settings, context: inputs.context, locale: locale)
+            renderer = LocalizedTextRenderer(formatter: formatter, lookup: environment.catalogLookup)
+        }
+        let newToday = inputs.context.localDate(of: now)
         if newToday != today { today = newToday }
-        if let database {
-            let all = ScheduleResolver.all(database: database, context: calendarContext)
-            resolvers = Dictionary(all.map { ($0.timetable.id, $0) }, uniquingKeysWith: { first, _ in first })
-        } else {
-            resolvers = [:]
+        if rebuild.resolvers {
+            if let database {
+                let all = ScheduleResolver.all(database: database, context: inputs.context)
+                resolvers = Dictionary(all.map { ($0.timetable.id, $0) }, uniquingKeysWith: { first, _ in first })
+            } else if !resolvers.isEmpty {
+                resolvers = [:]
+            }
         }
     }
 
     /// Rebuilds the calendar context and formatters (time zone, locale, first weekday or 12/24 h changed).
-    /// Call when the scene becomes active, and on system time / zone / locale changes. Clears Foundation's cached
-    /// system time zone first so `TimeZone.current` reflects a zone change made while the app was suspended.
+    /// Call on system time / zone / locale changes (always) and, through `sceneDidBecomeActive()`, when the scene
+    /// becomes active. Clears Foundation's cached system time zone first so `TimeZone.current` reflects a zone change
+    /// made while the app was suspended.
     func refreshEnvironment() {
         NSTimeZone.resetSystemTimeZone()
         rebuildDerived()
+        lastEnvironmentRefreshAt = now
         onChange?(.environment)
+    }
+
+    /// The scene became active (TabulaApp). After a background stay (and at the first activation) this always
+    /// refreshes, as before; after a short `.inactive` blip (Notification Centre, Face ID, a call banner) only when the
+    /// zone, locale, hour cycle, week start or local day changed, or the last refresh is 5+ minutes old
+    /// (`ForegroundRefreshPolicy`, Phase 10 P5).
+    func sceneDidBecomeActive() {
+        NSTimeZone.resetSystemTimeZone()
+        let returning = sceneWasInBackground
+        sceneWasInBackground = false
+        let current = EnvironmentFingerprint(settings: settings, deviceTimeZone: environment.deviceTimeZone(),
+                                             locale: environment.locale(), now: now)
+        if ForegroundRefreshPolicy.shouldRefresh(returningFromBackground: returning, last: derivedFingerprint,
+                                                 lastRefreshAt: lastEnvironmentRefreshAt, current: current, now: now) {
+            refreshEnvironment()
+        }
+    }
+
+    /// The scene entered the background (TabulaApp): the next activation is a real foreground and always refreshes.
+    func sceneDidEnterBackground() {
+        sceneWasInBackground = true
     }
 
     private func observeSystemChanges() {

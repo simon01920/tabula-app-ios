@@ -937,6 +937,8 @@ reminder.lesson.inDaysAt,other,"Lesson reminder body; plural on arg 1 (days), ar
 reminder.lesson.title,,Notification title: the subject's name (user text). Args: 1 subject name.,%@,%@,,
 reminder.lesson.todayAt,,Lesson reminder body; arg = start time. Args: 1 time.,Starts at %@,%@に開始,,
 reminder.lesson.tomorrowAt,,Lesson reminder body; arg = start time. Args: 1 time.,Tomorrow at %@,明日 %@,,
+reminder.markDoneFailed.body,,Body of the notification shown when 'Mark as Done' on a reminder notification could not be saved. Tabula is the app name.,Open Tabula to try again.,Tabulaを開いて、もう一度お試しください。,,
+reminder.markDoneFailed.title,,Title of a notification shown right after the user pressed 'Mark as Done' on a reminder notification but the app could not save it (e.g. the data is read-only). The subtitle is the original reminder's title.,Couldn't Mark as Done,完了にできませんでした,,
 reminder.notice.alarmLimit,other,In-app notice when too many loud alarms are set; plural on the count. Args: 1 count.,%lld alarms will arrive as notifications instead.,%lld件のアラームは、代わりに通知として届きます。,,
 reminder.notice.saturated,other,In-app notice when more reminders are due than iOS allows at once; plural on the count. Args: 1 count.,%lld reminders couldn't be scheduled yet. Open Tabula regularly to keep reminders up to date.,%lld件のリマインダーをまだ設定できていません。リマインダーを最新に保つため、Tabulaをこまめに開いてください。,,
 reminder.packTonight.inDays,other,"Pack-your-bag body for a day later than tomorrow. Plural on arg 1 (items), the only count. Args: 1 items, 2 first subject, 3 date (formatted, e.g. 'Mon 12 Oct').","%1$lld items to pack for %3$@, starting with %2$@",%3$@の持ち物が%1$lld点あります。まず%2$@,,

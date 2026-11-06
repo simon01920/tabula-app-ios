@@ -2,7 +2,9 @@
 // `AppModel`, runs `ReminderEngine` (TimetableUI: planner → diff → clients) and asks for the next background refresh.
 // It never decides reminder timing itself.
 //
-// Triggers (all coalesced; data changes debounced by 1 s):
+// Triggers (all coalesced; data changes debounced by 1 s; the launch re-plan waits `launchDelay` (1.5 s, Phase 10 P7)
+// so it does not land in the first frames — a notification action, App Intent or background refresh runs it at once
+// through `replanNow`):
 //   launch (store loaded) · scene active / time zone / locale / significant time change (AppModel.onChange(.environment))
 //   · any accepted data change (AppModel.onChange(.data)) · a notification action · AlarmKit authorization changes
 //   · BGAppRefreshTask (`backgroundRefresh()`) · an in-app timer at the plan's `nextReplanDate` while running.
@@ -86,6 +88,9 @@ final class ReminderCoordinator {
     /// Run (awaited) after a notification "Mark done" was saved and re-planned (Phase 4 B3 final QA M1): Live Activities
     /// refresh now and the widget snapshot is written, so neither waits for a debounce the system may never let run.
     @ObservationIgnored var afterCompletion: (@MainActor () async -> Void)?
+    /// Phase 10 P7: the launch re-plan's delay. It always runs: a later debounced request keeps the `.launch` reason
+    /// (`pendingReasons`), and `replanNow` (notification action, App Intent, background refresh) runs it immediately.
+    static let launchDelay: Duration = .milliseconds(1500)
 
     init(engine: ReminderEngine, model: AppModel, navigation: AppNavigation,
          backgroundScheduler: any BackgroundRefreshScheduling, deviceState: @escaping @MainActor () -> DeviceReminderState,
@@ -142,7 +147,7 @@ final class ReminderCoordinator {
                 await self.refreshHealthIfShown()
             }
         }
-        requestReplan(.launch, debounce: .zero)
+        requestReplan(.launch, debounce: Self.launchDelay)
     }
 
     // MARK: Triggers
@@ -296,11 +301,17 @@ final class ReminderCoordinator {
         switch ReminderResponseInterpreter.command(for: action, delivered: delivered) {
         case .markDone(let source):
             guard let mutation = ReminderResponseInterpreter.mutation(for: source, now: model.now) else { return }
-            let applied: Bool
-            if case .applied = model.apply(mutation) { applied = true } else { applied = false }
+            let outcome = model.apply(mutation)
             await model.flush()                              // persist first: the system may suspend us any moment
-            if applied {
+            switch outcome {
+            case .applied:
                 await engine.removeDelivered(for: source)   // the item's other reminders in Notification Center
+            case .failed(.notFound(_, _)):
+                break                                        // deleted meanwhile: nothing to complete; the re-plan drops it
+            case .readOnly, .rejected, .failed:
+                // Phase 10 B12: say so, or the user believes it is done (read-only store, not loaded, rejected, failed).
+                _ = await engine.notifyMarkDoneFailed(delivered, context: model.calendarContext,
+                                                      renderer: model.renderer, now: model.now)
             }
             await replanNow(.notificationAction)
             // Phase 4 B3 final QA M1: end an exam-day Live Activity and write the widget snapshot before returning

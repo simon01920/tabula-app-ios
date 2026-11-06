@@ -1030,6 +1030,8 @@ reminder.lesson.inDaysAt,other,"Lesson reminder body; plural on arg 1 (days), ar
 reminder.lesson.title,,Notification title: the subject's name (user text). Args: 1 subject name.,%@,%@,,
 reminder.lesson.todayAt,,Lesson reminder body; arg = start time. Args: 1 time.,Starts at %@,Zaczyna się o %@,,
 reminder.lesson.tomorrowAt,,Lesson reminder body; arg = start time. Args: 1 time.,Tomorrow at %@,Jutro o %@,,
+reminder.markDoneFailed.body,,Body of the notification shown when 'Mark as Done' on a reminder notification could not be saved. Tabula is the app name.,Open Tabula to try again.,Otwórz Tabulę i spróbuj ponownie.,,
+reminder.markDoneFailed.title,,Title of a notification shown right after the user pressed 'Mark as Done' on a reminder notification but the app could not save it (e.g. the data is read-only). The subtitle is the original reminder's title.,Couldn't Mark as Done,Nie udało się oznaczyć jako wykonane,,
 reminder.notice.alarmLimit,one,In-app notice when too many loud alarms are set; plural on the count. Args: 1 count.,%lld alarm will arrive as a notification instead.,%lld alarm przyjdzie zamiast tego jako powiadomienie.,,
 reminder.notice.alarmLimit,few,In-app notice when too many loud alarms are set; plural on the count. Args: 1 count.,%lld alarms will arrive as notifications instead.,%lld alarmy przyjdą zamiast tego jako powiadomienia.,,
 reminder.notice.alarmLimit,many,In-app notice when too many loud alarms are set; plural on the count. Args: 1 count.,%lld alarms will arrive as notifications instead.,%lld alarmów przyjdzie zamiast tego jako powiadomienia.,,

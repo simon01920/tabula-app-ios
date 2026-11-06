@@ -968,6 +968,8 @@ reminder.lesson.inDaysAt,other,"Lesson reminder body; plural on arg 1 (days), ar
 reminder.lesson.title,,Notification title: the subject's name (user text). Args: 1 subject name.,%@,%@,,
 reminder.lesson.todayAt,,Lesson reminder body; arg = start time. Args: 1 time.,Starts at %@,Commence à %@,,
 reminder.lesson.tomorrowAt,,Lesson reminder body; arg = start time. Args: 1 time.,Tomorrow at %@,Demain à %@,,
+reminder.markDoneFailed.body,,Body of the notification shown when 'Mark as Done' on a reminder notification could not be saved. Tabula is the app name.,Open Tabula to try again.,Ouvrez Tabula pour réessayer.,,
+reminder.markDoneFailed.title,,Title of a notification shown right after the user pressed 'Mark as Done' on a reminder notification but the app could not save it (e.g. the data is read-only). The subtitle is the original reminder's title.,Couldn't Mark as Done,Impossible de marquer comme terminé,,
 reminder.notice.alarmLimit,one,In-app notice when too many loud alarms are set; plural on the count. Args: 1 count.,%lld alarm will arrive as a notification instead.,%lld alarme arrivera plutôt sous forme de notification.,,
 reminder.notice.alarmLimit,other,In-app notice when too many loud alarms are set; plural on the count. Args: 1 count.,%lld alarms will arrive as notifications instead.,%lld alarmes arriveront plutôt sous forme de notifications.,,
 reminder.notice.saturated,one,In-app notice when more reminders are due than iOS allows at once; plural on the count. Args: 1 count.,%lld reminder couldn't be scheduled yet. Open Tabula regularly to keep reminders up to date.,%lld rappel n’a pas pu être programmé pour l’instant. Ouvrez Tabula régulièrement pour garder vos rappels à jour.,,

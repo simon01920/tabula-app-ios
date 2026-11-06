@@ -937,6 +937,8 @@ reminder.lesson.inDaysAt,other,"Lesson reminder body; plural on arg 1 (days), ar
 reminder.lesson.title,,Notification title: the subject's name (user text). Args: 1 subject name.,%@,%@,,
 reminder.lesson.todayAt,,Lesson reminder body; arg = start time. Args: 1 time.,Starts at %@,%@开始,,
 reminder.lesson.tomorrowAt,,Lesson reminder body; arg = start time. Args: 1 time.,Tomorrow at %@,明天 %@,,
+reminder.markDoneFailed.body,,Body of the notification shown when 'Mark as Done' on a reminder notification could not be saved. Tabula is the app name.,Open Tabula to try again.,请打开 Tabula 后重试。,,
+reminder.markDoneFailed.title,,Title of a notification shown right after the user pressed 'Mark as Done' on a reminder notification but the app could not save it (e.g. the data is read-only). The subtitle is the original reminder's title.,Couldn't Mark as Done,无法标记为已完成,,
 reminder.notice.alarmLimit,other,In-app notice when too many loud alarms are set; plural on the count. Args: 1 count.,%lld alarms will arrive as notifications instead.,%lld个闹钟将改为以通知的形式送达。,,
 reminder.notice.saturated,other,In-app notice when more reminders are due than iOS allows at once; plural on the count. Args: 1 count.,%lld reminders couldn't be scheduled yet. Open Tabula regularly to keep reminders up to date.,还有%lld个提醒暂时无法安排。请经常打开 Tabula，以保持提醒为最新。,,
 reminder.packTonight.inDays,other,"Pack-your-bag body for a day later than tomorrow. Plural on arg 1 (items), the only count. Args: 1 items, 2 first subject, 3 date (formatted, e.g. 'Mon 12 Oct').","%1$lld items to pack for %3$@, starting with %2$@",有%1$lld件物品要为%3$@准备，先从%2$@开始,,

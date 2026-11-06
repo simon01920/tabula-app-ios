@@ -8,6 +8,16 @@
 // soft limit, so the planner itself demotes the rest to Time Sensitive notifications and reports them in
 // `ReminderPlan.alarmOverflow` (the in-app notice). Same for an alarm authorisation lost between the check and the
 // call (plan again with `canScheduleAlarms == false`).
+//
+// Performance (Phase 10 P4):
+// - The planner (`ReminderInputBuilder.input` + `ReminderPlanner.plan`, pure value types, all Sendable) runs in a
+//   detached task at the caller's priority, so a re-plan no longer blocks the main thread while it resolves 14+ days of
+//   lessons. Client calls (UNUserNotificationCenter, AlarmKit) and every write of `state` stay on the main actor.
+// - The state is saved ONCE per run (it was up to five times). The only extra save is the documented write-ahead of
+//   the alarm ledger, and only when a pass is about to schedule an alarm id the ledger does not hold yet. A run cut
+//   short before its final save loses only the render signature / learned limit / applied plan of that run: the next
+//   run re-diffs against what is really pending (the same path as a lost state), and the ledger already lists every
+//   alarm that may exist.
 import Foundation
 import TimetableCore
 
@@ -72,7 +82,7 @@ public final class ReminderEngine {
     public let notifications: any NotificationCenterClient
     public let alarms: any AlarmClient
     private let store: any ReminderStateStore
-    /// The persisted state (loaded once, saved after every change).
+    /// The persisted state (loaded once, saved once per run, plus the ledger's write-ahead).
     public private(set) var state: AppliedReminderState
 
     public init(notifications: any NotificationCenterClient, alarms: any AlarmClient, store: any ReminderStateStore) {
@@ -103,9 +113,8 @@ public final class ReminderEngine {
                                                           ReminderApplyOperations.foreignPendingCount(pending)))
             let options = ReminderPlanningOptions(horizonDays: input.horizonDays, budget: budget,
                                                   alarmSoftLimit: softLimit, canScheduleAlarms: canScheduleAlarms)
-            let plan = ReminderPlanner.plan(ReminderInputBuilder.input(database: input.database, resolvers: input.resolvers,
-                                                                       context: input.context, now: input.now,
-                                                                       options: options))
+            let plan = await Self.plan(database: input.database, resolvers: input.resolvers, context: input.context,
+                                       now: input.now, options: options)
             plannedRequestCount = plan.notifications.count + plan.alarms.count
             let valuesKnown = input.renderSignature == nil || input.renderSignature == state.renderSignature
             if !valuesKnown { report.renderSignatureChanged = true }
@@ -115,8 +124,7 @@ public final class ReminderEngine {
                                                       now: input.now, valuesKnown: valuesKnown)
             let pass = await apply(ops, plan: plan, builder: builder, daemonAlarms: daemonAlarms.map { $0.map(\.id) })
             if input.renderSignature != nil {
-                state.renderSignature = input.renderSignature
-                store.save(state)
+                state.renderSignature = input.renderSignature   // saved with the run (final save)
             }
             applied = pass.applied
             report.notificationsAdded += pass.report.notificationsAdded
@@ -133,8 +141,7 @@ public final class ReminderEngine {
             if pass.report.alarmLimitReached {
                 report.alarmLimitReached = true
                 softLimit = applied.alarms.count
-                state.learnedAlarmLimit = LearnedAlarmLimit(count: softLimit, learnedAt: input.now)
-                store.save(state)
+                state.learnedAlarmLimit = LearnedAlarmLimit(count: softLimit, learnedAt: input.now)   // final save
                 continue
             }
             if pass.alarmsUnauthorized {
@@ -148,6 +155,15 @@ public final class ReminderEngine {
         store.save(state)
         return ReminderRunResult(plan: applied, report: report, alarmAuthorization: authorization,
                                  plannedRequestCount: plannedRequestCount)
+    }
+
+    /// The pure planning step, off the main actor (only Sendable values cross; the result is a value).
+    nonisolated static func plan(database: TabulaDatabase, resolvers: [ScheduleResolver], context: CalendarContext,
+                                 now: Date, options: ReminderPlanningOptions) async -> ReminderPlan {
+        await Task.detached(priority: Task.currentPriority) {
+            ReminderPlanner.plan(ReminderInputBuilder.input(database: database, resolvers: resolvers, context: context,
+                                                            now: now, options: options))
+        }.value
     }
 
     private struct Pass {
@@ -177,10 +193,12 @@ public final class ReminderEngine {
         }
         report.notificationsAdded = added.count
 
-        // Alarms: ledger first (write-ahead), then cancel, then schedule in plan order (soonest first).
+        // Alarms: ledger first (write-ahead), then cancel, then schedule in plan order (soonest first). The write-ahead
+        // is saved only when it adds an id (an alarm must never exist without being in the persisted ledger).
         let previousLedger = Set(state.alarmLedger)
-        state.alarmLedger = Self.sorted(previousLedger.union(ops.scheduleAlarms.map(\.alarmID)))
-        store.save(state)
+        let aheadLedger = previousLedger.union(ops.scheduleAlarms.map(\.alarmID))
+        state.alarmLedger = Self.sorted(aheadLedger)
+        if aheadLedger.count > previousLedger.count { store.save(state) }
         for id in ops.cancelAlarmIDs { await alarms.cancel(id: id) }
         report.alarmsCancelled = ops.cancelAlarmIDs.count
         report.alarmsUnchanged = ops.unchangedAlarms.count
@@ -219,8 +237,7 @@ public final class ReminderEngine {
             .subtracting(ops.cancelAlarmIDs)
         state.alarmLedger = Self.sorted(Set(applied.alarms.map(\.alarmID)).union(stillThere))
         state.activeAlarms = ops.lingeringAlarms
-        state.plan = applied
-        store.save(state)
+        state.plan = applied   // saved with the run (final save in `run`)
         return Pass(applied: applied, report: report, alarmsUnauthorized: stop == .notAuthorized)
     }
 
@@ -239,6 +256,13 @@ public final class ReminderEngine {
         guard let date = action.snoozeDate(now: now, context: context) else { return nil }
         let spec = ReminderRequestBuilder(renderer: renderer, context: context).snooze(delivered, until: date)
         return await notifications.add(spec)
+    }
+
+    /// Phase 10 B12: tells the user right away that a notification "Mark as Done" could not be saved.
+    public func notifyMarkDoneFailed(_ delivered: DeliveredNotification, context: CalendarContext,
+                                     renderer: LocalizedTextRenderer, now: Date) async -> NotificationAddOutcome {
+        await notifications.add(ReminderRequestBuilder(renderer: renderer, context: context)
+            .markDoneFailedNotice(for: delivered, now: now))
     }
 
     /// Removes every delivered notification of `source` from Notification Center (after Mark as Done).

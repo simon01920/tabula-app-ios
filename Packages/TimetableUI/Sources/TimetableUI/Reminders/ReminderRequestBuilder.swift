@@ -11,12 +11,14 @@ public enum ReminderUserInfo {
     public static let reminderID = "tabula.reminderID"
     /// `ReminderSource.rawValue` (`task/<UUID>`, `exam/<UUID>`, `lesson/<id>`, `packTonight/<date>`).
     public static let source = "tabula.source"
-    /// `planned`, `snooze` or `test`.
+    /// `planned`, `snooze`, `test` or `notice`.
     public static let kind = "tabula.kind"
 
     public static let kindPlanned = "planned"
     public static let kindSnooze = "snooze"
     public static let kindTest = "test"
+    /// An immediate notice about an action (Phase 10 B12: "Mark as Done" could not be saved).
+    public static let kindNotice = "notice"
 }
 
 /// Identifier schemes of requests the adapter adds outside the plan. None of them passes `ReminderID.isPlannerID`,
@@ -27,6 +29,9 @@ public enum ReminderRequestID {
     public static let snoozePrefix = "snooze."
     /// Prefix of the health check's test notification.
     public static let testPrefix = "tabula.test."
+    /// Prefix of immediate notices (Phase 10 B12): `tabula.notice.markDoneFailed.<source>`, one per item (a repeated
+    /// failure replaces the earlier notice).
+    public static let noticePrefix = "tabula.notice."
 
     /// The snooze id for `reminderID` (a planner id or, when snoozing a snooze, the id it was derived from).
     public static func snooze(for reminderID: String) -> String {
@@ -78,6 +83,12 @@ public struct ReminderRequestBuilder: Sendable {
         public static let testBody = "reminder.test.body"
         /// "Tabula test alarm" — health check test alarm.
         public static let testAlarmTitle = "reminder.test.alarmTitle"
+        /// "Couldn't mark as done" / "Open Tabula to try again." — a notification "Mark as Done" was not saved (B12).
+        public static let markDoneFailedTitle = "reminder.markDoneFailed.title"
+        public static let markDoneFailedBody = "reminder.markDoneFailed.body"
+        /// Every key above (catalog check).
+        public static let all = [alarmSnoozedTitle, testTitle, testBody, testAlarmTitle, markDoneFailedTitle,
+                                 markDoneFailedBody]
     }
 
     public let renderer: LocalizedTextRenderer
@@ -141,6 +152,25 @@ public struct ReminderRequestBuilder: Sendable {
             id: ReminderRequestID.testPrefix + "notification", title: renderer.string(forKey: Keys.testTitle), subtitle: nil,
             body: renderer.string(forKey: Keys.testBody), interruption: .active, threadID: "tabula.test", categoryID: "",
             userInfo: [ReminderUserInfo.kind: ReminderUserInfo.kindTest], fireDate: fire,
+            trigger: NotificationTriggerTime(instant: fire, zone: context.timeZone))
+    }
+
+    /// Phase 10 B12: told right away when a notification's "Mark as Done" could not be saved (read-only store, store not
+    /// loaded, a rejected or failed change), so the user does not believe the item is done. Subtitle = the original
+    /// notification's title (verbatim, so the user sees which item); no actions; a tap opens the item like the
+    /// original (same `source`), and a later successful Mark done removes it with the item's other notifications.
+    public func markDoneFailedNotice(for delivered: DeliveredNotification, now: Date,
+                                     delay: TimeInterval = 1) -> NotificationRequestSpec {
+        let fire = now.addingTimeInterval(delay)
+        let source = delivered.userInfo[ReminderUserInfo.source]
+        var userInfo = [ReminderUserInfo.kind: ReminderUserInfo.kindNotice]
+        if let source { userInfo[ReminderUserInfo.source] = source }
+        return NotificationRequestSpec(
+            id: ReminderRequestID.noticePrefix + "markDoneFailed." + (source ?? "unknown"),
+            title: renderer.string(forKey: Keys.markDoneFailedTitle),
+            subtitle: delivered.title.isEmpty ? nil : delivered.title,
+            body: renderer.string(forKey: Keys.markDoneFailedBody), interruption: .active,
+            threadID: delivered.threadID, categoryID: "", userInfo: userInfo, fireDate: fire,
             trigger: NotificationTriggerTime(instant: fire, zone: context.timeZone))
     }
 
