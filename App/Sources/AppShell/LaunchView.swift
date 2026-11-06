@@ -1,6 +1,8 @@
 // Launch screen: shown only while the store loads (`AppModel.phase == .loading`), then AppRootView cross-fades to the
-// app. No minimum display time. The background is the system background, which is what the static iOS launch screen
-// shows (Config/App-Info.plist `UILaunchScreen` is an empty dict on both build paths: no image, no colour asset).
+// app (a cut with Reduce Motion). Once on screen it stays for its 0.3 s swipe (no one-frame flash); with Reduce Motion
+// there is no swipe and no hold, and a store already loaded at the first frame never shows it (`LaunchHold`, P6).
+// The background is the system background, which is what the static iOS launch screen shows
+// (Config/App-Info.plist `UILaunchScreen` is an empty dict on both build paths: no image, no colour asset).
 // The mark is the app icon drawn in shapes (geometry from scripts/make-app-icon.py, 1024 px canvas scaled to 96 pt):
 // the ink square keeps the light icon's ink in both appearances, like the Home Screen icon the user just tapped.
 // Motion: the highlighter swipes in once (0.3 s), then the three lesson tiles light up top to bottom in a loop.
@@ -16,7 +18,8 @@ import UIKit
 struct LaunchView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var swiped = false
-    /// Called once the highlighter swipe (0.3 s) has played; `AppRootView` keeps the mark until then (no flash).
+    /// Called once the highlighter swipe (0.3 s) has played — at once with Reduce Motion (no swipe); `AppRootView`
+    /// keeps the mark until then (no flash).
     var onSwipeFinished: (() -> Void)? = nil
 
     var body: some View {
@@ -35,7 +38,8 @@ struct LaunchView: View {
             withAnimation(.easeOut(duration: 0.3)) { swiped = true }
         }
         .task {
-            try? await Task.sleep(for: .milliseconds(300))
+            let hold = LaunchHold.holdDuration(reduceMotion: reduceMotion)
+            if hold > .zero { try? await Task.sleep(for: hold) }
             onSwipeFinished?()
         }
     }

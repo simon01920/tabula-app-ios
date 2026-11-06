@@ -162,22 +162,64 @@ struct FollowUpRows: View {
 
 // MARK: - Quiet hours
 
+/// The quiet-hours switch and its start / end times. Phase 10 P14: time changes are kept in a local draft
+/// (`QuietHoursDraft`) and written to `quietHours` once — 0.8 s after the last change, when the rows disappear (screen
+/// left) or when the scene leaves `active` — instead of one `apply` (save + re-plan + widgets) per picker stop. The
+/// switch writes at once. The rows always show the draft, so nothing visible changes.
+/// APIs: View.onDisappear(perform:), View.onChange(of:_:) (iOS 17), Environment(\.scenePhase), Task.sleep(for:).
 struct QuietHoursRows: View {
     let toggleKey: LocalizedStringKey
     @Binding var quietHours: QuietHours?
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var draft = QuietHoursDraft()
+    @State private var commitTask: Task<Void, Never>?
+
+    private var shown: QuietHours? { draft.shown(stored: quietHours) }
 
     var body: some View {
-        Toggle(isOn: Binding(get: { quietHours != nil },
-                             set: { quietHours = $0 ? (quietHours ?? ReminderRuleEditing.defaultQuietHours) : nil })) {
-            Text(toggleKey)
+        Group {
+            Toggle(isOn: Binding(get: { shown != nil },
+                                 set: { write($0 ? (shown ?? ReminderRuleEditing.defaultQuietHours) : nil) })) {
+                Text(toggleKey)
+            }
+            .frame(minHeight: 44)
+            if let hours = shown {
+                TimeRow(titleKey: "reminders.quiet.start",
+                        time: Binding(get: { hours.start }, set: { edit(QuietHours(start: $0, end: hours.end)) }))
+                TimeRow(titleKey: "reminders.quiet.end",
+                        time: Binding(get: { hours.end }, set: { edit(QuietHours(start: hours.start, end: $0)) }))
+            }
         }
-        .frame(minHeight: 44)
-        if let hours = quietHours {
-            TimeRow(titleKey: "reminders.quiet.start",
-                    time: Binding(get: { hours.start }, set: { quietHours = QuietHours(start: $0, end: hours.end) }))
-            TimeRow(titleKey: "reminders.quiet.end",
-                    time: Binding(get: { hours.end }, set: { quietHours = QuietHours(start: hours.start, end: $0) }))
+        // Each row may report its own disappearance: `commit()` is idempotent (the first call takes the draft).
+        .onDisappear { commit() }
+        .onChange(of: scenePhase) { _, phase in
+            if phase != .active { commit() }
         }
+    }
+
+    /// A time edit: kept in the draft, written after a short pause.
+    private func edit(_ value: QuietHours) {
+        draft.edit(value)
+        commitTask?.cancel()
+        commitTask = Task { @MainActor in
+            try? await Task.sleep(for: QuietHoursDraft.commitDelay)
+            guard !Task.isCancelled else { return }
+            commit()
+        }
+    }
+
+    /// The switch: written at once (any pending time edit is part of it or replaced by it).
+    private func write(_ value: QuietHours?) {
+        commitTask?.cancel()
+        commitTask = nil
+        draft = QuietHoursDraft()
+        if value != quietHours { quietHours = value }
+    }
+
+    private func commit() {
+        commitTask?.cancel()
+        commitTask = nil
+        if case .write(let value) = draft.take(stored: quietHours) { quietHours = value }
     }
 }
 

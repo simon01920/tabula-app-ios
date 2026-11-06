@@ -39,10 +39,17 @@ public struct WeekStripModel: Equatable, Sendable {
 
     /// Builds the strip for `selection` (shown days = the timetable's enabled days) with actual schedules.
     public static func make(selection: TimetableSelection, today: LocalDate, resolver: ScheduleResolver) -> WeekStripModel {
+        make(selection: selection, today: today, resolver: resolver, scheduleOf: { resolver.day($0) })
+    }
+
+    /// The same strip from already-resolved days (`scheduleOf(date)` must equal `resolver.day(date)`; Phase 10 P11:
+    /// the Timetable tab resolves each shown date once per pass, `ResolvedWeek`).
+    public static func make(selection: TimetableSelection, today: LocalDate, resolver: ScheduleResolver,
+                            scheduleOf: (LocalDate) -> DaySchedule) -> WeekStripModel {
         let dates = TimetableSelection.shownDays(weekStart: selection.weekStart, resolver: resolver)
         let scheme = resolver.timetable.rotation
         let days = dates.map { date -> WeekStripDay in
-            let schedule = resolver.day(date)
+            let schedule = scheduleOf(date)
             return WeekStripDay(
                 date: date, isToday: date == today, isSelected: date == selection.selectedDate,
                 isSchoolDay: schedule.isSchoolDay,
