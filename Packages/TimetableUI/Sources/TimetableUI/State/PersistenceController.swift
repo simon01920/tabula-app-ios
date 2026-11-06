@@ -20,7 +20,8 @@ public enum SaveOutcome: Equatable, Sendable {
 /// Loads once and saves serially.
 public actor PersistenceController {
     private let repository: any TabulaRepository
-    /// Highest generation written **successfully** so far (`-1` before the first save).
+    /// Highest generation written **successfully** so far (`-1` before the first save; `loadedGeneration` after a
+    /// clean load, see `load()`).
     public private(set) var lastSavedGeneration = -1
     /// Number of successful writes (tests, debug screen).
     public private(set) var writeCount = 0
@@ -30,12 +31,24 @@ public actor PersistenceController {
         self.repository = repository
     }
 
+    /// The generation `AppModel` gives the snapshot it loaded (its counter starts at 0; every accepted change adds 1).
+    public static let loadedGeneration = 0
+
     /// Loads the stored database and maps the result (banners, read-only, first launch, failures).
+    ///
+    /// Phase 10: a clean load (`isUnchangedOnDisk`: read from the primary file, current schema, no recovery step)
+    /// counts as generation `loadedGeneration` already written, so a launch without edits writes nothing (the first
+    /// flush used to rewrite the whole store and rotate the backup file). A migrated, recovered or read-only load
+    /// still writes on the first flush, as before (`LoadReport.migrated`: "written on the next save").
     public func load() async -> StoreLoadOutcome {
         do {
             let database = try await repository.load()
             var report: LoadReport?
             if let file = repository as? FileRepository { report = await file.lastLoadReport }
+            if let report, Self.isUnchangedOnDisk(report) {
+                lastSavedGeneration = max(lastSavedGeneration, Self.loadedGeneration)
+                lastRequestedGeneration = max(lastRequestedGeneration, Self.loadedGeneration)
+            }
             return .loaded(database, report: report)
         } catch {
             return .failed(error)
@@ -57,6 +70,12 @@ public actor PersistenceController {
         let task = Task { await self.write(database, generation: generation, after: previous) }
         tail = task
         return await task.value
+    }
+
+    /// `true` when the loaded database is exactly what the primary file holds, so writing it again changes nothing:
+    /// read from `tabula.json` (not the backup), not migrated, not read-only, and no recovery step was taken.
+    static func isUnchangedOnDisk(_ report: LoadReport) -> Bool {
+        report.source == .primary && !report.migrated && !report.isReadOnly && report.events.isEmpty
     }
 
     /// `true` when the newest requested generation has not been written successfully (a retry is due).
