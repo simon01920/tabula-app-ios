@@ -84,3 +84,19 @@ Silent switch on/off · each Focus (DND, Sleep, custom) · Low Power Mode · app
 - **Health check model:** `ReminderHealthCheck` (rows for notifications, Time Sensitive, loud alarms, Focus, Silent mode,
   Low Power, Background App Refresh, pending vs 64, saturation, alarm overflow, hidden/locked app). UI in B4.
 - **Device matrix:** `docs/checklists/PHASE3_DEVICE.md` §A.
+- **Phase 10 WP1 (performance, behaviour kept):** trigger → work after the change.
+  - *Launch* (store loaded): reminder re-plan after `ReminderCoordinator.launchDelay` (1.5 s, was 0) so it misses the
+    first frames; still guaranteed (a later debounced request keeps the `.launch` reason), and a notification action,
+    App Intent or `BGAppRefreshTask` runs it at once (`replanNow`). Widget snapshot 800 ms, Live Activities 600 ms,
+    attachment cleanup 2 s: unchanged.
+  - *Data change* (`apply`): re-plan 1 s, widgets 800 ms, Live Activities 600 ms, attachment scan 3 s, iCloud scan
+    (paid builds): unchanged triggers. Each re-plan now saves the adapter state once (plus the ledger's write-ahead only
+    when a new alarm id is about to be scheduled) and runs the pure planner off the main actor.
+  - *Foreground*: after a real background stay, unchanged (environment refresh → all of the above with `.environment`).
+    After an `.inactive → .active` blip (Notification Centre, Face ID, call banner) only when the zone, locale, hour
+    cycle, week start or local day changed, or the last refresh is 5+ minutes old (`ForegroundRefreshPolicy`).
+  - *Zone / locale / significant time change* notifications: always refresh at once (unchanged).
+  - *Leaving active* (inactive and background): store flush + widget flush, unchanged (cheap when nothing is pending).
+  - *Mark as Done that cannot be saved* (read-only store, not loaded, rejected, failed): an immediate notice
+    `tabula.notice.markDoneFailed.<source>` ("Couldn't Mark as Done" / "Open Tabula to try again.", subtitle = the
+    original title, tap opens the item); never touched by the plan diff. An item deleted meanwhile gets no notice.
