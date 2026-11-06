@@ -84,7 +84,10 @@ struct TabulaRootApp: App {
             if phase == .active {
                 services.model.sceneDidBecomeActive()
             } else {
-                if phase == .background { services.model.sceneDidEnterBackground() }
+                if phase == .background {
+                    services.model.sceneDidEnterBackground()
+                    services.reminders.sceneDidEnterBackground()   // runs a still-waiting launch re-plan now
+                }
                 BackgroundSave.flush(services.model)
                 services.widgets.flushNow()           // a change made just before leaving reaches the widgets
             }

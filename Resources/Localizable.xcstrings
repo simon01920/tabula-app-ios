@@ -101474,85 +101474,85 @@
       }
     },
     "settings.backup.automatic.footer" : {
-      "comment" : "Footer of the Automatic copies section. 'Restore from Backup…' is the button name (settings.backup.restore).",
+      "comment" : "Footer of the Automatic copies section. 'Restore from Backup…' is the button name (settings.backup.restore). 'Each kind' = copies made before a restore, an import, a data move, etc.; 5 and 30 are fixed numbers (BackupFolder.keepPerLabel / minimumAge).",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula sem uloží kopii vašich dat dřív, než je obnova nahradí. Klepnutím kopii sdílíte nebo uložíte do Souborů; chcete-li se k ní vrátit, použijte Obnovit ze zálohy…."
+            "value" : "Tabula sem uloží kopii vašich dat dřív, než je obnova nahradí. Ponechá vždy alespoň 5 nejnovějších kopií každého druhu a starší po 30 dnech smaže. Klepnutím kopii sdílíte nebo uložíte do Souborů; chcete-li se k ní vrátit, použijte Obnovit ze zálohy…."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula sichert hier eine Kopie deiner Daten, bevor eine Wiederherstellung sie ersetzt. Tippe auf eine Kopie, um sie zu teilen oder in „Dateien“ zu sichern; um zu ihr zurückzukehren, nutze „Aus Backup wiederherstellen …“."
+            "value" : "Tabula sichert hier eine Kopie deiner Daten, bevor eine Wiederherstellung sie ersetzt. Von jeder Art bleiben mindestens die 5 neuesten Kopien erhalten; ältere werden nach 30 Tagen gelöscht. Tippe auf eine Kopie, um sie zu teilen oder in „Dateien“ zu sichern; um zu ihr zurückzukehren, nutze „Aus Backup wiederherstellen …“."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tabula saves a copy of your data here before a restore replaces it. Tap a copy to share it or save it to Files; to go back to it, use Restore from Backup…."
+            "value" : "Tabula saves a copy of your data here before a restore replaces it. It keeps at least the 5 newest copies of each kind and deletes older ones after 30 days. Tap a copy to share it or save it to Files; to go back to it, use Restore from Backup…."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula enregistre ici une copie de vos données avant qu’une restauration ne les remplace. Touchez une copie pour la partager ou l’enregistrer dans Fichiers ; pour y revenir, utilisez Restaurer une sauvegarde…."
+            "value" : "Tabula enregistre ici une copie de vos données avant qu’une restauration ne les remplace. Tabula conserve au moins les 5 copies les plus récentes de chaque type et supprime les plus anciennes après 30 jours. Touchez une copie pour la partager ou l’enregistrer dans Fichiers ; pour y revenir, utilisez Restaurer une sauvegarde…."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "A Tabula ide ment egy másolatot az adataidról, mielőtt egy visszaállítás lecserélné őket. Koppints egy másolatra a megosztáshoz vagy a Fájlokba mentéshez; ha vissza szeretnél térni hozzá, használd a Visszaállítás mentésből… gombot."
+            "value" : "A Tabula ide ment egy másolatot az adataidról, mielőtt egy visszaállítás lecserélné őket. Minden fajtából legalább az 5 legújabb másolatot megtartja, a régebbieket 30 nap után törli. Koppints egy másolatra a megosztáshoz vagy a Fájlokba mentéshez; ha vissza szeretnél térni hozzá, használd a Visszaállítás mentésből… gombot."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "復元でデータが置き換えられる前に、Tabulaはここにデータのコピーを保存します。コピーをタップすると共有したり“ファイル”に保存したりできます。元に戻すには「バックアップから復元…」を使ってください。"
+            "value" : "復元でデータが置き換えられる前に、Tabulaはここにデータのコピーを保存します。種類ごとに少なくとも最新の5件のコピーを残し、それより古いものは30日後に削除します。コピーをタップすると共有したり“ファイル”に保存したりできます。元に戻すには「バックアップから復元…」を使ってください。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula zapisuje tu kopię Twoich danych, zanim przywracanie je zastąpi. Stuknij kopię, aby ją udostępnić lub zapisać w Plikach; aby do niej wrócić, użyj opcji Przywróć z kopii zapasowej…."
+            "value" : "Tabula zapisuje tu kopię Twoich danych, zanim przywracanie je zastąpi. Tabula zachowuje co najmniej 5 najnowszych kopii każdego rodzaju, a starsze usuwa po 30 dniach. Stuknij kopię, aby ją udostępnić lub zapisać w Plikach; aby do niej wrócić, użyj opcji Przywróć z kopii zapasowej…."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula salvează aici o copie a datelor tale înainte ca o restaurare să le înlocuiască. Atinge o copie pentru a o partaja sau a o salva în Fișiere; pentru a reveni la ea, folosește Restaurează din backup…."
+            "value" : "Tabula salvează aici o copie a datelor tale înainte ca o restaurare să le înlocuiască. Tabula păstrează cel puțin cele mai noi 5 copii de fiecare tip și le șterge pe cele mai vechi după 30 de zile. Atinge o copie pentru a o partaja sau a o salva în Fișiere; pentru a reveni la ea, folosește Restaurează din backup…."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula sem uloží kópiu vašich údajov predtým, ako ich obnova nahradí. Klepnutím kópiu zdieľate alebo uložíte do Súborov; ak sa k nej chcete vrátiť, použite Obnoviť zo zálohy…."
+            "value" : "Tabula sem uloží kópiu vašich údajov predtým, ako ich obnova nahradí. Ponechá vždy aspoň 5 najnovších kópií každého druhu a staršie po 30 dňoch vymaže. Klepnutím kópiu zdieľate alebo uložíte do Súborov; ak sa k nej chcete vrátiť, použite Obnoviť zo zálohy…."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula овде чува копију ваших података пре него што их враћање замени. Додирните копију да бисте је поделили или сачували у Датотекама; да бисте јој се вратили, користите Врати из резервне копије…."
+            "value" : "Tabula овде чува копију ваших података пре него што их враћање замени. Tabula чува најмање 5 најновијих копија сваке врсте, а старије брише после 30 дана. Додирните копију да бисте је поделили или сачували у Датотекама; да бисте јој се вратили, користите Врати из резервне копије…."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula ovde čuva kopiju vaših podataka pre nego što ih vraćanje zameni. Dodirnite kopiju da biste je podelili ili sačuvali u Datotekama; da biste joj se vratili, koristite Vrati iz rezervne kopije…."
+            "value" : "Tabula ovde čuva kopiju vaših podataka pre nego što ih vraćanje zameni. Tabula čuva najmanje 5 najnovijih kopija svake vrste, a starije briše posle 30 dana. Dodirnite kopiju da biste je podelili ili sačuvali u Datotekama; da biste joj se vratili, koristite Vrati iz rezervne kopije…."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula зберігає тут копію ваших даних, перш ніж відновлення їх замінить. Торкніться копії, щоб поділитися нею або зберегти її у Файлах; щоб повернутися до неї, скористайтеся «Відновити з резервної копії…»."
+            "value" : "Tabula зберігає тут копію ваших даних, перш ніж відновлення їх замінить. Tabula зберігає щонайменше 5 найновіших копій кожного виду, а старіші видаляє через 30 днів. Торкніться копії, щоб поділитися нею або зберегти її у Файлах; щоб повернутися до неї, скористайтеся «Відновити з резервної копії…»."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "在恢复替换你的数据之前，Tabula 会在此保存一份数据副本。轻点副本可共享或存储到“文件”；如需恢复到该副本，请使用“从备份恢复…”。"
+            "value" : "在恢复替换你的数据之前，Tabula 会在此保存一份数据副本。每种副本至少保留最新的 5 份，较旧的副本会在 30 天后删除。轻点副本可共享或存储到“文件”；如需恢复到该副本，请使用“从备份恢复…”。"
           }
         }
       }

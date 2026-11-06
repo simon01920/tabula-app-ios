@@ -1,6 +1,8 @@
 // The review screen of the photo import (Phase 9 I2, PHASE9_PLAN decision 5). State: TimetableUI `ImportReview`
 // (pure, Linux-tested); this file only renders it and forwards taps.
-//   iPhone        segmented Image / Timetable switch; iPad and wide windows: both side by side.
+//   iPhone        segmented Image / Timetable switch; iPad and wide windows: both side by side. At accessibility
+//                 text sizes the switch is a menu (`adaptiveSegmentedPicker`), which shows only the choice, so the
+//                 "Show" label is shown above it (QA fix after Phase 10).
 //   Image         the picture, zoomable (pinch, double tap, VoiceOver zoom), uncertain cells outlined.
 //   Timetable     name · counts ("32 lessons", "12 subjects", "3 need checking") · notices · Questions (one-tap
 //                 answers) · the grid (days as rows, periods across, spans; uncertain cells outlined with a symbol) ·
@@ -27,6 +29,7 @@ struct ImportReviewScreen: View {
 
     @Environment(AppModel.self) private var model
     @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var pane: Pane = .timetable
     @State private var editing: EditTarget?
     @State private var resolved: ResolvedShare?
@@ -72,20 +75,38 @@ struct ImportReviewScreen: View {
             }
         } else {
             VStack(spacing: 0) {
-                Picker(selection: $pane) {
-                    Text("import.review.pane.image").tag(Pane.image)
-                    Text("import.review.pane.timetable").tag(Pane.timetable)
-                } label: {
-                    Text("import.review.pane")
-                }
-                .adaptiveSegmentedPicker()
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
+                paneSwitch
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
                 switch pane {
                 case .image: imagePane(review)
                 case .timetable: ImportReviewList(review: review, flow: flow, edit: edit)
                 }
             }
+        }
+    }
+
+    /// The Image / Timetable switch. Outside a Form the menu fallback at accessibility sizes hides the picker's label,
+    /// so the same word is shown above it (hidden from VoiceOver: the picker already reads it as its label).
+    @ViewBuilder private var paneSwitch: some View {
+        let picker = Picker(selection: $pane) {
+            Text("import.review.pane.image").tag(Pane.image)
+            Text("import.review.pane.timetable").tag(Pane.timetable)
+        } label: {
+            Text("import.review.pane")
+        }
+        .adaptiveSegmentedPicker()
+        if AdaptiveLayout.isStacked(dynamicTypeSize) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("import.review.pane")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .accessibilityHidden(true)
+                picker
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        } else {
+            picker
         }
     }
 

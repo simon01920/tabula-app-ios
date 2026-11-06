@@ -90,6 +90,23 @@ struct DerivedStateRebuildTests {
         #expect(!rebuild.context || rebuild.resolvers)   // a context change always takes the resolvers with it
     }
 
+    /// QA fix: the locale-change notification and a return from the background force the context and formatter
+    /// even when the inputs compare equal; resolvers still follow the value comparison; the first build is unchanged.
+    @Test func forcedEnvironmentRebuildIgnoresTheEqualityShortcut() {
+        let database = WP1.database
+        let same = WP1.inputs(database)
+        #expect(DerivedStateRebuild.needed(from: same, to: same, forceEnvironment: true)
+                == DerivedStateRebuild(context: true, formatter: true, resolvers: false))
+        #expect(DerivedStateRebuild.needed(from: same, to: same, forceEnvironment: false) == .nothing)
+        #expect(DerivedStateRebuild.needed(from: nil, to: same, forceEnvironment: true) == .everything)
+        var lessons = database
+        lessons.lessons.removeAll()
+        #expect(DerivedStateRebuild.needed(from: same, to: WP1.inputs(lessons), forceEnvironment: true) == .everything)
+        #expect(DerivedStateRebuild.needed(from: WP1.inputs(database, zone: WP1.zone),
+                                           to: WP1.inputs(database, zone: WP1.london), forceEnvironment: true)
+                == .everything)
+    }
+
     @Test func databaseAppearingOrVanishingRebuildsResolvers() {
         let database = WP1.database
         let empty = WP1.inputs(nil, settings: database.settings)
