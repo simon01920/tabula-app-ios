@@ -5,7 +5,8 @@
 // - store protection lives exactly as long as the editor: every ID the editor showed or added stays protected
 //   (`AttachmentEditorProtection`, grow-only) from `begin` until the editor disappears;
 // - `importingCount` lets the editor disable Save and swipe-to-dismiss while a copy is in flight, so a Save can never
-//   drop an attachment whose file is still being copied;
+//   drop an attachment whose file is still being copied; Cancel asks first (Phase 10 B3), and a copy that finishes
+//   after the editor ended never re-protects: it joins the draft on re-appear, or is deleted when the session is gone;
 // - a voice note's temporary file is deleted only after its ref is in the draft; when the copy fails the recording is
 //   kept and the user can retry or delete it.
 // Every change to the attachments goes through this session (the section passes its binding with each action), so the
@@ -58,6 +59,11 @@ final class AttachmentEditorSession {
     /// The editor is gone (`end()`, until a re-appear calls `begin` again): a recording whose copy fails now cannot be
     /// retried, so its temporary file is deleted instead of being kept as `pendingVoiceNote`.
     @ObservationIgnored private var isEnded = false
+    /// Copies that finished while the editor was off screen (`end()` ran, e.g. under Quick Look; B3, Phase 10). They
+    /// join the draft when the editor appears again (`begin`). They are not protected in the meantime, so if the
+    /// editor never comes back they are ordinary orphans for the cleanup. A copy that finishes after the session itself
+    /// is gone (sheet closed) is deleted right away (`runImport`).
+    @ObservationIgnored private var finishedWhileEnded: [(id: AttachmentRef.ID, kind: AttachmentKind, stored: StoredAttachmentFile)] = []
 
     private var store: (any AttachmentStore)? { model?.environment.attachments }
     private var quota: AttachmentQuota { model.map { AttachmentQuota(entitlements: $0.entitlements) } ?? .unlimited }
@@ -74,6 +80,9 @@ final class AttachmentEditorSession {
             refs = initial
         }
         protection.record(refs)
+        let finished = finishedWhileEnded
+        finishedWhileEnded = []
+        for copy in finished { append(copy.stored, id: copy.id, kind: copy.kind) }
         Task { await refresh() }
     }
 
@@ -86,9 +95,10 @@ final class AttachmentEditorSession {
         Task { await store.clearProtection(owner: owner) }
     }
 
-    /// File URLs, usage and protection for the current refs.
+    /// File URLs, usage and protection for the current refs. Does nothing once the editor ended: protecting again after
+    /// `end()` cleared it kept an orphan protected until relaunch (B3).
     func refresh() async {
-        guard let store else { return }
+        guard let store, !isEnded else { return }
         await store.setProtectedIDs(protection.ids, owner: owner)
         var urls: [AttachmentRef.ID: URL] = [:]
         for ref in AttachmentReferences.visible(refs) where ref.kind != .link {
@@ -277,6 +287,7 @@ final class AttachmentEditorSession {
     // MARK: Internals
 
     private func mutate(_ change: ([AttachmentRef]) -> [AttachmentRef]) {
+        guard !isEnded else { return }   // B3: no draft change or re-protection after the editor ended
         let base = target?.wrappedValue ?? refs
         let updated = change(base)
         refs = updated
@@ -285,31 +296,53 @@ final class AttachmentEditorSession {
         Task { await refresh() }
     }
 
+    /// Adds the ref of a finished copy to the draft.
+    private func append(_ stored: StoredAttachmentFile, id: AttachmentRef.ID, kind: AttachmentKind) {
+        mutate { refs in
+            refs + [AttachmentRef(id: id, meta: EditorEntities.placeholderMeta, kind: kind,
+                                  fileName: stored.fileName, contentType: stored.contentType,
+                                  byteCount: stored.byteCount, sortIndex: AttachmentReferences.nextSortIndex(refs))]
+        }
+    }
+
     /// Copies one file in (counted in `importingCount`), then appends its ref. Failures show an alert.
+    /// B3 (Phase 10): the task holds the session weakly. When the copy finishes after the editor ended, nothing is
+    /// protected again: the copy waits in `finishedWhileEnded` (editor only covered, e.g. by Quick Look) or, when the
+    /// session is gone (the sheet was closed with Cancel › Discard), its folder is deleted at once.
     private func runImport(kind: AttachmentKind, onSuccess: @escaping @MainActor () -> Void = {},
                            onFailure: @escaping @MainActor () -> Void = {},
                            _ operation: @escaping @MainActor (any AttachmentStore, AttachmentRef.ID, AttachmentQuota) async throws
                                -> StoredAttachmentFile) {
         guard let store else { return }
         let quota = quota
+        let owner = owner
         let id = AttachmentRef.ID(UUID())
         protection.record(id)   // protected before the folder exists
         importingCount += 1
-        Task {
-            await store.setProtectedIDs(protection.ids, owner: owner)
+        Task { [weak self] in
+            if let self, !self.isEnded { await store.setProtectedIDs(self.protection.ids, owner: owner) }
+            let stored: StoredAttachmentFile
             do {
-                let stored = try await operation(store, id, quota)
-                mutate { refs in
-                    refs + [AttachmentRef(id: id, meta: EditorEntities.placeholderMeta, kind: kind,
-                                          fileName: stored.fileName, contentType: stored.contentType,
-                                          byteCount: stored.byteCount, sortIndex: AttachmentReferences.nextSortIndex(refs))]
-                }
-                onSuccess()
+                stored = try await operation(store, id, quota)
             } catch {
                 onFailure()
-                importError = message(for: error)
+                if let self {
+                    self.importError = self.message(for: error)
+                    self.importingCount -= 1
+                }
+                return
             }
-            importingCount -= 1
+            onSuccess()
+            guard let self else {
+                try? await store.deleteFiles(id: id)   // nobody can add it any more: no orphan left behind
+                return
+            }
+            if self.isEnded {
+                self.finishedWhileEnded.append((id: id, kind: kind, stored: stored))
+            } else {
+                self.append(stored, id: id, kind: kind)
+            }
+            self.importingCount -= 1
         }
     }
 

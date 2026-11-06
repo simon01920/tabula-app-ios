@@ -1,11 +1,14 @@
 // Settings › Backup (Phase 6 S2, PHASE6_PLAN decision 5).
 //
-//   Export Backup           ShareLink of a `.tabulabackup` written from the in-memory snapshot when the page appears
+//   Export Backup           ShareLink of a `.tabulabackup` written from the in-memory snapshot when the page appears;
+//                           if that fails, a Try Again row prepares it again (Phase 10 U14)
 //   Restore from Backup…    fileImporter → BackupImport (verified, nothing changed on failure) → confirmation dialog:
 //                           Merge (default) / Replace… → destructive alert naming what is replaced and where the
 //                           automatic pre-restore copy is kept → copy written to `<store>/Backups` FIRST (both modes),
-//                           then applied; the export file is rebuilt afterwards
-//   Automatic copies        the archives in `<store>/Backups` (pre-restore, pre-migration), each shareable
+//                           then applied and saved; the result alert waits for the save and says when it failed
+//                           (Phase 10 B7); the export file is rebuilt afterwards
+//   Automatic copies        the archives in `<store>/Backups` (pre-restore, pre-import, pre-migration), each shareable;
+//                           the newest `BackupFolder.keepPerLabel` per kind are kept (Phase 10 B11)
 //
 // HIG: file management (system share sheet + document picker), alerts (destructive button + Cancel, plain-word errors
 // that say nothing was changed), settings (one pushed page). No UTType is declared: the file is shared and picked as
@@ -28,6 +31,8 @@ struct SettingsBackupView: View {
     @State private var picked: PickedBackup?
     @State private var confirmingReplace: PickedBackup?
     @State private var result: RestoreResult?
+    /// A restore was applied and its save is running: the result alert waits for it (B7).
+    @State private var restoring = false
 
     var body: some View {
         Form {
@@ -43,14 +48,20 @@ struct SettingsBackupView: View {
                         Label { Text("settings.backup.export") } icon: { Image(systemName: "square.and.arrow.up") }
                     }
                     .foregroundStyle(.secondary)
+                    if exportFailed {
+                        // U14: a failed export can be retried here (it used to need leaving and reopening the page).
+                        Button { Task { await prepareExport() } } label: {
+                            Label { Text("settings.backup.export.retry") } icon: { Image(systemName: "arrow.clockwise") }
+                        }
+                    }
                 }
                 Button { importing = true } label: {
                     Label { Text("settings.backup.restore") } icon: { Image(systemName: "arrow.down.doc") }
                 }
-                .disabled(model.isReadOnly || model.database == nil)
+                .disabled(model.isReadOnly || model.database == nil || restoring)
             } footer: {
                 VStack(alignment: .leading, spacing: 8) {
-                    if exportFailed { Text("settings.backup.export.failed") }
+                    if exportFailed { Text("settings.backup.export.failedRetry") }
                     Text("settings.backup.footer")
                 }
             }
@@ -100,6 +111,7 @@ struct SettingsBackupView: View {
     // MARK: Export
 
     private func prepareExport() async {
+        exportFailed = false   // a retry shows the progress row again
         automatic = BackupFolder.entries(in: model.environment.backupDirectory)
         guard let database = model.database else { exportFailed = true; return }
         let day = model.today
@@ -142,11 +154,19 @@ struct SettingsBackupView: View {
         automatic = BackupFolder.entries(in: model.environment.backupDirectory)
         switch model.apply(.restore(backup.database, mode: mode)) {
         case .applied:
-            result = RestoreResult(titleKey: "settings.backup.done.title",
-                                   messageKey: mode == .merge ? "settings.backup.done.merged" : "settings.backup.done.replaced")
             exportURL = nil
+            restoring = true
             Task {
-                await model.flush()
+                // B7: "Backup Restored" only once the restored data is on disk; a failed save says so instead (the
+                // data stays in memory and the store's save banner and retry apply, AppModel).
+                let saved = await model.flushForSync()
+                restoring = false
+                if saved {
+                    result = RestoreResult(titleKey: "settings.backup.done.title",
+                                           messageKey: mode == .merge ? "settings.backup.done.merged" : "settings.backup.done.replaced")
+                } else {
+                    result = RestoreResult(titleKey: "settings.backup.notSaved.title", messageKey: "settings.backup.notSaved.message")
+                }
                 await prepareExport()  // Export must share the restored data
             }
         case .rejected, .readOnly, .failed:

@@ -13777,6 +13777,90 @@
         }
       }
     },
+    "editor.common.discard.busyMessage" : {
+      "comment" : "Message of the discard confirmation when Cancel is tapped while an attachment file is still being copied into the task. The destructive button is editor.common.discard ('Discard Changes').",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Příloha se ještě přidává. Pokud změny zahodíte, nepřidá se a vaše úpravy se neuloží."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ein Anhang wird noch hinzugefügt. Wenn du verwirfst, wird er nicht hinzugefügt und deine Änderungen werden nicht gesichert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An attachment is still being added. If you discard, it won't be added and your edits won't be saved."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Une pièce jointe est encore en cours d’ajout. Si vous abandonnez, elle ne sera pas ajoutée et vos modifications ne seront pas enregistrées."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Egy melléklet hozzáadása még folyamatban van. Ha elveted, nem kerül hozzáadásra, és a módosításaid nem lesznek mentve."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "添付ファイルを追加中です。破棄すると、添付ファイルは追加されず、編集内容も保存されません。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Załącznik jest jeszcze dodawany. Jeśli odrzucisz zmiany, nie zostanie dodany, a Twoje edycje nie zostaną zapisane."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Un atașament se adaugă încă. Dacă renunți, nu va fi adăugat, iar modificările tale nu vor fi salvate."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Príloha sa ešte pridáva. Ak zmeny zahodíte, nepridá sa a vaše úpravy sa neuložia."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Прилог се још додаје. Ако одбаците измене, неће бити додат, а ваше измене неће бити сачуване."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Prilog se još dodaje. Ako odbacite izmene, neće biti dodat, a vaše izmene neće biti sačuvane."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Вкладення ще додається. Якщо відхилити зміни, його не буде додано, а ваші зміни не буде збережено."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "附件仍在添加中。如果放弃，附件将不会被添加，你的修改也不会被保存。"
+          }
+        }
+      }
+    },
     "editor.common.discard.message" : {
       "comment" : "Message of the discard confirmation.",
       "extractionState" : "manual",
@@ -99877,86 +99961,170 @@
         }
       }
     },
-    "settings.backup.export.failed" : {
-      "comment" : "Footer (Settings › Backup) when writing the export file failed.",
+    "settings.backup.export.failedRetry" : {
+      "comment" : "Footer (Settings › Backup) when writing the export file failed. 'Try Again' is the button name (settings.backup.export.retry).",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Soubor zálohy se nepodařilo připravit. Vraťte se zpět a otevřete tuto stránku znovu."
+            "value" : "Soubor zálohy se nepodařilo připravit. Klepněte na Zkusit znovu."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Die Backup-Datei konnte nicht vorbereitet werden. Geh zurück und öffne diese Seite erneut."
+            "value" : "Die Backup-Datei konnte nicht vorbereitet werden. Tippe auf „Erneut versuchen“."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The backup file couldn't be prepared. Go back and open this page again."
+            "value" : "The backup file couldn't be prepared. Tap Try Again."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Le fichier de sauvegarde n’a pas pu être préparé. Revenez en arrière et rouvrez cette page."
+            "value" : "Le fichier de sauvegarde n’a pas pu être préparé. Touchez Réessayer."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "A mentésfájlt nem sikerült előkészíteni. Lépj vissza, és nyisd meg újra ezt az oldalt."
+            "value" : "A mentésfájlt nem sikerült előkészíteni. Koppints az Újra gombra."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "バックアップファイルを準備できませんでした。前の画面に戻ってから、このページをもう一度開いてください。"
+            "value" : "バックアップファイルを準備できませんでした。「再試行」をタップしてください。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Nie udało się przygotować pliku kopii zapasowej. Wróć i otwórz tę stronę ponownie."
+            "value" : "Nie udało się przygotować pliku kopii zapasowej. Stuknij Spróbuj ponownie."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Fișierul de backup nu a putut fi pregătit. Revino și deschide din nou această pagină."
+            "value" : "Fișierul de backup nu a putut fi pregătit. Atinge Încearcă din nou."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Súbor zálohy sa nepodarilo pripraviť. Vráťte sa späť a otvorte túto stránku znova."
+            "value" : "Súbor zálohy sa nepodarilo pripraviť. Ťuknite na Skúsiť znova."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Датотека резервне копије није могла да се припреми. Вратите се назад и поново отворите ову страницу."
+            "value" : "Датотека резервне копије није могла да се припреми. Додирните Покушај поново."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Datoteka rezervne kopije nije mogla da se pripremi. Vratite se nazad i ponovo otvorite ovu stranicu."
+            "value" : "Datoteka rezervne kopije nije mogla da se pripremi. Dodirnite Pokušaj ponovo."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Не вдалося підготувати файл резервної копії. Поверніться назад і знову відкрийте цю сторінку."
+            "value" : "Не вдалося підготувати файл резервної копії. Торкніться «Спробувати ще раз»."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "无法准备备份文件。请返回并重新打开此页面。"
+            "value" : "无法准备备份文件。请轻点“重试”。"
+          }
+        }
+      }
+    },
+    "settings.backup.export.retry" : {
+      "comment" : "Button (Settings › Backup) under Export Backup, shown when the backup file could not be prepared: prepares it again.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zkusit znovu"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Erneut versuchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try Again"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Réessayer"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Újra"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "再試行"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Spróbuj ponownie"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Încearcă din nou"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Skúsiť znova"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Покушај поново"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pokušaj ponovo"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Спробувати ще раз"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "重试"
           }
         }
       }
@@ -100377,6 +100545,174 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "恢复备份"
+          }
+        }
+      }
+    },
+    "settings.backup.notSaved.message" : {
+      "comment" : "Alert message after a restore whose data could not be written to storage (e.g. device full). Same advice as store.banner.saveFailed.message.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Záloha byla použita, ale Tabula ji nemohla uložit do tohoto iPhonu. Data se zachovají, dokud je Tabula otevřená, a ukládání se zopakuje při další změně. Zkontrolujte, zda má váš iPhone volné úložiště."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Das Backup wurde übernommen, aber Tabula konnte es nicht auf diesem iPhone sichern. Die Daten bleiben erhalten, solange Tabula geöffnet ist, und das Sichern wird bei deiner nächsten Änderung erneut versucht. Prüfe, ob dein iPhone freien Speicherplatz hat."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The backup was applied, but Tabula couldn't save it on this iPhone. It's kept while Tabula is open, and saving is retried with your next change. Check that your iPhone has free storage."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "La sauvegarde a été appliquée, mais Tabula n’a pas pu l’enregistrer sur cet iPhone. Les données sont conservées tant que Tabula est ouverte et l’enregistrement sera retenté à votre prochaine modification. Vérifiez que votre iPhone dispose d’espace de stockage libre."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A mentés alkalmazva lett, de a Tabula nem tudta elmenteni erre az iPhone-ra. Az adatok megmaradnak, amíg a Tabula nyitva van, és a mentést a következő módosításnál újra megpróbáljuk. Ellenőrizd, hogy van-e szabad hely az iPhone-odon."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "バックアップは適用されましたが、TabulaはこのiPhoneに保存できませんでした。Tabulaを開いている間はデータが保持され、次の変更時に保存が再試行されます。iPhoneの空き容量を確認してください。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kopia zapasowa została zastosowana, ale Tabula nie mogła jej zapisać na tym iPhonie. Dane są zachowane, dopóki Tabula jest otwarta, a zapis zostanie ponowiony przy kolejnej zmianie. Sprawdź, czy iPhone ma wolne miejsce."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Backupul a fost aplicat, dar Tabula nu l-a putut salva pe acest iPhone. Datele sunt păstrate cât timp Tabula e deschisă, iar salvarea se reîncearcă la următoarea modificare. Verifică dacă iPhone-ul are spațiu liber."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Záloha sa použila, ale Tabula ju nemohla uložiť do tohto iPhonu. Údaje sa zachovajú, kým je Tabula otvorená, a ukladanie sa zopakuje pri ďalšej zmene. Skontrolujte, či má váš iPhone voľné úložisko."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Резервна копија је примењена, али Tabula није могла да је сачува на овом iPhone-у. Подаци се чувају док је Tabula отворена, а чување ће бити поновљено при следећој измени. Проверите да ли iPhone има слободног простора."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Rezervna kopija je primenjena, ali Tabula nije mogla da je sačuva na ovom iPhone-u. Podaci se čuvaju dok je Tabula otvorena, a čuvanje će biti ponovljeno pri sledećoj izmeni. Proverite da li iPhone ima slobodnog prostora."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Резервну копію застосовано, але Tabula не змогла зберегти її на цьому iPhone. Дані зберігаються, доки Tabula відкрита, а збереження буде повторено після наступної зміни. Перевірте, чи є на iPhone вільне місце."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "备份已应用，但 Tabula 无法将其保存到这台 iPhone。只要 Tabula 保持打开，数据就会保留，并在下次更改时重试保存。请检查 iPhone 是否有可用存储空间。"
+          }
+        }
+      }
+    },
+    "settings.backup.notSaved.title" : {
+      "comment" : "Alert title after a restore: the backup was applied, but writing the data to storage failed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Obnovená data nebyla uložena"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wiederhergestellte Daten nicht gesichert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restored Data Not Saved"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Données restaurées non enregistrées"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A visszaállított adatok nincsenek mentve"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "復元したデータを保存できませんでした"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Przywrócone dane nie zostały zapisane"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Datele restaurate nu au fost salvate"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Obnovené údaje sa neuložili"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Враћени подаци нису сачувани"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vraćeni podaci nisu sačuvani"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Відновлені дані не збережено"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "恢复的数据未保存"
           }
         }
       }
