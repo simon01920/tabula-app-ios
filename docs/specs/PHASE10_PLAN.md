@@ -53,6 +53,7 @@ Translations of the new keys go in each WP (catalog rule). A final localisation-
 | P10-2 | **App Privacy label (U2).** Share codes store a timetable on the worker for 30 days. Declare "User Content — not linked — App Functionality"? | The in-app privacy text is corrected to say so; the label is decided at Phase 12 |
 | P10-3 | **Real domain (U3) for share links, privacy policy and support email.** All are placeholders. | validate warns (does not fail) while `.invalid` / `{{DOMAIN}}` remain; must be fixed before Phase 12 |
 | P10-4 | **Week-view export taller than the page (P8-3, B1).** | Fit the day to the page by computing the hour height (no scaling, no extra pages) |
+| P10-6 | **Backup retention (QA).** Count-only pruning could delete the copy the app promised after a restore. | Keep the newest 5 per label and anything younger than 30 days |
 | P10-5 | **Native translation review (U4).** Every non-English string is `needs_review`. | Not in Phase 10; `REVIEW.md` counts updated |
 
 ## Gate evidence

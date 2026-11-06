@@ -2,7 +2,7 @@
 
 **Status:** READY FOR REVIEW, waiting for your approval (2026-11-06).
 - Plan: `docs/specs/PHASE10_PLAN.md`
-- Device checklist: `docs/checklists/PHASE10_DEVICE.md` (84 rows)
+- Device checklist: `docs/checklists/PHASE10_DEVICE.md` (90 rows)
 - PR: simon01920/tabula-app-ios#1 (`main-er1vxs` → `main`)
 
 **Roadmap change (your decision, 2026-11-05).** Phase 10 is now polish, bug fixes and performance. Monetisation moves to Phase 11 and Release to Phase 12 (`ROADMAP.md`).
@@ -25,8 +25,8 @@
 | WP7 Privacy manifest and screenshot coverage | env-ci-engineer-sonnet · **Sonnet** | FileTimestamp C617.1 (+ 3B52.1 in the app) in all manifests, enforced by validate; placeholder-domain warning; `sim_pick` finds a device on older runtimes; Increase Contrast and double-length screenshot inputs; `@hu` routes | `d9921c1`, merged `04b85e9` |
 | CI fixes | orchestrator · Opus | A `@ScaledMetric` declared in the wrong struct (macOS build); `.onInkLabel()` on two new prominent buttons; review export | `2c7b8a6` |
 | QA, merged state | qa-reviewer · **Opus** | **No code defect that loses data, shows stale widgets or misses a reminder** (all 10 focus areas traced). Majors: RISKS not updated, device checklist missing, backup pruning could delete the copy the app promised. Minors: locale-only changes, launch re-plan postponed if suspended within 1.5 s, B12 save failure, engine re-entrancy, picker label at AX | read-only |
-| Docs | orchestrator · Opus | RISKS #100–#113, ENVIRONMENT §41, device checklist (84 rows), PHASE8_PLAN XLSX note, NOTIFICATIONS trigger table (WP1) | `11ee901`, `b7989ba` |
-| QA fix pass | swiftui-engineer · **Opus** | _pending_ | _pending_ |
+| Docs | orchestrator · Opus | RISKS #100–#113, ENVIRONMENT §41, device checklist (90 rows), PHASE8_PLAN XLSX note, NOTIFICATIONS trigger table (WP1) | `11ee901`, `b7989ba` |
+| QA fix pass | swiftui-engineer · **Opus** | Backup retention: newest 5 per label plus anything younger than 30 days (P10-6), footer in 12 languages; forced context/formatter rebuild on a locale change and a real foreground; a pending launch re-plan runs when the app goes to the background; "Mark done" whose save fails posts the notice; `ReminderEngine.run` coalesces concurrent calls; visible picker label at AX sizes | `dc739a3`, merged; 3 test files |
 
 **Tier split.** Opus did all four audits, WP1–WP5 (state, concurrency, sync, time zones, persistence) and the QA review. Sonnet did WP6 (UI polish on existing screens) and WP7 (config and CI wiring).
 
@@ -89,7 +89,7 @@ CI found the Sonnet work's only compile error, and I reverted one of its design 
 
 ## Not done / known limits
 - **Screenshots not reviewed by me in this session.** The artifact storage host is blocked by this cloud environment's network policy (ENVIRONMENT §41). The PNGs are in run 42312145288 (artifact `ui-screenshots-57`). See "Human steps".
-- **Nothing seen on a device:** all 84 checklist rows are open.
+- **Nothing seen on a device:** all 90 checklist rows are open.
 - **Speed is not measured:** no Instruments numbers yet (rows A1, A2, A6 and section C).
 - **Kept as is:**
   - P16 (off-screen `TimelineView`): device check A6.

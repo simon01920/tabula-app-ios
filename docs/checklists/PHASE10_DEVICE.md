@@ -149,5 +149,13 @@ Nothing here was compiled or run in the container that wrote it.
 - [ ] F10 Week start set to Sunday in Settings while the region starts on Monday: date pickers in editors start on Sunday.
 - [ ] F11 Play voice note A to its end and tap note B at once: B keeps playing.
 
+# H. QA fix pass
+- [ ] H1 Replace-restore once, then restore 5 more times: the first "pre-restore" copy is still in Automatic copies (kept for 30 days).
+- [ ] H2 Change 24-Hour Time or the Region format while Tabula is in the background, return: every time and date follows at once.
+- [ ] H3 Launch Tabula and go to the Home Screen within 1.5 s: reminders are still planned (debug screen, last run reason "launch").
+- [ ] H4 Read-only store (debug tools), "Mark as Done" on a reminder: the "Couldn't Mark as Done" notice appears.
+- [ ] H5 Import review at AX5: the "Show" label is visible above the menu; VoiceOver reads it once.
+- [ ] H6 Settings › Backup footer at XXL in German: the retention sentence fits.
+
 # G. Privacy manifest (WP7)
 - [ ] G1 First TestFlight upload after Phase 10: no ITMS-91053 "Missing API declaration" email.
