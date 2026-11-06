@@ -162,7 +162,9 @@ final class ReminderCoordinator {
         let assertion = BackgroundAssertion(name: "tabula.launch-replan")
         Task { [weak self] in
             defer { assertion.end() }
-            await self?.replanNow(.launch)
+            // A second background before this Task ran (back, forward, back) must not queue a second launch run.
+            guard let self, self.launchReplanPending else { return }
+            await self.replanNow(.launch)
         }
     }
 
