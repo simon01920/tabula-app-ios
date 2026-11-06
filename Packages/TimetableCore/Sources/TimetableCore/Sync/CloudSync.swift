@@ -12,6 +12,10 @@ import Foundation
 // Pending changes: `CloudSyncLedger.serverHashes` keeps the SHA-256 of the payload last known to be on the server (sent
 // or fetched). A record is pending iff its current payload hash differs. It is derived from the database itself, so it
 // is correct across restarts and crashes without an outbox; the engine's own pending list is only a cache of it.
+// Cost (Phase 10 C1, CloudRecordIndex.swift): the adapter's scan re-encodes and re-hashes only entities that changed
+// since its previous scan (`CloudRecordIndex`), and the send batch builds only the records the engine asks for
+// (`CloudRecordSource`). The bytes are unchanged (`cloudRecord` fast path, byte-equality argument at
+// `CloudRecordEncoding.reencodesIdentically`).
 
 /// Names and limits of the CloudKit layout.
 public enum CloudSyncSchema {
@@ -74,12 +78,51 @@ extension TabulaDatabase {
     }
 
     /// The record of `entity`, with the unknown keys this database keeps for it.
+    ///
+    /// Fast path (Phase 10 C1): an entity without unknown keys whose canonical bytes pass
+    /// `CloudRecordEncoding.reencodesIdentically` is sent as exactly those bytes, skipping the parse and the second
+    /// encode of `cloudRecordThroughJSONTree`. The output is byte-identical (argument at `reencodesIdentically`;
+    /// checked per entity type in `CloudSyncIncrementalTests`), so no record changes its hash and nothing is uploaded
+    /// again after an update.
     func cloudRecord<E: SyncEntity>(_ entity: E) throws -> CloudRecord {
-        let object = (unknownFields.fields(of: entity) ?? EntityUnknownFields())
-            .applied(to: try SyncJSON.object(entity), type: E.entityType)
+        let unknown = unknownFields.fields(of: entity)
+        guard unknown?.isEmpty ?? true else { return try cloudRecordThroughJSONTree(entity, unknown: unknown) }
+        let bytes = try TabulaJSON.makeEncoder().encode(entity)
+        guard CloudRecordEncoding.reencodesIdentically(bytes) else {
+            return try cloudRecordThroughJSONTree(entity, unknown: unknown, encoded: bytes)
+        }
+        // The JSON `id` of every entity is `EntityID.encode(to:)` = `id.uuidString` (the tree path reads it back).
+        return CloudRecord(type: E.entityType, name: entity.id.uuidString, payload: bytes, schemaVersion: schemaVersion)
+    }
+
+    /// The reference encoding (Phase 6 S1): entity → JSON tree → unknown keys merged in → canonical bytes.
+    /// `encoded`: the entity's canonical bytes (`TabulaJSON.makeEncoder().encode(entity)`) when already at hand.
+    func cloudRecordThroughJSONTree<E: SyncEntity>(_ entity: E, unknown: EntityUnknownFields?,
+                                                   encoded: Data? = nil) throws -> CloudRecord {
+        let tree: [String: JSONValue]
+        if let encoded {
+            guard case .object(let parsed) = try SyncJSONParser.parse(encoded) else {
+                throw SyncError.malformedRecord("value does not encode as a JSON object")
+            }
+            tree = parsed
+        } else {
+            tree = try SyncJSON.object(entity)
+        }
+        let object = (unknown ?? EntityUnknownFields()).applied(to: tree, type: E.entityType)
         return CloudRecord(type: E.entityType, name: try SyncJSON.id(of: object),
                            payload: try TabulaJSON.makeEncoder().encode(JSONValue.object(object)),
                            schemaVersion: schemaVersion)
+    }
+
+    /// The records named `names`, keyed by name; names of no entity are left out (C1: the send batch builds only
+    /// what the engine asks for). Equals the matching subset of `cloudRecords()` (first record per name).
+    public func cloudRecords(named names: some Sequence<String>) throws -> [String: CloudRecord] {
+        let source = CloudRecordSource(database: self)
+        var result: [String: CloudRecord] = [:]
+        for name in names where result[name] == nil {
+            if let record = try source.record(named: name) { result[name] = record }
+        }
+        return result
     }
 
     /// `true` when any entity (other than the settings singleton) is not deleted.
@@ -195,6 +238,13 @@ public struct CloudSyncLedger: Codable, Hashable, Sendable {
     /// before the save leaves older data on disk that the ledger then sends over the newer server copy.
     public func pending(_ records: [CloudRecord], skipping: Set<String> = []) -> [CloudRecord] {
         records.filter { serverHashes[$0.name] != $0.payloadHash && !skipping.contains($0.name) }
+    }
+
+    /// `pending(_:skipping:)` for records whose hashes are already known (`CloudRecordIndex`): nothing is hashed here.
+    public func pending(hashed records: [HashedCloudRecord], skipping: Set<String> = []) -> [CloudRecord] {
+        records.compactMap { item in
+            serverHashes[item.record.name] != item.hash && !skipping.contains(item.record.name) ? item.record : nil
+        }
     }
 
     /// The ledger stored at `url`; a fresh one when the file is missing or unreadable.
