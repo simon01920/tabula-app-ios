@@ -19,7 +19,7 @@ struct NoTimetableView: View {
             Text(messageKey)
         } actions: {
             Button { adding = true } label: {
-                Text("editor.timetables.add")
+                Text("editor.timetables.add").onInkLabel()
             }
             .buttonStyle(.borderedProminent)
             .disabled(model.isReadOnly || model.database == nil)

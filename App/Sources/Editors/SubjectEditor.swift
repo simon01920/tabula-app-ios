@@ -64,8 +64,6 @@ private struct SubjectEditorBody: View {
     let embedded: Bool
     let onSaved: ((Subject.ID) -> Void)?
     @Environment(AppModel.self) private var model
-    /// U16: the symbol cells grow with Dynamic Type so a .title3 glyph is never clipped at AX5.
-    @ScaledMetric(relativeTo: .title3) private var symbolSide: CGFloat = 48
 
     var body: some View {
         EmbeddableEditorScaffold(
@@ -93,6 +91,8 @@ private struct SubjectFormContent: View {
     @State private var browsingPack: PalettePackID?
     @State private var confirmingDelete = false
     @State private var deleteFailed = false
+    /// U16: the symbol cells grow with Dynamic Type so a .title3 glyph is never clipped at AX5.
+    @ScaledMetric(relativeTo: .title3) private var symbolSide: CGFloat = 48
 
     private var activePack: PalettePack {
         let id = browsingPack ?? currentPaletteChoice ?? timetable.palettePackID ?? model.settings.palettePackID

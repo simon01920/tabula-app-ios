@@ -221,7 +221,7 @@ struct ImportPDFPagePicker: View {
             } description: {
                 Text("import.pdf.pages.failed.message")
             } actions: {
-                Button(action: onBack) { Text("import.pdf.pages.failed.action") }
+                Button(action: onBack) { Text("import.pdf.pages.failed.action").onInkLabel() }
                     .buttonStyle(.borderedProminent)
             }
         case true?:
