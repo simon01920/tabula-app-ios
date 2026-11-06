@@ -18,6 +18,11 @@
 //   short before its final save loses only the render signature / learned limit / applied plan of that run: the next
 //   run re-diffs against what is really pending (the same path as a lost state), and the ledger already lists every
 //   alarm that may exist.
+//
+// Re-entrancy (QA fix after Phase 10): `run` suspends at every client call, so two calls could interleave and diff
+// against the same `state`. A call that arrives while a run is in progress is coalesced like
+// `ReminderCoordinator.runCoalesced`: its input (the newest wins) is run once more after the current run, and every
+// caller returns the result of that last run.
 import Foundation
 import TimetableCore
 
@@ -84,6 +89,14 @@ public final class ReminderEngine {
     private let store: any ReminderStateStore
     /// The persisted state (loaded once, saved once per run, plus the ledger's write-ahead).
     public private(set) var state: AppliedReminderState
+    /// A run is in progress (`run(_:)` coalesces further calls).
+    public private(set) var isRunning = false
+    /// The newest input that arrived while a run was in progress; run once more after it.
+    private var queuedInput: ReminderRunInput?
+    /// Callers waiting for the coalesced run.
+    private var waiters: [CheckedContinuation<ReminderRunResult, Never>] = []
+    /// Number of callers waiting for a coalesced run (tests, debug).
+    public var waitingRunCount: Int { waiters.count }
 
     public init(notifications: any NotificationCenterClient, alarms: any AlarmClient, store: any ReminderStateStore) {
         self.notifications = notifications
@@ -92,8 +105,29 @@ public final class ReminderEngine {
         state = store.load() ?? .empty
     }
 
-    /// Re-plans and applies. Safe to call repeatedly: a second run with the same input changes nothing.
+    /// Re-plans and applies. Safe to call repeatedly: a second run with the same input changes nothing. Never two at
+    /// once: a call during a run waits, its input (the newest of the waiting ones) runs right after, and every caller
+    /// returns that last run's result.
     public func run(_ input: ReminderRunInput) async -> ReminderRunResult {
+        if isRunning {
+            queuedInput = input
+            return await withCheckedContinuation { waiters.append($0) }
+        }
+        isRunning = true
+        var result = await runOnce(input)
+        while let queued = queuedInput {
+            queuedInput = nil
+            result = await runOnce(queued)
+        }
+        isRunning = false
+        let waiting = waiters
+        waiters = []
+        for waiter in waiting { waiter.resume(returning: result) }
+        return result
+    }
+
+    /// One run (`run(_:)` guarantees it never overlaps another).
+    private func runOnce(_ input: ReminderRunInput) async -> ReminderRunResult {
         let authorization = await alarms.authorization()
         var canScheduleAlarms = authorization == .authorized && input.loudAlarmsEntitled
         var softLimit = state.learnedAlarmLimit?.softLimit(defaultLimit: input.defaultAlarmSoftLimit, now: input.now)

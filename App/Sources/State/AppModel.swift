@@ -285,13 +285,15 @@ final class AppModel {
     }
 
     /// Rebuilds (and assigns) only what changed: context, formatter + renderer, resolvers (`DerivedStateRebuild`).
-    private func rebuildDerived() {
+    /// `forceEnvironment` rebuilds the context, formatter and renderer even when the inputs compare equal (a locale
+    /// preference change `Locale ==` may not see; QA fix after Phase 10).
+    private func rebuildDerived(forceEnvironment: Bool = false) {
         let settings = self.settings
         let deviceTimeZone = environment.deviceTimeZone()
         let locale = environment.locale()
         let inputs = DerivedStateInputs(settings: settings, database: database, deviceTimeZone: deviceTimeZone,
                                         locale: locale)
-        let rebuild = DerivedStateRebuild.needed(from: derivedInputs, to: inputs)
+        let rebuild = DerivedStateRebuild.needed(from: derivedInputs, to: inputs, forceEnvironment: forceEnvironment)
         derivedInputs = inputs
         derivedFingerprint = EnvironmentFingerprint(settings: settings, deviceTimeZone: deviceTimeZone, locale: locale,
                                                     now: now)
@@ -315,10 +317,11 @@ final class AppModel {
     /// Rebuilds the calendar context and formatters (time zone, locale, first weekday or 12/24 h changed).
     /// Call on system time / zone / locale changes (always) and, through `sceneDidBecomeActive()`, when the scene
     /// becomes active. Clears Foundation's cached system time zone first so `TimeZone.current` reflects a zone change
-    /// made while the app was suspended.
-    func refreshEnvironment() {
+    /// made while the app was suspended. `forceEnvironment`: see `rebuildDerived(forceEnvironment:)`; `true` on the
+    /// locale-change notification and on a real return from the background.
+    func refreshEnvironment(forceEnvironment: Bool = false) {
         NSTimeZone.resetSystemTimeZone()
-        rebuildDerived()
+        rebuildDerived(forceEnvironment: forceEnvironment)
         lastEnvironmentRefreshAt = now
         onChange?(.environment)
     }
@@ -326,7 +329,8 @@ final class AppModel {
     /// The scene became active (TabulaApp). After a background stay (and at the first activation) this always
     /// refreshes, as before; after a short `.inactive` blip (Notification Centre, Face ID, a call banner) only when the
     /// zone, locale, hour cycle, week start or local day changed, or the last refresh is 5+ minutes old
-    /// (`ForegroundRefreshPolicy`, Phase 10 P5).
+    /// (`ForegroundRefreshPolicy`, Phase 10 P5). A return from the background also rebuilds the context and
+    /// formatters without the equality shortcut (Region / 24-Hour Time may have changed while suspended).
     func sceneDidBecomeActive() {
         NSTimeZone.resetSystemTimeZone()
         let returning = sceneWasInBackground
@@ -335,7 +339,7 @@ final class AppModel {
                                              locale: environment.locale(), now: now)
         if ForegroundRefreshPolicy.shouldRefresh(returningFromBackground: returning, last: derivedFingerprint,
                                                  lastRefreshAt: lastEnvironmentRefreshAt, current: current, now: now) {
-            refreshEnvironment()
+            refreshEnvironment(forceEnvironment: returning)
         }
     }
 
@@ -348,8 +352,10 @@ final class AppModel {
         guard observers.isEmpty else { return }
         for name in [NSNotification.Name.NSSystemTimeZoneDidChange, NSLocale.currentLocaleDidChangeNotification,
                      UIApplication.significantTimeChangeNotification] {
+            // A locale change always rebuilds the formatter: `Locale ==` may miss a preference-only change.
+            let forceEnvironment = name == NSLocale.currentLocaleDidChangeNotification
             observers.append(NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
-                MainActor.assumeIsolated { self?.refreshEnvironment() }
+                MainActor.assumeIsolated { self?.refreshEnvironment(forceEnvironment: forceEnvironment) }
             })
         }
     }

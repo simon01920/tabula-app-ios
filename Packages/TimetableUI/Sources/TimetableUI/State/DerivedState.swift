@@ -88,10 +88,19 @@ public struct DerivedStateRebuild: Equatable, Sendable {
     public static let nothing = DerivedStateRebuild(context: false, formatter: false, resolvers: false)
 
     /// `old == nil` (first build) rebuilds everything.
-    public static func needed(from old: DerivedStateInputs?, to new: DerivedStateInputs) -> DerivedStateRebuild {
+    ///
+    /// `forceEnvironment` (QA fix after Phase 10): rebuild the context and the formatter (and with it the renderer)
+    /// even when the inputs compare equal. `Locale ==` may not notice a preference-only change (24-Hour Time, Region
+    /// formats), so `AppModel` passes `true` on `NSLocale.currentLocaleDidChangeNotification` and on a real return
+    /// from the background; applies and `.inactive` blips keep the equality shortcut. Resolvers still follow the
+    /// value comparison: they only read the context's zone and first weekday (a Gregorian calendar without a locale),
+    /// which compare exactly.
+    public static func needed(from old: DerivedStateInputs?, to new: DerivedStateInputs,
+                              forceEnvironment: Bool = false) -> DerivedStateRebuild {
         guard let old else { return .everything }
         let context = old.context != new.context
-        return DerivedStateRebuild(context: context, formatter: old.formatter != new.formatter,
+        return DerivedStateRebuild(context: forceEnvironment || context,
+                                   formatter: forceEnvironment || old.formatter != new.formatter,
                                    resolvers: context || old.schedule != new.schedule)
     }
 }
