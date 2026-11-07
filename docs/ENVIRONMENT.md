@@ -762,3 +762,13 @@ Authored in a container with python3 only (no Swift, no macOS): validated by run
 - **CI results on PR #1:**
   - `0197a5e`: one macOS compile error (a `@ScaledMetric` declared in the wrong struct) and one validate rule (`.onInkLabel()`), both fixed in `2c7b8a6`.
   - `0ba1e8e` (all seven work packages merged): every job green; 642 core + 743 TimetableUI tests.
+- **Update 2026-11-07, cloud environment `tabula-app-ios`** (decision P10-7, approved by the human). It is a personal environment for this repository.
+  - **Allowed hosts:** `download.swift.org`, `results-receiver.actions.githubusercontent.com` and `productionresultssa32.blob.core.windows.net`.
+    - The artifact storage host differs between runs (`productionresultssa15`, `…sa32`). A screenshot artifact on another storage account needs its host added, or a review from the GitHub web page.
+  - **Setup script:** installs the Swift 6.4.0 toolchain (Ubuntu 24.04 tarball from download.swift.org) into `/opt/swift` plus its apt dependencies, and links `swift`/`swiftc` into `/usr/local/bin`.
+    - The commands ran in this session.
+    - The script itself runs only on a freshly built container, so it is unproven until the next new session.
+  - **Verified in this session after the install:** `bash scripts/validate.sh` on `c84370b` exited 0 (ALL CHECKS PASSED).
+    - 642 core + 747 TimetableUI tests.
+    - The share Worker tests (12/12) also ran, because this container has Node; the CI Linux job skips them.
+

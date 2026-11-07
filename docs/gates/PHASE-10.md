@@ -46,6 +46,7 @@ CI found the Sonnet work's only compile error, and I reverted one of its design 
   - The CloudKit variant compiles.
 - **xtool/SwiftPM path:** the build passes. Bundle: app 13 `InfoPlist.strings`, widget 0; widget appex keeps `__text`/`__swift5_entry`.
 - **Final head (`e2cae07`, with the QA fix pass and the double-launch fix): iOS CI run 42313737371, every job green.** Linux tests and validate, macOS core tests, XcodeGen iOS + watchOS build, CloudKit variant, xtool path. The test counts above are from `0ba1e8e`; the final head adds the QA fix tests, and all pass.
+- **Local run in this session (Swift 6.4.0 installed through P10-7):** `validate.sh` on `c84370b` exited 0, **ALL CHECKS PASSED**. 642 core + **747 TimetableUI** tests, and the share Worker tests 12/12 (not run in CI).
 - **First CI run (`0197a5e`, four packages):** failed on one compile error and one validate rule. Both were fixed in `2c7b8a6`.
 - **Not measured:** the compiler warning count (the CI log tail does not show it). Phase 9 reported 0.
 
@@ -127,7 +128,7 @@ CI found the Sonnet work's only compile error, and I reverted one of its design 
 | P10-4 | **Week/Day PDF taller than the page** | Fit by shrinking the hour height (min 20 pt) |
 | P10-5 | **Native translation review** of all 12 languages | Not in Phase 10 |
 | P10-6 | **Backup retention** | Keep the newest 5 copies of each kind, and anything younger than 30 days |
-| P10-7 | **Cloud environment `tabula-app-ios`.** Approved in this session: `download.swift.org` plus the GitHub Actions log and artifact hosts. The artifact storage host changes per run (`productionresultssaNN.blob.core.windows.net`), so later runs may need their host added | Keep it; add a setup script that installs Swift 6.4 once it has been tried in a session |
+| P10-7 | **Cloud environment `tabula-app-ios`.** Approved in this session: `download.swift.org` plus the GitHub Actions log and artifact hosts, and a setup script that installs Swift 6.4.0 (approved; unproven until the next fresh session). The artifact storage host changes per run (`productionresultssaNN.blob.core.windows.net`), so later runs may need their host added | Keep it, and start future cloud sessions for this repo on it |
 
 ## Risks
 New rows #100–#113 in `docs/RISKS.md`. Three of them are decisions (P10-2, P10-3, P10-6). The main open risk is #100: Phase 10 has only been checked by CI, not on a device.
