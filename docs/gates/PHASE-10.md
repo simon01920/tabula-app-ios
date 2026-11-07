@@ -82,6 +82,10 @@ CI found the Sonnet work's only compile error, and I reverted one of its design 
   - Today.
   - Japanese widgets, which now use "・" (WP2).
 - **One regression found and fixed (`1e87ea6`).** Exams in Slovak at AX-XXXL: the U7 menu fallback in that tight, background-less List row was clipped at the top ("Zobraziť") and bottom ("Nadchádzajúce"). At accessibility sizes the two choices are now full-width rows with a checkmark under the "Show" header; segmented as before at other sizes. The other menu fallbacks rendered correctly in their screenshots.
+- **Rerun 42317047487 on `c84370b`** (iPhone SE, 5 screens × light/dark/AX-XXXL) confirms both fixes:
+  - **Exams in Slovak at AX-XXXL:** "Zobraziť" header, then full-width "Nadchádzajúce ✓" and "História" rows; nothing clipped. Normal sizes still segmented.
+  - **Import review at AX:** the visible "Show" label sits above the menu (QA fix #6).
+  - **Backup:** unchanged. The seed has no automatic copies, so the new retention footer is not shown (device row H6).
 - **The Increase Contrast variant looks almost identical to light.** Whether `simctl ui … increase_contrast` takes effect is still unverified (device row: Increase Contrast on the phone).
 
 **Device:** nothing has run on a device. `PHASE10_DEVICE.md` is the list.
