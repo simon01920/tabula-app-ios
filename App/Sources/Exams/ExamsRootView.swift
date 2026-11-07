@@ -38,6 +38,7 @@ enum ExamEditorTarget: Identifiable, Hashable {
 struct ExamsRootView: View {
     private let initialSegment: ExamSegment
     @Environment(AppModel.self) private var model
+    @Environment(\.dynamicTypeSize) private var typeSize
     /// `nil` = not chosen by the user yet → `initialSegment` (no `State(initialValue:)` in initialisers).
     @State private var chosenSegment: ExamSegment?
     @State private var editor: ExamEditorTarget?
@@ -82,15 +83,41 @@ struct ExamsRootView: View {
     private var content: some View {
         if let list = listModel, !list.isEmpty {
             List {
-                Section {
-                    Picker(selection: segmentBinding) {
-                        ForEach(ExamSegment.allCases) { Text($0.titleKey).tag($0) }
-                    } label: {
+                if AdaptiveLayout.isStacked(typeSize) {
+                    // Phase 10 screenshot review (iPhone SE, sk, AX-XXXL): the menu fallback of the segmented picker
+                    // was clipped at the top and bottom in this tight, background-less row. At accessibility sizes the
+                    // two choices are full-width rows instead, which wrap any translation.
+                    Section {
+                        ForEach(ExamSegment.allCases) { option in
+                            Button { segmentBinding.wrappedValue = option } label: {
+                                HStack(spacing: 12) {
+                                    Text(option.titleKey)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    if segment == option {
+                                        Image(systemName: "checkmark")
+                                            .foregroundStyle(Color.accentColor)
+                                            .accessibilityHidden(true)
+                                    }
+                                }
+                                .contentShape(Rectangle())
+                            }
+                            .foregroundStyle(.primary)
+                            .accessibilityAddTraits(segment == option ? .isSelected : [])
+                        }
+                    } header: {
                         Text("exams.segment.label")
                     }
-                    .adaptiveSegmentedPicker()
-                    .listRowBackground(Color.clear)
-                    .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
+                } else {
+                    Section {
+                        Picker(selection: segmentBinding) {
+                            ForEach(ExamSegment.allCases) { Text($0.titleKey).tag($0) }
+                        } label: {
+                            Text("exams.segment.label")
+                        }
+                        .pickerStyle(.segmented)
+                        .listRowBackground(Color.clear)
+                        .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
+                    }
                 }
                 switch segment {
                 case .upcoming: upcoming(list)
