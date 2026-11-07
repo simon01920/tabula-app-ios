@@ -125,7 +125,9 @@ public enum WidgetTimelinePlanner {
                                        reloadDate: now.addingTimeInterval(unavailableRetry), context: nil)
         }
         let context = context(for: snapshot, deviceTimeZone: deviceTimeZone)
-        let first = entry(snapshot: snapshot, at: now, context: context)
+        // Phase 10 WP2 (C3): each day's lessons are resolved to instants and sorted once for the whole plan.
+        var timed = TimedLessons(snapshot: snapshot, context: context)
+        let first = entry(&timed, at: now)
         if case .unavailable = first.state {
             return NowNextTimelinePlan(entries: [first], reloadDate: now.addingTimeInterval(unavailableRetry),
                                        context: context)
@@ -135,8 +137,9 @@ public enum WidgetTimelinePlanner {
         for day in snapshot.days {
             midnights.insert(context.startOfDay(day.date.adding(days: 1)))
             for lesson in day.lessons where lesson.takesPlace || includeCancelledBoundaries {
-                boundaries.insert(lesson.start(in: context))
-                boundaries.insert(lesson.end(in: context))
+                let start = lesson.start(in: context)
+                boundaries.insert(start)
+                boundaries.insert(TimedLessons.end(of: lesson, start: start, in: context))
             }
         }
         if includeTaskDueBoundaries, let last = snapshot.lastDay {
@@ -156,7 +159,7 @@ public enum WidgetTimelinePlanner {
         }
         var entries = [first]
         for date in kept {
-            entries.append(entry(snapshot: snapshot, at: date, context: context))
+            entries.append(entry(&timed, at: date))
         }
         let coverageEnd = snapshot.lastDay.map { context.startOfDay($0.adding(days: 1)) } ?? now
         let natural = isCut ? (kept.last ?? now) : max(coverageEnd, now)
@@ -168,33 +171,47 @@ public enum WidgetTimelinePlanner {
 
     /// The entry (state + later lessons) at `instant`.
     public static func entry(snapshot: WidgetSnapshot, at instant: Date, context: CalendarContext) -> NowNextTimelineEntry {
-        let state = state(snapshot: snapshot, at: instant, context: context)
-        var later: [WidgetSnapshot.Lesson] = []
-        if let next = state.next, let day = snapshot.day(next.date) {
-            let nextStart = next.start(in: context)
-            later = active(day, context).filter { candidate in
-                candidate.id != next.id && candidate.start(in: context) >= nextStart && candidate.start(in: context) > instant
-            }
-            .prefix(maxLaterLessons).map { $0 }
-        }
-        return NowNextTimelineEntry(date: instant, state: state, laterLessons: later)
+        var timed = TimedLessons(snapshot: snapshot, context: context)
+        return entry(&timed, at: instant)
     }
 
     /// The state at `instant`.
     public static func state(snapshot: WidgetSnapshot, at instant: Date, context: CalendarContext) -> NowNextState {
-        guard snapshot.hasTimetable else { return .unavailable(.noTimetable) }
-        let today = context.localDate(of: instant)
-        guard let day = snapshot.day(today) else { return .unavailable(.outdated) }
-        let lessons = active(day, context)
-        let running = lessons.filter { $0.start(in: context) <= instant && instant < $0.end(in: context) }
-        let current = running.max { lhs, rhs in
-            let (ls, rs) = (lhs.start(in: context), rhs.start(in: context))
-            if ls != rs { return ls < rs }
-            let (le, re) = (lhs.end(in: context), rhs.end(in: context))
-            if le != re { return le > re }
-            return lhs.id > rhs.id
+        var timed = TimedLessons(snapshot: snapshot, context: context)
+        return state(&timed, at: instant)
+    }
+
+    // MARK: Internals
+
+    /// The entry at `instant`, from lessons resolved at most once per day.
+    static func entry(_ timed: inout TimedLessons, at instant: Date) -> NowNextTimelineEntry {
+        let state = state(&timed, at: instant)
+        var later: [WidgetSnapshot.Lesson] = []
+        if let next = state.next, let index = timed.snapshot.dayIndex(next.date) {
+            let nextStart = next.start(in: timed.context)
+            later = timed.active(dayAt: index).filter { candidate in
+                candidate.lesson.id != next.id && candidate.start >= nextStart && candidate.start > instant
+            }
+            .prefix(maxLaterLessons).map(\.lesson)
         }
-        let next = nextLesson(after: instant, from: today, snapshot: snapshot, context: context)
+        return NowNextTimelineEntry(date: instant, state: state, laterLessons: later)
+    }
+
+    /// The state at `instant`, from lessons resolved at most once per day.
+    static func state(_ timed: inout TimedLessons, at instant: Date) -> NowNextState {
+        let snapshot = timed.snapshot
+        guard snapshot.hasTimetable else { return .unavailable(.noTimetable) }
+        let today = timed.context.localDate(of: instant)
+        guard let index = snapshot.dayIndex(today) else { return .unavailable(.outdated) }
+        let day = snapshot.days[index]
+        let lessons = timed.active(dayAt: index)
+        let running = lessons.filter { $0.start <= instant && instant < $0.end }
+        let current = running.max { lhs, rhs in
+            if lhs.start != rhs.start { return lhs.start < rhs.start }
+            if lhs.end != rhs.end { return lhs.end > rhs.end }
+            return lhs.lesson.id > rhs.lesson.id
+        }?.lesson
+        let next = nextLesson(&timed, after: instant, from: today)
         if let current { return .current(current, next: next) }
         if lessons.isEmpty {
             switch day.kind {
@@ -203,34 +220,94 @@ public enum WidgetTimelinePlanner {
             case .school, .free: return .free(next: next)
             }
         }
-        let lastEnd = lessons.map { $0.end(in: context) }.max() ?? instant
+        let lastEnd = lessons.map(\.end).max() ?? instant
         if instant >= lastEnd { return .dayOver(next: next) }
         // Before the first lesson or between lessons (TodayState: only "upcoming" when the next lesson is today).
         guard let next, next.date == today else { return .dayOver(next: next) }
-        return .upcoming(next, isFirstOfDay: instant < lessons[0].start(in: context))
+        return .upcoming(next, isFirstOfDay: instant < lessons[0].start)
     }
-
-    // MARK: Internals
 
     /// Lessons that take place, by (start, end, id) like `ScheduleResolver`'s instant order.
     static func active(_ day: WidgetSnapshot.Day, _ context: CalendarContext) -> [WidgetSnapshot.Lesson] {
-        day.lessons.filter(\.takesPlace).sorted { lhs, rhs in
-            let (ls, rs) = (lhs.start(in: context), rhs.start(in: context))
-            if ls != rs { return ls < rs }
-            let (le, re) = (lhs.end(in: context), rhs.end(in: context))
-            if le != re { return le < re }
-            return lhs.id < rhs.id
-        }
+        TimedLessons.active(day, context).map(\.lesson)
     }
 
     /// The first lesson that takes place and starts after `instant`: today, the later covered days, then the
     /// snapshot's following lesson.
-    static func nextLesson(after instant: Date, from today: LocalDate, snapshot: WidgetSnapshot,
-                           context: CalendarContext) -> WidgetSnapshot.Lesson? {
-        for day in snapshot.days where day.date >= today {
-            if let lesson = active(day, context).first(where: { $0.start(in: context) > instant }) { return lesson }
+    static func nextLesson(_ timed: inout TimedLessons, after instant: Date,
+                           from today: LocalDate) -> WidgetSnapshot.Lesson? {
+        for index in timed.snapshot.days.indices where timed.snapshot.days[index].date >= today {
+            if let item = timed.active(dayAt: index).first(where: { $0.start > instant }) { return item.lesson }
         }
-        if let following = snapshot.followingLesson, following.start(in: context) > instant { return following }
+        if let following = timed.snapshot.followingLesson, let start = timed.followingStart, start > instant {
+            return following
+        }
         return nil
+    }
+}
+
+/// The snapshot's lessons as instants in one planning context (Phase 10 WP2, C3). `Lesson.start(in:)` / `end(in:)` each
+/// resolve a wall-clock time (DST policy) and `end` resolves the start again, and a plan asked for the same days'
+/// sorted lessons for each of up to 29 entries. Here each day is filtered, resolved and sorted at most once (on first
+/// use) and shared by every entry of the plan. The instants are exactly `start(in:)` / `end(in:)`, the order is the one
+/// `WidgetTimelinePlanner.active` always had (same comparator on the same input order).
+struct TimedLessons {
+    /// One lesson that takes place, with its instants.
+    struct Item {
+        let lesson: WidgetSnapshot.Lesson
+        /// `lesson.start(in: context)`.
+        let start: Date
+        /// `lesson.end(in: context)`.
+        let end: Date
+    }
+
+    let snapshot: WidgetSnapshot
+    let context: CalendarContext
+    /// `snapshot.followingLesson?.start(in: context)`.
+    let followingStart: Date?
+    /// `active(snapshot.days[index], context)` by day index, filled on first use.
+    private var days: [Int: [Item]] = [:]
+
+    init(snapshot: WidgetSnapshot, context: CalendarContext) {
+        self.snapshot = snapshot
+        self.context = context
+        followingStart = snapshot.followingLesson?.start(in: context)
+    }
+
+    /// The lessons of `snapshot.days[index]` that take place, by (start, end, id).
+    mutating func active(dayAt index: Int) -> [Item] {
+        if let cached = days[index] { return cached }
+        let items = Self.active(snapshot.days[index], context)
+        days[index] = items
+        return items
+    }
+
+    /// The lessons of `day` that take place, by (start, end, id) like `ScheduleResolver`'s instant order.
+    static func active(_ day: WidgetSnapshot.Day, _ context: CalendarContext) -> [Item] {
+        day.lessons.filter(\.takesPlace)
+            .map { lesson -> Item in
+                let start = lesson.start(in: context)
+                return Item(lesson: lesson, start: start, end: end(of: lesson, start: start, in: context))
+            }
+            .sorted { lhs, rhs in
+                if lhs.start != rhs.start { return lhs.start < rhs.start }
+                if lhs.end != rhs.end { return lhs.end < rhs.end }
+                return lhs.lesson.id < rhs.lesson.id
+            }
+    }
+
+    /// `lesson.end(in: context)` when `start == lesson.start(in: context)` (one resolve instead of two).
+    static func end(of lesson: WidgetSnapshot.Lesson, start: Date, in context: CalendarContext) -> Date {
+        max(start, context.date(lesson.date, lesson.endTime))
+    }
+}
+
+extension WidgetSnapshot {
+    /// The index in `days` of the day `day(_:)` returns for `date`, if any.
+    func dayIndex(_ date: LocalDate) -> Int? {
+        guard let first = firstDay else { return nil }
+        let offset = first.days(to: date)
+        guard days.indices.contains(offset), days[offset].date == date else { return days.firstIndex { $0.date == date } }
+        return offset
     }
 }

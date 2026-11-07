@@ -127,26 +127,32 @@ public struct LessonWorkIndex: Equatable, Sendable {
         }
 
         var result: [OccurrenceID: LessonWork] = [:]
-        let liveTasks = tasks.filter { !$0.isDeleted }.sorted(by: taskOrder)
-        for task in liveTasks {
-            guard let occurrence = occurrence(of: task, byLink: byLink, anchor: anchor) else { continue }
+        // Phase 10 P11: match first, then sort only the matched items. Which occurrence a task / exam belongs to does
+        // not depend on the order, and the orders below are total (the id breaks every tie), so each occurrence's list
+        // is exactly the same as sorting every live item first; the completed history of other days is never sorted.
+        let matchedTasks = tasks.compactMap { task -> (task: TaskItem, occurrence: OccurrenceID)? in
+            guard !task.isDeleted, let occurrence = occurrence(of: task, byLink: byLink, anchor: anchor) else { return nil }
+            return (task: task, occurrence: occurrence)
+        }.sorted { taskOrder($0.task, $1.task) }
+        for (task, occurrence) in matchedTasks {
             if task.isCompleted {
                 result[occurrence, default: LessonWork()].completedTaskIDs.append(task.id)
             } else {
                 result[occurrence, default: LessonWork()].openTaskIDs.append(task.id)
             }
         }
-        let liveExams = exams.filter { !$0.isDeleted }
-            .sorted { ($0.date, $0.start ?? .midnight, $0.title, $0.id) < ($1.date, $1.start ?? .midnight, $1.title, $1.id) }
-        for exam in liveExams {
-            guard let subjectID = exam.subjectID else { continue }
+        let matchedExams = exams.compactMap { exam -> (exam: Exam, occurrence: OccurrenceID)? in
+            guard !exam.isDeleted, let subjectID = exam.subjectID else { return nil }
             let key = DaySubject(date: exam.date, subjectID: subjectID)
             var target: OccurrenceID?
             if let start = exam.start, let candidates = bySubjectDay[key] {
                 let containing = candidates.filter { $0.startTime <= start && start < $0.endTime }
                 target = (containing.first { $0.status != .cancelled } ?? containing.first)?.id
             }
-            guard let occurrence = target ?? anchor(exam.date, subjectID) else { continue }
+            guard let occurrence = target ?? anchor(exam.date, subjectID) else { return nil }
+            return (exam: exam, occurrence: occurrence)
+        }.sorted { examOrder($0.exam, $1.exam) }
+        for (exam, occurrence) in matchedExams {
             result[occurrence, default: LessonWork()].examIDs.append(exam.id)
         }
         return LessonWorkIndex(byOccurrence: result)
@@ -169,6 +175,11 @@ public struct LessonWorkIndex: Equatable, Sendable {
         if dueKey(a) != dueKey(b) { return dueKey(a) < dueKey(b) }
         if a.priority != b.priority { return a.priority > b.priority }
         return (a.title, a.id) < (b.title, b.id)
+    }
+
+    /// Date, start (untimed first), title, id.
+    static func examOrder(_ a: Exam, _ b: Exam) -> Bool {
+        (a.date, a.start ?? .midnight, a.title, a.id) < (b.date, b.start ?? .midnight, b.title, b.id)
     }
 
     private struct DaySubject: Hashable {

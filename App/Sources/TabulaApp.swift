@@ -54,6 +54,9 @@ struct TabulaRootApp: App {
                 #endif
                 .task { await services.model.load() }
                 // TipKit once per launch (the Timetable symbol legend, U4); its screenshot route shows every tip.
+                // Not deferred further (Phase 10 P17): `Tips.configure(_:)` "must be called before tips display" and
+                // Apple says to call it "during app initialization" (docs checked 2026-11-05); `.task` already runs it
+                // after the first frame, and a launch route can show the Timetable tip at once.
                 .task {
                     if LaunchContext.options.screen == "timetable.grid-legend" { Tips.showAllTipsForTesting() }
                     try? Tips.configure()
@@ -70,10 +73,21 @@ struct TabulaRootApp: App {
                     }
                 }
         }
+        // Phase 10 P5: `.active` refreshes the environment (and re-plans reminders, widgets, Live Activities) after a
+        // background stay as before, but after a short `.inactive` blip (Notification Centre, Face ID, a call banner)
+        // only when zone / locale / day changed or 5+ minutes passed (`AppModel.sceneDidBecomeActive`). Zone, locale and
+        // significant-time-change notifications still refresh at once (AppModel observers).
+        // Leaving `.active` (inactive AND background) still flushes: data safety first (an app killed from the app
+        // switcher may never reach `.background`), and both flushes are cheap when nothing is pending (the store
+        // skips an already-written generation, the widget writer returns without a pending change).
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
-                services.model.refreshEnvironment()   // day / time zone / locale may have changed; also re-plans reminders
+                services.model.sceneDidBecomeActive()
             } else {
+                if phase == .background {
+                    services.model.sceneDidEnterBackground()
+                    services.reminders.sceneDidEnterBackground()   // runs a still-waiting launch re-plan now
+                }
                 BackgroundSave.flush(services.model)
                 services.widgets.flushNow()           // a change made just before leaving reaches the widgets
             }

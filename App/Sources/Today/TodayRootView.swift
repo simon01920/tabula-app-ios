@@ -73,13 +73,7 @@ struct TodayRootView: View {
                 }
             }
         } else {
-            ContentUnavailableView {
-                Label { Text("today.empty.noTimetable.title") } icon: { Image(systemName: "calendar.badge.exclamationmark") }
-            } description: {
-                Text("today.empty.noTimetable.message")
-            } actions: {
-                EmptyView()
-            }
+            NoTimetableView(titleKey: "today.empty.noTimetable.title", messageKey: "today.empty.noTimetable.message")
         }
     }
 
@@ -263,7 +257,7 @@ private struct DueTodaySection: View {
                         }
                         .foregroundStyle(Color.correction)
                         Spacer(minLength: 0)
-                        Image(systemName: "chevron.right")
+                        Image(systemName: "chevron.forward")
                             .font(.footnote.weight(.semibold))
                             .foregroundStyle(.secondary)
                             .accessibilityHidden(true)

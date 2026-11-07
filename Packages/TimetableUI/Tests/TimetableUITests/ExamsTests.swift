@@ -169,8 +169,8 @@ struct ExamTextTests {
         #expect(all.room == "A214" && all.building == nil && all.notes == "Bring calculator")
         #expect(all.topics == ["limits", "series"])
         let none = ExamFacts(exam: e, visibility: FieldVisibility([]))
-        #expect(none.room == nil && none.notes == nil && none.location == nil)
-        #expect(all.location == "A214")
+        #expect(none.room == nil && none.notes == nil && none.location(separator: ", ") == nil)
+        #expect(all.location(separator: ", ") == "A214")
     }
 
     @Test func timeShowsStartOrRangeAndIgnoresLoneEnd() {

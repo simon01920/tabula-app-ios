@@ -102,7 +102,7 @@ struct AttachmentRow: View {
                 parts.append(bytes.formatted(.byteCount(style: .file).locale(locale)))
             }
         }
-        return parts.isEmpty ? nil : parts.joined(separator: " · ")
+        return parts.isEmpty ? nil : parts.joined(separator: model.renderer.string(forKey: "a11y.separator"))
     }
 
     @ViewBuilder private var leading: some View {

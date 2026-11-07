@@ -72,6 +72,36 @@ struct ExportTests {
                                  context: w.world.context).isEmpty)
     }
 
+    /// Phase 10 WP3 (C5): the resolver entry point gives exactly the rows of the database entry point (same resolver
+    /// inputs), across the A/B rotation, the DST change, the holiday and every override kind.
+    @Test func resolverEntryPointMatchesDatabaseEntryPoint() throws {
+        let w = World()
+        let range = LocalDateRange(start: Fixture.date("2026-10-12"), end: Fixture.date("2026-11-08"))
+        let resolver = try #require(ScheduleResolver(database: w.database, timetableID: w.world.timetable.id,
+                                                     context: w.world.context))
+        let viaDatabase = ExportRows.build(database: w.database, timetableID: w.world.timetable.id, range: range,
+                                           context: w.world.context)
+        // The pre-Phase-10 body of `build(database:…)`, kept here as the independent reference.
+        let reference = range.days.flatMap { date in
+            let resolution = resolver.resolution(for: date)
+            return resolution.schedule.entries.map { entry in
+                let sourceID: UUID
+                switch entry.source {
+                case .lesson(let id): sourceID = id.uuid
+                case .oneOff(let id): sourceID = id.uuid
+                }
+                return ExportRow(occurrenceID: entry.id, sourceID: sourceID, date: entry.date, start: entry.startTime,
+                                 end: entry.endTime, subject: entry.subject.name, room: entry.room,
+                                 teacher: entry.teacher, status: entry.status, reasons: resolution.reasons(for: entry.id))
+            }
+        }
+        #expect(!viaDatabase.isEmpty)
+        #expect(viaDatabase == reference)
+        #expect(ExportRows.build(resolver: resolver, range: range) == reference)
+        #expect(ExportRows.build(resolver: resolver, range: LocalDateRange(start: Fixture.date("2026-10-20"),
+                                                                           end: Fixture.date("2026-10-19"))).isEmpty)
+    }
+
     // MARK: CSV
 
     @Test func csvQuotesPerRFC4180AndNeutralisesFormulas() {
@@ -191,7 +221,7 @@ struct ExportTests {
         let data = XLSXExport.data(rows: rows, labels: Self.labels, sheetName: "Rozvrh: 2026/27 [A]")
         let entries = try ZipReader.entries(Array(data))
         #expect(entries.map(\.name) == ["[Content_Types].xml", "_rels/.rels", "xl/workbook.xml",
-                                        "xl/_rels/workbook.xml.rels", "xl/worksheets/sheet1.xml"])
+                                        "xl/_rels/workbook.xml.rels", "xl/worksheets/sheet1.xml", "xl/styles.xml"])
         for entry in entries {
             let xml = try #require(String(bytes: entry.bytes, encoding: .utf8))
             #expect(xml.hasPrefix("<?xml"))
@@ -244,7 +274,7 @@ struct ExportTests {
         let ics = ICSExport.data(rows: rows, labels: Self.labels, timeZone: world.context.timeZone, stamp: Fixture.now)
         let xlsx = XLSXExport.data(rows: rows, labels: Self.labels)
         #expect(csv.count < 60_000 && ics.count < 300_000 && xlsx.count < 40_000)
-        #expect(try ZipReader.entries(Array(xlsx)).count == 5)
+        #expect(try ZipReader.entries(Array(xlsx)).count == 6)
     }
 }
 

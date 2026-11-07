@@ -143,6 +143,7 @@ struct DayPagerHeader: View {
         .labelsHidden()
         .datePickerStyle(.compact)
         .environment(\.timeZone, LocalDateBridge.timeZone)
-        .environment(\.calendar, LocalDateBridge.calendar(locale: model.environment.locale()))
+        .environment(\.calendar, LocalDateBridge.calendar(locale: model.environment.locale(),
+                                                                  firstWeekday: model.calendarContext.firstWeekday))
     }
 }

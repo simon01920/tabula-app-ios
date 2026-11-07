@@ -8,10 +8,10 @@ enum ImportBellInference {
         var end: LocalTime?
     }
 
-    // Regex is not Sendable, hence computed. "8h00" is French; "1:00 p.m." / "1:00PM" is 12-hour.
-    private static var timePattern: Regex<(Substring, Substring, Substring, Substring?)> {
+    // "8h00" is French; "1:00 p.m." / "1:00PM" is 12-hour. Built once (Phase 10 C6); `nonisolated(unsafe)`
+    // because `Regex` is not `Sendable` although it is safe to share for matching (see `ImportCellSplitter`).
+    nonisolated(unsafe) private static let timePattern: Regex<(Substring, Substring, Substring, Substring?)> =
         /(\d{1,2})[:.h](\d{2})(?!\d)(?:\s?([AaPp])\.?\s?[Mm]\b\.?)?/
-    }
     /// Words that may accompany a period number; a cell of only these, numbers and times is a header, not a lesson.
     private static let periodWords: Set<String> = Set([
         "hod", "hodina", "h", "period", "lesson", "hour", "std", "stunde", "lekcja", "lekce", "lekc", "ora", "heure",

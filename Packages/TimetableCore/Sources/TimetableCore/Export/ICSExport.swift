@@ -63,6 +63,8 @@ public enum ICSExport {
     /// One content line, folded (§3.1) so no physical line exceeds 75 octets before its CRLF; never splits a
     /// UTF-8 sequence. Continuation lines start with a space, which counts toward their 75.
     static func fold(_ line: String) -> String {
+        // Most lines fit (Phase 10 C7): the loop below would rebuild them scalar by scalar unchanged.
+        if line.utf8.count <= 75 { return line + "\r\n" }
         var out = ""
         var octets = 0
         for scalar in line.unicodeScalars {
@@ -78,7 +80,12 @@ public enum ICSExport {
     }
 
     /// The VTIMEZONE of `zone` for the dates `first…last`: the observance in effect at the start of `first`, then
-    /// one STANDARD/DAYLIGHT block per offset change Foundation reports before the end of `last`.
+    /// one STANDARD/DAYLIGHT block (RFC 5545 §3.6.5) per UTC-offset change before the end of `last`.
+    ///
+    /// Phase 10 K1: the changes come from the offsets themselves (`offsetChanges`), not from
+    /// `nextDaylightSavingTimeTransition`, so a change of the *standard* offset (Caracas 2016, Volgograd 2020,
+    /// Samoa's skipped 2011-12-30) gets its block too, on every platform. A transition that keeps the offset (only
+    /// the DST flag flips) needs no block and gets none, as before.
     static func vtimezone(_ zone: TimeZone, from first: LocalDate, through last: LocalDate) -> [String] {
         let context = CalendarContext(timeZone: zone, firstWeekday: .monday)
         let start = context.startOfDay(first)
@@ -91,18 +98,59 @@ public enum ICSExport {
         }
         let initial = zone.secondsFromGMT(for: start)
         observance(at: start, offsetFrom: initial, offsetTo: initial, onset: format(first, .midnight))
-        var cursor = start
-        while let transition = zone.nextDaylightSavingTimeTransition(after: cursor), transition < end {
-            let from = zone.secondsFromGMT(for: transition.addingTimeInterval(-1))
-            let to = zone.secondsFromGMT(for: transition)
+        let changes = offsetChanges(zone, after: CalendarContext.floorSeconds(start),
+                                    before: CalendarContext.floorSeconds(end))
+        for change in changes {
             // Onset is the local time just before the change, i.e. in the old offset (§3.6.5).
-            if from != to {
-                observance(at: transition, offsetFrom: from, offsetTo: to,
-                           onset: format(localSeconds: CalendarContext.floorSeconds(transition) + Int64(from)))
-            }
-            cursor = transition
+            observance(at: Date(timeIntervalSince1970: TimeInterval(change.utcSeconds)), offsetFrom: change.from,
+                       offsetTo: change.to, onset: format(localSeconds: change.utcSeconds + Int64(change.from)))
         }
         return lines + ["END:VTIMEZONE"]
+    }
+
+    /// One change of a zone's UTC offset: the first second (`utcSeconds`, since 1970) of the new offset.
+    struct OffsetChange: Hashable {
+        /// First instant with the new offset.
+        var utcSeconds: Int64
+        /// Offset at `utcSeconds − 1`.
+        var from: Int
+        /// Offset at `utcSeconds`.
+        var to: Int
+    }
+
+    /// Every instant `t` with `lower < t < upper` (whole UTC seconds) at which `zone`'s UTC offset changes,
+    /// ascending.
+    ///
+    /// Samples the offset every `step` seconds and bisects each sample interval whose ends differ down to the
+    /// second. Assumes at most one change per `step` (6 h), which every tz-database zone satisfies (changes are
+    /// weeks apart); offsets change on whole seconds, so the bisection finds the exact instant.
+    static func offsetChanges(_ zone: TimeZone, after lower: Int64, before upper: Int64,
+                              step: Int64 = 6 * 3600) -> [OffsetChange] {
+        func offsetAt(_ seconds: Int64) -> Int {
+            zone.secondsFromGMT(for: Date(timeIntervalSince1970: TimeInterval(seconds)))
+        }
+        guard upper - lower > 1, step > 0 else { return [] }
+        var changes: [OffsetChange] = []
+        // The last instant that can hold a change is `upper − 1`.
+        var low = lower
+        var lowOffset = offsetAt(lower)
+        while low < upper - 1 {
+            let high = min(low + step, upper - 1)
+            let highOffset = offsetAt(high)
+            if highOffset != lowOffset {
+                // Invariant: offsetAt(a) == lowOffset and offsetAt(b) != lowOffset; the change is at b once b == a + 1.
+                var a = low
+                var b = high
+                while b - a > 1 {
+                    let middle = a + (b - a) / 2
+                    if offsetAt(middle) == lowOffset { a = middle } else { b = middle }
+                }
+                changes.append(OffsetChange(utcSeconds: b, from: lowOffset, to: offsetAt(b)))
+            }
+            low = high
+            lowOffset = highOffset
+        }
+        return changes
     }
 
     /// `yyyyMMddTHHmmss` of a wall-clock date and time.

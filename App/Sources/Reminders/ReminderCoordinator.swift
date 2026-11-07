@@ -2,7 +2,10 @@
 // `AppModel`, runs `ReminderEngine` (TimetableUI: planner → diff → clients) and asks for the next background refresh.
 // It never decides reminder timing itself.
 //
-// Triggers (all coalesced; data changes debounced by 1 s):
+// Triggers (all coalesced; data changes debounced by 1 s; the launch re-plan waits `launchDelay` (1.5 s, Phase 10 P7)
+// so it does not land in the first frames — a notification action, App Intent or background refresh runs it at once
+// through `replanNow`, and the scene going to the background while it still waits runs it at once under a background
+// assertion, `sceneDidEnterBackground()`, QA fix after Phase 10):
 //   launch (store loaded) · scene active / time zone / locale / significant time change (AppModel.onChange(.environment))
 //   · any accepted data change (AppModel.onChange(.data)) · a notification action · AlarmKit authorization changes
 //   · BGAppRefreshTask (`backgroundRefresh()`) · an in-app timer at the plan's `nextReplanDate` while running.
@@ -77,6 +80,8 @@ final class ReminderCoordinator {
     @ObservationIgnored private var observers: [any NSObjectProtocol] = []
     @ObservationIgnored private var authorizationTask: Task<Void, Never>?
     @ObservationIgnored private var started = false
+    /// The `.launch` re-plan was requested and no run has covered it yet (`sceneDidEnterBackground()`).
+    @ObservationIgnored private var launchReplanPending = false
     @ObservationIgnored private let offerStore: any ReminderPermissionOfferStore
     /// A user save happened since the last run started (consumed by the next run).
     @ObservationIgnored private var offerArmed = false
@@ -86,6 +91,9 @@ final class ReminderCoordinator {
     /// Run (awaited) after a notification "Mark done" was saved and re-planned (Phase 4 B3 final QA M1): Live Activities
     /// refresh now and the widget snapshot is written, so neither waits for a debounce the system may never let run.
     @ObservationIgnored var afterCompletion: (@MainActor () async -> Void)?
+    /// Phase 10 P7: the launch re-plan's delay. It always runs: a later debounced request keeps the `.launch` reason
+    /// (`pendingReasons`), and `replanNow` (notification action, App Intent, background refresh) runs it immediately.
+    static let launchDelay: Duration = .milliseconds(1500)
 
     init(engine: ReminderEngine, model: AppModel, navigation: AppNavigation,
          backgroundScheduler: any BackgroundRefreshScheduling, deviceState: @escaping @MainActor () -> DeviceReminderState,
@@ -142,7 +150,22 @@ final class ReminderCoordinator {
                 await self.refreshHealthIfShown()
             }
         }
-        requestReplan(.launch, debounce: .zero)
+        launchReplanPending = true
+        requestReplan(.launch, debounce: Self.launchDelay)
+    }
+
+    /// The scene went to `.background` (TabulaApp). If the launch re-plan is still waiting for `launchDelay`, run it
+    /// now under a background assertion: a suspension would otherwise postpone it to the next resume (QA fix after
+    /// Phase 10). Nothing to do once a run covered it.
+    func sceneDidEnterBackground() {
+        guard launchReplanPending else { return }
+        let assertion = BackgroundAssertion(name: "tabula.launch-replan")
+        Task { [weak self] in
+            defer { assertion.end() }
+            // A second background before this Task ran (back, forward, back) must not queue a second launch run.
+            guard let self, self.launchReplanPending else { return }
+            await self.replanNow(.launch)
+        }
     }
 
     // MARK: Triggers
@@ -195,6 +218,7 @@ final class ReminderCoordinator {
         guard !model.isLoading, model.problem == nil else { return }
         let reasons = pendingReasons.sorted { $0.rawValue < $1.rawValue }
         pendingReasons = []
+        if reasons.contains(.launch) { launchReplanPending = false }
         let offerTrigger: ReminderPermissionOffer.Trigger = offerArmed ? .userSave : Self.offerTrigger(for: reasons)
         offerArmed = false
         let database = model.database ?? DatabaseMutation.emptyBase
@@ -296,11 +320,24 @@ final class ReminderCoordinator {
         switch ReminderResponseInterpreter.command(for: action, delivered: delivered) {
         case .markDone(let source):
             guard let mutation = ReminderResponseInterpreter.mutation(for: source, now: model.now) else { return }
-            let applied: Bool
-            if case .applied = model.apply(mutation) { applied = true } else { applied = false }
-            await model.flush()                              // persist first: the system may suspend us any moment
-            if applied {
+            let outcome = model.apply(mutation)
+            // Persist first: the system may suspend us any moment. `flushForSync()` also says whether the snapshot
+            // with the completion is on disk (QA fix after Phase 10: B12 also covers a failed save).
+            let saved = await model.flushForSync()
+            switch outcome {
+            case .applied where saved:
                 await engine.removeDelivered(for: source)   // the item's other reminders in Notification Center
+            case .applied:
+                // Applied in memory but not saved (disk full, read-only store found while saving): the completion is
+                // lost if the app is ended now, so say so and keep the item's other delivered reminders.
+                _ = await engine.notifyMarkDoneFailed(delivered, context: model.calendarContext,
+                                                      renderer: model.renderer, now: model.now)
+            case .failed(.notFound(_, _)):
+                break                                        // deleted meanwhile: nothing to complete; the re-plan drops it
+            case .readOnly, .rejected, .failed:
+                // Phase 10 B12: say so, or the user believes it is done (read-only store, not loaded, rejected, failed).
+                _ = await engine.notifyMarkDoneFailed(delivered, context: model.calendarContext,
+                                                      renderer: model.renderer, now: model.now)
             }
             await replanNow(.notificationAction)
             // Phase 4 B3 final QA M1: end an exam-day Live Activity and write the widget snapshot before returning

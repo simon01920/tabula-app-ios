@@ -61,7 +61,7 @@ struct WeekStepView: View {
             } label: {
                 Text("onboarding.week.anchor.week")
             }
-            .pickerStyle(.segmented)
+            .adaptiveSegmentedPicker()
             .frame(minHeight: 44)
             Toggle(isOn: $flow.draft.followsCalendarParity) {
                 Text("onboarding.week.parity.toggle").fixedSize(horizontal: false, vertical: true)
@@ -96,7 +96,7 @@ struct WeekStepView: View {
             } label: {
                 Text(verbatim: question)
             }
-            .pickerStyle(.segmented)
+            .adaptiveSegmentedPicker()
             .frame(minHeight: 44)
             Text("onboarding.week.anchor.day.footer")
                 .font(.footnote)

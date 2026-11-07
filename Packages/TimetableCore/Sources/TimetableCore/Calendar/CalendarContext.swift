@@ -81,6 +81,13 @@ public struct CalendarContext: Hashable, Sendable {
         let window: Int64 = 2 * 86_400
         let offsetBefore = offset(atUTCSeconds: localSeconds - window)
         let offsetAfter = offset(atUTCSeconds: localSeconds + window)
+        // Fast path (Phase 10 C4), the same reasoning as `DayClock`: with at most one transition in the window,
+        // equal offsets at both ends mean there is none, so the local time maps uniquely with that offset.
+        // Two lookups instead of four to six; `CalendarContextResolveFastPathTests` compares it with the full
+        // search every 15 minutes around every transition 2020–2030 (and Samoa 2011).
+        if offsetBefore == offsetAfter {
+            return .unique(Self.date(utcSeconds: localSeconds - offsetBefore))
+        }
         let offsetHere = offset(atUTCSeconds: localSeconds)
         var instants: [Int64] = []
         for candidate in Set([offsetBefore, offsetAfter, offsetHere]) {

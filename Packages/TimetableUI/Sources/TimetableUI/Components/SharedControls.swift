@@ -71,6 +71,29 @@ private struct LongValuePickerStyle: ViewModifier {
 }
 #endif
 
+#if !os(watchOS)
+extension View {
+    /// Phase 10 U7: a segmented picker with a fallback. Segments truncate long translations ("Nadchádzajúce",
+    /// "Heure de cours") and cannot scroll, so at accessibility text sizes the picker becomes a menu, which wraps
+    /// its choices. Use instead of `.pickerStyle(.segmented)`.
+    public func adaptiveSegmentedPicker() -> some View {
+        modifier(AdaptiveSegmentedPickerStyle())
+    }
+}
+
+private struct AdaptiveSegmentedPickerStyle: ViewModifier {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    func body(content: Content) -> some View {
+        if AdaptiveLayout.isStacked(dynamicTypeSize) {
+            content.pickerStyle(.menu)
+        } else {
+            content.pickerStyle(.segmented)
+        }
+    }
+}
+#endif
+
 /// "Pro" on a Pro-only option. Not a button: it explains why the option is unavailable.
 public struct ProBadge: View {
     private let text: Text

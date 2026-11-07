@@ -25,7 +25,12 @@ enum ImportCellSplitter {
 
     // MARK: Week markers
 
-    private static var prefixMarker: Regex<(Substring, Substring, Substring)> { /^\s*[\(\[]?\s*([ABab])\s*[\)\]:]\s*(.*)$/ } // Regex is not Sendable
+    // Regexes are built once (Phase 10 C6: as computed properties every access parsed the pattern and compiled a
+    // new program, per line and per token). `Regex` is not `Sendable` (swift-experimental-string-processing has
+    // no conformance), but it is immutable once built and its program compiles lazily behind an atomic
+    // compare-and-swap (`Regex.Program.loweredProgram`), so sharing one for concurrent matching is safe; hence
+    // `nonisolated(unsafe)`. Never mutate these (`.ignoresCase()` etc. return new values).
+    nonisolated(unsafe) private static let prefixMarker: Regex<(Substring, Substring, Substring)> = /^\s*[\(\[]?\s*([ABab])\s*[\)\]:]\s*(.*)$/
 
     private static func weekGroups(_ text: String) -> [(Set<Int>?, [String])] {
         var lines: [String] = []
@@ -73,14 +78,16 @@ enum ImportCellSplitter {
 
     // MARK: Fields
 
-    private static var bracketed: Regex<(Substring, Substring)> { /[\(\[]([^\)\]]{1,12})[\)\]]/ } // Regex is not Sendable
+    nonisolated(unsafe) private static let bracketed: Regex<(Substring, Substring)> = /[\(\[]([^\)\]]{1,12})[\)\]]/
     /// "204", "3P1", "H5S1", "B-204", "C1.04", "2O4" (a letter or two, then a digit). Not "TPVAJ1" or "ANJ1".
-    private static var roomToken: Regex<Substring> { /[A-Za-zÀ-ž]{0,2}[-.]?[0-9][A-Za-z0-9.\/-]{0,6}/ } // Regex is not Sendable
-    private static var personName: Regex<(Substring, Substring?)> { /\p{Lu}\p{Ll}+(\s\p{Lu}\p{Ll}+){1,2}|\p{Lu}\.\s?\p{Lu}\p{Ll}+|\p{Lu}\p{Ll}+,?\s\p{Lu}\./ } // Regex is not Sendable
+    nonisolated(unsafe) private static let roomToken: Regex<Substring> = /[A-Za-zÀ-ž]{0,2}[-.]?[0-9][A-Za-z0-9.\/-]{0,6}/
+    /// "12." (an ordinal or a date fragment), never a room.
+    nonisolated(unsafe) private static let ordinalToken: Regex<Substring> = /\d{1,2}\./
+    nonisolated(unsafe) private static let personName: Regex<(Substring, Substring?)> = /\p{Lu}\p{Ll}+(\s\p{Lu}\p{Ll}+){1,2}|\p{Lu}\.\s?\p{Lu}\p{Ll}+|\p{Lu}\p{Ll}+,?\s\p{Lu}\./
     private static let suffixTitles: Set<String> = ["phd", "csc", "msc", "mba", "dis", "bsc", "drsc"]
 
     static func isRoomToken(_ token: String) -> Bool {
-        token.count >= 2 && token.wholeMatch(of: roomToken) != nil && token.wholeMatch(of: /\d{1,2}\./) == nil
+        token.count >= 2 && token.wholeMatch(of: roomToken) != nil && token.wholeMatch(of: ordinalToken) == nil
     }
 
     private static func isRoomWord(_ token: String) -> Bool {

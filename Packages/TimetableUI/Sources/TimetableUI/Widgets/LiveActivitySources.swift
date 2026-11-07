@@ -78,11 +78,22 @@ public enum LiveActivitySourceBuilder {
     /// The sources at `now`. `database == nil` (onboarding) → no lessons, no exams.
     public static func make(database: TabulaDatabase?, now: Date, context: CalendarContext, locale: Locale,
                             languageCode: String?) -> LiveActivitySources {
+        let snapshot = WidgetSnapshotBuilder.make(database: database, now: now, context: context, tier: .pro, locale: locale,
+                                                  languageCode: languageCode)
+        return make(snapshot: snapshot, database: database, now: now, context: context, locale: locale,
+                    languageCode: languageCode)
+    }
+
+    /// The sources from the widget snapshot the app already built for this data, context and minute (Phase 10 WP2,
+    /// P3: the Live Activity controller and the widget writer share one build per change, `WidgetSnapshotSource`).
+    /// Only the snapshot's days are read. That build carries the app's tier where `make(database:…)` uses `.pro`; the
+    /// days can differ only when the far days are trimmed at a 1-byte edge (`"free"` vs `"pro"`), and then the Live
+    /// Activity follows exactly the days the widgets got. Today the app's tier is `.pro` (`AllAccessEntitlements`).
+    public static func make(snapshot: WidgetSnapshot, database: TabulaDatabase?, now: Date, context: CalendarContext,
+                            locale: Locale, languageCode: String?) -> LiveActivitySources {
         let settings = database?.settings ?? .untouchedDefaults
         let style = LiveActivityStyle(localeID: locale.identifier, languageCode: languageCode, hourCycle: settings.hourCycle,
                                       timeZoneID: context.timeZone.identifier)
-        let snapshot = WidgetSnapshotBuilder.make(database: database, now: now, context: context, tier: .pro, locale: locale,
-                                                  languageCode: languageCode)
         return make(snapshot: snapshot, database: database, now: now, context: context, style: style)
     }
 
@@ -92,12 +103,13 @@ public enum LiveActivitySourceBuilder {
         var lessonDays: [LiveActivityLessonDay] = []
         if snapshot.hasTimetable {
             for day in snapshot.days {
-                let lessons = WidgetTimelinePlanner.active(day, context)
+                // Instants resolved once per lesson (Phase 10 WP2, C3): exactly `start(in:)` / `end(in:)`.
+                let lessons = TimedLessons.active(day, context)
                     .prefix(LiveActivityLimits.maxLessons)
-                    .map { lesson in
-                        LiveActivityLesson(subject: LiveActivitySubject(lesson.subject),
-                                           room: LiveActivityLimits.cut(lesson.room, LiveActivityLimits.maxRoomLength),
-                                           start: lesson.start(in: context), end: lesson.end(in: context))
+                    .map { item in
+                        LiveActivityLesson(subject: LiveActivitySubject(item.lesson.subject),
+                                           room: LiveActivityLimits.cut(item.lesson.room, LiveActivityLimits.maxRoomLength),
+                                           start: item.start, end: item.end)
                     }
                 if !lessons.isEmpty { lessonDays.append(LiveActivityLessonDay(day: day.date, lessons: Array(lessons))) }
             }

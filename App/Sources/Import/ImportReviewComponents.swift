@@ -317,12 +317,12 @@ enum ImportA11y {
         return renderer.format(key: "import.cell.position", arguments: [.text(day), .integer(Int64(lesson.period))])
     }
 
-    /// "Monday, period 3. Mathematics. 204. Needs checking."
+    /// "Monday, period 3, Mathematics, 204, Needs checking" (the language's list separator, U15).
     static func label(_ lesson: ImportLesson, renderer: LocalizedTextRenderer, formatter: TimetableFormatter) -> String {
         var parts = [position(lesson, renderer: renderer, formatter: formatter), lesson.subject]
         parts += [lesson.room, lesson.teacher].compactMap { $0 }
         if lesson.needsReview { parts.append(renderer.string(forKey: "import.cell.needsChecking")) }
-        return parts.joined(separator: ". ")
+        return parts.joined(separator: renderer.string(forKey: "a11y.separator"))
     }
 
     /// The reasons, one sentence each (empty when nothing needs checking).

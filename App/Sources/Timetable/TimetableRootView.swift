@@ -10,6 +10,8 @@
 // - the one-time symbol legend (TipKit, TimetableMarkers.swift) above weeks with change markers.
 // Taps: a lesson → `LessonDetailView` sheet; a free grid slot → `QuickAddSheet`.
 // Task / exam badges: `TimetableContent` puts the `LessonWorkIndex` of the shown week into the environment.
+// Performance (Phase 10 P11): `TimetableContent` resolves the shown week once per pass (`ResolvedWeek`, TimetableUI)
+// and hands the same resolutions to the strip, the badges, the layout and the change reasons.
 // Navigation state is `TimetableSelection` (TimetableUI, Linux-tested); "now" is `model.now`, refreshed once a minute
 // by a TimelineView unless the clock is fixed (screenshot mode).
 // HIG: toolbars.md › Actions ("Make sure the meaning of each control is clear"), › Item groupings (navigation and
@@ -74,13 +76,7 @@ struct TimetableRootView: View {
                         }
                     }
                 } else {
-                    ContentUnavailableView {
-                        Label { Text("timetable.empty.noTimetable") } icon: { Image(systemName: "calendar.badge.exclamationmark") }
-                    } description: {
-                        EmptyView()
-                    } actions: {
-                        EmptyView()
-                    }
+                    NoTimetableView(titleKey: "timetable.empty.noTimetable", messageKey: "timetable.empty.noTimetable.message")
                 }
             }
             .navigationTitle(title)
@@ -434,10 +430,10 @@ private struct TimetableContent: View {
 
     var body: some View {
         let today = resolver.context.localDate(of: now)
-        let strip = WeekStripModel.make(selection: selection, today: today, resolver: resolver)
-        let work = LessonWorkSupport.index(dates: (0..<7).map { selection.weekStart.adding(days: $0) }
-                                               + [selection.selectedDate],
-                                           resolver: resolver, database: model.database)
+        // Phase 10 P11: every shown date is resolved once per pass; strip, badges, layouts and reasons share it.
+        let week = ResolvedWeek(selection: selection, resolver: resolver)
+        let strip = week.strip(today: today)
+        let work = week.lessonWork(database: model.database)
         let dayBased = TimetableViewChoice.isDayBased(viewKind)
         VStack(spacing: 0) {
             if showsLegendTip, strip.days.contains(where: \.hasChanges) {
@@ -458,7 +454,7 @@ private struct TimetableContent: View {
                 }
                 Divider()
             }
-            content(today: today, strip: strip)
+            content(today: today, strip: strip, week: week)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .environment(\.lessonWork, work)
@@ -476,15 +472,21 @@ private struct TimetableContent: View {
     }
 
     @ViewBuilder
-    private func content(today: LocalDate, strip: WeekStripModel) -> some View {
+    private func content(today: LocalDate, strip: WeekStripModel, week: ResolvedWeek) -> some View {
         let nowMinute = resolver.context.local(from: now).time.minuteOfDay
         switch viewKind {
         case .timeBlocks where !typeSize.isAccessibilitySize:
-            TimeBlockWeekView(layout: TimeBlockLayout.week(containing: selection.weekStart, resolver: resolver),
-                              strip: strip, timetable: timetable, reasons: reasons(for: strip.days.map(\.date)),
-                              today: today, nowMinute: nowMinute, onOpen: onOpen)
+            TimeBlockWeekView(layout: week.timeBlockWeekLayout(),
+                              strip: strip, timetable: timetable, reasons: week.reasons(for: strip.days.map(\.date)),
+                              today: today, nowMinute: nowMinute, onOpen: onOpen) {
+                // U9: columns or overlap lanes too narrow (TimeBlockFit) → the grid, as at accessibility sizes.
+                let layout = week.gridLayout()
+                TimetableGridView(layout: layout, strip: strip, timetable: timetable,
+                                  reasons: week.reasons(for: layout.columns.map(\.date)), today: today, nowMinute: nowMinute,
+                                  onOpen: onOpen, onAdd: onAdd)
+            }
         case .day, .tiles:
-            let resolution = resolver.resolution(for: selection.selectedDate)
+            let resolution = week.resolution(for: selection.selectedDate)
             if resolution.schedule.entries.isEmpty {
                 DayEmptyView(schedule: resolution.schedule)
             } else if viewKind == .tiles || typeSize.isAccessibilitySize {
@@ -503,14 +505,14 @@ private struct TimetableContent: View {
                 .contentMargins(.bottom, 24, for: .scrollContent)
             } else {
                 TimeBlockDayView(layout: TimeBlockLayout.make(days: [resolution.schedule]), timetable: timetable,
-                                 reasons: reasons(for: [selection.selectedDate]), today: today, nowMinute: nowMinute,
+                                 reasons: week.reasons(for: [selection.selectedDate]), today: today, nowMinute: nowMinute,
                                  onOpen: onOpen)
             }
         default:
             // Grid (and the week view at accessibility sizes, which the grid shows as a list).
-            let layout = TimetableCore.GridLayout.week(containing: selection.weekStart, resolver: resolver)
+            let layout = week.gridLayout()
             TimetableGridView(layout: layout, strip: strip, timetable: timetable,
-                              reasons: reasons(for: layout.columns.map(\.date)), today: today, nowMinute: nowMinute,
+                              reasons: week.reasons(for: layout.columns.map(\.date)), today: today, nowMinute: nowMinute,
                               onOpen: onOpen, onAdd: onAdd)
         }
     }
@@ -529,14 +531,6 @@ private struct TimetableContent: View {
                 return
             }
         }
-    }
-
-    private func reasons(for dates: [LocalDate]) -> [OccurrenceID: [ModificationReason]] {
-        var result: [OccurrenceID: [ModificationReason]] = [:]
-        for date in dates {
-            for change in resolver.resolution(for: date).changes { result[change.occurrenceID] = change.reasons }
-        }
-        return result
     }
 
     private func bell(_ id: BellSchedule.ID?) -> BellSchedule? {

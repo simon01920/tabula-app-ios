@@ -7309,6 +7309,258 @@
         }
       }
     },
+    "attachments.voice.replace.confirm" : {
+      "comment" : "Destructive button of the replace-recording confirmation: deletes the earlier take and starts recording.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nahrát znovu"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Neu aufnehmen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Record Again"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Réenregistrer"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Új felvétel"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "もう一度録音"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nagraj ponownie"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Înregistrează din nou"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nahrať znova"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Сними поново"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Snimi ponovo"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Записати знову"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "重新录音"
+          }
+        }
+      }
+    },
+    "attachments.voice.replace.message" : {
+      "comment" : "Message of the replace-recording confirmation: the earlier take is deleted when recording starts again.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nové nahrávání smaže nahrávku, kterou jste právě pořídili."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Eine neue Aufnahme löscht die gerade gemachte Aufnahme."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recording again deletes the recording you just made."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Un nouvel enregistrement supprime celui que vous venez de faire."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Az új felvétel törli az imént készített felvételt."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "もう一度録音すると、今録音したものは削除されます。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nagrywanie od nowa usunie właśnie wykonane nagranie."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "O nouă înregistrare o șterge pe cea pe care tocmai ai făcut-o."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nové nahrávanie odstráni nahrávku, ktorú ste práve urobili."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Нови снимак брише снимак који сте управо направили."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Novi snimak briše snimak koji ste upravo napravili."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Новий запис видалить щойно зроблений запис."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "重新录音会删除刚刚录制的内容。"
+          }
+        }
+      }
+    },
+    "attachments.voice.replace.title" : {
+      "comment" : "Title of the confirmation shown when the user taps Record although a voice note was already recorded in the sheet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nahradit tuto nahrávku?"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Aufnahme ersetzen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace this recording?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Remplacer cet enregistrement ?"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Lecseréled ezt a felvételt?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "この録音を置き換えますか？"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zastąpić to nagranie?"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Înlocuiești această înregistrare?"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nahradiť túto nahrávku?"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Заменити овај снимак?"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zameniti ovaj snimak?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Замінити цей запис?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "要替换这段录音吗？"
+          }
+        }
+      }
+    },
     "attachments.voice.retry" : {
       "comment" : "Button in the error alert when a recorded voice note could not be added: try adding the same recording again.",
       "extractionState" : "manual",
@@ -13777,6 +14029,90 @@
         }
       }
     },
+    "editor.common.discard.busyMessage" : {
+      "comment" : "Message of the discard confirmation when Cancel is tapped while an attachment file is still being copied into the task. The destructive button is editor.common.discard ('Discard Changes').",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Příloha se ještě přidává. Pokud změny zahodíte, nepřidá se a vaše úpravy se neuloží."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ein Anhang wird noch hinzugefügt. Wenn du verwirfst, wird er nicht hinzugefügt und deine Änderungen werden nicht gesichert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An attachment is still being added. If you discard, it won't be added and your edits won't be saved."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Une pièce jointe est encore en cours d’ajout. Si vous abandonnez, elle ne sera pas ajoutée et vos modifications ne seront pas enregistrées."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Egy melléklet hozzáadása még folyamatban van. Ha elveted, nem kerül hozzáadásra, és a módosításaid nem lesznek mentve."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "添付ファイルを追加中です。破棄すると、添付ファイルは追加されず、編集内容も保存されません。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Załącznik jest jeszcze dodawany. Jeśli odrzucisz zmiany, nie zostanie dodany, a Twoje edycje nie zostaną zapisane."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Un atașament se adaugă încă. Dacă renunți, nu va fi adăugat, iar modificările tale nu vor fi salvate."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Príloha sa ešte pridáva. Ak zmeny zahodíte, nepridá sa a vaše úpravy sa neuložia."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Прилог се још додаје. Ако одбаците измене, неће бити додат, а ваше измене неће бити сачуване."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Prilog se još dodaje. Ako odbacite izmene, neće biti dodat, a vaše izmene neće biti sačuvane."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Вкладення ще додається. Якщо відхилити зміни, його не буде додано, а ваші зміни не буде збережено."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "附件仍在添加中。如果放弃，附件将不会被添加，你的修改也不会被保存。"
+          }
+        }
+      }
+    },
     "editor.common.discard.message" : {
       "comment" : "Message of the discard confirmation.",
       "extractionState" : "manual",
@@ -15537,6 +15873,174 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "已调整：%@"
+          }
+        }
+      }
+    },
+    "editor.dayChange.existing.confirm.message" : {
+      "comment" : "Message of the undo-change confirmation: what happens to the entry after the change is removed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pro tuto položku se v tento den opět použije běžný rozvrh."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Für diesen Eintrag gilt an diesem Tag wieder der reguläre Stundenplan."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The regular timetable applies again for this entry on this day."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "L’emploi du temps habituel s’applique de nouveau à cette entrée ce jour-là."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Erre a bejegyzésre ezen a napon ismét a szokásos órarend érvényes."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "この日のこの項目には、通常の時間割が再び適用されます。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dla tego wpisu w tym dniu znów obowiązuje zwykły plan."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pentru această intrare, în această zi se aplică din nou orarul obișnuit."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pre túto položku v tento deň opäť platí bežný rozvrh."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "За ову ставку тог дана поново важи редовни распоред."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Za ovu stavku tog dana ponovo važi redovni raspored."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Для цього запису в цей день знову діятиме звичайний розклад."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "当天此项将恢复为常规课表。"
+          }
+        }
+      }
+    },
+    "editor.dayChange.existing.confirm.title" : {
+      "comment" : "Title of the confirmation shown before an existing change for a day (cancelled lesson, moved lesson, extra lesson...) is undone.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vrátit tuto změnu?"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Diese Änderung rückgängig machen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo this change?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Annuler cette modification ?"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Visszavonod ezt a módosítást?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "この変更を取り消しますか？"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Cofnąć tę zmianę?"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Anulezi această modificare?"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vrátiť túto zmenu?"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Поништити ову измену?"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Poništiti ovu izmenu?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Скасувати цю зміну?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "要撤销此更改吗？"
           }
         }
       }
@@ -30409,6 +30913,1686 @@
         }
       }
     },
+    "editor.subject.symbol.name.atom" : {
+      "comment" : "VoiceOver name of the suggested subject symbol 'atom' in the symbol picker of the subject editor. A short noun naming what the icon shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Atom"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Atom"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atom"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Atome"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Atom"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "原子"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Atom"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Atom"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Atóm"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Атом"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Atom"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Атом"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "原子"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol.name.book.fill" : {
+      "comment" : "VoiceOver name of the suggested subject symbol 'book.fill' in the symbol picker of the subject editor. A short noun naming what the icon shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kniha"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Buch"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Book"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Livre"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Könyv"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "本"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Książka"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Carte"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kniha"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Књига"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Knjiga"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Книга"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "书"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol.name.brain.head.profile" : {
+      "comment" : "VoiceOver name of the suggested subject symbol 'brain.head.profile' in the symbol picker of the subject editor. A short noun naming what the icon shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hlava s mozkem"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kopf mit Gehirn"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Head with brain"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tête avec cerveau"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fej agyvelővel"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "脳のある頭"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Głowa z mózgiem"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Cap cu creier"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hlava s mozgom"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Глава са мозгом"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Glava sa mozgom"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Голова з мозком"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "带大脑的头"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol.name.building.columns.fill" : {
+      "comment" : "VoiceOver name of the suggested subject symbol 'building.columns.fill' in the symbol picker of the subject editor. A short noun naming what the icon shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Budova se sloupy"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Gebäude mit Säulen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Building with columns"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Bâtiment à colonnes"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Oszlopos épület"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "円柱のある建物"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Budynek z kolumnami"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Clădire cu coloane"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Budova so stĺpmi"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Зграда са стубовима"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zgrada sa stubovima"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Будівля з колонами"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "带圆柱的建筑"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol.name.camera.fill" : {
+      "comment" : "VoiceOver name of the suggested subject symbol 'camera.fill' in the symbol picker of the subject editor. A short noun naming what the icon shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fotoaparát"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kamera"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Camera"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Appareil photo"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fényképezőgép"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "カメラ"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Aparat fotograficzny"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Aparat foto"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fotoaparát"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Фотоапарат"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fotoaparat"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Фотоапарат"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "相机"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol.name.character.book.closed.fill" : {
+      "comment" : "VoiceOver name of the suggested subject symbol 'character.book.closed.fill' in the symbol picker of the subject editor. A short noun naming what the icon shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Jazyková kniha"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sprachbuch"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language book"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Livre de langue"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nyelvkönyv"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "語学の本"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Książka językowa"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Carte de limbă"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Jazyková kniha"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Језичка књига"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Jezička knjiga"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Мовна книга"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "语言书"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol.name.figure.run" : {
+      "comment" : "VoiceOver name of the suggested subject symbol 'figure.run' in the symbol picker of the subject editor. A short noun naming what the icon shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Běžící postava"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Laufende Figur"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Running figure"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Personne qui court"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Futó alak"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "走る人"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Biegnąca postać"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Figură care aleargă"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Bežiaca postava"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Фигура која трчи"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Figura koja trči"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Постать, що біжить"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "奔跑的人"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol.name.flag.fill" : {
+      "comment" : "VoiceOver name of the suggested subject symbol 'flag.fill' in the symbol picker of the subject editor. A short noun naming what the icon shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vlajka"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Flagge"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flag"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Drapeau"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zászló"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "旗"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Flaga"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Steag"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vlajka"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Застава"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zastava"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Прапор"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "旗帜"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol.name.function" : {
+      "comment" : "VoiceOver name of the suggested subject symbol 'function' in the symbol picker of the subject editor. A short noun naming what the icon shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Funkce"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Funktion"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Function"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fonction"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Függvény"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "関数"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Funkcja"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Funcție"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Funkcia"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Функција"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Funkcija"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Функція"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "函数"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol.name.globe.europe.africa.fill" : {
+      "comment" : "VoiceOver name of the suggested subject symbol 'globe.europe.africa.fill' in the symbol picker of the subject editor. A short noun naming what the icon shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Glóbus"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Globus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Globe"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Globe terrestre"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Földgömb"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "地球儀"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Globus"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Glob"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Glóbus"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Глобус"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Globus"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Глобус"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "地球仪"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol.name.hammer.fill" : {
+      "comment" : "VoiceOver name of the suggested subject symbol 'hammer.fill' in the symbol picker of the subject editor. A short noun naming what the icon shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kladivo"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hammer"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hammer"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Marteau"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kalapács"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ハンマー"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Młotek"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ciocan"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kladivo"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Чекић"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Čekić"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Молоток"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "锤子"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol.name.heart.fill" : {
+      "comment" : "VoiceOver name of the suggested subject symbol 'heart.fill' in the symbol picker of the subject editor. A short noun naming what the icon shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Srdce"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Herz"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heart"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Cœur"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Szív"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ハート"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Serce"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Inimă"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Srdce"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Срце"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Srce"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Серце"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "心形"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol.name.laptopcomputer" : {
+      "comment" : "VoiceOver name of the suggested subject symbol 'laptopcomputer' in the symbol picker of the subject editor. A short noun naming what the icon shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Notebook"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Laptop"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laptop"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ordinateur portable"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Laptop"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ノートパソコン"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Laptop"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Laptop"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Notebook"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Лаптоп"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Laptop"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ноутбук"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "笔记本电脑"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol.name.leaf.fill" : {
+      "comment" : "VoiceOver name of the suggested subject symbol 'leaf.fill' in the symbol picker of the subject editor. A short noun naming what the icon shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "List"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Blatt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leaf"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Feuille"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Levél"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "葉"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Liść"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Frunză"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "List"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Лист"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "List"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Листок"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "叶子"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol.name.music.note" : {
+      "comment" : "VoiceOver name of the suggested subject symbol 'music.note' in the symbol picker of the subject editor. A short noun naming what the icon shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nota"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Musiknote"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Music note"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Note de musique"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hangjegy"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "音符"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nuta"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Notă muzicală"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nota"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Нота"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nota"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Нота"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "音符"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol.name.paintpalette.fill" : {
+      "comment" : "VoiceOver name of the suggested subject symbol 'paintpalette.fill' in the symbol picker of the subject editor. A short noun naming what the icon shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Paleta barev"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Farbpalette"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paint palette"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Palette de peinture"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Festőpaletta"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "パレット"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Paleta farb"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Paletă de culori"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Paleta farieb"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Палета боја"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Paleta boja"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Палітра фарб"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "调色板"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol.name.pencil" : {
+      "comment" : "VoiceOver name of the suggested subject symbol 'pencil' in the symbol picker of the subject editor. A short noun naming what the icon shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tužka"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Bleistift"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pencil"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Crayon"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ceruza"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "鉛筆"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ołówek"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Creion"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ceruzka"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Оловка"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Olovka"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Олівець"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "铅笔"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol.name.star.fill" : {
+      "comment" : "VoiceOver name of the suggested subject symbol 'star.fill' in the symbol picker of the subject editor. A short noun naming what the icon shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hvězda"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Stern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Star"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Étoile"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Csillag"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "星"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Gwiazda"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Stea"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hviezda"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Звезда"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zvezda"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Зірка"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "星星"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol.name.testtube.2" : {
+      "comment" : "VoiceOver name of the suggested subject symbol 'testtube.2' in the symbol picker of the subject editor. A short noun naming what the icon shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zkumavky"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Reagenzgläser"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Test tubes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Éprouvettes"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kémcsövek"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "試験管"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Probówki"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Eprubete"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Skúmavky"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Епрувете"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Epruvete"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Пробірки"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "试管"
+          }
+        }
+      }
+    },
+    "editor.subject.symbol.name.theatermasks.fill" : {
+      "comment" : "VoiceOver name of the suggested subject symbol 'theatermasks.fill' in the symbol picker of the subject editor. A short noun naming what the icon shows.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Divadelní masky"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Theatermasken"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Theatre masks"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Masques de théâtre"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Színházi maszkok"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "演劇の仮面"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Maski teatralne"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Măști de teatru"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Divadelné masky"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Позоришне маске"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pozorišne maske"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Театральні маски"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "戏剧面具"
+          }
+        }
+      }
+    },
     "editor.subject.symbol.none" : {
       "comment" : "Symbol option: no symbol.",
       "extractionState" : "manual",
@@ -30524,7 +32708,7 @@
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Rendszerszimbólum"
+            "value" : "Szimbólum"
           }
         },
         "ja" : {
@@ -57247,6 +59431,90 @@
         }
       }
     },
+    "import.error.pdfLocked" : {
+      "comment" : "Import Timetable: alert message when the chosen PDF file is locked with a password.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Toto PDF je chráněné heslem. Odstraňte heslo, nebo pořiďte snímek obrazovky rozvrhu a vyberte ho."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dieses PDF ist passwortgeschützt. Entferne das Passwort oder mache ein Bildschirmfoto vom Stundenplan und wähle es aus."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This PDF is password-protected. Remove the password, or take a screenshot of the timetable and choose that."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ce PDF est protégé par un mot de passe. Supprimez le mot de passe, ou faites une capture d’écran de l’emploi du temps et choisissez-la."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ez a PDF jelszóval védett. Távolítsd el a jelszót, vagy készíts képernyőképet az órarendről, és azt válaszd."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このPDFはパスワードで保護されています。パスワードを解除するか、時間割のスクリーンショットを撮ってそれを選択してください。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ten plik PDF jest chroniony hasłem. Usuń hasło albo zrób zrzut ekranu planu lekcji i wybierz go."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Acest PDF este protejat cu parolă. Elimină parola sau fă o captură de ecran a orarului și alege-o pe aceea."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Toto PDF je chránené heslom. Odstráňte heslo alebo urobte snímku obrazovky rozvrhu a vyberte ju."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Овај PDF је заштићен лозинком. Уклоните лозинку или направите снимак екрана распореда и изаберите њега."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ovaj PDF je zaštićen lozinkom. Uklonite lozinku ili napravite snimak ekrana rasporeda i izaberite njega."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Цей PDF захищено паролем. Зніміть пароль або зробіть знімок екрана розкладу й виберіть його."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "此 PDF 受密码保护。请移除密码，或截取课程表的屏幕快照并选择它。"
+          }
+        }
+      }
+    },
     "import.error.title" : {
       "comment" : "Alert title for photo import problems.",
       "extractionState" : "manual",
@@ -58587,6 +60855,258 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "第 %lld 页"
+          }
+        }
+      }
+    },
+    "import.pdf.pages.failed.action" : {
+      "comment" : "Import Timetable, page picker for a PDF: button that goes back to the import choices to pick a different file.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vybrat jiný soubor"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Andere Datei auswählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose Another File"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Choisir un autre fichier"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Másik fájl kiválasztása"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "別のファイルを選択"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wybierz inny plik"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Alege alt fișier"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vybrať iný súbor"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Изабери други фајл"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Izaberi drugi fajl"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Вибрати інший файл"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "选择其他文件"
+          }
+        }
+      }
+    },
+    "import.pdf.pages.failed.message" : {
+      "comment" : "Import Timetable, page picker for a PDF: explanation under 'Can’t Show the Pages'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Toto PDF se nepodařilo otevřít. Může být poškozené nebo chráněné heslem."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dieses PDF konnte nicht geöffnet werden. Es ist eventuell beschädigt oder passwortgeschützt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This PDF couldn’t be opened. It may be damaged or password-protected."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ce PDF n’a pas pu être ouvert. Il est peut-être endommagé ou protégé par un mot de passe."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ezt a PDF-et nem sikerült megnyitni. Lehet, hogy sérült vagy jelszóval védett."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このPDFを開けませんでした。破損しているか、パスワードで保護されている可能性があります。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nie udało się otworzyć tego pliku PDF. Może być uszkodzony lub chroniony hasłem."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Acest PDF nu a putut fi deschis. Poate fi deteriorat sau protejat cu parolă."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Toto PDF sa nepodarilo otvoriť. Môže byť poškodené alebo chránené heslom."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Овај PDF није могао да се отвори. Можда је оштећен или заштићен лозинком."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ovaj PDF nije mogao da se otvori. Možda je oštećen ili zaštićen lozinkom."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Не вдалося відкрити цей PDF. Можливо, він пошкоджений або захищений паролем."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "无法打开此 PDF。它可能已损坏或受密码保护。"
+          }
+        }
+      }
+    },
+    "import.pdf.pages.failed.title" : {
+      "comment" : "Import Timetable, page picker for a PDF: title of the empty state when the PDF's pages cannot be read.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Stránky nelze zobrazit"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Seiten nicht darstellbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Can’t Show the Pages"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Impossible d’afficher les pages"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Az oldalak nem jeleníthetők meg"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ページを表示できません"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nie można pokazać stron"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Paginile nu pot fi afișate"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Strany sa nedajú zobraziť"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Странице не могу да се прикажу"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Stranice ne mogu da se prikažu"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Не вдається показати сторінки"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "无法显示页面"
           }
         }
       }
@@ -82447,6 +84967,174 @@
         }
       }
     },
+    "reminder.markDoneFailed.body" : {
+      "comment" : "Body of the notification shown when 'Mark as Done' on a reminder notification could not be saved. Tabula is the app name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Otevřete Tabulu a zkuste to znovu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Öffne Tabula und versuche es erneut."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Tabula to try again."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ouvrez Tabula pour réessayer."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nyisd meg a Tabulát, és próbáld újra."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabulaを開いて、もう一度お試しください。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Otwórz Tabulę i spróbuj ponownie."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Deschide Tabula și încearcă din nou."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Otvorte Tabulu a skúste to znova."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Отворите апликацију Tabula и покушајте поново."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Otvorite aplikaciju Tabula i pokušajte ponovo."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Відкрийте Tabula і спробуйте ще раз."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "请打开 Tabula 后重试。"
+          }
+        }
+      }
+    },
+    "reminder.markDoneFailed.title" : {
+      "comment" : "Title of a notification shown right after the user pressed 'Mark as Done' on a reminder notification but the app could not save it (e.g. the data is read-only). The subtitle is the original reminder's title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nepodařilo se označit jako hotové"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Konnte nicht als erledigt markiert werden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't Mark as Done"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Impossible de marquer comme terminé"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nem sikerült késznek jelölni"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "完了にできませんでした"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nie udało się oznaczyć jako wykonane"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nu s-a putut marca ca terminat"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nepodarilo sa označiť ako hotové"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Није успело означавање као готово"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nije uspelo označavanje kao gotovo"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Не вдалося позначити як виконане"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "无法标记为已完成"
+          }
+        }
+      }
+    },
     "reminder.notice.alarmLimit" : {
       "comment" : "In-app notice when too many loud alarms are set; plural on the count. Args: 1 count.",
       "extractionState" : "manual",
@@ -98114,85 +100802,85 @@
       }
     },
     "settings.about.privacy.body" : {
-      "comment" : "Short privacy summary.",
+      "comment" : "Short privacy summary. Must stay accurate: share codes store a copy of the timetable on the share server for 30 days (worker TTL_SECONDS).",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Vaše rozvrhy zůstávají ve vašem zařízení. Tabula nemá účty a neshromažďuje žádná analytická data ani data o používání."
+            "value" : "Vaše rozvrhy zůstávají ve vašem zařízení a, pokud zapnete synchronizaci iCloud, ve vašem vlastním iCloudu. Když sdílíte rozvrh pomocí kódu, uchovává se jeho kopie 30 dní na sdílecím serveru Tabuly a poté se odstraní. Tabula nemá účty, sledování, analytiku ani reklamy."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Deine Stundenpläne bleiben auf deinem Gerät. Tabula hat keine Konten und erfasst keine Analyse- oder Nutzungsdaten."
+            "value" : "Deine Stundenpläne bleiben auf deinem Gerät und, wenn du die iCloud-Synchronisierung einschaltest, in deiner eigenen iCloud. Wenn du einen Stundenplan mit einem Code teilst, wird 30 Tage lang eine Kopie auf dem Tabula-Server für geteilte Stundenpläne gespeichert und danach entfernt. Tabula hat keine Konten, kein Tracking, keine Analyse und keine Werbung."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your timetables stay on your device. Tabula has no accounts and collects no analytics or usage data."
+            "value" : "Your timetables stay on your device and, if you turn on iCloud sync, in your own iCloud. When you share a timetable with a code, a copy is kept on Tabula's share server for 30 days and then removed. Tabula has no accounts, no tracking, no analytics and no ads."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Vos emplois du temps restent sur votre appareil. Tabula n’a pas de comptes et ne collecte aucune donnée d’analyse ni d’utilisation."
+            "value" : "Vos emplois du temps restent sur votre appareil et, si vous activez la synchronisation iCloud, dans votre propre iCloud. Lorsque vous partagez un emploi du temps avec un code, une copie est conservée pendant 30 jours sur le serveur de partage de Tabula, puis supprimée. Tabula n’a ni comptes, ni suivi, ni analyse, ni publicité."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Az órarendjeid az eszközödön maradnak. A Tabulának nincsenek fiókjai, és nem gyűjt elemzési vagy használati adatokat."
+            "value" : "Az órarendjeid az eszközödön maradnak, és ha bekapcsolod az iCloud-szinkronizálást, a saját iCloudodban. Ha egy órarendet kóddal osztasz meg, annak egy másolatát 30 napig a Tabula megosztási szerverén tároljuk, majd töröljük. A Tabulának nincsenek fiókjai, nem követ, nem végez elemzést, és nincsenek benne reklámok."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "時間割はあなたのデバイスに保存されます。Tabulaにはアカウントがなく、分析データや利用状況データを収集することもありません。"
+            "value" : "時間割はあなたのデバイスに保存され、iCloud同期をオンにした場合はあなた自身のiCloudにも保存されます。コードで時間割を共有すると、そのコピーがTabulaの共有サーバーに30日間保管され、その後削除されます。Tabulaにはアカウントがなく、トラッキング、分析、広告もありません。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Twoje plany pozostają na Twoim urządzeniu. Tabula nie ma kont i nie zbiera danych analitycznych ani danych o użyciu."
+            "value" : "Twoje plany pozostają na Twoim urządzeniu, a jeśli włączysz synchronizację iCloud, także w Twoim własnym iCloud. Gdy udostępnisz plan za pomocą kodu, jego kopia jest przechowywana na serwerze udostępniania Tabuli przez 30 dni, a potem usuwana. Tabula nie ma kont, śledzenia, analityki ani reklam."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Orarele tale rămân pe dispozitivul tău. Tabula nu are conturi și nu colectează date analitice sau de utilizare."
+            "value" : "Orarele tale rămân pe dispozitivul tău și, dacă activezi sincronizarea iCloud, în propriul tău iCloud. Când partajezi un orar cu un cod, o copie este păstrată 30 de zile pe serverul de partajare Tabula, apoi este eliminată. Tabula nu are conturi, urmărire, analiză sau reclame."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Vaše rozvrhy zostávajú vo vašom zariadení. Tabula nemá účty a nezbiera žiadne analytické ani údaje o používaní."
+            "value" : "Vaše rozvrhy zostávajú vo vašom zariadení a, ak zapnete synchronizáciu iCloud, vo vašom vlastnom iCloude. Keď zdieľate rozvrh pomocou kódu, kópia sa 30 dní uchováva na zdieľacom serveri Tabuly a potom sa odstráni. Tabula nemá účty, sledovanie, analytiku ani reklamy."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ваши распореди остају на вашем уређају. Tabula нема налоге и не прикупља аналитичке податке нити податке о коришћењу."
+            "value" : "Ваши распореди остају на вашем уређају и, ако укључите iCloud синхронизацију, у вашем сопственом iCloud-у. Када делите распоред помоћу кода, копија се 30 дана чува на Tabula серверу за дељење, а затим се уклања. Tabula нема налоге, праћење, аналитику ни рекламе."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Vaši rasporedi ostaju na vašem uređaju. Tabula nema naloge i ne prikuplja analitičke podatke niti podatke o korišćenju."
+            "value" : "Vaši rasporedi ostaju na vašem uređaju i, ako uključite iCloud sinhronizaciju, u vašem sopstvenom iCloud-u. Kada delite raspored pomoću koda, kopija se 30 dana čuva na Tabula serveru za deljenje, a zatim se uklanja. Tabula nema naloge, praćenje, analitiku ni reklame."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ваші розклади залишаються на вашому пристрої. Tabula не має облікових записів і не збирає аналітичних даних чи даних про використання."
+            "value" : "Ваші розклади залишаються на вашому пристрої, а якщо ви ввімкнете синхронізацію iCloud, то й у вашому власному iCloud. Коли ви ділитеся розкладом за допомогою коду, його копія зберігається на сервері обміну Tabula 30 днів, а потім видаляється. Tabula не має облікових записів, відстеження, аналітики та реклами."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "你的课程表保存在你的设备上。Tabula 没有账户，也不收集任何分析或使用数据。"
+            "value" : "你的课表保存在你的设备上；如果开启 iCloud 同步，也会保存在你自己的 iCloud 中。当你用代码分享课表时，副本会在 Tabula 的分享服务器上保留 30 天，然后被移除。Tabula 没有账户，没有跟踪、分析或广告。"
           }
         }
       }
@@ -98786,85 +101474,85 @@
       }
     },
     "settings.backup.automatic.footer" : {
-      "comment" : "Footer of the Automatic copies section. 'Restore from Backup…' is the button name (settings.backup.restore).",
+      "comment" : "Footer of the Automatic copies section. 'Restore from Backup…' is the button name (settings.backup.restore). 'Each kind' = copies made before a restore, an import, a data move, etc.; 5 and 30 are fixed numbers (BackupFolder.keepPerLabel / minimumAge).",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula sem uloží kopii vašich dat dřív, než je obnova nahradí. Klepnutím kopii sdílíte nebo uložíte do Souborů; chcete-li se k ní vrátit, použijte Obnovit ze zálohy…."
+            "value" : "Tabula sem uloží kopii vašich dat dřív, než je obnova nahradí. Ponechá vždy alespoň 5 nejnovějších kopií každého druhu a starší po 30 dnech smaže. Klepnutím kopii sdílíte nebo uložíte do Souborů; chcete-li se k ní vrátit, použijte Obnovit ze zálohy…."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula sichert hier eine Kopie deiner Daten, bevor eine Wiederherstellung sie ersetzt. Tippe auf eine Kopie, um sie zu teilen oder in „Dateien“ zu sichern; um zu ihr zurückzukehren, nutze „Aus Backup wiederherstellen …“."
+            "value" : "Tabula sichert hier eine Kopie deiner Daten, bevor eine Wiederherstellung sie ersetzt. Von jeder Art bleiben mindestens die 5 neuesten Kopien erhalten; ältere werden nach 30 Tagen gelöscht. Tippe auf eine Kopie, um sie zu teilen oder in „Dateien“ zu sichern; um zu ihr zurückzukehren, nutze „Aus Backup wiederherstellen …“."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tabula saves a copy of your data here before a restore replaces it. Tap a copy to share it or save it to Files; to go back to it, use Restore from Backup…."
+            "value" : "Tabula saves a copy of your data here before a restore replaces it. It keeps at least the 5 newest copies of each kind and deletes older ones after 30 days. Tap a copy to share it or save it to Files; to go back to it, use Restore from Backup…."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula enregistre ici une copie de vos données avant qu’une restauration ne les remplace. Touchez une copie pour la partager ou l’enregistrer dans Fichiers ; pour y revenir, utilisez Restaurer une sauvegarde…."
+            "value" : "Tabula enregistre ici une copie de vos données avant qu’une restauration ne les remplace. Tabula conserve au moins les 5 copies les plus récentes de chaque type et supprime les plus anciennes après 30 jours. Touchez une copie pour la partager ou l’enregistrer dans Fichiers ; pour y revenir, utilisez Restaurer une sauvegarde…."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "A Tabula ide ment egy másolatot az adataidról, mielőtt egy visszaállítás lecserélné őket. Koppints egy másolatra a megosztáshoz vagy a Fájlokba mentéshez; ha vissza szeretnél térni hozzá, használd a Visszaállítás mentésből… gombot."
+            "value" : "A Tabula ide ment egy másolatot az adataidról, mielőtt egy visszaállítás lecserélné őket. Minden fajtából legalább az 5 legújabb másolatot megtartja, a régebbieket 30 nap után törli. Koppints egy másolatra a megosztáshoz vagy a Fájlokba mentéshez; ha vissza szeretnél térni hozzá, használd a Visszaállítás mentésből… gombot."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "復元でデータが置き換えられる前に、Tabulaはここにデータのコピーを保存します。コピーをタップすると共有したり“ファイル”に保存したりできます。元に戻すには「バックアップから復元…」を使ってください。"
+            "value" : "復元でデータが置き換えられる前に、Tabulaはここにデータのコピーを保存します。種類ごとに少なくとも最新の5件のコピーを残し、それより古いものは30日後に削除します。コピーをタップすると共有したり“ファイル”に保存したりできます。元に戻すには「バックアップから復元…」を使ってください。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula zapisuje tu kopię Twoich danych, zanim przywracanie je zastąpi. Stuknij kopię, aby ją udostępnić lub zapisać w Plikach; aby do niej wrócić, użyj opcji Przywróć z kopii zapasowej…."
+            "value" : "Tabula zapisuje tu kopię Twoich danych, zanim przywracanie je zastąpi. Tabula zachowuje co najmniej 5 najnowszych kopii każdego rodzaju, a starsze usuwa po 30 dniach. Stuknij kopię, aby ją udostępnić lub zapisać w Plikach; aby do niej wrócić, użyj opcji Przywróć z kopii zapasowej…."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula salvează aici o copie a datelor tale înainte ca o restaurare să le înlocuiască. Atinge o copie pentru a o partaja sau a o salva în Fișiere; pentru a reveni la ea, folosește Restaurează din backup…."
+            "value" : "Tabula salvează aici o copie a datelor tale înainte ca o restaurare să le înlocuiască. Tabula păstrează cel puțin cele mai noi 5 copii de fiecare tip și le șterge pe cele mai vechi după 30 de zile. Atinge o copie pentru a o partaja sau a o salva în Fișiere; pentru a reveni la ea, folosește Restaurează din backup…."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula sem uloží kópiu vašich údajov predtým, ako ich obnova nahradí. Klepnutím kópiu zdieľate alebo uložíte do Súborov; ak sa k nej chcete vrátiť, použite Obnoviť zo zálohy…."
+            "value" : "Tabula sem uloží kópiu vašich údajov predtým, ako ich obnova nahradí. Ponechá vždy aspoň 5 najnovších kópií každého druhu a staršie po 30 dňoch vymaže. Klepnutím kópiu zdieľate alebo uložíte do Súborov; ak sa k nej chcete vrátiť, použite Obnoviť zo zálohy…."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula овде чува копију ваших података пре него што их враћање замени. Додирните копију да бисте је поделили или сачували у Датотекама; да бисте јој се вратили, користите Врати из резервне копије…."
+            "value" : "Tabula овде чува копију ваших података пре него што их враћање замени. Tabula чува најмање 5 најновијих копија сваке врсте, а старије брише после 30 дана. Додирните копију да бисте је поделили или сачували у Датотекама; да бисте јој се вратили, користите Врати из резервне копије…."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula ovde čuva kopiju vaših podataka pre nego što ih vraćanje zameni. Dodirnite kopiju da biste je podelili ili sačuvali u Datotekama; da biste joj se vratili, koristite Vrati iz rezervne kopije…."
+            "value" : "Tabula ovde čuva kopiju vaših podataka pre nego što ih vraćanje zameni. Tabula čuva najmanje 5 najnovijih kopija svake vrste, a starije briše posle 30 dana. Dodirnite kopiju da biste je podelili ili sačuvali u Datotekama; da biste joj se vratili, koristite Vrati iz rezervne kopije…."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula зберігає тут копію ваших даних, перш ніж відновлення їх замінить. Торкніться копії, щоб поділитися нею або зберегти її у Файлах; щоб повернутися до неї, скористайтеся «Відновити з резервної копії…»."
+            "value" : "Tabula зберігає тут копію ваших даних, перш ніж відновлення їх замінить. Tabula зберігає щонайменше 5 найновіших копій кожного виду, а старіші видаляє через 30 днів. Торкніться копії, щоб поділитися нею або зберегти її у Файлах; щоб повернутися до неї, скористайтеся «Відновити з резервної копії…»."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "在恢复替换你的数据之前，Tabula 会在此保存一份数据副本。轻点副本可共享或存储到“文件”；如需恢复到该副本，请使用“从备份恢复…”。"
+            "value" : "在恢复替换你的数据之前，Tabula 会在此保存一份数据副本。每种副本至少保留最新的 5 份，较旧的副本会在 30 天后删除。轻点副本可共享或存储到“文件”；如需恢复到该副本，请使用“从备份恢复…”。"
           }
         }
       }
@@ -99877,86 +102565,170 @@
         }
       }
     },
-    "settings.backup.export.failed" : {
-      "comment" : "Footer (Settings › Backup) when writing the export file failed.",
+    "settings.backup.export.failedRetry" : {
+      "comment" : "Footer (Settings › Backup) when writing the export file failed. 'Try Again' is the button name (settings.backup.export.retry).",
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Soubor zálohy se nepodařilo připravit. Vraťte se zpět a otevřete tuto stránku znovu."
+            "value" : "Soubor zálohy se nepodařilo připravit. Klepněte na Zkusit znovu."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Die Backup-Datei konnte nicht vorbereitet werden. Geh zurück und öffne diese Seite erneut."
+            "value" : "Die Backup-Datei konnte nicht vorbereitet werden. Tippe auf „Erneut versuchen“."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The backup file couldn't be prepared. Go back and open this page again."
+            "value" : "The backup file couldn't be prepared. Tap Try Again."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Le fichier de sauvegarde n’a pas pu être préparé. Revenez en arrière et rouvrez cette page."
+            "value" : "Le fichier de sauvegarde n’a pas pu être préparé. Touchez Réessayer."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "A mentésfájlt nem sikerült előkészíteni. Lépj vissza, és nyisd meg újra ezt az oldalt."
+            "value" : "A mentésfájlt nem sikerült előkészíteni. Koppints az Újra gombra."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "バックアップファイルを準備できませんでした。前の画面に戻ってから、このページをもう一度開いてください。"
+            "value" : "バックアップファイルを準備できませんでした。「再試行」をタップしてください。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Nie udało się przygotować pliku kopii zapasowej. Wróć i otwórz tę stronę ponownie."
+            "value" : "Nie udało się przygotować pliku kopii zapasowej. Stuknij Spróbuj ponownie."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Fișierul de backup nu a putut fi pregătit. Revino și deschide din nou această pagină."
+            "value" : "Fișierul de backup nu a putut fi pregătit. Atinge Încearcă din nou."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Súbor zálohy sa nepodarilo pripraviť. Vráťte sa späť a otvorte túto stránku znova."
+            "value" : "Súbor zálohy sa nepodarilo pripraviť. Ťuknite na Skúsiť znova."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Датотека резервне копије није могла да се припреми. Вратите се назад и поново отворите ову страницу."
+            "value" : "Датотека резервне копије није могла да се припреми. Додирните Покушај поново."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Datoteka rezervne kopije nije mogla da se pripremi. Vratite se nazad i ponovo otvorite ovu stranicu."
+            "value" : "Datoteka rezervne kopije nije mogla da se pripremi. Dodirnite Pokušaj ponovo."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Не вдалося підготувати файл резервної копії. Поверніться назад і знову відкрийте цю сторінку."
+            "value" : "Не вдалося підготувати файл резервної копії. Торкніться «Спробувати ще раз»."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "无法准备备份文件。请返回并重新打开此页面。"
+            "value" : "无法准备备份文件。请轻点“重试”。"
+          }
+        }
+      }
+    },
+    "settings.backup.export.retry" : {
+      "comment" : "Button (Settings › Backup) under Export Backup, shown when the backup file could not be prepared: prepares it again.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zkusit znovu"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Erneut versuchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try Again"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Réessayer"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Újra"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "再試行"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Spróbuj ponownie"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Încearcă din nou"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Skúsiť znova"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Покушај поново"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pokušaj ponovo"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Спробувати ще раз"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "重试"
           }
         }
       }
@@ -100377,6 +103149,174 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "恢复备份"
+          }
+        }
+      }
+    },
+    "settings.backup.notSaved.message" : {
+      "comment" : "Alert message after a restore whose data could not be written to storage (e.g. device full). Same advice as store.banner.saveFailed.message.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Záloha byla použita, ale Tabula ji nemohla uložit do tohoto iPhonu. Data se zachovají, dokud je Tabula otevřená, a ukládání se zopakuje při další změně. Zkontrolujte, zda má váš iPhone volné úložiště."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Das Backup wurde übernommen, aber Tabula konnte es nicht auf diesem iPhone sichern. Die Daten bleiben erhalten, solange Tabula geöffnet ist, und das Sichern wird bei deiner nächsten Änderung erneut versucht. Prüfe, ob dein iPhone freien Speicherplatz hat."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The backup was applied, but Tabula couldn't save it on this iPhone. It's kept while Tabula is open, and saving is retried with your next change. Check that your iPhone has free storage."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "La sauvegarde a été appliquée, mais Tabula n’a pas pu l’enregistrer sur cet iPhone. Les données sont conservées tant que Tabula est ouverte et l’enregistrement sera retenté à votre prochaine modification. Vérifiez que votre iPhone dispose d’espace de stockage libre."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A mentés alkalmazva lett, de a Tabula nem tudta elmenteni erre az iPhone-ra. Az adatok megmaradnak, amíg a Tabula nyitva van, és a mentést a következő módosításnál újra megpróbáljuk. Ellenőrizd, hogy van-e szabad hely az iPhone-odon."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "バックアップは適用されましたが、TabulaはこのiPhoneに保存できませんでした。Tabulaを開いている間はデータが保持され、次の変更時に保存が再試行されます。iPhoneの空き容量を確認してください。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kopia zapasowa została zastosowana, ale Tabula nie mogła jej zapisać na tym iPhonie. Dane są zachowane, dopóki Tabula jest otwarta, a zapis zostanie ponowiony przy kolejnej zmianie. Sprawdź, czy iPhone ma wolne miejsce."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Backupul a fost aplicat, dar Tabula nu l-a putut salva pe acest iPhone. Datele sunt păstrate cât timp Tabula e deschisă, iar salvarea se reîncearcă la următoarea modificare. Verifică dacă iPhone-ul are spațiu liber."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Záloha sa použila, ale Tabula ju nemohla uložiť do tohto iPhonu. Údaje sa zachovajú, kým je Tabula otvorená, a ukladanie sa zopakuje pri ďalšej zmene. Skontrolujte, či má váš iPhone voľné úložisko."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Резервна копија је примењена, али Tabula није могла да је сачува на овом iPhone-у. Подаци се чувају док је Tabula отворена, а чување ће бити поновљено при следећој измени. Проверите да ли iPhone има слободног простора."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Rezervna kopija je primenjena, ali Tabula nije mogla da je sačuva na ovom iPhone-u. Podaci se čuvaju dok je Tabula otvorena, a čuvanje će biti ponovljeno pri sledećoj izmeni. Proverite da li iPhone ima slobodnog prostora."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Резервну копію застосовано, але Tabula не змогла зберегти її на цьому iPhone. Дані зберігаються, доки Tabula відкрита, а збереження буде повторено після наступної зміни. Перевірте, чи є на iPhone вільне місце."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "备份已应用，但 Tabula 无法将其保存到这台 iPhone。只要 Tabula 保持打开，数据就会保留，并在下次更改时重试保存。请检查 iPhone 是否有可用存储空间。"
+          }
+        }
+      }
+    },
+    "settings.backup.notSaved.title" : {
+      "comment" : "Alert title after a restore: the backup was applied, but writing the data to storage failed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Obnovená data nebyla uložena"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wiederhergestellte Daten nicht gesichert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restored Data Not Saved"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Données restaurées non enregistrées"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A visszaállított adatok nincsenek mentve"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "復元したデータを保存できませんでした"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Przywrócone dane nie zostały zapisane"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Datele restaurate nu au fost salvate"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Obnovené údaje sa neuložili"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Враћени подаци нису сачувани"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vraćeni podaci nisu sačuvani"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Відновлені дані не збережено"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "恢复的数据未保存"
           }
         }
       }
@@ -119739,6 +122679,90 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "课程表“%@”的二维码"
+          }
+        }
+      }
+    },
+    "share.sheet.qr.failed" : {
+      "comment" : "Share Timetable sheet: shown in place of the QR code when it could not be drawn. The 'Share Link' button below still works.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "QR kód se nepodařilo vytvořit. Sdílejte raději odkaz."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Der QR-Code konnte nicht erstellt werden. Teile stattdessen den Link."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The QR code couldn’t be created. Share the link instead."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Le code QR n’a pas pu être créé. Partagez plutôt le lien."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A QR-kódot nem sikerült létrehozni. Oszd meg inkább a linket."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "QRコードを作成できませんでした。代わりにリンクを共有してください。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nie udało się utworzyć kodu QR. Udostępnij zamiast tego link."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Codul QR nu a putut fi creat. Partajează linkul în schimb."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "QR kód sa nepodarilo vytvoriť. Zdieľajte radšej odkaz."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "QR код није могао да се направи. Поделите линк уместо тога."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "QR kod nije mogao da se napravi. Podelite link umesto toga."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Не вдалося створити QR-код. Поділіться натомість посиланням."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "无法生成二维码。请改为共享链接。"
           }
         }
       }
@@ -140403,6 +143427,90 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "还没有课程表"
+          }
+        }
+      }
+    },
+    "timetable.empty.noTimetable.message" : {
+      "comment" : "Description under the 'No timetable yet' title of the Timetable tab; the 'Add Timetable' button is below it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Přidejte rozvrh a váš týden se zobrazí tady."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Füge einen Stundenplan hinzu, um hier deine Woche zu sehen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a timetable to see your week here."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ajoutez un emploi du temps pour voir votre semaine ici."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Adj hozzá egy órarendet, hogy itt láthasd a heted."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "時間割を追加すると、ここに1週間の予定が表示されます。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dodaj plan lekcji, aby zobaczyć tutaj swój tydzień."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Adaugă un orar pentru a-ți vedea aici săptămâna."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pridajte rozvrh a váš týždeň sa zobrazí tu."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Додајте распоред да бисте овде видели своју недељу."
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dodajte raspored da biste ovde videli svoju nedelju."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Додайте розклад, щоб бачити тут свій тиждень."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "添加课表后，你的一周安排会显示在这里。"
           }
         }
       }

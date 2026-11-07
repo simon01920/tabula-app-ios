@@ -5,6 +5,8 @@
 //       (CIFilterBuiltins: `message` Data, `correctionLevel` "L"/"M"/"Q"/"H"; iPhoneOS27.0.sdk CIFilterBuiltins.h
 //       `@protocol CIQRCodeGenerator`), CIContext.createCGImage(_:from:). The generator emits one pixel per module; the
 //       view scales it with `.interpolation(.none)`, so the code stays crisp at any size.
+// Phase 10 WP3 (P8/U12): one `CIContext` for the process (creating one per call was the cost; `CIContext` conforms to
+//   `Sendable`, Apple documentation JSON 2026-11-05) and rendering off the main actor (`@concurrent`), once per text.
 import CoreImage
 import CoreImage.CIFilterBuiltins
 import Foundation
@@ -58,16 +60,16 @@ enum ShareServiceClient {
 }
 
 enum QRCodeRenderer {
+    private static let context = CIContext(options: [.useSoftwareRenderer: false])
+
     /// A QR code of `text` (one pixel per module), or `nil` when it does not fit one code.
-    static func image(for text: String) -> UIImage? {
+    @concurrent
+    static func image(for text: String) async -> CGImage? {
         let filter = CIFilter.qrCodeGenerator()
         filter.message = Data(text.utf8)
         // M (15 % recovery) whenever it fits (2331 bytes at version 40), else L (2953 bytes, SharePlan.qrByteCapacity).
         filter.correctionLevel = text.utf8.count <= 2331 ? "M" : "L"
-        guard let output = filter.outputImage,
-              let cgImage = CIContext(options: [.useSoftwareRenderer: false]).createCGImage(output, from: output.extent) else {
-            return nil
-        }
-        return UIImage(cgImage: cgImage)
+        guard let output = filter.outputImage else { return nil }
+        return context.createCGImage(output, from: output.extent)
     }
 }

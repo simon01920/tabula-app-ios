@@ -9,7 +9,11 @@ import TimetableUI
 struct AppRootView: View {
     let launchRoute: LaunchRoute
     @Environment(AppModel.self) private var model
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    /// The launch mark's hold (its swipe) has passed.
     @State private var launchHeld = false
+    /// The launch mark was actually on screen (a store loaded before the first frame never shows it; P6).
+    @State private var launchAppeared = false
 
     var body: some View {
         content
@@ -30,12 +34,17 @@ struct AppRootView: View {
                 if let banner = model.banners.first {
                     StoreBannerView(banner: banner) { model.dismissBanner() }
                 }
-                if case .main = model.phase, launchHeld { SampleDataBanner() }   // "This is sample data · Remove" (U6)
+                if case .main = model.phase, !showsLaunch { SampleDataBanner() }   // "This is sample data · Remove" (U6)
                 phaseView
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .animation(.easeOut(duration: 0.2), value: showsLaunch)   // cross-fade out of LaunchView
+                    // Cross-fade out of LaunchView; a cut with Reduce Motion (P6).
+                    .animation(launchFade, value: showsLaunch)
             }
         }
+    }
+
+    private var launchFade: Animation? {
+        LaunchHold.fadeDuration(reduceMotion: reduceMotion).map { Animation.easeOut(duration: $0) }
     }
 
     private var isLoading: Bool {
@@ -43,14 +52,18 @@ struct AppRootView: View {
         return false
     }
 
-    /// QA: a fast load would show the mark for one frame and fade it (a flash), so it stays for its one highlighter
-    /// swipe (0.3 s from launch, never longer) or until loading ends, whichever is later.
-    private var showsLaunch: Bool { isLoading || !launchHeld }
+    /// QA: a fast load would show the mark for one frame and fade it (a flash), so once it appeared it stays for its one
+    /// highlighter swipe (0.3 s, none with Reduce Motion) or until loading ends, whichever is later. A store already
+    /// loaded at the first frame shows the app directly (Phase 10 P6).
+    private var showsLaunch: Bool {
+        LaunchHold.showsLaunch(isLoading: isLoading, markAppeared: launchAppeared, holdFinished: launchHeld)
+    }
 
     @ViewBuilder
     private var phaseView: some View {
         if showsLaunch {
             LaunchView(onSwipeFinished: { launchHeld = true })
+                .onAppear { launchAppeared = true }
                 .transition(.opacity)
         } else {
             phaseContent

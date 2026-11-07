@@ -11,10 +11,16 @@
 //              alert asks Merge / Keep This iPhone / Use iCloud; otherwise it merges.
 //   fetch      records → `CloudRecordBatch` → `model.apply(.mergeRemote, origin: .sync)` (reminders, widgets, Live
 //              Activities follow through `onChange`) → store flushed → ledger notes the server version.
+//              Back-to-back fetched batches are buffered and merged + saved once (Phase 10 C10, `fetched`); the
+//              buffer is applied before any other event and before a send batch is built.
 //   send       after every change the ledger diff (payload hash ≠ server hash) adds `.saveRecord` pending changes; the
-//              batch is built from the current database. serverRecordChanged → merge the server copy, which makes the
-//              record pending again with the new change tag; zoneNotFound / unknownItem → re-create and re-send.
-//   state      `.stateUpdate` is written only after the store is flushed (data before acknowledgement).
+//              scan is incremental (C1, `CloudRecordIndex`: only changed entities are encoded and hashed), and the
+//              batch encodes only the records the engine takes (`CloudRecordSource`), from the current database.
+//              serverRecordChanged → merge the server copy, which makes the record pending again with the new change
+//              tag; zoneNotFound / unknownItem → re-create and re-send.
+//   state      `.stateUpdate` is written only after the store is flushed (data before acknowledgement). A failed save
+//              holds the state until the next successful save (B16, `flushStore`); a failed merge or skipped newer-
+//              version records hold it for the session.
 //   account    sign-out / switch / sign-in: local data stays (never dropped silently), the ledger is reset, so the
 //              next fetch is a first sync again.
 //   purged     zone deleted (Settings › iCloud › Manage, encrypted data reset): Apple says not to re-send; local data
@@ -50,13 +56,34 @@ final class CloudSyncController: CKSyncEngineDelegate {
     @ObservationIgnored private var unmergeable: Set<String> = []
     @ObservationIgnored private var heldState: CKSyncEngine.State.Serialization?
     @ObservationIgnored private var fetchFailed = false
-    /// A merge could not be saved, or newer-version records were skipped: stop saving the engine state, so the next
-    /// launch fetches again from the last saved state (after an app update the skipped records then apply).
-    @ObservationIgnored private var stateBlocked = false
+    /// Newer-version records were skipped, or fetched records could not be merged into the model: the engine state is
+    /// not saved again this session, so the next launch fetches from the last saved state (after an app update the
+    /// skipped records then apply). Never cleared by a later save: the skipped data is not in memory.
+    @ObservationIgnored private var stateHeldBack = false
+    /// The last store flush failed: the merged data is only in memory, so the engine state waits (B16). Cleared by the
+    /// next successful flush, which then writes `stateAwaitingSave`.
+    @ObservationIgnored private var saveFailed = false
+    /// The newest engine state not written yet (its save is running, or failed), numbered in arrival order.
+    @ObservationIgnored private var stateAwaitingSave: (state: CKSyncEngine.State.Serialization, serial: Int)?
+    @ObservationIgnored private var stateSerial = 0
+    /// Serial of the state last written: an older one that finishes its save later is not written over it.
+    @ObservationIgnored private var writtenStateSerial = 0
     @ObservationIgnored private var operationProblem: CloudSyncStatus?
     @ObservationIgnored private var oversized = false
     @ObservationIgnored private var newerDataSeen = false
     @ObservationIgnored private var scanTask: Task<Void, Never>?
+    /// Records + hashes of the previous scan (C1): a scan re-encodes only entities that changed since.
+    @ObservationIgnored private var recordIndex = CloudRecordIndex()
+    /// Fetched records not merged yet (C10): back-to-back `fetchedRecordZoneChanges` events are merged and saved once.
+    /// Applied before any other event is handled and before a send batch is built, so the engine state is never saved
+    /// past records that are only in this buffer.
+    @ObservationIgnored private var fetchBuffer: [CKRecord] = []
+    @ObservationIgnored private var fetchBufferNames: Set<String> = []
+
+    /// Upper bound of `fetchBuffer` (memory; CKSyncEngine batches hold a few hundred records).
+    private static let fetchBufferLimit = 2_000
+
+    private var stateBlocked: Bool { stateHeldBack || saveFailed }
 
     nonisolated private static let zoneID = CKRecordZone.ID(zoneName: CloudSyncSchema.zoneName)
 
@@ -93,6 +120,8 @@ final class CloudSyncController: CKSyncEngineDelegate {
         if syncAllowed {
             if engine == nil { start() }
             scheduleScan()
+            // B16: after a failed save, every change retries it; once it succeeds the waiting engine state is written.
+            if saveFailed { Task { _ = await flushStore() } }
         } else if engine != nil || status != .off {
             stop()
         }
@@ -116,6 +145,12 @@ final class CloudSyncController: CKSyncEngineDelegate {
         let old = engine
         engine = nil
         scanTask?.cancel()
+        // Unmerged fetches and an unwritten state are dropped with the engine: the state on disk is older than both,
+        // so the next start fetches them again.
+        fetchBuffer = []
+        fetchBufferNames = []
+        stateAwaitingSave = nil
+        recordIndex = CloudRecordIndex()   // memory: rebuilt by the first scan after a restart
         Task { await old?.cancelOperations() }
         if status != .iCloudDataDeleted { status = .off }
     }
@@ -158,6 +193,14 @@ final class CloudSyncController: CKSyncEngineDelegate {
 
     func handleEvent(_ event: CKSyncEngine.Event, syncEngine: CKSyncEngine) async {
         guard syncEngine === engine else { return }
+        if case .fetchedRecordZoneChanges(let changes) = event {
+            await fetched(changes.modifications.map(\.record), deletions: changes.deletions.map(\.recordID))
+            return
+        }
+        // C10: every other event (state update, end of the fetch, send, account or zone change) first sees the buffered
+        // fetches merged and saved, in the order they arrived.
+        await applyFetchBuffer()
+        guard syncEngine === engine else { return }
         switch event {
         case .stateUpdate(let update):
             if ledger.initialSyncDone { await persist(update.stateSerialization) } else { heldState = update.stateSerialization }
@@ -165,13 +208,8 @@ final class CloudSyncController: CKSyncEngineDelegate {
             accountChanged(change.changeType)
         case .fetchedDatabaseChanges(let changes):
             if changes.deletions.contains(where: { $0.zoneID == Self.zoneID }) { zoneDeleted() }
-        case .fetchedRecordZoneChanges(let changes):
-            await received(changes.modifications.map(\.record))
-            // A CKRecord deletion is not a Tabula delete (tombstones are records): forget it, so ours is sent again.
-            for deletion in changes.deletions where deletion.recordID.zoneID == Self.zoneID {
-                ledger.serverHashes[deletion.recordID.recordName] = nil
-                ledger.systemFields[deletion.recordID.recordName] = nil
-            }
+        case .fetchedRecordZoneChanges:
+            break   // handled above
         case .sentRecordZoneChanges(let sent):
             await handleSent(sent)
         case .sentDatabaseChanges(let sent):
@@ -195,14 +233,18 @@ final class CloudSyncController: CKSyncEngineDelegate {
 
     func nextRecordZoneChangeBatch(_ context: CKSyncEngine.SendChangesContext,
                                    syncEngine: CKSyncEngine) async -> CKSyncEngine.RecordZoneChangeBatch? {
-        guard syncEngine === engine, ledger.initialSyncDone, let database = model.database else { return nil }
+        guard syncEngine === engine, ledger.initialSyncDone else { return nil }
+        // C10: fetched records merge first, so a batch never carries a change tag older than what was fetched.
+        await applyFetchBuffer()
+        guard syncEngine === engine, let database = model.database else { return nil }
         let pending = syncEngine.state.pendingRecordZoneChanges.filter { context.options.scope.contains($0) }
         guard !pending.isEmpty else { return nil }
-        let records = (try? database.cloudRecords()) ?? []
-        let byName = Dictionary(records.map { ($0.name, $0) }, uniquingKeysWith: { first, _ in first })
+        // C1: only the records the engine takes into this batch are encoded (it stops at its request limit), not the
+        // whole database. A record that cannot be built is dropped from the pending list, as before.
+        let source = CloudRecordSource(database: database)
         let tags = ledger.systemFields
         return await CKSyncEngine.RecordZoneChangeBatch(pendingChanges: pending) { id in
-            guard let record = byName[id.recordName], !record.isTooLarge else {
+            guard let record = try? source.record(named: id.recordName), !record.isTooLarge else {
                 syncEngine.state.remove(pendingRecordZoneChanges: [.saveRecord(id)])
                 return nil
             }
@@ -211,6 +253,43 @@ final class CloudSyncController: CKSyncEngineDelegate {
     }
 
     // MARK: Fetch
+
+    /// One `fetchedRecordZoneChanges` event (C10). After the first sync the records are buffered, so back-to-back
+    /// batches cost one merge, one validation and one forced save instead of one each. The result is the one of
+    /// applying the batches one by one, because the buffer is applied, in arrival order:
+    /// - before any other event (`handleEvent`), above all `.stateUpdate`: the engine state is saved only after the
+    ///   records it covers are merged and saved; a kill with a full buffer loses neither (both are fetched again);
+    /// - before a send batch is built (`nextRecordZoneChangeBatch`);
+    /// - before a record name already in the buffer is added (a later server copy of it then merges on top, exactly as
+    ///   two separate batches did), and before this batch's CKRecord deletions are noted (they must follow the
+    ///   modifications they come after);
+    /// - when it holds `fetchBufferLimit` records.
+    private func fetched(_ ckRecords: [CKRecord], deletions: [CKRecord.ID]) async {
+        let records = ckRecords.filter { $0.recordID.zoneID == Self.zoneID }
+        let zoneDeletions = deletions.filter { $0.zoneID == Self.zoneID }
+        if ledger.initialSyncDone {
+            if records.contains(where: { fetchBufferNames.contains($0.recordID.recordName) }) { await applyFetchBuffer() }
+            fetchBuffer += records
+            fetchBufferNames.formUnion(records.map(\.recordID.recordName))
+            if !zoneDeletions.isEmpty || fetchBuffer.count >= Self.fetchBufferLimit { await applyFetchBuffer() }
+        } else {
+            await received(records)   // the first sync buffers everything itself, until the user's choice
+        }
+        // A CKRecord deletion is not a Tabula delete (tombstones are records): forget it, so ours is sent again.
+        for id in zoneDeletions {
+            ledger.serverHashes[id.recordName] = nil
+            ledger.systemFields[id.recordName] = nil
+        }
+    }
+
+    /// Merges and saves the buffered fetches (C10); a no-op when the buffer is empty.
+    private func applyFetchBuffer() async {
+        guard !fetchBuffer.isEmpty else { return }
+        let records = fetchBuffer
+        fetchBuffer = []
+        fetchBufferNames = []
+        await received(records)
+    }
 
     /// Applies fetched (or conflicting server) records; returns the names that could not be applied.
     @discardableResult
@@ -239,15 +318,17 @@ final class CloudSyncController: CKSyncEngineDelegate {
         let batch = CloudRecordBatch(records, unknownTypeNames: unknown)
         if batch.holdsBackState {
             newerDataSeen = true
-            stateBlocked = true   // never acknowledge past records this build skipped
+            stateHeldBack = true   // never acknowledge past records this build skipped
         }
         let rejected = Set(batch.rejected.keys)
         guard !batch.hashes.isEmpty else { return rejected }
-        guard case .applied = model.apply(.mergeRemote(batch.database, choice: choice), origin: .sync),
-              await model.flushForSync() else {
-            stateBlocked = true
+        guard case .applied = model.apply(.mergeRemote(batch.database, choice: choice), origin: .sync) else {
+            stateHeldBack = true   // not merged: the data exists only on the server, so the state must stay behind it
             return nil
         }
+        // Merged into memory; a failed save holds the state back only until a later save succeeds (B16). The records
+        // are not acknowledged in the ledger then: they look pending, are sent, conflict and merge again (harmless).
+        guard await flushStore() else { return nil }
         for (name, hash) in batch.hashes {
             ledger.serverHashes[name] = hash
             ledger.systemFields[name] = tags[name]
@@ -261,7 +342,7 @@ final class CloudSyncController: CKSyncEngineDelegate {
     private func handleSent(_ event: CKSyncEngine.Event.SentRecordZoneChanges) async {
         // Acknowledge only what is on disk: after a kill inside the save debounce, older data would otherwise be
         // pending against a ledger that names the newer server copy, and be sent over it.
-        let persisted = await model.flushForSync()
+        let persisted = await flushStore()
         for record in event.savedRecords where persisted && record.recordID.zoneID == Self.zoneID {
             let name = record.recordID.recordName
             if let payload = record[CloudSyncSchema.payloadField] as? Data {
@@ -300,15 +381,25 @@ final class CloudSyncController: CKSyncEngineDelegate {
     }
 
     /// Queues every record whose payload is not the server's (off the main actor; the database is a value).
+    /// C1/C10: the scan is incremental (`CloudRecordIndex`): only entities that changed since the previous scan are
+    /// encoded and hashed, so a fetched batch or a single edit no longer costs a full re-encode of the database.
     private func scheduleScan() {
         guard ledger.initialSyncDone, let engine, let database = model.database else { return }
-        let ledger = self.ledger, skipping = unmergeable
+        let ledger = self.ledger, skipping = unmergeable, index = recordIndex
         scanTask?.cancel()
         scanTask = Task { [weak self] in
             try? await Task.sleep(for: .milliseconds(300))
             guard !Task.isCancelled else { return }
-            let pending = await Task.detached(priority: .utility) { ledger.pending((try? database.cloudRecords()) ?? [], skipping: skipping) }.value
-            guard !Task.isCancelled, let self, engine === self.engine else { return }
+            let (pending, updated) = await Task.detached(priority: .utility) { () -> ([CloudRecord], CloudRecordIndex?) in
+                var working = index
+                // An entity that cannot be encoded: nothing is pending (as before) and the index stays as it was.
+                guard let records = try? working.records(for: database) else { return ([], nil) }
+                return (ledger.pending(hashed: records, skipping: skipping), working)
+            }.value
+            guard let self else { return }
+            // Kept even when this scan was superseded: any index is a valid cache for any database.
+            if let updated { recordIndex = updated }
+            guard !Task.isCancelled, engine === self.engine else { return }
             oversized = pending.contains(where: \.isTooLarge)
             let queued = Set(engine.state.pendingRecordZoneChanges)
             let changes = pending.filter { !$0.isTooLarge }
@@ -344,18 +435,39 @@ final class CloudSyncController: CKSyncEngineDelegate {
         firstSyncUnknown = []
         unmergeable = []
         heldState = nil
+        stateAwaitingSave = nil
         isAwaitingFirstSyncChoice = false
         saveLedger()
     }
 
+    /// Writes the engine state once the store is saved (data before acknowledgement). When the save fails the state
+    /// waits in `stateAwaitingSave` (the newest one wins) and `flushStore` writes it after the next successful save.
     private func persist(_ state: CKSyncEngine.State.Serialization) async {
-        guard !stateBlocked else { return }
+        guard !stateHeldBack else { return }
+        stateSerial += 1
+        stateAwaitingSave = (state, stateSerial)
+        _ = await flushStore()
+    }
+
+    /// `model.flushForSync()`, remembering the outcome (B16). A failed save no longer blocks the engine state for the
+    /// rest of the session: the next successful save clears `saveFailed` and writes the state that was waiting when
+    /// that save began. Safe: a state is set only after the merges it covers are in memory (`handleEvent` applies the
+    /// fetch buffer first), and the save writes the whole snapshot taken when it began. Merges that failed, and
+    /// skipped newer-version records, set `stateHeldBack` instead, which no save clears.
+    private func flushStore() async -> Bool {
+        let waiting = stateAwaitingSave
         guard await model.flushForSync() else {
-            stateBlocked = true
-            return
+            saveFailed = true
+            return false
         }
-        ledger.engineState = try? JSONEncoder().encode(state)
-        saveLedger()
+        saveFailed = false
+        if let waiting, waiting.serial > writtenStateSerial, !stateHeldBack, ledger.initialSyncDone {
+            writtenStateSerial = waiting.serial
+            if stateAwaitingSave?.serial == waiting.serial { stateAwaitingSave = nil }
+            ledger.engineState = try? JSONEncoder().encode(waiting.state)
+            saveLedger()
+        }
+        return true
     }
 
     private func finishOperation() {

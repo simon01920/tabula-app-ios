@@ -195,6 +195,9 @@ private enum ProgressTint {
 /// One compact lesson row: badge, name, "when · room".
 struct NowNextLessonRow: View {
     let line: NowNextDisplay.LessonLine
+    /// `NowNextDisplay.detailSeparator` (the snapshot language's, RISKS #69). The Today widget's status row keeps the
+    /// default (its `TodayDisplay` carries no separator yet).
+    var separator: String = NowNextPresenter.defaultDetailSeparator
 
     var body: some View {
         HStack(alignment: .center, spacing: 6) {
@@ -203,7 +206,7 @@ struct NowNextLessonRow: View {
                 Text(verbatim: line.name)
                     .font(.caption.weight(.semibold))
                     .lineLimit(1)
-                Text(verbatim: [line.whenText, line.room].compactMap { $0 }.joined(separator: " · "))
+                Text(verbatim: [line.whenText, line.room].compactMap { $0 }.joined(separator: separator))
                     .font(.caption2)
                     .monospacedDigit()
                     .foregroundStyle(.secondary)
@@ -261,7 +264,7 @@ struct NowNextMainColumn: View {
                         .lineLimit(2)
                         .minimumScaleFactor(0.8)
                 }
-                Text(verbatim: [lesson.timeRange, lesson.room].compactMap { $0 }.joined(separator: " · "))
+                Text(verbatim: [lesson.timeRange, lesson.room].compactMap { $0 }.joined(separator: display.detailSeparator))
                     .font(.caption)
                     .monospacedDigit()
                     .foregroundStyle(.secondary)
@@ -297,7 +300,7 @@ struct NowNextMainColumn: View {
                     Text(verbatim: display.nextCaption ?? "")
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(.secondary)
-                    NowNextLessonRow(line: next)
+                    NowNextLessonRow(line: next, separator: display.detailSeparator)
                 } else if let nothing = display.nothingAhead {
                     Text(verbatim: nothing)
                         .font(.caption2)
@@ -360,7 +363,7 @@ struct NowNextMediumView: View {
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.secondary)
                     ForEach(list) { line in
-                        NowNextLessonRow(line: line)
+                        NowNextLessonRow(line: line, separator: display.detailSeparator)
                     }
                     Spacer(minLength: 0)
                 }
@@ -391,7 +394,7 @@ struct NowNextRectangularView: View {
                     .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .widgetAccentable()
-                Text(verbatim: [lesson.shortName, lesson.room].compactMap { $0 }.joined(separator: " · "))
+                Text(verbatim: [lesson.shortName, lesson.room].compactMap { $0 }.joined(separator: display.detailSeparator))
                     .font(.body.weight(.semibold))
                     .lineLimit(1)
                 if let next = display.nextCompact {
@@ -403,7 +406,7 @@ struct NowNextRectangularView: View {
                     .monospacedDigit()
                     .lineLimit(1)
                     .widgetAccentable()
-                Text(verbatim: [lesson.name, lesson.room].compactMap { $0 }.joined(separator: " · "))
+                Text(verbatim: [lesson.name, lesson.room].compactMap { $0 }.joined(separator: display.detailSeparator))
                     .font(.caption)
                     .lineLimit(2)
             case let .status(_, title, _):

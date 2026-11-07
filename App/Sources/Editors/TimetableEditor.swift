@@ -374,7 +374,7 @@ private struct TimetableFormContent: View {
             } label: {
                 Text("editor.density")
             }
-            .pickerStyle(.segmented)
+            .adaptiveSegmentedPicker()
             Picker(selection: $draft.palettePackID) {
                 Text("editor.palette.appDefault").tag(PalettePackID?.none)
                 ForEach(PalettePack.all) { pack in

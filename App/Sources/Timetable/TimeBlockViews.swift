@@ -11,14 +11,21 @@
 //   room on the same line when it fits; the teacher as footnote only when the block is tall enough;
 // - the current lesson has the highlighter outline; cancelled blocks are dimmed; badges use the one-slot rule in the
 //   week view (`CellBadgeView`) and the full status / task capsules in the day view.
+// Phase 10 WP3:
+// - U9: when a day column or an overlap lane would be too narrow (`TimeBlockFit`, e.g. 7 days with overlaps on a
+//   375 pt phone), the week view shows its `fallback` (the periods × days grid) instead of the blocks;
+// - B1 (decision P10-4): on an export page the hour height fits the visible hours into the height left on the page
+//   (`ExportPageFit.hourHeight`, read through `exportAvailableHeight`), never above the on-screen height and never
+//   below 20 pt (a longer day is clipped at the page bottom).
 // APIs: GeometryReader, ScrollView, ZStack + frame/offset, zIndex(_:), Rectangle, Capsule, ViewThatFits, @ScaledMetric,
 //       Button(.plain), accessibilitySortPriority(_:), accessibilityHidden(_:).
 import SwiftUI
 import TimetableCore
 import TimetableUI
 
-/// The week as proportional blocks with an hour axis.
-struct TimeBlockWeekView: View {
+/// The week as proportional blocks with an hour axis; `fallback` when the columns are too narrow (never on an export
+/// page, which is always wide enough).
+struct TimeBlockWeekView<Fallback: View>: View {
     let layout: TimeBlockLayout
     let strip: WeekStripModel
     let timetable: Timetable
@@ -26,35 +33,51 @@ struct TimeBlockWeekView: View {
     let today: LocalDate
     let nowMinute: Int
     let onOpen: (ResolvedLesson) -> Void
+    @ViewBuilder let fallback: () -> Fallback
 
+    @Environment(\.isExportRendering) private var exporting
     @ScaledMetric(relativeTo: .caption2) private var gutterWidth: CGFloat = 46
     private let horizontalPadding: CGFloat = 8
 
     var body: some View {
         GeometryReader { proxy in
             let width = proxy.size.width - 2 * horizontalPadding
-            let columnWidth = max(1, (width - gutterWidth) / CGFloat(max(1, layout.columns.count)))
-            VStack(spacing: 0) {
-                HStack(spacing: 0) {
-                    Color.clear.frame(width: gutterWidth, height: 1)
-                    ForEach(layout.columns, id: \.index) { column in
-                        if let day = strip.days.first(where: { $0.date == column.date }) {
-                            DayColumnHeader(day: day).frame(width: columnWidth)
-                        } else {
-                            Color.clear.frame(width: columnWidth)
-                        }
+            if !exporting, fit(width: width) == .fallback {
+                fallback()
+            } else {
+                blocks(width: width)
+            }
+        }
+    }
+
+    private func fit(width: CGFloat) -> TimeBlockFit {
+        TimeBlockFit.choose(columnCount: layout.columns.count,
+                            maximumLaneCount: layout.blocks.map(\.laneCount).max() ?? 1,
+                            availableWidth: Double(width), gutterWidth: Double(gutterWidth))
+    }
+
+    private func blocks(width: CGFloat) -> some View {
+        let columnWidth = max(1, (width - gutterWidth) / CGFloat(max(1, layout.columns.count)))
+        return VStack(spacing: 0) {
+            HStack(spacing: 0) {
+                Color.clear.frame(width: gutterWidth, height: 1)
+                ForEach(layout.columns, id: \.index) { column in
+                    if let day = strip.days.first(where: { $0.date == column.date }) {
+                        DayColumnHeader(day: day).frame(width: columnWidth)
+                    } else {
+                        Color.clear.frame(width: columnWidth)
                     }
                 }
-                Divider()
-                ExportAwareScroll {
-                    TimeBlockCanvas(layout: layout, timetable: timetable, reasons: reasons, today: today,
-                                    nowMinute: nowMinute, width: width, gutterWidth: gutterWidth, detailed: false,
-                                    onOpen: onOpen)
-                        .padding(.vertical, 12)
-                }
             }
-            .padding(.horizontal, horizontalPadding)
+            Divider()
+            ExportAwareScroll {
+                TimeBlockCanvas(layout: layout, timetable: timetable, reasons: reasons, today: today,
+                                nowMinute: nowMinute, width: width, gutterWidth: gutterWidth, detailed: false,
+                                onOpen: onOpen)
+                    .padding(.vertical, TimeBlockCanvas.verticalPadding)
+            }
         }
+        .padding(.horizontal, horizontalPadding)
     }
 }
 
@@ -75,7 +98,7 @@ struct TimeBlockDayView: View {
                 TimeBlockCanvas(layout: layout, timetable: timetable, reasons: reasons, today: today, nowMinute: nowMinute,
                                 width: proxy.size.width - 32, gutterWidth: gutterWidth, detailed: true, onOpen: onOpen)
                     .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
+                    .padding(.vertical, TimeBlockCanvas.verticalPadding)
             }
         }
     }
@@ -93,8 +116,13 @@ struct TimeBlockCanvas: View {
     let detailed: Bool
     let onOpen: (ResolvedLesson) -> Void
 
+    /// Space above and below the canvas inside its scroll view (week and day views).
+    static let verticalPadding: CGFloat = 12
+
     @Environment(AppModel.self) private var model
     @Environment(\.lessonWork) private var work
+    /// Set on an export page only: the height left for the canvas and its vertical padding.
+    @Environment(\.exportAvailableHeight) private var exportHeight
     @ScaledMetric(relativeTo: .caption) private var comfortableHourHeight: CGFloat = 72
     @ScaledMetric(relativeTo: .caption) private var compactHourHeight: CGFloat = 54
     @ScaledMetric(relativeTo: .caption) private var minimumBlockHeight: CGFloat = 24
@@ -102,7 +130,11 @@ struct TimeBlockCanvas: View {
 
     private var hourHeight: CGFloat {
         let base = timetable.density.effective == .compact ? compactHourHeight : comfortableHourHeight
-        return detailed ? base * 1.3 : base
+        let screen = detailed ? base * 1.3 : base
+        guard let exportHeight else { return screen }
+        return CGFloat(ExportPageFit.hourHeight(availableHeight: Double(exportHeight - 2 * Self.verticalPadding),
+                                                visibleMinutes: layout.endMinute - layout.startMinute,
+                                                preferred: Double(screen)))
     }
 
     private var totalHeight: CGFloat { CGFloat(layout.endMinute - layout.startMinute) / 60 * hourHeight }

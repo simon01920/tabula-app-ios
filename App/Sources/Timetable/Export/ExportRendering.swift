@@ -4,33 +4,59 @@
 // Print layout = light scheme, Large text, fixed page size (A4 points: 842 × 595 landscape for grid and week, 595 × 842
 // portrait for day), no today / now markers (today = `LocalDate.earliest`, minute -1), no interaction. The views are not
 // forked: they get no-op callbacks. One page per week (grid, week) or per enabled day (day).
-// PDF: one `CGContext` PDF with a page per `ImageRenderer.render` call. Image: the pages stacked in one PNG at scale 3
-// (at most `ExportPlan.maximumImagePages`, so the bitmap stays below 16 384 px).
+// PDF: one `CGContext` PDF with a page per `ImageRenderer.render` call. Image: the pages stacked in one PNG (at most
+// `ExportPlan.maximumImagePages`).
+// Phase 10 WP3:
+// - P1/B13: the PNG scale is 3 only while the bitmap stays within `ExportPageFit.imagePixelBudget` (12 MP); more
+//   pages get a lower scale (6 pages: 1.99). `ImageRenderer.cgImage` is taken on the main actor (ImageRenderer is
+//   `@MainActor`); the PNG is encoded with ImageIO off the main actor (`ExportPNGEncoder`, `@concurrent`).
+// - B2: the PDF loop stops at the next page when its task is cancelled (Cancel, a deep link, the sheet closing) and
+//   returns nil, so the sheet publishes nothing.
+// - B1 (P10-4): in export, `ExportAwareScroll` reports the height left on the page (`exportAvailableHeight`); the
+//   time-block canvas fits its hours into it.
+// APIs checked in Apple's documentation JSON (2026-11-05): `ImageRenderer.cgImage` (`@MainActor final var cgImage:
+//   CGImage?`, iOS 16), `CGImageDestinationCreateWithData(_:_:_:_:)`, `CGImageDestinationAddImage(_:_:_:)`,
+//   `CGImageDestinationFinalize(_:)` (iOS 4); `CGImage` conforms to `Sendable`.
 // Unverifiable without a device: ImageRenderer with GeometryReader / ScrollView content (docs/checklists/PHASE8_DEVICE.md).
+import ImageIO
 import SwiftUI
 import TimetableCore
 import TimetableUI
 import UIKit
+import UniformTypeIdentifiers
 
 /// `true` inside an export page: scroll wrappers are dropped (ImageRenderer does not draw UIKit-backed scroll views);
 /// the page frame is fixed, so the views' GeometryReaders read the page size.
 private struct IsExportRenderingKey: EnvironmentKey { static let defaultValue = false }
+
+/// On an export page: the height `ExportAwareScroll` has for its content (`nil` on screen).
+private struct ExportAvailableHeightKey: EnvironmentKey { static let defaultValue: CGFloat? = nil }
 
 extension EnvironmentValues {
     var isExportRendering: Bool {
         get { self[IsExportRenderingKey.self] }
         set { self[IsExportRenderingKey.self] = newValue }
     }
+
+    var exportAvailableHeight: CGFloat? {
+        get { self[ExportAvailableHeightKey.self] }
+        set { self[ExportAvailableHeightKey.self] = newValue }
+    }
 }
 
-/// A vertical `ScrollView`, or plain stacked content when exporting.
+/// A vertical `ScrollView`, or plain stacked content when exporting (top-aligned in the space left on the page, whose
+/// height the content can read as `exportAvailableHeight`).
 struct ExportAwareScroll<Content: View>: View {
     @Environment(\.isExportRendering) private var exporting
     @ViewBuilder let content: () -> Content
 
     var body: some View {
         if exporting {
-            VStack(spacing: 0) { content() }.frame(maxHeight: .infinity, alignment: .top)
+            GeometryReader { proxy in
+                VStack(spacing: 0) { content() }
+                    .environment(\.exportAvailableHeight, proxy.size.height)
+                    .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
+            }
         } else {
             ScrollView(.vertical) { content() }
         }
@@ -66,6 +92,7 @@ struct ExportPrintJob {
         guard let context = CGContext(consumer: consumer, mediaBox: &box, nil) else { return nil }
         for date in pages {
             await Task.yield()   // a long PDF must not freeze the progress indicator between pages
+            guard !Task.isCancelled else { return nil }   // B2: Cancel / a deep link stops at the next page
             let renderer = ImageRenderer(content: pageView(date))
             renderer.proposedSize = ProposedViewSize(pageSize)
             renderer.render { _, draw in
@@ -75,19 +102,43 @@ struct ExportPrintJob {
             }
         }
         context.closePDF()
+        guard !Task.isCancelled else { return nil }
         return data.length > 0 ? data as Data : nil
     }
 
-    /// The pages stacked in one PNG.
+    /// The pages stacked in one PNG: rasterised here (main actor), encoded off the main actor.
     @MainActor
-    func pngData() -> Data? {
+    func pngData() async -> Data? {
+        guard let bitmap = pngBitmap(), !Task.isCancelled else { return nil }
+        return await ExportPNGEncoder.encode(bitmap)
+    }
+
+    /// The stacked pages as one bitmap, at the scale the pixel budget allows.
+    @MainActor
+    private func pngBitmap() -> CGImage? {
         let shown = Array(pages.prefix(ExportPlan.maximumImagePages))
         guard !shown.isEmpty else { return nil }
         let stack = VStack(spacing: 0) { ForEach(shown, id: \.self) { pageView($0) } }
         let renderer = ImageRenderer(content: stack)
-        renderer.scale = 3
+        renderer.scale = CGFloat(ExportPageFit.imageScale(width: Double(pageSize.width),
+                                                          height: Double(pageSize.height) * Double(shown.count)))
         renderer.isOpaque = true
-        return renderer.uiImage?.pngData()
+        return renderer.cgImage
+    }
+}
+
+/// PNG encoding with ImageIO, off the main actor (encoding a multi-megapixel bitmap takes noticeable time).
+enum ExportPNGEncoder {
+    @concurrent
+    static func encode(_ image: CGImage) async -> Data? {
+        let data = NSMutableData()
+        guard let destination = CGImageDestinationCreateWithData(data as CFMutableData,
+                                                                 UTType.png.identifier as CFString, 1, nil) else {
+            return nil
+        }
+        CGImageDestinationAddImage(destination, image, nil)
+        guard CGImageDestinationFinalize(destination), data.length > 0 else { return nil }
+        return data as Data
     }
 }
 
@@ -121,7 +172,7 @@ struct ExportPreviewRouteView: View {
             guard let timetable = model.activeTimetable, let resolver = model.resolver(for: timetable.id) else { return }
             let week = resolver.context.startOfWeek(containing: model.today)
             let job = ExportPrintJob(model: model, timetable: timetable, resolver: resolver, view: .grid, pages: [week])
-            image = job.pngData().flatMap(UIImage.init(data:))
+            image = await job.pngData().flatMap(UIImage.init(data:))
             renderFailed = image == nil
         }
     }
@@ -180,7 +231,7 @@ private struct ExportPageView: View {
         case .week:
             TimeBlockWeekView(layout: TimeBlockLayout.week(containing: weekStart, resolver: resolver), strip: strip,
                               timetable: timetable, reasons: reasons(strip.days.map(\.date)), today: .earliest,
-                              nowMinute: -1, onOpen: { _ in })
+                              nowMinute: -1, onOpen: { _ in }, fallback: { EmptyView() })   // a page is never too narrow
         case .day:
             TimeBlockDayView(layout: TimeBlockLayout.make(days: [resolver.resolution(for: date).schedule]),
                              timetable: timetable, reasons: reasons([date]), today: .earliest, nowMinute: -1,

@@ -45,12 +45,20 @@ public struct ExportRow: Hashable, Sendable {
 public enum ExportRows {
     /// Every occurrence of timetable `timetableID` on the dates of `range`, cancelled ones included (flagged by
     /// `status`), in date then engine order (start, end, ID). Empty for an empty range or an unknown timetable.
+    /// Builds a resolver first; a caller that already holds one should use `build(resolver:range:)`.
     public static func build(database: TabulaDatabase, timetableID: Timetable.ID, range: LocalDateRange,
                              context: CalendarContext) -> [ExportRow] {
         guard let resolver = ScheduleResolver(database: database, timetableID: timetableID, context: context) else {
             return []
         }
-        return range.days.flatMap { date in
+        return build(resolver: resolver, range: range)
+    }
+
+    /// Every occurrence of `resolver`'s timetable on the dates of `range` (same order and content as
+    /// `build(database:timetableID:range:context:)`). Pure value work on Sendable inputs, so the app runs it off
+    /// the main actor (Phase 10 WP3, C5).
+    public static func build(resolver: ScheduleResolver, range: LocalDateRange) -> [ExportRow] {
+        range.days.flatMap { date in
             let resolution = resolver.resolution(for: date)
             return resolution.schedule.entries.map { entry in
                 let sourceID: UUID
