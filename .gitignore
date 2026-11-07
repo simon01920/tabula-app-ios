@@ -61,3 +61,7 @@ tabula-kit.zip
 
 # UI/UX review screenshots (large; regenerate with scripts/ux-review-index.py)
 docs/ux-review/screens/
+
+# App Preview video captures (CI artifacts, large; never commit)
+video/captures/
+video/output*/

@@ -69,6 +69,9 @@ public enum SampleScenarios {
         case .elementary: database = elementary()
         case .secondary: database = secondary().database
         case .university: database = university()
+        case .preview, .previewBlank:
+            return SampleScenario(kind: kind, database: preview(blank: kind == .previewBlank), timeZone: previewTimeZone,
+                                  referenceNow: previewReferenceNow, today: previewToday, localeFirstWeekday: .monday)
         }
         return SampleScenario(kind: kind, database: database, timeZone: timeZone, referenceNow: referenceNow,
                               today: today, localeFirstWeekday: .monday)

@@ -189,6 +189,22 @@ targets:
       - package: TimetableCore
       - package: TimetableUI
 
+  # App Preview capture (video/): XCUITest bundle that drives the real app while the CI workflow
+  # .github/workflows/app-preview-capture.yml screen-records the simulator. XcodeGen/CI only: not in Package.swift or
+  # xtool.yml (the xtool path is unaffected) and not in the TabulaApp scheme (release/archive unchanged).
+  TabulaPreviewCapture:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: PreviewCapture/Sources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(TABULA_BUNDLE_ID).previewcapture
+        TEST_TARGET_NAME: TabulaApp
+        TARGETED_DEVICE_FAMILY: "1"
+    dependencies:
+      - target: TabulaApp
+
 schemes:
   TabulaApp:
     build:
@@ -198,3 +214,12 @@ schemes:
       config: Debug
     archive:
       config: Release
+  TabulaPreviewCapture:
+    build:
+      targets:
+        TabulaApp: all
+        TabulaPreviewCapture: [test]
+    test:
+      config: Debug
+      targets:
+        - TabulaPreviewCapture
