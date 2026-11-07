@@ -64,7 +64,24 @@ CI found the Sonnet work's only compile error, and I reverted one of its design 
 - Backup pruning.
 - Clean-launch save.
 
-**Screenshots:** run 42312145288 on `0ba1e8e`, iPhone SE (3rd generation), 15 changed screens incl. hu/sk/ja, with the Increase Contrast variant. _Review pending (see "Not done")._
+**Screenshots, run 42312145288 on `0ba1e8e`.** iPhone SE (3rd generation), iOS 27.2 simulator. 15 screens × light / dark / AX-XXXL / Increase Contrast, 60 PNGs, reviewed by the orchestrator. The environment change P10-7 made the artifact reachable.
+- **Correct at 375 pt:**
+  - Weekday chips (4 + 3, two columns at AX).
+  - Subject editor in Hungarian.
+  - Slovak exam card.
+  - Export sheet (stacks at AX) and Grid export preview.
+  - Onboarding week.
+  - About › Privacy, with the corrected text.
+  - Backup.
+  - Reminders settings.
+  - Share sheet (QR rendered once, off main).
+  - Tasks.
+  - Grid.
+  - University week: 5 days keep readable time blocks.
+  - Today.
+  - Japanese widgets, which now use "・" (WP2).
+- **One regression found and fixed (`1e87ea6`).** Exams in Slovak at AX-XXXL: the U7 menu fallback in that tight, background-less List row was clipped at the top ("Zobraziť") and bottom ("Nadchádzajúce"). At accessibility sizes the two choices are now full-width rows with a checkmark under the "Show" header; segmented as before at other sizes. The other menu fallbacks rendered correctly in their screenshots.
+- **The Increase Contrast variant looks almost identical to light.** Whether `simctl ui … increase_contrast` takes effect is still unverified (device row: Increase Contrast on the phone).
 
 **Device:** nothing has run on a device. `PHASE10_DEVICE.md` is the list.
 
@@ -91,7 +108,6 @@ CI found the Sonnet work's only compile error, and I reverted one of its design 
   - The privacy text is accurate.
 
 ## Not done / known limits
-- **Screenshots not reviewed by me in this session.** The artifact storage host is blocked by this cloud environment's network policy (ENVIRONMENT §41). The PNGs are in run 42312145288 (artifact `ui-screenshots-57`). See "Human steps".
 - **Nothing seen on a device:** all 90 checklist rows are open.
 - **Speed is not measured:** no Instruments numbers yet (rows A1, A2, A6 and section C).
 - **Kept as is:**
@@ -111,7 +127,7 @@ CI found the Sonnet work's only compile error, and I reverted one of its design 
 | P10-4 | **Week/Day PDF taller than the page** | Fit by shrinking the hour height (min 20 pt) |
 | P10-5 | **Native translation review** of all 12 languages | Not in Phase 10 |
 | P10-6 | **Backup retention** | Keep the newest 5 copies of each kind, and anything younger than 30 days |
-| P10-7 | **A cloud environment for this repo** that allows `download.swift.org` (Swift toolchain) and the GitHub Actions log/artifact hosts, so cloud sessions can run the tests and look at screenshots | Proposed in this session; no change without your approval |
+| P10-7 | **Cloud environment `tabula-app-ios`.** Approved in this session: `download.swift.org` plus the GitHub Actions log and artifact hosts. The artifact storage host changes per run (`productionresultssaNN.blob.core.windows.net`), so later runs may need their host added | Keep it; add a setup script that installs Swift 6.4 once it has been tried in a session |
 
 ## Risks
 New rows #100–#113 in `docs/RISKS.md`. Three of them are decisions (P10-2, P10-3, P10-6). The main open risk is #100: Phase 10 has only been checked by CI, not on a device.
