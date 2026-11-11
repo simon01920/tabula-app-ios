@@ -147,6 +147,16 @@ jobs:
           xcrun simctl status_bar "$SIM_UDID" override --time "9:41" --dataNetwork wifi --wifiMode active \
             --wifiBars 3 --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100 || true
           xcrun simctl install "$SIM_UDID" "$APP"
+          # Landscape: iPadOS ignores the app's geometry request (-TabulaOrientation) for resizable apps, so also rotate
+          # the simulated device through Simulator.app's Device menu (needs the runner's GUI session; warns if not).
+          if [ "$ORIENTATION" = landscape ]; then
+            open -a Simulator --args -CurrentDeviceUDID "$SIM_UDID" || true
+            sleep 15
+            osascript -e 'tell application "Simulator" to activate' \
+              -e 'tell application "System Events" to tell process "Simulator" to click menu item "Rotate Left" of menu "Device" of menu bar 1' \
+              || echo "::warning::could not rotate the simulator through its Device menu"
+            sleep 3
+          fi
 
           shoot() { # shoot <screen> <variant> [extra launch args...]
             local entry="$1" variant="$2" pid screen seed lang

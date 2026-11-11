@@ -13,7 +13,7 @@ enum ScreenshotOrientation {
         let mask: UIInterfaceOrientationMask = raw == "landscape" ? .landscapeRight : .portrait
         for case let scene as UIWindowScene in UIApplication.shared.connectedScenes {
             scene.requestGeometryUpdate(.iOS(interfaceOrientations: mask)) { error in
-                print("TabulaOrientation \(raw): \(error.localizedDescription)")
+                NSLog("TabulaOrientation %@: %@", raw, error.localizedDescription)   // in the simulator's unified log
             }
         }
     }
