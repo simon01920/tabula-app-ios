@@ -2,7 +2,7 @@
 
 Human request: thoughtful support for iPhone Duo and iPad, existing iPhones unchanged. Layout follows the available
 container width, the size classes and the safe areas. No device-name checks, no fixed screen sizes.
-Device checklist: `docs/checklists/ADAPTIVE_DEVICE.md`. Risks: RISKS #114–#116. Environment: ENVIRONMENT §42.
+Device checklist: `docs/checklists/ADAPTIVE_DEVICE.md`. Risks: RISKS #114–#117. Environment: ENVIRONMENT §42.
 
 ## Platform
 
