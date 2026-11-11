@@ -125,6 +125,14 @@ public struct DayChangeDraft: Equatable, Sendable {
         moves = false
     }
 
+    /// The lesson to preselect among `available` (the date's lessons that can be cancelled or changed): the tapped
+    /// one when it is available; none when it is not (already cancelled that day: changing it would silently undo the
+    /// cancellation, which "Existing changes" undoes explicitly); without a tapped lesson, the date's first lesson.
+    public static func preselectedLesson(_ tapped: Lesson.ID?, available: [Lesson.ID]) -> Lesson.ID? {
+        guard let tapped else { return available.first }
+        return available.contains(tapped) ? tapped : nil
+    }
+
     /// Kinds that need the day to have at least one lesson to pick from.
     public static func kindsNeedingLesson() -> Set<Kind> { [.cancelLesson, .changeLesson] }
 
