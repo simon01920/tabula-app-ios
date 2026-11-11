@@ -159,3 +159,6 @@ Nothing here was compiled or run in the container that wrote it.
 
 # G. Privacy manifest (WP7)
 - [ ] G1 First TestFlight upload after Phase 10: no ITMS-91053 "Missing API declaration" email.
+
+# I. Bug fix pass (2026-11, `wip/bugfix-2026-11`)
+- [ ] I1 Split class: two lessons in Tuesday period 3 (two language groups). Days × periods grid: both tiles share the day row (stacked, half height each), both readable and tappable; periods × days (Settings › Grid layout): side by side in the day column. VoiceOver reaches both, the first lane first. Repeat at XXL, German, dark mode and compact density (the half-height tile is tight: note if the name is unreadable).

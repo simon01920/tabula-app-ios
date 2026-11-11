@@ -130,6 +130,23 @@ struct LayoutTests {
         #expect(onlyTwo.columns.map(\.weekday) == [.monday, .friday])
     }
 
+    @Test func splitClassCellsGetSideBySideLanes() {
+        // Tuesday: a P2–P3 double overlaps a P3 group lesson (split class); P4 overlaps nothing.
+        var world = ScheduleWorld()
+        let double = world.lesson(world.math, .tuesday, period: 2, span: 2)
+        let group = world.lesson(world.english, .tuesday, period: 3)
+        let after = world.lesson(world.physics, .tuesday, period: 4)
+        let monday = world.lesson(world.math, .monday, period: 3)
+        let grid = GridLayout.week(containing: d("2026-10-07"), resolver: world.resolver)
+        let lanes = grid.cellLanes
+        func lane(_ id: Lesson.ID, _ date: String) -> GridLayout.Lane? { lanes[.lesson(id, on: d(date))] }
+        #expect(lanes.count == grid.cells.count)
+        #expect(lane(double, "2026-10-06") == GridLayout.Lane(lane: 0, count: 2))
+        #expect(lane(group, "2026-10-06") == GridLayout.Lane(lane: 1, count: 2))
+        #expect(lane(after, "2026-10-06") == GridLayout.Lane(lane: 0, count: 1))
+        #expect(lane(monday, "2026-10-05") == GridLayout.Lane(lane: 0, count: 1), "same row, other column")
+    }
+
     @Test func gridShowsTheCycleWeekAndCanJumpToTheOther() {
         var world = ScheduleWorld(rotation: .weekCycle(WeekCycle(length: 2, anchor: .isoWeekParity(policy: .strict, offset: 0),
                                                                  labels: ["A", "B"])))
