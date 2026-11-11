@@ -14,4 +14,23 @@ struct BugfixPass202611Tests {
         #expect(DayChangeDraft.preselectedLesson(nil, available: [other, tapped]) == other)
         #expect(DayChangeDraft.preselectedLesson(nil, available: []) == nil)
     }
+
+    /// Fix 4: editing a lesson while the timetable has no week cycle keeps its stored A/B restriction.
+    @Test func editingWithoutWeekCycleKeepsCycleWeeks() throws {
+        let scenario = SampleScenarios.secondary()
+        let today = LocalDate(year: 2027, month: 2, day: 10)!
+        var lesson = try #require(scenario.database.lessons.first { !$0.isDeleted })
+        lesson.occurrence = LessonOccurrenceRule(day: lesson.occurrence.day, cycleWeeks: [2])
+        var timetable = scenario.timetable
+        timetable.rotation = .none
+        var draft = LessonDraft(lesson: lesson, timetable: timetable, today: today)
+        draft.room = "301"
+        let kept = try #require(draft.makeLesson(in: timetable))
+        #expect(kept.occurrence.cycleWeeks == [2])
+        // With a week cycle the editor's choice still wins (all weeks = no restriction).
+        timetable.rotation = .weekCycle(WeekCycle(length: 2, anchor: .referenceWeek(date: today, cycleWeek: 1)))
+        draft.cycleWeeks = [1, 2]
+        let everyWeek = try #require(draft.makeLesson(in: timetable))
+        #expect(everyWeek.occurrence.cycleWeeks == nil)
+    }
 }
