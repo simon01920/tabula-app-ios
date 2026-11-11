@@ -12,6 +12,7 @@
 //                         prefills subject, due = the lesson's date and the linked occurrence
 //   tasks.detail        → sheet: the detail of the task a notification deep link asked for
 //                         (`AppNavigation.presentedItem`); without one (screenshot launch) a sample task from the seed
+//   tasks.selected      → the tab with a sample task open (detail column on wide screens, else the detail sheet)
 // The detail route is also the notification deep-link target (Routing/AppNavigation.swift).
 import SwiftUI
 import TimetableCore
@@ -28,7 +29,18 @@ enum TasksRoutes: RouteProvider {
             AppRoute("tasks.editor", .sheet(over: .tasks)) { TaskEditorRouteView() },
             AppRoute("tasks.editor-new", .sheet(over: .tasks)) { TaskEditorNewRouteView() },
             AppRoute("tasks.detail", .sheet(over: .tasks)) { TaskDetailRouteView() },
+            AppRoute("tasks.selected", .tabRoot(.tasks)) { TasksSelectedRouteView() },
         ]
+    }
+}
+
+/// `tasks.selected` (adaptive layout): the tab with a sample task open, in the detail column when the list and the
+/// detail are side by side, else as today's sheet.
+private struct TasksSelectedRouteView: View {
+    @Environment(AppModel.self) private var model
+
+    var body: some View {
+        TasksRootView(initialSelection: TaskSeedPicker.sampleTask(in: model)?.id)
     }
 }
 

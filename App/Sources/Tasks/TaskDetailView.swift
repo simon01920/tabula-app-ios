@@ -17,12 +17,18 @@ private struct TaskEditTarget: Identifiable {
 
 struct TaskDetailView: View {
     let taskID: TaskItem.ID
+    /// Set when the detail is the Tasks split view's detail column (no Close button; the tab presents the editor).
+    var pane: DetailPane?
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
     @State private var editTarget: TaskEditTarget?
     @State private var confirmingDelete = false
 
     private var task: TaskItem? { model.database?.tasks.first { $0.id == taskID && !$0.isDeleted } }
+
+    private func leave() {
+        if let pane { pane.close() } else { dismiss() }
+    }
 
     var body: some View {
         NavigationStack {
@@ -40,19 +46,23 @@ struct TaskDetailView: View {
             .navigationTitle(Text("tasks.detail.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    SheetCloseButton()
+                if pane == nil {
+                    ToolbarItem(placement: .cancellationAction) {
+                        SheetCloseButton()
+                    }
                 }
                 if task != nil {
                     ToolbarItem(placement: .primaryAction) {
-                        Button { editTarget = TaskEditTarget(taskID: taskID) } label: { Text("tasks.action.edit") }
+                        Button {
+                            if let pane { pane.edit() } else { editTarget = TaskEditTarget(taskID: taskID) }
+                        } label: { Text("tasks.action.edit") }
                     }
                 }
             }
         }
         // Deleted in the editor above (or on another device) while the detail is open: close it.
         .onChange(of: task == nil) { _, isGone in
-            if isGone { dismiss() }
+            if isGone { leave() }
         }
         .sheet(item: $editTarget) { target in
             TaskEditorView(mode: .edit(target.taskID))
@@ -60,7 +70,7 @@ struct TaskDetailView: View {
         .confirmationDialog("tasks.delete.title", isPresented: $confirmingDelete, titleVisibility: .visible) {
             Button("tasks.delete.confirm", role: .destructive) {
                 model.apply(.delete(taskID))
-                dismiss()
+                leave()
             }
             Button("editor.common.cancel", role: .cancel) {}
         } message: {

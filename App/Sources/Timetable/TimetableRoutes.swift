@@ -5,6 +5,7 @@
 //   timetable.grid-legend     → the grid with the one-time symbol legend forced visible (TipKit test mode) (U4)
 //   timetable.grid-periods    → the grid in the periods × days layout (the Settings option), setting unchanged
 //   timetable.lesson-detail   → sheet: a changed lesson of the shown week (else the first lesson)
+//   timetable.grid-selected   → the grid with that sample lesson open (inspector beside the grid when wide, else sheet)
 //   timetable.quick-add       → sheet: the subject picker for the first free slot of the shown week
 //   export.sheet              → sheet: Export (type, view, range) (Phase 8 E2)
 //   export.preview            → DEBUG only: sheet showing the exported grid image of the current week
@@ -29,6 +30,9 @@ enum TimetableRoutes: RouteProvider {
                 TimetableRootView(initialView: .grid).environment(\.gridLayoutOverride, .periodsAsRows)
             },
             AppRoute("timetable.lesson-detail", .sheet(over: .timetable)) { LessonDetailRouteView() },
+            AppRoute("timetable.grid-selected", .tabRoot(.timetable)) {
+                TimetableRootView(initialView: .grid, opensSampleLesson: true)
+            },
             AppRoute("timetable.quick-add", .sheet(over: .timetable)) { QuickAddRouteView() },
             AppRoute("export.sheet", .sheet(over: .timetable)) { ExportSheet() },
         ]
@@ -44,14 +48,17 @@ private struct LessonDetailRouteView: View {
     @Environment(AppModel.self) private var model
 
     var body: some View {
-        if let target {
+        if let target = LessonDetailTarget.sample(in: model) {
             LessonDetailView(target: target)
         } else {
             RouteEmptyView()
         }
     }
+}
 
-    private var target: LessonDetailTarget? {
+extension LessonDetailTarget {
+    /// A changed lesson of the shown week, else the first lesson (`timetable.lesson-detail`, `timetable.grid-selected`).
+    @MainActor static func sample(in model: AppModel) -> LessonDetailTarget? {
         guard let timetable = model.activeTimetable, let resolver = model.resolver(for: timetable.id) else { return nil }
         let start = TimetableCore.GridLayout.displayWeekStart(today: model.today, resolver: resolver)
         let entries = (0..<7).flatMap { resolver.day(start.adding(days: $0)).entries }

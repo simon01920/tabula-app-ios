@@ -60,6 +60,8 @@ struct SettingsRootView: View {
                 importing = false
             }
         }
+        // Every settings page (root and pushed) in one readable column on wide screens; unchanged on iPhone.
+        .readableWidth()
     }
 
     // MARK: Timetable

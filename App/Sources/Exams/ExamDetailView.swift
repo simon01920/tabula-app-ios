@@ -28,6 +28,9 @@ struct ExamDetailSheet: View {
 /// The detail list (no navigation container of its own).
 struct ExamDetailContent: View {
     let examID: Exam.ID
+    /// Set by the Exams tab (pushed or in the split view's detail column): the tab presents the editor, so a resize that
+    /// moves the detail between the stack and the column never closes it. `nil` in the deep-link sheet.
+    var pane: DetailPane?
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
     @State private var editor: ExamEditorTarget?
@@ -50,7 +53,9 @@ struct ExamDetailContent: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button { editor = .existing(examID) } label: { Text("exams.action.edit") }
+                Button {
+                    if let pane { pane.edit() } else { editor = .existing(examID) }
+                } label: { Text("exams.action.edit") }
                     .disabled(exam == nil)
             }
             if let exam, !exam.isCompleted, !ExamActions.completion(of: exam, model: model).isPrimaryButton {
@@ -60,7 +65,9 @@ struct ExamDetailContent: View {
                             Label { Text("exams.action.moveToHistory") } icon: { Image(AppSymbol.completed) }
                         }
                     } label: {
-                        Label { Text("exams.action.more") } icon: { Image(systemName: "ellipsis.circle") }
+                        // Not the ellipsis: iPhone Duo reserves it for the system overflow menu
+                        // (HIG designing-for-iphone-duo.md › Vertical controls, "Use the system overflow menu").
+                        Label { Text("exams.action.more") } icon: { Image(systemName: "archivebox") }
                     }
                 }
             }
@@ -71,7 +78,9 @@ struct ExamDetailContent: View {
         .closesForDeepLink { editor = nil }   // QA fix Q6 (pushed in the Exams tab, not nested in a tab sheet)
         // Deleted from the editor: leave the detail (pop / dismiss) instead of showing an empty page.
         .onChange(of: exam == nil) { _, isMissing in
-            if isMissing { dismiss() }
+            if isMissing {
+                if let pane { pane.close() } else { dismiss() }
+            }
         }
     }
 
