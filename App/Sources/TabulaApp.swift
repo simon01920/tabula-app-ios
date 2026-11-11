@@ -53,6 +53,9 @@ struct TabulaRootApp: App {
                 .modifier(FirstSyncAlert(cloudSync: services.cloudSync))
                 #endif
                 .task { await services.model.load() }
+                #if DEBUG
+                .task { ScreenshotOrientation.apply() }   // `-TabulaOrientation` (CI screenshots only)
+                #endif
                 // TipKit once per launch (the Timetable symbol legend, U4); its screenshot route shows every tip.
                 // Not deferred further (Phase 10 P17): `Tips.configure(_:)` "must be called before tips display" and
                 // Apple says to call it "during app initialization" (docs checked 2026-11-05); `.task` already runs it

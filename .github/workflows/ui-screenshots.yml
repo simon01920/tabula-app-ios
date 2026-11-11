@@ -43,6 +43,14 @@ on:
         description: "Extra variant per screen with every localized string doubled (-NSDoubleLocalizedStrings YES, Apple's long-string test; whether SwiftUI catalog lookups honour it is UNVERIFIED, so compare against the light shot). Adds 1 screenshot per screen."
         type: boolean
         default: false
+      displays:
+        description: "Multi-display devices (iPhone Duo): space-separated `simctl io --display=` values, one screenshot per display and variant (names: the first step prints `simctl help io`). Empty = the device's only display."
+        type: string
+        default: ""
+      orientation:
+        description: "landscape | portrait: the DEBUG launch argument -TabulaOrientation asks the window scene to rotate (UIWindowScene.requestGeometryUpdate; simctl has no rotate command). Empty = the device default (portrait)."
+        type: string
+        default: ""
       watch:
         description: "Also screenshot the watch app on an Apple Watch simulator (~+3 min)"
         type: boolean
@@ -52,7 +60,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: ui-screenshots-${{ github.ref }}
+  # Per device + orientation, so manual runs on several devices can run side by side; push runs (no inputs) keep one group.
+  group: ui-screenshots-${{ github.ref }}-${{ inputs.device }}-${{ inputs.orientation }}
   cancel-in-progress: true
 
 env:
@@ -62,6 +71,8 @@ env:
   # Core set only (fits the 45-min job); full list for UX reviews: scripts/ui-screens-full.txt, dispatch in batches.
   SCREENS: ${{ inputs.screens || 'today@secondary today.after-school@secondary timetable.grid@secondary timetable.week@university timetable.tiles@elementary tasks@secondary tasks.quick-add@secondary exams@secondary settings@secondary settings.reminders@secondary settings.backup@secondary onboarding@empty widgets.gallery@secondary widgets.gallery-live@secondary today@secondary@sk settings@secondary@hu' }}
   DEVICE_OVERRIDE: ${{ inputs.device || '' }}
+  DISPLAYS: ${{ inputs.displays || '' }}
+  ORIENTATION: ${{ inputs.orientation || '' }}
   EXTRA_CONTRAST: ${{ inputs.increase_contrast && '1' || '0' }}
   EXTRA_DOUBLE: ${{ inputs.double_length && '1' || '0' }}
   OUT: screenshots
@@ -81,6 +92,8 @@ jobs:
           xcrun simctl list devicetypes
           xcrun simctl list runtimes
           xcrun simctl help ui | sed -n '1,60p' || true
+          # Exits non-zero on Xcode 27 (ENVIRONMENT §41), so no pipe: the --display names for multi-display devices.
+          xcrun simctl help io || true
 
       - name: Install XcodeGen (pinned + SHA-256)
         run: |
@@ -142,7 +155,8 @@ jobs:
             local args=(-TabulaScreen "$screen" "$@")
             [ -n "$seed" ] && args+=(-TabulaSeed "$seed")
             [ -n "$lang" ] && args+=(-AppleLanguages "($lang)" -AppleLocale "$lang")
-            local name="${entry//@/_}"
+            [ -n "$ORIENTATION" ] && args+=(-TabulaOrientation "$ORIENTATION")
+            local name="${entry//@/_}${ORIENTATION:+-$ORIENTATION}"
             xcrun simctl terminate "$SIM_UDID" "$BUNDLE_ID" >/dev/null 2>&1 || true
             pid="$(xcrun simctl launch "$SIM_UDID" "$BUNDLE_ID" "${args[@]}" | awk -F': ' '{print $2}')"
             sleep 8
@@ -153,11 +167,18 @@ jobs:
                 --predicate "process == \"TabulaApp\"" > "logs/crash-$name-$variant.log" 2>&1 || true
               return 1
             fi
-            if ! xcrun simctl io "$SIM_UDID" screenshot --type=png "$OUT/$name-$variant.png" || [ ! -s "$OUT/$name-$variant.png" ]; then
-              echo "::error::screenshot failed for $entry ($variant)"
-              return 1
-            fi
-            echo "captured $OUT/$name-$variant.png"
+            # One file per display: `simctl io` cannot pick a display on its own when a device has two (Duo).
+            local display file
+            for display in ${DISPLAYS:-default}; do
+              file="$OUT/$name-$variant.png"; local io=(io "$SIM_UDID" screenshot --type=png)
+              # A screenshot option like recordVideo's `[--display=]` (help io, ENVIRONMENT §41).
+              if [ "$display" != default ]; then file="$OUT/$name-$variant-$display.png"; io+=(--display="$display"); fi
+              if ! xcrun simctl "${io[@]}" "$file" || [ ! -s "$file" ]; then
+                echo "::error::screenshot failed for $entry ($variant, display $display)"
+                return 1
+              fi
+              echo "captured $file"
+            done
           }
 
           failed=0
