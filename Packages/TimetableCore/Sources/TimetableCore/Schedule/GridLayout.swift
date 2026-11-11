@@ -91,6 +91,11 @@ public struct GridLayout: Hashable, Sendable, Codable {
         public var lane: Int
         /// Lanes of its overlap group (1 when it shares no row).
         public var count: Int
+
+        public init(lane: Int, count: Int) {
+            self.lane = lane
+            self.count = count
+        }
     }
 
     /// First day of the week shown (`week(containing:)` only).
