@@ -71,6 +71,7 @@ struct SettingsColoursView: View {
                 Text("settings.colors.apply.footer")
             }
         }
+        .readableWidth()   // one readable column on wide screens (ADAPTIVE_LAYOUT.md)
         .navigationTitle(Text("settings.colors.title"))
         .navigationBarTitleDisplayMode(.inline)
         .disabled(model.isReadOnly)

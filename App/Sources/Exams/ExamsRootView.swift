@@ -41,6 +41,7 @@ struct ExamsRootView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.dynamicTypeSize) private var typeSize
     @Environment(\.layoutWidth) private var layoutWidth
+    @Environment(\.layoutContainerWidth) private var containerWidth
     /// `nil` = not chosen by the user yet → `initialSegment` (no `State(initialValue:)` in initialisers).
     @State private var chosenSegment: ExamSegment?
     @State private var editor: ExamEditorTarget?
@@ -86,11 +87,10 @@ struct ExamsRootView: View {
                 }
             }
         }
-        .task {
-            // Screenshot route `exams.selected`: after the first layout has measured the width.
-            guard !didSelectInitial, let initialSelection else { return }
+        // Screenshot route `exams.selected`: once the width is measured (keyed, so the closure sees the measured layout).
+        .task(id: containerWidth > 0) {
+            guard containerWidth > 0, !didSelectInitial, let initialSelection else { return }
             didSelectInitial = true
-            try? await Task.sleep(for: .milliseconds(300))
             open(initialSelection)
         }
         .sheet(item: $editor) { target in

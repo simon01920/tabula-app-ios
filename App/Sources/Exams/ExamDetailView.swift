@@ -33,6 +33,7 @@ struct ExamDetailContent: View {
     var pane: DetailPane?
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.layoutWidth) private var layoutWidth
     @State private var editor: ExamEditorTarget?
 
     private var exam: Exam? {
@@ -51,6 +52,9 @@ struct ExamDetailContent: View {
         }
         .navigationTitle(Text("exams.detail.title"))
         .navigationBarTitleDisplayMode(.inline)
+        // In the split view's detail column the exam replaces the placeholder: no Back to an empty page
+        // (iPad 13" screenshot, run 43117870293).
+        .navigationBarBackButtonHidden(pane != nil && layoutWidth.showsSplit)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {

@@ -24,12 +24,14 @@ public enum LayoutWidth: Int, Sendable, Comparable, CaseIterable {
     /// - Parameters:
     ///   - width: available width in points, without the leading / trailing safe area (bars on the side on Duo).
     ///   - isHorizontallyRegular / isVerticallyRegular: the environment's size classes.
-    public init(width: Double, isHorizontallyRegular: Bool, isVerticallyRegular: Bool) {
+    ///   - isAccessibilityText: accessibility text sizes (AX1–AX5) need the whole width for one column: a 360 pt list
+    ///     column broke words ("Upcom-ing", "Labo-ratórny") on an 11-inch iPad, so they never split.
+    public init(width: Double, isHorizontallyRegular: Bool, isVerticallyRegular: Bool, isAccessibilityText: Bool = false) {
         guard isHorizontallyRegular, isVerticallyRegular, width >= Self.mediumMinimum else {
             self = .compact
             return
         }
-        self = width >= Self.expandedMinimum ? .expanded : .medium
+        self = width >= Self.expandedMinimum && !isAccessibilityText ? .expanded : .medium
     }
 
     /// Wide content that keeps a side panel beside it (the timetable grid beside a lesson's detail) needs this much.

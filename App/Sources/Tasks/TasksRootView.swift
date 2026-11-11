@@ -51,6 +51,7 @@ struct TasksRootView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.layoutWidth) private var layoutWidth
+    @Environment(\.layoutContainerWidth) private var containerWidth
     /// The task in the detail column when the list and the detail are side by side (`LayoutWidth.showsSplit`);
     /// always `nil` in the one-column layout, where the detail is a sheet as before.
     @State private var selectedTaskID: TaskItem.ID?
@@ -107,11 +108,11 @@ struct TasksRootView: View {
                 if sheet == nil { sheet = .detail(id) }
             }
         }
-        .task {
-            // Screenshot route `tasks.selected`: after the first layout has measured the width.
-            guard !didSelectInitial, let initialSelection else { return }
+        // Screenshot route `tasks.selected`: once the width is measured. Keyed on it so the closure sees the measured
+        // layout (a plain `.task` kept the first, still-compact value and opened a sheet over the split: run 43117879078).
+        .task(id: containerWidth > 0) {
+            guard containerWidth > 0, !didSelectInitial, let initialSelection else { return }
             didSelectInitial = true
-            try? await Task.sleep(for: .milliseconds(300))
             open(initialSelection)
         }
         .closesForDeepLink { sheet = nil }   // QA fix Q6: a notification tap needs the screen

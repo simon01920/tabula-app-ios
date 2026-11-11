@@ -122,10 +122,10 @@ struct TimetableRootView: View {
                 if detail == nil { detail = shown }
             }
         }
-        .task {
-            guard opensSampleLesson, !didOpenSample else { return }
+        // Screenshot route `timetable.grid-selected`: once the width is measured (keyed, so the closure sees it).
+        .task(id: containerWidth > 0) {
+            guard containerWidth > 0, opensSampleLesson, !didOpenSample else { return }
             didOpenSample = true
-            try? await Task.sleep(for: .milliseconds(300))   // after the first layout has measured the width
             if let target = LessonDetailTarget.sample(in: model) { open(target) }
         }
         .sheet(item: $detail) { target in

@@ -52,6 +52,9 @@ struct SettingsRootView: View {
                 DeveloperSettingsLink()
                 #endif
             }
+            // One readable column on wide screens; unchanged on iPhone. On the Form, not the stack: safe-area padding on
+            // the NavigationStack did not reach its pages (iPad 11" screenshot, run 43117879078). Pushed pages add it too.
+            .readableWidth()
             .navigationTitle(Text("shell.tab.settings"))
             .sheet(isPresented: $addingTimetable) { NewTimetableSheet() }
             .sheet(isPresented: $importing) { ShareImportView() }
@@ -60,8 +63,6 @@ struct SettingsRootView: View {
                 importing = false
             }
         }
-        // Every settings page (root and pushed) in one readable column on wide screens; unchanged on iPhone.
-        .readableWidth()
     }
 
     // MARK: Timetable

@@ -57,6 +57,7 @@ struct RemindersRuleEditorView: View {
                 quietSection(current)
             }
         }
+        .readableWidth()   // one readable column on wide screens (ADAPTIVE_LAYOUT.md)
         .navigationTitle(Text(LocalizedStringKey(ReminderKindList.titleKey(target, terminology: terminology))))
         .navigationBarTitleDisplayMode(.inline)
         .disabled(model.isReadOnly)

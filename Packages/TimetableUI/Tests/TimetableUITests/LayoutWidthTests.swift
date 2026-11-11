@@ -29,6 +29,11 @@ import Testing
         #expect(LayoutWidth.compact < .medium && LayoutWidth.medium < .expanded)
     }
 
+    @Test func accessibilityTextNeverSplits() {
+        #expect(LayoutWidth(width: 1376, isHorizontallyRegular: true, isVerticallyRegular: true, isAccessibilityText: true) == .medium)
+        #expect(LayoutWidth(width: 440, isHorizontallyRegular: false, isVerticallyRegular: true, isAccessibilityText: true) == .compact)
+    }
+
     @Test func splitColumnsFitTheExpandedMinimum() {
         // The list column at its minimum plus a 380 pt detail must fit the expanded breakpoint.
         #expect(LayoutWidth.listColumn.min + 380 <= LayoutWidth.expandedMinimum)

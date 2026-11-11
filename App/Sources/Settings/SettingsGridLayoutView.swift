@@ -29,6 +29,7 @@ struct SettingsGridLayoutView: View {
                 Text("settings.gridLayout.footer")
             }
         }
+        .readableWidth()   // one readable column on wide screens (ADAPTIVE_LAYOUT.md)
         .navigationTitle(Text("settings.gridLayout.title"))
         .navigationBarTitleDisplayMode(.inline)
     }

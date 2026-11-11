@@ -55,6 +55,7 @@ struct SettingsLiveActivitiesView: View {
             .disabled(!liveActivities.isEntitled
                       || !(liveActivities.preferences.lessonEnabled || liveActivities.preferences.examEnabled))
         }
+        .readableWidth()   // one readable column on wide screens (ADAPTIVE_LAYOUT.md)
         .navigationTitle(Text("settings.liveActivities.title"))
         .navigationBarTitleDisplayMode(.inline)
     }

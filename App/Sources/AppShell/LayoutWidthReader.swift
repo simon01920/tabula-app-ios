@@ -56,12 +56,14 @@ extension View {
 private struct LayoutWidthReader: ViewModifier {
     @Environment(\.horizontalSizeClass) private var horizontal
     @Environment(\.verticalSizeClass) private var vertical
+    @Environment(\.dynamicTypeSize) private var typeSize
     @State private var width: Double = 0
 
     func body(content: Content) -> some View {
         content
             .environment(\.layoutWidth, LayoutWidth(width: width, isHorizontallyRegular: horizontal == .regular,
-                                                    isVerticallyRegular: vertical == .regular))
+                                                    isVerticallyRegular: vertical == .regular,
+                                                    isAccessibilityText: typeSize.isAccessibilitySize))
             .environment(\.layoutContainerWidth, width)
             // The width without the side safe areas (Duo side bars, landscape sensor housings).
             .onGeometryChange(for: Double.self) { proxy in
