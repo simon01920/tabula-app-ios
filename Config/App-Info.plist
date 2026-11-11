@@ -11,9 +11,11 @@
   - Usage-description strings here are the English fallbacks; the 12 languages live in
     Resources/InfoPlist.xcstrings (Xcode compiles it; the xtool path generates InfoPlist.strings with
     scripts/infoplist-strings.py). validate_config.py checks the English text is identical in both.
-  - No UIDeviceFamily here: Xcode takes it from TARGETED_DEVICE_FAMILY ("1" = iPhone, project.yml) and warned
+  - No UIDeviceFamily here: Xcode takes it from TARGETED_DEVICE_FAMILY ("1,2" = iPhone + iPad, project.yml) and warned
     "User supplied UIDeviceFamily key in the Info.plist will be overwritten" (first CI run, 2026-10-06).
-    The xtool path therefore uses xtool's default [1, 2]; harmless for local iPhone dev installs.
+    The xtool path uses xtool's default [1, 2], the same families.
+  - iPad: all four orientations (UISupportedInterfaceOrientations~ipad) and no UIRequiresFullScreen, so the app
+    resizes in Split View, Stage Manager and windowed iPadOS (docs/specs/ADAPTIVE_LAYOUT.md; validate_config.py).
 -->
 <plist version="1.0">
 <dict>
@@ -42,6 +44,13 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
