@@ -133,6 +133,13 @@ public struct DayChangeDraft: Equatable, Sendable {
         return available.contains(tapped) ? tapped : nil
     }
 
+    /// `true` when "Shortened lessons" is offered: only a timetable on bell schedules has one to swap (a free-form
+    /// timetable would be converted to bell schedules by the bell editor's Save).
+    public static func offersShortDay(in timetable: Timetable) -> Bool {
+        if case .bellSchedule = timetable.timeStructure { return true }
+        return false
+    }
+
     /// Kinds that need the day to have at least one lesson to pick from.
     public static func kindsNeedingLesson() -> Set<Kind> { [.cancelLesson, .changeLesson] }
 

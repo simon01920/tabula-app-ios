@@ -107,7 +107,8 @@ private struct DayChangeFormContent: View {
 
     private var availableKinds: [DayChangeDraft.Kind] {
         DayChangeDraft.Kind.allCases.filter { kind in
-            !DayChangeDraft.kindsNeedingLesson().contains(kind) || !entries.isEmpty || draft.kind == kind
+            (kind != .shortDay || DayChangeDraft.offersShortDay(in: timetable))
+                && (!DayChangeDraft.kindsNeedingLesson().contains(kind) || !entries.isEmpty || draft.kind == kind)
         }
     }
 

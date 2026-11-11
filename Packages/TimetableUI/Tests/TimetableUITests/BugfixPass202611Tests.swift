@@ -33,4 +33,12 @@ struct BugfixPass202611Tests {
         let everyWeek = try #require(draft.makeLesson(in: timetable))
         #expect(everyWeek.occurrence.cycleWeeks == nil)
     }
+
+    /// Fix 5: a free-form timetable is not offered "Shortened lessons" (its bell editor would convert it).
+    @Test func shortDayOnlyForBellScheduleTimetables() {
+        var timetable = SampleScenarios.secondary().timetable
+        #expect(DayChangeDraft.offersShortDay(in: timetable))
+        timetable.timeStructure = .freeForm(defaultDurationMinutes: 90)
+        #expect(!DayChangeDraft.offersShortDay(in: timetable))
+    }
 }
