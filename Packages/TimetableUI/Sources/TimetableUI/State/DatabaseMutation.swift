@@ -45,12 +45,15 @@ public struct DatabaseMutation: Sendable {
     public let label: String
     /// `true` when the mutation replaces the whole database (onboarding, debug sample loading).
     public let replacesDatabase: Bool
+    /// Issues the mutation brings along and may keep (a restored backup's own); only others can reject it.
+    public let knownIssues: [ValidationIssue]
     let step: @Sendable (inout TabulaDatabase, inout HybridLogicalClock, Date) throws -> Void
 
-    init(label: String, replacesDatabase: Bool = false,
+    init(label: String, replacesDatabase: Bool = false, knownIssues: [ValidationIssue] = [],
                  step: @escaping @Sendable (inout TabulaDatabase, inout HybridLogicalClock, Date) throws -> Void) {
         self.label = label
         self.replacesDatabase = replacesDatabase
+        self.knownIssues = knownIssues
         self.step = step
     }
 
@@ -105,7 +108,8 @@ public struct DatabaseMutation: Sendable {
 
     /// Several mutations as one (all or nothing).
     public static func batch(_ mutations: [DatabaseMutation], label: String = "batch") -> DatabaseMutation {
-        DatabaseMutation(label: label, replacesDatabase: mutations.contains(where: \.replacesDatabase)) {
+        DatabaseMutation(label: label, replacesDatabase: mutations.contains(where: \.replacesDatabase),
+                         knownIssues: mutations.flatMap(\.knownIssues)) {
             database, clock, now in
             for mutation in mutations { try mutation.step(&database, &clock, now) }
         }

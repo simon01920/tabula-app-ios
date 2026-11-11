@@ -226,8 +226,7 @@ final class AppModel {
         }
         if origin == .sync && candidate == database { return .applied(warnings: []) }   // re-applied data: no save, no re-plan
         let candidateIssues = candidate.validate()
-        // A replacing mutation starts from scratch: only its own errors count.
-        var verdict = MutationValidation.verdict(before: mutation.replacesDatabase ? [] : issues, after: candidateIssues)
+        var verdict = MutationValidation.verdict(for: mutation, before: issues, after: candidateIssues)
         if origin == .sync, case .rejected = verdict { verdict = .accepted(newWarnings: []) }
         switch verdict {
         case .rejected(let errors):
