@@ -141,6 +141,11 @@ public struct CalendarContext: Hashable, Sendable {
     /// The first instant of `date` (local midnight, or the first existing minute if midnight is skipped).
     public func startOfDay(_ date: LocalDate) -> Date { self.date(date, .midnight) }
 
+    /// When `localDate(of:)` next changes after `instant`: the start of the following day in this zone (its first
+    /// existing minute when DST skips midnight). The app refreshes "today" then: this zone's midnight need not be the
+    /// device's.
+    public func startOfNextDay(after instant: Date) -> Date { startOfDay(localDate(of: instant).adding(days: 1)) }
+
     /// The half-open interval `[startOfDay(date), startOfDay(date + 1))`; 23 h or 25 h on DST days.
     public func dayInterval(_ date: LocalDate) -> DateInterval {
         let start = startOfDay(date)

@@ -277,7 +277,8 @@ public struct LessonDraft: Equatable, Sendable {
         guard canSave(in: timetable), let subjectID, let slot = slot.slot else { return nil }
         var lesson = base
         lesson.subjectID = subjectID
-        var weeks: Set<Int>?
+        // Without a week cycle the stored A/B restriction is kept (the resolver ignores it until A/B returns).
+        var weeks = base.occurrence.cycleWeeks
         if case .weekCycle(let cycle) = timetable.rotation {
             let allWeeks = Set(1...max(1, cycle.length))
             let chosen = cycleWeeks.intersection(allWeeks)

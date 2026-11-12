@@ -36,6 +36,13 @@ public enum MutationValidation {
         }
     }
 
+    /// The verdict for `mutation`: a replacing mutation starts from scratch (only its own errors count), and the
+    /// issues it brings along (`knownIssues`, e.g. a restored backup's) count as known.
+    public static func verdict(for mutation: DatabaseMutation, before: [ValidationIssue],
+                               after: [ValidationIssue]) -> MutationVerdict {
+        verdict(before: (mutation.replacesDatabase ? [] : before) + mutation.knownIssues, after: after)
+    }
+
     /// The verdict for going from `before` (issues of the stored database) to `after` (issues of the candidate).
     public static func verdict(before: [ValidationIssue], after: [ValidationIssue]) -> MutationVerdict {
         let known = Set(before.map(IssueKey.init))

@@ -16,7 +16,10 @@ extension DatabaseMutation {
     /// timestamp, so later edits always stamp above the restored data. `settings.syncEnabled` keeps this device's value
     /// in both modes (re-stamped now if the merge took the backup's), so a restore never switches iCloud sync.
     public static func restore(_ backup: TabulaDatabase, mode: BackupRestore.Mode) -> DatabaseMutation {
-        DatabaseMutation(label: mode == .merge ? "restore backup (merge)" : "restore backup (replace)") {
+        // The backup's own validation errors do not block it (it could never be restored); errors a merge newly
+        // creates still do.
+        DatabaseMutation(label: mode == .merge ? "restore backup (merge)" : "restore backup (replace)",
+                         knownIssues: backup.validate()) {
             database, clock, now in
             clock.receive(backup.latestTimestamp, now: now)
             var restored = try BackupRestore.apply(backup, to: database, mode: mode, clock: &clock, now: now)

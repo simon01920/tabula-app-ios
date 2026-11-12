@@ -235,7 +235,11 @@ struct GridWeekView: View {
     }
 
     private func lessonCells(tops: [CGFloat], heights: [CGFloat], columnWidth: CGFloat) -> some View {
-        ForEach(layout.cells, id: \.entry.id) { cell in
+        let lanes = layout.cellLanes
+        return ForEach(layout.cells, id: \.entry.id) { cell in
+            // Split class (two lessons in one period): each lane gets an equal share of the day column's width.
+            let lane = lanes[cell.entry.id] ?? TimetableCore.GridLayout.Lane(lane: 0, count: 1)
+            let laneWidth = columnWidth / CGFloat(lane.count)
             let spanHeight = (cell.row..<min(cell.row + cell.rowSpan, heights.count)).reduce(CGFloat(0)) { $0 + heights[$1] }
             let current = NowLinePresentation.isCurrent(cell.entry, today: today, minuteOfDay: nowMinute)
             Button {
@@ -245,14 +249,15 @@ struct GridWeekView: View {
                              badges: work.badges(for: cell.entry.id), isCurrent: current)
             }
             .buttonStyle(.plain)
-            .frame(width: columnWidth - 4, height: spanHeight - 4)
-            .offset(x: periodColumnWidth + CGFloat(cell.column) * columnWidth + 2, y: tops[cell.row] + 2)
+            .frame(width: laneWidth - 4, height: spanHeight - 4)
+            .offset(x: periodColumnWidth + CGFloat(cell.column) * columnWidth + CGFloat(lane.lane) * laneWidth + 2,
+                    y: tops[cell.row] + 2)
             .accessibilityLabel(Text(verbatim: GridPresentation.cellAccessibilityLabel(
                 cell, reasons: reasons[cell.entry.id] ?? [], visibility: timetable.fieldVisibility,
                 badges: work.badges(for: cell.entry.id), renderer: model.renderer)))
             .accessibilityValue(ifPresent: current ? "today.a11y.inProgress" : nil)
             .accessibilityHint(Text("timetable.a11y.openHint"))
-            .accessibilitySortPriority(sortPriority(column: cell.column, row: cell.row))
+            .accessibilitySortPriority(sortPriority(column: cell.column, row: cell.row) - Double(lane.lane) * 0.01)
         }
     }
 

@@ -84,6 +84,20 @@ public struct GridLayout: Hashable, Sendable, Codable {
         public var row: Int
     }
 
+    /// A cell's place among the cells of its column that share rows (a split class: two groups in one period):
+    /// lane `lane` of `count`, drawn side by side so every lesson stays visible and tappable.
+    public struct Lane: Hashable, Sendable {
+        /// 0-based lane.
+        public var lane: Int
+        /// Lanes of its overlap group (1 when it shares no row).
+        public var count: Int
+
+        public init(lane: Int, count: Int) {
+            self.lane = lane
+            self.count = count
+        }
+    }
+
     /// First day of the week shown (`week(containing:)` only).
     public var weekStart: LocalDate?
     /// Cycle week shown (week cycles, `week(containing:)` only).
@@ -102,6 +116,16 @@ public struct GridLayout: Hashable, Sendable, Codable {
     public var emptySlots: [Slot]
     /// Occurrences that match no row, in day order.
     public var unplaced: [ResolvedLesson]
+
+    /// The lane of every cell, by occurrence (greedy per column over the covered rows, as `TimeBlockLayout`).
+    public var cellLanes: [OccurrenceID: Lane] {
+        var lanes: [OccurrenceID: Lane] = [:]
+        for column in Dictionary(grouping: cells, by: \.column).values {
+            let assigned = TimeBlockLayout.overlapLanes(column.map { ($0.row, $0.row + $0.rowSpan) })
+            for (cell, lane) in zip(column, assigned) { lanes[cell.entry.id] = Lane(lane: lane.lane, count: lane.count) }
+        }
+        return lanes
+    }
 
     // MARK: Factories
 

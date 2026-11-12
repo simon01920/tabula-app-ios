@@ -27,8 +27,11 @@ struct DayChangeEditorView: View {
            let timetable = timetableID.flatMap({ id in model.timetables.first { $0.id == id } }) ?? model.activeTimetable {
             let day = date ?? model.today
             let entries = DayChangeEditorView.lessonEntries(model: model, timetable: timetable, date: day)
+            // A tapped lesson keeps "Change a lesson" even when it cannot be preselected (cancelled that day).
             let draft = DayChangeDraft(
-                timetable: timetable, date: day, lessonID: lessonID ?? entries.first?.lessonID,
+                timetable: timetable, date: day,
+                lessonID: DayChangeDraft.preselectedLesson(lessonID, available: entries.map(\.lessonID)),
+                kind: lessonID == nil ? nil : .changeLesson,
                 schedule: defaultSchedule(of: timetable, in: database), id: newID)
             EditorScaffold(
                 titleKey: "editor.dayChange.title",
@@ -104,7 +107,8 @@ private struct DayChangeFormContent: View {
 
     private var availableKinds: [DayChangeDraft.Kind] {
         DayChangeDraft.Kind.allCases.filter { kind in
-            !DayChangeDraft.kindsNeedingLesson().contains(kind) || !entries.isEmpty || draft.kind == kind
+            (kind != .shortDay || DayChangeDraft.offersShortDay(in: timetable))
+                && (!DayChangeDraft.kindsNeedingLesson().contains(kind) || !entries.isEmpty || draft.kind == kind)
         }
     }
 

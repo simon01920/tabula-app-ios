@@ -108,6 +108,15 @@ struct CalendarContextTests {
         #expect(saoPaulo.secondsInDay(day) == 23 * 3600)
     }
 
+    @Test func startOfNextDayFollowsTheZoneAcrossDST() {
+        // Bratislava 2026-10-25 has 25 hours; 23:30 CEST on the 24th → midnight CEST (22:00 UTC).
+        #expect(bratislava.startOfNextDay(after: Fixture.utc("2026-10-24", "21:30")) == Fixture.utc("2026-10-24", "22:00"))
+        #expect(bratislava.startOfNextDay(after: Fixture.utc("2026-10-24", "22:00")) == Fixture.utc("2026-10-25", "23:00"))
+        // Brazil 2018-11-04 skipped 00:00–01:00: the next day starts at its first existing minute.
+        let saoPaulo = CalendarContext(timeZone: Fixture.zone("America/Sao_Paulo"), firstWeekday: .monday)
+        #expect(saoPaulo.startOfNextDay(after: Fixture.utc("2018-11-03", "15:00")) == Fixture.utc("2018-11-04", "03:00"))
+    }
+
     @Test func skippedCalendarDayShiftsByTwentyFourHours() {
         // Samoa skipped 2011-12-30 entirely (UTC−10 → UTC+14).
         let apia = CalendarContext(timeZone: Fixture.zone("Pacific/Apia"), firstWeekday: .monday)

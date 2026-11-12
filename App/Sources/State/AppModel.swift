@@ -104,6 +104,9 @@ final class AppModel {
     /// Environment at the last derived-state build, and when the environment was last refreshed (Phase 10 P5).
     @ObservationIgnored private var derivedFingerprint: EnvironmentFingerprint?
     @ObservationIgnored private var lastEnvironmentRefreshAt: Date?
+    /// Refreshes `today` at the next midnight of the calendar context's zone (`significantTimeChangeNotification`
+    /// only fires at the device's midnight; a fixed timetable zone can be hours ahead or behind).
+    @ObservationIgnored private var dayRolloverTask: Task<Void, Never>?
     /// The scene went to the background since it was last active (`true` until the first activation).
     @ObservationIgnored private var sceneWasInBackground = true
     /// Called after the store loaded, after every accepted change and after every environment refresh (time zone,
@@ -223,8 +226,7 @@ final class AppModel {
         }
         if origin == .sync && candidate == database { return .applied(warnings: []) }   // re-applied data: no save, no re-plan
         let candidateIssues = candidate.validate()
-        // A replacing mutation starts from scratch: only its own errors count.
-        var verdict = MutationValidation.verdict(before: mutation.replacesDatabase ? [] : issues, after: candidateIssues)
+        var verdict = MutationValidation.verdict(for: mutation, before: issues, after: candidateIssues)
         if origin == .sync, case .rejected = verdict { verdict = .accepted(newWarnings: []) }
         switch verdict {
         case .rejected(let errors):
@@ -304,6 +306,7 @@ final class AppModel {
         }
         let newToday = inputs.context.localDate(of: now)
         if newToday != today { today = newToday }
+        scheduleDayRollover(context: inputs.context)
         if rebuild.resolvers {
             if let database {
                 let all = ScheduleResolver.all(database: database, context: inputs.context)
@@ -311,6 +314,19 @@ final class AppModel {
             } else if !resolvers.isEmpty {
                 resolvers = [:]
             }
+        }
+    }
+
+    /// Re-arms `dayRolloverTask` for the next midnight in `context`'s zone (not in screenshot mode: the clock is fixed).
+    private func scheduleDayRollover(context: CalendarContext) {
+        guard !environment.nowProvider.isFixed else { return }
+        dayRolloverTask?.cancel()
+        let current = now
+        let delay = context.startOfNextDay(after: current).timeIntervalSince(current) + 1   // + 1 s: safely past midnight
+        dayRolloverTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(delay))
+            guard !Task.isCancelled else { return }
+            self?.refreshEnvironment()
         }
     }
 

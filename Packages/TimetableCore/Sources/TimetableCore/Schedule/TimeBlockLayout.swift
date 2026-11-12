@@ -159,25 +159,31 @@ public struct TimeBlockLayout: Hashable, Sendable, Codable {
 
     /// Greedy lane assignment per group of transitively overlapping occurrences (input in wall-clock order).
     static func lanes(for entries: [ResolvedLesson]) -> [(ResolvedLesson, Int, Int)] {
-        var result: [(ResolvedLesson, Int, Int)] = []
-        var group: [(ResolvedLesson, Int)] = []
+        let lanes = overlapLanes(entries.map { ($0.startTime.minuteOfDay, $0.endTime.minuteOfDay) })
+        return zip(entries, lanes).map { ($0, $1.lane, $1.count) }
+    }
+
+    /// Greedy lane assignment per group of transitively overlapping half-open intervals (input sorted by start):
+    /// each interval's lane and its group's lane count, in input order. Shared with `GridLayout.cellLanes`.
+    static func overlapLanes(_ intervals: [(start: Int, end: Int)]) -> [(lane: Int, count: Int)] {
+        var result: [(lane: Int, count: Int)] = []
+        var group: [Int] = []
         var laneEnds: [Int] = []
         var groupEnd = Int.min
         func flush() {
             let count = max(1, laneEnds.count)
-            result += group.map { ($0.0, $0.1, count) }
+            result += group.map { ($0, count) }
             group.removeAll()
             laneEnds.removeAll()
         }
-        for entry in entries {
-            let start = entry.startTime.minuteOfDay, end = entry.endTime.minuteOfDay
+        for (start, end) in intervals {
             if !group.isEmpty && start >= groupEnd { flush() }
             if let free = laneEnds.firstIndex(where: { $0 <= start }) {
                 laneEnds[free] = end
-                group.append((entry, free))
+                group.append(free)
             } else {
                 laneEnds.append(end)
-                group.append((entry, laneEnds.count - 1))
+                group.append(laneEnds.count - 1)
             }
             groupEnd = group.count == 1 ? end : max(groupEnd, end)
         }

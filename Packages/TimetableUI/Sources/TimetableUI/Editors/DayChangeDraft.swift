@@ -125,6 +125,21 @@ public struct DayChangeDraft: Equatable, Sendable {
         moves = false
     }
 
+    /// The lesson to preselect among `available` (the date's lessons that can be cancelled or changed): the tapped
+    /// one when it is available; none when it is not (already cancelled that day: changing it would silently undo the
+    /// cancellation, which "Existing changes" undoes explicitly); without a tapped lesson, the date's first lesson.
+    public static func preselectedLesson(_ tapped: Lesson.ID?, available: [Lesson.ID]) -> Lesson.ID? {
+        guard let tapped else { return available.first }
+        return available.contains(tapped) ? tapped : nil
+    }
+
+    /// `true` when "Shortened lessons" is offered: only a timetable on bell schedules has one to swap (a free-form
+    /// timetable would be converted to bell schedules by the bell editor's Save).
+    public static func offersShortDay(in timetable: Timetable) -> Bool {
+        if case .bellSchedule = timetable.timeStructure { return true }
+        return false
+    }
+
     /// Kinds that need the day to have at least one lesson to pick from.
     public static func kindsNeedingLesson() -> Set<Kind> { [.cancelLesson, .changeLesson] }
 
