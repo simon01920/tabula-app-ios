@@ -53,7 +53,7 @@ Palette packs, per-subject colours, always the system light/dark appearance (no 
 See SHARING.md, AI_IMPORT.md. Export: image (grid/week/day, themed), PDF, CSV, XLSX (decide library vs minimal writer in the phase plan), `.ics`; user chooses type and view.
 
 ## Extra features (all wanted for v1 scope, scheduled across phases)
-Live Activity/Dynamic Island · Lock Screen & StandBy widgets · Focus filter (auto-silence during lessons) · App Intents/Shortcuts/Siri ("What's next?") · one-off overrides · "Pack tonight" reminder from the bring-list · free-period planner (suggest homework for gaps) · attachments · `.ics`/Apple Calendar export · term and holiday ranges · Watch complication · localisation in 12 languages · iPad layout (stretch, after v1 core).
+Live Activity/Dynamic Island · Lock Screen & StandBy widgets · Focus filter (auto-silence during lessons) · App Intents/Shortcuts/Siri ("What's next?") · one-off overrides · "Pack tonight" reminder from the bring-list · free-period planner (suggest homework for gaps) · attachments · `.ics`/Apple Calendar export · term and holiday ranges · Watch complication · localisation in 12 languages · iPad and iPhone Duo layouts (adaptive by available width and size class, `docs/specs/ADAPTIVE_LAYOUT.md`; human request 2026-11-11).
 
 ## Free vs Pro (proposal — configurable behind `Entitlements`)
 Free: 1 timetable, grid/day/tile views, tasks (subtasks, priorities), exams, standard + Time Sensitive reminders, small/medium widgets, iCloud sync, QR/code share and import.

@@ -135,7 +135,7 @@ struct MainTabView: View {
             Tab("shell.tab.tasks", systemImage: "checklist", value: AppTab.tasks) {
                 if let request = navigation.taskSegmentRequest {
                     // Phase 3 C1: Today's overdue chip asked for a segment; a new request id rebuilds the tab on it.
-                    TasksRootView(initialSegment: request.segment).id(request.id)
+                    TasksRootView(initialSegment: request.segment).id(request.id).readsLayoutWidth()
                 } else {
                     root(for: .tasks) { TasksRootView() }
                 }
@@ -147,6 +147,9 @@ struct MainTabView: View {
                 root(for: .settings) { SettingsRootView() }
             }
         }
+        // Adaptive layout (docs/specs/ADAPTIVE_LAYOUT.md): a tab bar on iPhone (on the side on iPhone Duo, placed by the
+        // system), a tab bar that converts to a sidebar on iPad (HIG tab-bars.md › Tablet). sidebarAdaptable: iOS 18.
+        .tabViewStyle(.sidebarAdaptable)
         .sheet(isPresented: isSheetPresented) {
             launchRoute?.makeView()
         }
@@ -155,13 +158,15 @@ struct MainTabView: View {
         .rootPresenter()
     }
 
-    /// The launch route's view when it targets `tab`, else the tab's normal root.
-    @ViewBuilder
+    /// The launch route's view when it targets `tab`, else the tab's normal root; both measure `\.layoutWidth`.
     private func root<Root: View>(for tab: AppTab, @ViewBuilder normal: () -> Root) -> some View {
-        if let launchRoute, case .tabRoot(tab) = launchRoute.placement {
-            launchRoute.makeView()
-        } else {
-            normal()
+        Group {
+            if let launchRoute, case .tabRoot(tab) = launchRoute.placement {
+                launchRoute.makeView()
+            } else {
+                normal()
+            }
         }
+        .readsLayoutWidth()
     }
 }

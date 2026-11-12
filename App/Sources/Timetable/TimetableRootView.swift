@@ -3,7 +3,7 @@
 // - title = the timetable's name (a title menu switches timetables when there are several); the shown week's range
 //   and rotation phrase ("12 Oct – 16 Oct · Odd week") are the iOS 26 navigation subtitle, so no date header and no
 //   button-like "Week B" capsule sit in the content;
-// - toolbar: previous / next week, then ONE stable "View Options" menu (`ellipsis`): "Today" first when another
+// - toolbar: previous / next week, then ONE stable "View Options" menu (`slider.horizontal.3`): "Today" first when another
 //   week/day is shown (D13: a leading button truncated the title), the view picker (Grid / Week / Day / Tiles), Edit
 //   Timetable, Add Lesson, "Change for This Day…" in day views, then density, "Show Week" and Subjects;
 // - an empty timetable shows "No lessons yet" with an Add Lesson button above the (quiet) grid;
@@ -35,9 +35,19 @@ struct TimetableRootView: View {
 
     @Environment(AppModel.self) private var model
     @Environment(\.dynamicTypeSize) private var typeSize
+    @Environment(\.layoutWidth) private var layoutWidth
+    @Environment(\.layoutContainerWidth) private var containerWidth
     @State private var selection: TimetableSelection?
     @State private var sessionViews: [Timetable.ID: TimetableViewKind] = [:]
+    /// The lesson detail as a sheet (narrow layouts, unchanged on iPhone).
     @State private var detail: LessonDetailTarget?
+    /// The lesson detail in the inspector column beside the grid (wide layouts, `LayoutWidth.fitsSidePanel`).
+    @State private var inspected: LessonDetailTarget?
+    /// A task opened from the inspector (presented here, so a resize never closes it or its editor).
+    @State private var inspectedTask: InspectedTask?
+    /// Screenshot route `timetable.grid-selected`: open the sample lesson once after the first layout.
+    private let opensSampleLesson: Bool
+    @State private var didOpenSample = false
     @State private var quickAdd: QuickAddTarget?
     @State private var editor: EditorPresentation?
     @State private var management: ManagementSheet?
@@ -49,13 +59,17 @@ struct TimetableRootView: View {
         initialView = nil
         initialWeekOffset = 0
         forcesLegendTip = false
+        opensSampleLesson = false
     }
 
-    init(initialView: TimetableViewKind, weekOffset: Int = 0, forcesLegendTip: Bool = false) {
+    init(initialView: TimetableViewKind, weekOffset: Int = 0, forcesLegendTip: Bool = false, opensSampleLesson: Bool = false) {
         self.initialView = initialView
         initialWeekOffset = weekOffset
         self.forcesLegendTip = forcesLegendTip
+        self.opensSampleLesson = opensSampleLesson
     }
+
+    private var showsInspector: Bool { layoutWidth.fitsSidePanel(containerWidth: containerWidth) }
 
     var body: some View {
         NavigationStack {
@@ -85,8 +99,40 @@ struct TimetableRootView: View {
             .timetableSwitcher(isEnabled: model.timetables.count > 1) { timetableMenu }
             .toolbar { toolbarContent }
         }
+        // Adaptive layout: on wide screens the lesson opens in an inspector column beside the grid (HIG: show an extra
+        // level of hierarchy when there is room), else as today's sheet.
+        .inspector(isPresented: Binding(get: { showsInspector && inspected != nil },
+                                        set: { if !$0 { inspected = nil } })) {
+            if let inspected {
+                LessonDetailView(target: inspected, inspector: LessonInspector(
+                    close: { self.inspected = nil },
+                    present: { editor = $0 },
+                    openTask: { inspectedTask = InspectedTask(taskID: $0) }))
+                    .id(inspected.id)
+                    .sidePanelWidth()
+            }
+        }
+        // A resize moves an open lesson between the inspector and the sheet. An open sheet is never closed here: an
+        // editor on top of it may hold unsaved changes.
+        .onChange(of: showsInspector) { _, wide in
+            if wide {
+                if let detail, inspected == nil { inspected = detail }
+            } else if let shown = inspected {
+                inspected = nil
+                if detail == nil { detail = shown }
+            }
+        }
+        // Screenshot route `timetable.grid-selected`: once the width is measured (keyed, so the closure sees it).
+        .task(id: containerWidth > 0) {
+            guard containerWidth > 0, opensSampleLesson, !didOpenSample else { return }
+            didOpenSample = true
+            if let target = LessonDetailTarget.sample(in: model) { open(target) }
+        }
         .sheet(item: $detail) { target in
             LessonDetailView(target: target)
+        }
+        .sheet(item: $inspectedTask) { target in
+            TaskDetailView(taskID: target.taskID)
         }
         .sheet(item: $quickAdd) { target in
             QuickAddSheet(target: target)
@@ -100,6 +146,7 @@ struct TimetableRootView: View {
             showsExport = false
             importingPhoto = false
             detail = nil
+            inspectedTask = nil
             quickAdd = nil
             management = nil
             sharing = nil
@@ -110,7 +157,7 @@ struct TimetableRootView: View {
         TimetableContent(timetable: timetable, resolver: resolver, now: model.now,
                          viewKind: viewKind(for: timetable), selection: selectionBinding(resolver),
                          showsLegendTip: forcesLegendTip || !model.isClockFixed,
-                         onOpen: open, onAdd: { quickAdd = $0 })
+                         onOpen: { open($0) }, onAdd: { quickAdd = $0 })
     }
 
     // MARK: State
@@ -158,7 +205,12 @@ struct TimetableRootView: View {
     }
 
     private func open(_ lesson: ResolvedLesson) {
-        detail = LessonDetailTarget(lesson)
+        open(LessonDetailTarget(lesson))
+    }
+
+    /// The inspector column when it fits beside the grid, else the sheet (unchanged on iPhone).
+    private func open(_ target: LessonDetailTarget) {
+        if showsInspector { inspected = target } else { detail = target }
     }
 
     /// Remembers the view for this timetable (persisted; also kept for the session if the store is read-only).
@@ -358,10 +410,18 @@ struct TimetableRootView: View {
                 .disabled(model.isReadOnly)
             }
         } label: {
-            // One stable glyph whatever the current view (Opus H4); VoiceOver and long-press read "View Options".
-            Label { Text("timetable.options") } icon: { Image(systemName: "ellipsis") }
+            // One stable glyph whatever the current view (Opus H4); VoiceOver and long-press read "View Options". Not
+            // the ellipsis: iPhone Duo reserves it for the system overflow menu (HIG designing-for-iphone-duo.md ›
+            // Vertical controls, "Reserve the ellipsis symbol for overflow, and give other menus a distinct symbol").
+            Label { Text("timetable.options") } icon: { Image(systemName: "slider.horizontal.3") }
         }
     }
+}
+
+/// A task opened from the lesson inspector (`sheet(item:)` needs an `Identifiable`).
+private struct InspectedTask: Identifiable {
+    let taskID: TaskItem.ID
+    var id: String { taskID.uuidString }
 }
 
 private extension View {

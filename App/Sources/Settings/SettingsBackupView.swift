@@ -83,6 +83,7 @@ struct SettingsBackupView: View {
                 }
             }
         }
+        .readableWidth()   // one readable column on wide screens (ADAPTIVE_LAYOUT.md)
         .navigationTitle(Text("settings.backup.title"))
         .task { await prepareExport() }
         .fileImporter(isPresented: $importing, allowedContentTypes: [.data]) { pick($0) }

@@ -47545,6 +47545,90 @@
         }
       }
     },
+    "exams.split.placeholder" : {
+      "comment" : "Exams tab on wide screens (iPad): shown in the detail column beside the exam list until an exam is chosen. Title-style capitalisation, like an empty-state title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vyberte zkoušku"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Prüfung auswählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select an Exam"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Choisissez un examen"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vizsga kiválasztása"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "試験を選択"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wybierz egzamin"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Alege un examen"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vyberte skúšku"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Изаберите испит"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Izaberite ispit"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Виберіть іспит"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "选择考试"
+          }
+        }
+      }
+    },
     "exams.status.done" : {
       "comment" : "Label on an exam that was marked done.",
       "extractionState" : "manual",
@@ -56288,31 +56372,31 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula na tomto iPhonu používá Apple Intelligence ke kontrole buněk, kterými si není jistá."
+            "value" : "Tabula na tomto zařízení používá Apple Intelligence ke kontrole buněk, kterými si není jistá."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula nutzt Apple Intelligence auf diesem iPhone, um unsichere Zellen zu prüfen."
+            "value" : "Tabula nutzt Apple Intelligence auf diesem Gerät, um unsichere Zellen zu prüfen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tabula uses Apple Intelligence on this iPhone to check the cells it is unsure about."
+            "value" : "Tabula uses Apple Intelligence on this device to check the cells it is unsure about."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula utilise Apple Intelligence sur cet iPhone pour vérifier les cellules dont elle n’est pas sûre."
+            "value" : "Tabula utilise Apple Intelligence sur cet appareil pour vérifier les cellules dont elle n’est pas sûre."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "A Tabula az Apple Intelligence-t használja ezen az iPhone-on, hogy ellenőrizze a bizonytalan cellákat."
+            "value" : "A Tabula az Apple Intelligence-t használja ezen az eszközön, hogy ellenőrizze a bizonytalan cellákat."
           }
         },
         "ja" : {
@@ -56324,43 +56408,43 @@
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula używa Apple Intelligence na tym iPhonie, aby sprawdzić komórki, których nie jest pewna."
+            "value" : "Tabula używa Apple Intelligence na tym urządzeniu, aby sprawdzić komórki, których nie jest pewna."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula folosește Apple Intelligence pe acest iPhone pentru a verifica celulele de care nu e sigură."
+            "value" : "Tabula folosește Apple Intelligence pe acest dispozitiv pentru a verifica celulele de care nu e sigură."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula na tomto iPhone používa Apple Intelligence na kontrolu buniek, ktorými si nie je istá."
+            "value" : "Tabula na tomto zariadení používa Apple Intelligence na kontrolu buniek, ktorými si nie je istá."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Табула користи Apple Intelligence на овом iPhone-у да провери ћелије у које није сигурна."
+            "value" : "Табула користи Apple Intelligence на овом уређају да провери ћелије у које није сигурна."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula koristi Apple Intelligence na ovom iPhone-u da proveri ćelije u koje nije sigurna."
+            "value" : "Tabula koristi Apple Intelligence na ovom uređaju da proveri ćelije u koje nije sigurna."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula використовує Apple Intelligence на цьому iPhone, щоб перевірити клітинки, у яких не впевнена."
+            "value" : "Tabula використовує Apple Intelligence на цьому пристрої, щоб перевірити клітинки, у яких не впевнена."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula 会使用这台 iPhone 上的 Apple 智能检查不确定的单元格。"
+            "value" : "Tabula 会使用这台设备上的 Apple 智能检查不确定的单元格。"
           }
         }
       }
@@ -56372,79 +56456,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tento iPhone nepodporuje Apple Intelligence. Import funguje i tak; nejisté buňky zkontrolujete sami."
+            "value" : "Toto zařízení nepodporuje Apple Intelligence. Import funguje i tak; nejisté buňky zkontrolujete sami."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Dieses iPhone unterstützt Apple Intelligence nicht. Der Import funktioniert trotzdem; unsichere Zellen prüfst du selbst."
+            "value" : "Dieses Gerät unterstützt Apple Intelligence nicht. Der Import funktioniert trotzdem; unsichere Zellen prüfst du selbst."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This iPhone does not support Apple Intelligence. Import still works; you check uncertain cells yourself."
+            "value" : "This device does not support Apple Intelligence. Import still works; you check uncertain cells yourself."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Cet iPhone ne prend pas en charge Apple Intelligence. L’importation fonctionne quand même ; vous vérifiez vous-même les cellules incertaines."
+            "value" : "Cet appareil ne prend pas en charge Apple Intelligence. L’importation fonctionne quand même ; vous vérifiez vous-même les cellules incertaines."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ez az iPhone nem támogatja az Apple Intelligence-t. Az importálás így is működik; a bizonytalan cellákat te ellenőrzöd."
+            "value" : "Ez az eszköz nem támogatja az Apple Intelligence-t. Az importálás így is működik; a bizonytalan cellákat te ellenőrzöd."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "このiPhoneはApple Intelligenceに対応していません。読み込みはそのまま使えます。不確かなセルはご自身で確認してください。"
+            "value" : "このデバイスはApple Intelligenceに対応していません。読み込みはそのまま使えます。不確かなセルはご自身で確認してください。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ten iPhone nie obsługuje Apple Intelligence. Import nadal działa; niepewne komórki sprawdzasz sam."
+            "value" : "To urządzenie nie obsługuje Apple Intelligence. Import nadal działa; niepewne komórki sprawdzasz sam."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Acest iPhone nu acceptă Apple Intelligence. Importul funcționează oricum; verifici singur celulele nesigure."
+            "value" : "Acest dispozitiv nu acceptă Apple Intelligence. Importul funcționează oricum; verifici singur celulele nesigure."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tento iPhone nepodporuje Apple Intelligence. Import funguje aj tak; neisté bunky skontrolujete sami."
+            "value" : "Toto zariadenie nepodporuje Apple Intelligence. Import funguje aj tak; neisté bunky skontrolujete sami."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Овај iPhone не подржава Apple Intelligence. Увоз ипак ради; несигурне ћелије проверавате сами."
+            "value" : "Овај уређај не подржава Apple Intelligence. Увоз ипак ради; несигурне ћелије проверавате сами."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ovaj iPhone ne podržava Apple Intelligence. Uvoz ipak radi; nesigurne ćelije proveravate sami."
+            "value" : "Ovaj uređaj ne podržava Apple Intelligence. Uvoz ipak radi; nesigurne ćelije proveravate sami."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Цей iPhone не підтримує Apple Intelligence. Імпорт однаково працює; непевні клітинки ви перевіряєте самі."
+            "value" : "Цей пристрій не підтримує Apple Intelligence. Імпорт однаково працює; непевні клітинки ви перевіряєте самі."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "这台 iPhone 不支持 Apple 智能。导入仍可使用，不确定的单元格需要你自己检查。"
+            "value" : "这台设备不支持 Apple 智能。导入仍可使用，不确定的单元格需要你自己检查。"
           }
         }
       }
@@ -56624,79 +56708,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Apple Intelligence se na tomto iPhonu ještě připravuje. Do té doby import funguje bez ní."
+            "value" : "Apple Intelligence se na tomto zařízení ještě připravuje. Do té doby import funguje bez ní."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Apple Intelligence wird auf diesem iPhone noch vorbereitet. Bis dahin funktioniert der Import ohne."
+            "value" : "Apple Intelligence wird auf diesem Gerät noch vorbereitet. Bis dahin funktioniert der Import ohne."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Apple Intelligence is still getting ready on this iPhone. Import works without it in the meantime."
+            "value" : "Apple Intelligence is still getting ready on this device. Import works without it in the meantime."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Apple Intelligence est encore en préparation sur cet iPhone. En attendant, l’importation fonctionne sans."
+            "value" : "Apple Intelligence est encore en préparation sur cet appareil. En attendant, l’importation fonctionne sans."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Az Apple Intelligence még készül ezen az iPhone-on. Addig az importálás nélküle működik."
+            "value" : "Az Apple Intelligence még készül ezen az eszközön. Addig az importálás nélküle működik."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "このiPhoneではApple Intelligenceの準備中です。それまではApple Intelligenceなしで読み込めます。"
+            "value" : "このデバイスではApple Intelligenceの準備中です。それまではApple Intelligenceなしで読み込めます。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Apple Intelligence wciąż się przygotowuje na tym iPhonie. Do tego czasu import działa bez niej."
+            "value" : "Apple Intelligence wciąż się przygotowuje na tym urządzeniu. Do tego czasu import działa bez niej."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Apple Intelligence încă se pregătește pe acest iPhone. Între timp, importul funcționează fără ea."
+            "value" : "Apple Intelligence încă se pregătește pe acest dispozitiv. Între timp, importul funcționează fără ea."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Apple Intelligence sa na tomto iPhone ešte pripravuje. Dovtedy import funguje bez nej."
+            "value" : "Apple Intelligence sa na tomto zariadení ešte pripravuje. Dovtedy import funguje bez nej."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Apple Intelligence се још припрема на овом iPhone-у. До тада увоз ради без ње."
+            "value" : "Apple Intelligence се још припрема на овом уређају. До тада увоз ради без ње."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Apple Intelligence se još priprema na ovom iPhone-u. Do tada uvoz radi bez nje."
+            "value" : "Apple Intelligence se još priprema na ovom uređaju. Do tada uvoz radi bez nje."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Apple Intelligence ще готується на цьому iPhone. Поки що імпорт працює без неї."
+            "value" : "Apple Intelligence ще готується на цьому пристрої. Поки що імпорт працює без неї."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "这台 iPhone 上的 Apple 智能仍在准备中。在此期间导入照常可用。"
+            "value" : "这台设备上的 Apple 智能仍在准备中。在此期间导入照常可用。"
           }
         }
       }
@@ -56792,79 +56876,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ne na tomto iPhonu"
+            "value" : "Ne na tomto zařízení"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Nicht auf diesem iPhone"
+            "value" : "Nicht auf diesem Gerät"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Not on This iPhone"
+            "value" : "Not on This Device"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Pas sur cet iPhone"
+            "value" : "Pas sur cet appareil"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ezen az iPhone-on nem"
+            "value" : "Ezen az eszközön nem"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "このiPhoneは非対応"
+            "value" : "このデバイスは非対応"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Nie na tym iPhonie"
+            "value" : "Nie na tym urządzeniu"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Nu pe acest iPhone"
+            "value" : "Nu pe acest dispozitiv"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Nie na tomto iPhone"
+            "value" : "Nie na tomto zariadení"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Није на овом iPhone-у"
+            "value" : "Није на овом уређају"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Nije na ovom iPhone-u"
+            "value" : "Nije na ovom uređaju"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Не на цьому iPhone"
+            "value" : "Не на цьому пристрої"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "此 iPhone 不支持"
+            "value" : "此设备不支持"
           }
         }
       }
@@ -57296,79 +57380,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Používá Apple Intelligence na tomto iPhonu"
+            "value" : "Používá Apple Intelligence na tomto zařízení"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Nutzt Apple Intelligence auf diesem iPhone"
+            "value" : "Nutzt Apple Intelligence auf diesem Gerät"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Uses Apple Intelligence on this iPhone"
+            "value" : "Uses Apple Intelligence on this device"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Utilise Apple Intelligence sur cet iPhone"
+            "value" : "Utilise Apple Intelligence sur cet appareil"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Az Apple Intelligence-t használja ezen az iPhone-on"
+            "value" : "Az Apple Intelligence-t használja ezen az eszközön"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "このiPhoneのApple Intelligenceを使用"
+            "value" : "このデバイスのApple Intelligenceを使用"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Używa Apple Intelligence na tym iPhonie"
+            "value" : "Używa Apple Intelligence na tym urządzeniu"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Folosește Apple Intelligence pe acest iPhone"
+            "value" : "Folosește Apple Intelligence pe acest dispozitiv"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Používa Apple Intelligence na tomto iPhone"
+            "value" : "Používa Apple Intelligence na tomto zariadení"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Користи Apple Intelligence на овом iPhone-у"
+            "value" : "Користи Apple Intelligence на овом уређају"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Koristi Apple Intelligence na ovom iPhone-u"
+            "value" : "Koristi Apple Intelligence na ovom uređaju"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Використовує Apple Intelligence на цьому iPhone"
+            "value" : "Використовує Apple Intelligence на цьому пристрої"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "使用这台 iPhone 上的 Apple 智能"
+            "value" : "使用这台设备上的 Apple 智能"
           }
         }
       }
@@ -57464,79 +57548,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Text se čte na tomto iPhonu. Nic se neodesílá."
+            "value" : "Text se čte na tomto zařízení. Nic se neodesílá."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Der Text wird auf diesem iPhone gelesen. Nichts wird hochgeladen."
+            "value" : "Der Text wird auf diesem Gerät gelesen. Nichts wird hochgeladen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The text is read on this iPhone. Nothing is uploaded."
+            "value" : "The text is read on this device. Nothing is uploaded."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Le texte est lu sur cet iPhone. Rien n’est envoyé."
+            "value" : "Le texte est lu sur cet appareil. Rien n’est envoyé."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "A szöveget ez az iPhone olvassa be. Semmi sem kerül feltöltésre."
+            "value" : "A szöveget ez az eszköz olvassa be. Semmi sem kerül feltöltésre."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "文字はこのiPhone上で読み取られます。何もアップロードされません。"
+            "value" : "文字はこのデバイス上で読み取られます。何もアップロードされません。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tekst jest odczytywany na tym iPhonie. Nic nie jest wysyłane."
+            "value" : "Tekst jest odczytywany na tym urządzeniu. Nic nie jest wysyłane."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Textul este citit pe acest iPhone. Nimic nu este încărcat."
+            "value" : "Textul este citit pe acest dispozitiv. Nimic nu este încărcat."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Text sa číta na tomto iPhone. Nič sa neodosiela."
+            "value" : "Text sa číta na tomto zariadení. Nič sa neodosiela."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Текст се чита на овом iPhone-у. Ништа се не отпрема."
+            "value" : "Текст се чита на овом уређају. Ништа се не отпрема."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tekst se čita na ovom iPhone-u. Ništa se ne otprema."
+            "value" : "Tekst se čita na ovom uređaju. Ništa se ne otprema."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Текст розпізнається на цьому iPhone. Нічого не надсилається."
+            "value" : "Текст розпізнається на цьому пристрої. Нічого не надсилається."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "文字在这台 iPhone 上识别，不会上传任何内容。"
+            "value" : "文字在这台设备上识别，不会上传任何内容。"
           }
         }
       }
@@ -61202,79 +61286,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Vše probíhá na tomto iPhonu."
+            "value" : "Vše probíhá na tomto zařízení."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Alles passiert auf diesem iPhone."
+            "value" : "Alles passiert auf diesem Gerät."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Everything happens on this iPhone."
+            "value" : "Everything happens on this device."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tout se passe sur cet iPhone."
+            "value" : "Tout se passe sur cet appareil."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Minden ezen az iPhone-on történik."
+            "value" : "Minden ezen az eszközön történik."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "処理はすべてこのiPhone上で行われます。"
+            "value" : "処理はすべてこのデバイス上で行われます。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wszystko dzieje się na tym iPhonie."
+            "value" : "Wszystko dzieje się na tym urządzeniu."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Totul se întâmplă pe acest iPhone."
+            "value" : "Totul se întâmplă pe acest dispozitiv."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Všetko prebieha na tomto iPhone."
+            "value" : "Všetko prebieha na tomto zariadení."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Све се дешава на овом iPhone-у."
+            "value" : "Све се дешава на овом уређају."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Sve se dešava na ovom iPhone-u."
+            "value" : "Sve se dešava na ovom uređaju."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Усе відбувається на цьому iPhone."
+            "value" : "Усе відбувається на цьому пристрої."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "所有处理都在这台 iPhone 上完成。"
+            "value" : "所有处理都在这台设备上完成。"
           }
         }
       }
@@ -61286,79 +61370,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Používá Apple Intelligence na tomto iPhonu. Nic se neodesílá."
+            "value" : "Používá Apple Intelligence na tomto zařízení. Nic se neodesílá."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Nutzt Apple Intelligence auf diesem iPhone. Nichts wird hochgeladen."
+            "value" : "Nutzt Apple Intelligence auf diesem Gerät. Nichts wird hochgeladen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Uses Apple Intelligence on this iPhone. Nothing is uploaded."
+            "value" : "Uses Apple Intelligence on this device. Nothing is uploaded."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Utilise Apple Intelligence sur cet iPhone. Rien n’est envoyé."
+            "value" : "Utilise Apple Intelligence sur cet appareil. Rien n’est envoyé."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Az Apple Intelligence-t használja ezen az iPhone-on. Semmi sem kerül feltöltésre."
+            "value" : "Az Apple Intelligence-t használja ezen az eszközön. Semmi sem kerül feltöltésre."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "このiPhoneのApple Intelligenceを使用します。何もアップロードされません。"
+            "value" : "このデバイスのApple Intelligenceを使用します。何もアップロードされません。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Używa Apple Intelligence na tym iPhonie. Nic nie jest wysyłane."
+            "value" : "Używa Apple Intelligence na tym urządzeniu. Nic nie jest wysyłane."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Folosește Apple Intelligence pe acest iPhone. Nimic nu este încărcat."
+            "value" : "Folosește Apple Intelligence pe acest dispozitiv. Nimic nu este încărcat."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Používa Apple Intelligence na tomto iPhone. Nič sa neodosiela."
+            "value" : "Používa Apple Intelligence na tomto zariadení. Nič sa neodosiela."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Користи Apple Intelligence на овом iPhone-у. Ништа се не отпрема."
+            "value" : "Користи Apple Intelligence на овом уређају. Ништа се не отпрема."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Koristi Apple Intelligence na ovom iPhone-u. Ništa se ne otprema."
+            "value" : "Koristi Apple Intelligence na ovom uređaju. Ništa se ne otprema."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Використовує Apple Intelligence на цьому iPhone. Нічого не надсилається."
+            "value" : "Використовує Apple Intelligence на цьому пристрої. Нічого не надсилається."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "使用这台 iPhone 上的 Apple 智能，不会上传任何内容。"
+            "value" : "使用这台设备上的 Apple 智能，不会上传任何内容。"
           }
         }
       }
@@ -101648,79 +101732,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Záloha byla sloučena s daty v tomto iPhonu."
+            "value" : "Záloha byla sloučena s daty v tomto zařízení."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Das Backup wurde mit den Daten auf diesem iPhone zusammengeführt."
+            "value" : "Das Backup wurde mit den Daten auf diesem Gerät zusammengeführt."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The backup was merged with the data on this iPhone."
+            "value" : "The backup was merged with the data on this device."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "La sauvegarde a été fusionnée avec les données de cet iPhone."
+            "value" : "La sauvegarde a été fusionnée avec les données de cet appareil."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "A mentés egyesítve lett az iPhone-on lévő adatokkal."
+            "value" : "A mentés egyesítve lett az eszközön lévő adatokkal."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "バックアップをこのiPhoneのデータと結合しました。"
+            "value" : "バックアップをこのデバイスのデータと結合しました。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Kopia zapasowa została scalona z danymi na tym iPhonie."
+            "value" : "Kopia zapasowa została scalona z danymi na tym urządzeniu."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Backupul a fost combinat cu datele de pe acest iPhone."
+            "value" : "Backupul a fost combinat cu datele de pe acest dispozitiv."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Záloha sa zlúčila s údajmi v tomto iPhone."
+            "value" : "Záloha sa zlúčila s údajmi v tomto zariadení."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Резервна копија је спојена са подацима на овом iPhone-у."
+            "value" : "Резервна копија је спојена са подацима на овом уређају."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Rezervna kopija je spojena sa podacima na ovom iPhone-u."
+            "value" : "Rezervna kopija je spojena sa podacima na ovom uređaju."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Резервну копію об’єднано з даними на цьому iPhone."
+            "value" : "Резервну копію об’єднано з даними на цьому пристрої."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "备份已与此 iPhone 上的数据合并。"
+            "value" : "备份已与此设备上的数据合并。"
           }
         }
       }
@@ -101732,79 +101816,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tento iPhone má teď data ze zálohy. Kopie vašich předchozích dat je v Automatických kopiích."
+            "value" : "Toto zařízení má teď data ze zálohy. Kopie vašich předchozích dat je v Automatických kopiích."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Dieses iPhone hat jetzt die Daten aus dem Backup. Eine Kopie deiner vorherigen Daten findest du unter „Automatische Kopien“."
+            "value" : "Dieses Gerät hat jetzt die Daten aus dem Backup. Eine Kopie deiner vorherigen Daten findest du unter „Automatische Kopien“."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This iPhone now has the data from the backup. A copy of your previous data is in Automatic copies."
+            "value" : "This device now has the data from the backup. A copy of your previous data is in Automatic copies."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Cet iPhone contient maintenant les données de la sauvegarde. Une copie de vos données précédentes se trouve dans Copies automatiques."
+            "value" : "Cet appareil contient maintenant les données de la sauvegarde. Une copie de vos données précédentes se trouve dans Copies automatiques."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Az iPhone-on most a mentés adatai vannak. A korábbi adataid másolata az Automatikus másolatok között található."
+            "value" : "Az eszközön most a mentés adatai vannak. A korábbi adataid másolata az Automatikus másolatok között található."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "このiPhoneのデータはバックアップの内容になりました。以前のデータのコピーは「自動コピー」にあります。"
+            "value" : "このデバイスのデータはバックアップの内容になりました。以前のデータのコピーは「自動コピー」にあります。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ten iPhone ma teraz dane z kopii zapasowej. Kopia poprzednich danych jest w sekcji Kopie automatyczne."
+            "value" : "To urządzenie ma teraz dane z kopii zapasowej. Kopia poprzednich danych jest w sekcji Kopie automatyczne."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Acest iPhone are acum datele din backup. O copie a datelor anterioare se află în Copii automate."
+            "value" : "Acest dispozitiv are acum datele din backup. O copie a datelor anterioare se află în Copii automate."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tento iPhone má teraz údaje zo zálohy. Kópia vašich predchádzajúcich údajov je v Automatických kópiách."
+            "value" : "Toto zariadenie má teraz údaje zo zálohy. Kópia vašich predchádzajúcich údajov je v Automatických kópiách."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Овај iPhone сада има податке из резервне копије. Копија ваших претходних података налази се у Аутоматским копијама."
+            "value" : "Овај уређај сада има податке из резервне копије. Копија ваших претходних података налази се у Аутоматским копијама."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ovaj iPhone sada ima podatke iz rezervne kopije. Kopija vaših prethodnih podataka nalazi se u Automatskim kopijama."
+            "value" : "Ovaj uređaj sada ima podatke iz rezervne kopije. Kopija vaših prethodnih podataka nalazi se u Automatskim kopijama."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Тепер на цьому iPhone дані з резервної копії. Копія ваших попередніх даних — в «Автоматичних копіях»."
+            "value" : "Тепер на цьому пристрої дані з резервної копії. Копія ваших попередніх даних — в «Автоматичних копіях»."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "此 iPhone 现在使用备份中的数据。之前数据的副本位于“自动副本”中。"
+            "value" : "此设备现在使用备份中的数据。之前数据的副本位于“自动副本”中。"
           }
         }
       }
@@ -102908,79 +102992,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Záloha z %@. Sloučit spojí zálohu s daty v tomto iPhonu; pokud se stejná položka změnila na obou místech, vyhraje novější změna. Nahradit sladí tento iPhone se zálohou."
+            "value" : "Záloha z %@. Sloučit spojí zálohu s daty v tomto zařízení; pokud se stejná položka změnila na obou místech, vyhraje novější změna. Nahradit sladí toto zařízení se zálohou."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Backup vom %@. „Zusammenführen“ kombiniert das Backup mit den Daten auf diesem iPhone; wurde dasselbe Element an beiden Stellen geändert, gilt die neuere Änderung. „Ersetzen“ gleicht dieses iPhone an das Backup an."
+            "value" : "Backup vom %@. „Zusammenführen“ kombiniert das Backup mit den Daten auf diesem Gerät; wurde dasselbe Element an beiden Stellen geändert, gilt die neuere Änderung. „Ersetzen“ gleicht dieses Gerät an das Backup an."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Backup from %@. Merge combines the backup with the data on this iPhone; where both changed the same item, the newer change wins. Replace makes this iPhone match the backup."
+            "value" : "Backup from %@. Merge combines the backup with the data on this device; where both changed the same item, the newer change wins. Replace makes this device match the backup."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Sauvegarde du %@. Fusionner combine la sauvegarde avec les données de cet iPhone ; si un même élément a changé des deux côtés, la modification la plus récente l’emporte. Remplacer aligne cet iPhone sur la sauvegarde."
+            "value" : "Sauvegarde du %@. Fusionner combine la sauvegarde avec les données de cet appareil ; si un même élément a changé des deux côtés, la modification la plus récente l’emporte. Remplacer aligne cet appareil sur la sauvegarde."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Mentés ekkor: %@. Az Egyesítés összevonja a mentést az iPhone-on lévő adatokkal; ha ugyanaz az elem mindkét helyen változott, az újabb módosítás érvényes. A Csere az iPhone-t a mentéssel teszi azonossá."
+            "value" : "Mentés ekkor: %@. Az Egyesítés összevonja a mentést az eszközön lévő adatokkal; ha ugyanaz az elem mindkét helyen változott, az újabb módosítás érvényes. A Csere az eszközt a mentéssel teszi azonossá."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "%@のバックアップです。「結合」はバックアップとこのiPhoneのデータを組み合わせます。同じ項目が両方で変更されている場合は、新しい変更が優先されます。「置き換え」はこのiPhoneをバックアップと同じ状態にします。"
+            "value" : "%@のバックアップです。「結合」はバックアップとこのデバイスのデータを組み合わせます。同じ項目が両方で変更されている場合は、新しい変更が優先されます。「置き換え」はこのデバイスをバックアップと同じ状態にします。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Kopia z %@. Scal łączy kopię z danymi na tym iPhonie; jeśli ten sam element zmieniono w obu miejscach, wygrywa nowsza zmiana. Zastąp sprawia, że ten iPhone będzie zgodny z kopią."
+            "value" : "Kopia z %@. Scal łączy kopię z danymi na tym urządzeniu; jeśli ten sam element zmieniono w obu miejscach, wygrywa nowsza zmiana. Zastąp sprawia, że to urządzenie będzie zgodne z kopią."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Backup din %@. Combină unește backupul cu datele de pe acest iPhone; dacă același element s-a schimbat în ambele locuri, câștigă modificarea mai nouă. Înlocuiește face ca acest iPhone să corespundă backupului."
+            "value" : "Backup din %@. Combină unește backupul cu datele de pe acest dispozitiv; dacă același element s-a schimbat în ambele locuri, câștigă modificarea mai nouă. Înlocuiește face ca acest dispozitiv să corespundă backupului."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Záloha z %@. Zlúčiť spojí zálohu s údajmi v tomto iPhone; ak sa tá istá položka zmenila na oboch miestach, vyhrá novšia zmena. Nahradiť zosúladí tento iPhone so zálohou."
+            "value" : "Záloha z %@. Zlúčiť spojí zálohu s údajmi v tomto zariadení; ak sa tá istá položka zmenila na oboch miestach, vyhrá novšia zmena. Nahradiť zosúladí toto zariadenie so zálohou."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Резервна копија од %@. Споји комбинује резервну копију са подацима на овом iPhone-у; ако је иста ставка промењена на оба места, важи новија промена. Замени усклађује овај iPhone са резервном копијом."
+            "value" : "Резервна копија од %@. Споји комбинује резервну копију са подацима на овом уређају; ако је иста ставка промењена на оба места, важи новија промена. Замени усклађује овај уређај са резервном копијом."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Rezervna kopija od %@. Spoji kombinuje rezervnu kopiju sa podacima na ovom iPhone-u; ako je ista stavka promenjena na oba mesta, važi novija promena. Zameni usklađuje ovaj iPhone sa rezervnom kopijom."
+            "value" : "Rezervna kopija od %@. Spoji kombinuje rezervnu kopiju sa podacima na ovom uređaju; ako je ista stavka promenjena na oba mesta, važi novija promena. Zameni usklađuje ovaj uređaj sa rezervnom kopijom."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Резервна копія від %@. «Об’єднати» поєднує резервну копію з даними на цьому iPhone; якщо той самий елемент змінено в обох місцях, перемагає новіша зміна. «Замінити» робить цей iPhone таким, як резервна копія."
+            "value" : "Резервна копія від %@. «Об’єднати» поєднує резервну копію з даними на цьому пристрої; якщо той самий елемент змінено в обох місцях, перемагає новіша зміна. «Замінити» робить цей пристрій таким, як резервна копія."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "%@ 的备份。“合并”会将备份与此 iPhone 上的数据合并；如果同一项目在两处都有更改，以较新的更改为准。“替换”会使此 iPhone 与备份完全一致。"
+            "value" : "%@ 的备份。“合并”会将备份与此设备上的数据合并；如果同一项目在两处都有更改，以较新的更改为准。“替换”会使此设备与备份完全一致。"
           }
         }
       }
@@ -103160,79 +103244,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Záloha byla použita, ale Tabula ji nemohla uložit do tohoto iPhonu. Data se zachovají, dokud je Tabula otevřená, a ukládání se zopakuje při další změně. Zkontrolujte, zda má váš iPhone volné úložiště."
+            "value" : "Záloha byla použita, ale Tabula ji nemohla uložit do tohoto zařízení. Data se zachovají, dokud je Tabula otevřená, a ukládání se zopakuje při další změně. Zkontrolujte, zda má vaše zařízení volné úložiště."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Das Backup wurde übernommen, aber Tabula konnte es nicht auf diesem iPhone sichern. Die Daten bleiben erhalten, solange Tabula geöffnet ist, und das Sichern wird bei deiner nächsten Änderung erneut versucht. Prüfe, ob dein iPhone freien Speicherplatz hat."
+            "value" : "Das Backup wurde übernommen, aber Tabula konnte es nicht auf diesem Gerät sichern. Die Daten bleiben erhalten, solange Tabula geöffnet ist, und das Sichern wird bei deiner nächsten Änderung erneut versucht. Prüfe, ob dein Gerät freien Speicherplatz hat."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The backup was applied, but Tabula couldn't save it on this iPhone. It's kept while Tabula is open, and saving is retried with your next change. Check that your iPhone has free storage."
+            "value" : "The backup was applied, but Tabula couldn't save it on this device. It's kept while Tabula is open, and saving is retried with your next change. Check that your device has free storage."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "La sauvegarde a été appliquée, mais Tabula n’a pas pu l’enregistrer sur cet iPhone. Les données sont conservées tant que Tabula est ouverte et l’enregistrement sera retenté à votre prochaine modification. Vérifiez que votre iPhone dispose d’espace de stockage libre."
+            "value" : "La sauvegarde a été appliquée, mais Tabula n’a pas pu l’enregistrer sur cet appareil. Les données sont conservées tant que Tabula est ouverte et l’enregistrement sera retenté à votre prochaine modification. Vérifiez que votre appareil dispose d’espace de stockage libre."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "A mentés alkalmazva lett, de a Tabula nem tudta elmenteni erre az iPhone-ra. Az adatok megmaradnak, amíg a Tabula nyitva van, és a mentést a következő módosításnál újra megpróbáljuk. Ellenőrizd, hogy van-e szabad hely az iPhone-odon."
+            "value" : "A mentés alkalmazva lett, de a Tabula nem tudta elmenteni erre az eszközre. Az adatok megmaradnak, amíg a Tabula nyitva van, és a mentést a következő módosításnál újra megpróbáljuk. Ellenőrizd, hogy van-e szabad hely az eszközödön."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "バックアップは適用されましたが、TabulaはこのiPhoneに保存できませんでした。Tabulaを開いている間はデータが保持され、次の変更時に保存が再試行されます。iPhoneの空き容量を確認してください。"
+            "value" : "バックアップは適用されましたが、Tabulaはこのデバイスに保存できませんでした。Tabulaを開いている間はデータが保持され、次の変更時に保存が再試行されます。デバイスの空き容量を確認してください。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Kopia zapasowa została zastosowana, ale Tabula nie mogła jej zapisać na tym iPhonie. Dane są zachowane, dopóki Tabula jest otwarta, a zapis zostanie ponowiony przy kolejnej zmianie. Sprawdź, czy iPhone ma wolne miejsce."
+            "value" : "Kopia zapasowa została zastosowana, ale Tabula nie mogła jej zapisać na tym urządzeniu. Dane są zachowane, dopóki Tabula jest otwarta, a zapis zostanie ponowiony przy kolejnej zmianie. Sprawdź, czy urządzenie ma wolne miejsce."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Backupul a fost aplicat, dar Tabula nu l-a putut salva pe acest iPhone. Datele sunt păstrate cât timp Tabula e deschisă, iar salvarea se reîncearcă la următoarea modificare. Verifică dacă iPhone-ul are spațiu liber."
+            "value" : "Backupul a fost aplicat, dar Tabula nu l-a putut salva pe acest dispozitiv. Datele sunt păstrate cât timp Tabula e deschisă, iar salvarea se reîncearcă la următoarea modificare. Verifică dacă dispozitivul are spațiu liber."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Záloha sa použila, ale Tabula ju nemohla uložiť do tohto iPhonu. Údaje sa zachovajú, kým je Tabula otvorená, a ukladanie sa zopakuje pri ďalšej zmene. Skontrolujte, či má váš iPhone voľné úložisko."
+            "value" : "Záloha sa použila, ale Tabula ju nemohla uložiť do tohto zariadenia. Údaje sa zachovajú, kým je Tabula otvorená, a ukladanie sa zopakuje pri ďalšej zmene. Skontrolujte, či má vaše zariadenie voľné úložisko."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Резервна копија је примењена, али Tabula није могла да је сачува на овом iPhone-у. Подаци се чувају док је Tabula отворена, а чување ће бити поновљено при следећој измени. Проверите да ли iPhone има слободног простора."
+            "value" : "Резервна копија је примењена, али Tabula није могла да је сачува на овом уређају. Подаци се чувају док је Tabula отворена, а чување ће бити поновљено при следећој измени. Проверите да ли уређај има слободног простора."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Rezervna kopija je primenjena, ali Tabula nije mogla da je sačuva na ovom iPhone-u. Podaci se čuvaju dok je Tabula otvorena, a čuvanje će biti ponovljeno pri sledećoj izmeni. Proverite da li iPhone ima slobodnog prostora."
+            "value" : "Rezervna kopija je primenjena, ali Tabula nije mogla da je sačuva na ovom uređaju. Podaci se čuvaju dok je Tabula otvorena, a čuvanje će biti ponovljeno pri sledećoj izmeni. Proverite da li uređaj ima slobodnog prostora."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Резервну копію застосовано, але Tabula не змогла зберегти її на цьому iPhone. Дані зберігаються, доки Tabula відкрита, а збереження буде повторено після наступної зміни. Перевірте, чи є на iPhone вільне місце."
+            "value" : "Резервну копію застосовано, але Tabula не змогла зберегти її на цьому пристрої. Дані зберігаються, доки Tabula відкрита, а збереження буде повторено після наступної зміни. Перевірте, чи є на пристрої вільне місце."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "备份已应用，但 Tabula 无法将其保存到这台 iPhone。只要 Tabula 保持打开，数据就会保留，并在下次更改时重试保存。请检查 iPhone 是否有可用存储空间。"
+            "value" : "备份已应用，但 Tabula 无法将其保存到这台设备。只要 Tabula 保持打开，数据就会保留，并在下次更改时重试保存。请检查设备是否有可用存储空间。"
           }
         }
       }
@@ -103412,79 +103496,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Vaše rozvrhy, předměty, hodiny, úkoly, písemky, připomínky a nastavení v tomto iPhonu se nahradí zálohou z %@. Soubory připojené k úkolům, které v záloze nejsou, se smažou. Tabula nejdřív uloží kopii vašich aktuálních dat do Nastavení › Záloha › Automatické kopie."
+            "value" : "Vaše rozvrhy, předměty, hodiny, úkoly, písemky, připomínky a nastavení v tomto zařízení se nahradí zálohou z %@. Soubory připojené k úkolům, které v záloze nejsou, se smažou. Tabula nejdřív uloží kopii vašich aktuálních dat do Nastavení › Záloha › Automatické kopie."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Deine Stundenpläne, Fächer, Stunden, Aufgaben, Prüfungen, Erinnerungen und Einstellungen auf diesem iPhone werden durch das Backup vom %@ ersetzt. Dateien, die an Aufgaben hängen, die nicht im Backup sind, werden gelöscht. Tabula sichert vorher eine Kopie deiner aktuellen Daten unter Einstellungen › Backup › Automatische Kopien."
+            "value" : "Deine Stundenpläne, Fächer, Stunden, Aufgaben, Prüfungen, Erinnerungen und Einstellungen auf diesem Gerät werden durch das Backup vom %@ ersetzt. Dateien, die an Aufgaben hängen, die nicht im Backup sind, werden gelöscht. Tabula sichert vorher eine Kopie deiner aktuellen Daten unter Einstellungen › Backup › Automatische Kopien."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your timetables, subjects, lessons, tasks, exams, reminders and settings on this iPhone will be replaced with the backup from %@. Files attached to tasks that aren't in the backup will be deleted. Tabula first saves a copy of your current data in Settings › Backup › Automatic copies."
+            "value" : "Your timetables, subjects, lessons, tasks, exams, reminders and settings on this device will be replaced with the backup from %@. Files attached to tasks that aren't in the backup will be deleted. Tabula first saves a copy of your current data in Settings › Backup › Automatic copies."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Vos emplois du temps, matières, cours, devoirs, examens, rappels et réglages sur cet iPhone seront remplacés par la sauvegarde du %@. Les fichiers joints aux devoirs absents de la sauvegarde seront supprimés. Tabula enregistre d’abord une copie de vos données actuelles dans Réglages › Sauvegarde › Copies automatiques."
+            "value" : "Vos emplois du temps, matières, cours, devoirs, examens, rappels et réglages sur cet appareil seront remplacés par la sauvegarde du %@. Les fichiers joints aux devoirs absents de la sauvegarde seront supprimés. Tabula enregistre d’abord une copie de vos données actuelles dans Réglages › Sauvegarde › Copies automatiques."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Az iPhone-on lévő órarendjeidet, tantárgyaidat, óráidat, feladataidat, vizsgáidat, emlékeztetőidet és beállításaidat lecseréli a(z) %@ időpontú mentés. A mentésben nem szereplő feladatokhoz csatolt fájlok törlődnek. A Tabula előbb ment egy másolatot a jelenlegi adataidról ide: Beállítások › Biztonsági mentés › Automatikus másolatok."
+            "value" : "Az eszközön lévő órarendjeidet, tantárgyaidat, óráidat, feladataidat, vizsgáidat, emlékeztetőidet és beállításaidat lecseréli a(z) %@ időpontú mentés. A mentésben nem szereplő feladatokhoz csatolt fájlok törlődnek. A Tabula előbb ment egy másolatot a jelenlegi adataidról ide: Beállítások › Biztonsági mentés › Automatikus másolatok."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "このiPhoneの時間割、科目、授業、課題、試験、リマインダー、設定が、%@のバックアップに置き換えられます。バックアップにない課題の添付ファイルは削除されます。Tabulaは先に現在のデータのコピーを「設定」›「バックアップ」›「自動コピー」に保存します。"
+            "value" : "このデバイスの時間割、科目、授業、課題、試験、リマインダー、設定が、%@のバックアップに置き換えられます。バックアップにない課題の添付ファイルは削除されます。Tabulaは先に現在のデータのコピーを「設定」›「バックアップ」›「自動コピー」に保存します。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Twoje plany lekcji, przedmioty, lekcje, zadania, sprawdziany, przypomnienia i ustawienia na tym iPhonie zostaną zastąpione kopią z %@. Pliki załączone do zadań, których nie ma w kopii, zostaną usunięte. Tabula najpierw zapisze kopię Twoich bieżących danych w Ustawienia › Kopia zapasowa › Kopie automatyczne."
+            "value" : "Twoje plany lekcji, przedmioty, lekcje, zadania, sprawdziany, przypomnienia i ustawienia na tym urządzeniu zostaną zastąpione kopią z %@. Pliki załączone do zadań, których nie ma w kopii, zostaną usunięte. Tabula najpierw zapisze kopię Twoich bieżących danych w Ustawienia › Kopia zapasowa › Kopie automatyczne."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Orarele, materiile, orele, temele, examenele, mementourile și setările de pe acest iPhone vor fi înlocuite cu backupul din %@. Fișierele atașate temelor care nu sunt în backup vor fi șterse. Tabula salvează mai întâi o copie a datelor actuale în Setări › Backup › Copii automate."
+            "value" : "Orarele, materiile, orele, temele, examenele, mementourile și setările de pe acest dispozitiv vor fi înlocuite cu backupul din %@. Fișierele atașate temelor care nu sunt în backup vor fi șterse. Tabula salvează mai întâi o copie a datelor actuale în Setări › Backup › Copii automate."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Vaše rozvrhy, predmety, hodiny, úlohy, písomky, pripomienky a nastavenia v tomto iPhone sa nahradia zálohou z %@. Súbory priložené k úlohám, ktoré v zálohe nie sú, sa vymažú. Tabula najprv uloží kópiu vašich aktuálnych údajov do Nastavenia › Záloha › Automatické kópie."
+            "value" : "Vaše rozvrhy, predmety, hodiny, úlohy, písomky, pripomienky a nastavenia v tomto zariadení sa nahradia zálohou z %@. Súbory priložené k úlohám, ktoré v zálohe nie sú, sa vymažú. Tabula najprv uloží kópiu vašich aktuálnych údajov do Nastavenia › Záloha › Automatické kópie."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ваши распореди, предмети, часови, задаци, испити, подсетници и подешавања на овом iPhone-у биће замењени резервном копијом од %@. Датотеке приложене задацима којих нема у резервној копији биће обрисане. Tabula прво чува копију ваших тренутних података у Подешавања › Резервна копија › Аутоматске копије."
+            "value" : "Ваши распореди, предмети, часови, задаци, испити, подсетници и подешавања на овом уређају биће замењени резервном копијом од %@. Датотеке приложене задацима којих нема у резервној копији биће обрисане. Tabula прво чува копију ваших тренутних података у Подешавања › Резервна копија › Аутоматске копије."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Vaši rasporedi, predmeti, časovi, zadaci, ispiti, podsetnici i podešavanja na ovom iPhone-u biće zamenjeni rezervnom kopijom od %@. Datoteke priložene zadacima kojih nema u rezervnoj kopiji biće obrisane. Tabula prvo čuva kopiju vaših trenutnih podataka u Podešavanja › Rezervna kopija › Automatske kopije."
+            "value" : "Vaši rasporedi, predmeti, časovi, zadaci, ispiti, podsetnici i podešavanja na ovom uređaju biće zamenjeni rezervnom kopijom od %@. Datoteke priložene zadacima kojih nema u rezervnoj kopiji biće obrisane. Tabula prvo čuva kopiju vaših trenutnih podataka u Podešavanja › Rezervna kopija › Automatske kopije."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ваші розклади, предмети, уроки, завдання, іспити, нагадування й параметри на цьому iPhone буде замінено резервною копією від %@. Файли, вкладені в завдання, яких немає в резервній копії, буде видалено. Спочатку Tabula зберігає копію ваших поточних даних у Параметри › Резервна копія › Автоматичні копії."
+            "value" : "Ваші розклади, предмети, уроки, завдання, іспити, нагадування й параметри на цьому пристрої буде замінено резервною копією від %@. Файли, вкладені в завдання, яких немає в резервній копії, буде видалено. Спочатку Tabula зберігає копію ваших поточних даних у Параметри › Резервна копія › Автоматичні копії."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "此 iPhone 上的课表、科目、课程、作业、考试、提醒和设置将被 %@ 的备份替换。备份中不存在的作业的附件将被删除。Tabula 会先将当前数据的副本保存到“设置”›“备份”›“自动副本”。"
+            "value" : "此设备上的课表、科目、课程、作业、考试、提醒和设置将被 %@ 的备份替换。备份中不存在的作业的附件将被删除。Tabula 会先将当前数据的副本保存到“设置”›“备份”›“自动副本”。"
           }
         }
       }
@@ -107486,79 +107570,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Data aplikace Tabula v iCloudu byla smazána. Data v tomto iPhonu zůstávají. Chcete-li je znovu nahrát, zapněte Synchronizaci s iCloudem."
+            "value" : "Data aplikace Tabula v iCloudu byla smazána. Data v tomto zařízení zůstávají. Chcete-li je znovu nahrát, zapněte Synchronizaci s iCloudem."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Die Daten von Tabula in iCloud wurden gelöscht. Deine Daten auf diesem iPhone bleiben erhalten. Aktiviere „iCloud-Synchronisierung“, um sie erneut hochzuladen."
+            "value" : "Die Daten von Tabula in iCloud wurden gelöscht. Deine Daten auf diesem Gerät bleiben erhalten. Aktiviere „iCloud-Synchronisierung“, um sie erneut hochzuladen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tabula's data in iCloud was deleted. Your data on this iPhone is kept. Turn on iCloud Sync to upload it again."
+            "value" : "Tabula's data in iCloud was deleted. Your data on this device is kept. Turn on iCloud Sync to upload it again."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Les données de Tabula dans iCloud ont été supprimées. Vos données sur cet iPhone sont conservées. Activez Synchronisation iCloud pour les envoyer à nouveau."
+            "value" : "Les données de Tabula dans iCloud ont été supprimées. Vos données sur cet appareil sont conservées. Activez Synchronisation iCloud pour les envoyer à nouveau."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "A Tabula iCloudban tárolt adatai törlődtek. Az ezen az iPhone-on lévő adataid megmaradtak. Az újbóli feltöltéshez kapcsold be az iCloud-szinkronizálást."
+            "value" : "A Tabula iCloudban tárolt adatai törlődtek. Az ezen az eszközön lévő adataid megmaradtak. Az újbóli feltöltéshez kapcsold be az iCloud-szinkronizálást."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "iCloud上のTabulaのデータが削除されました。このiPhone上のデータは保持されています。再度アップロードするには、iCloud同期をオンにしてください。"
+            "value" : "iCloud上のTabulaのデータが削除されました。このデバイス上のデータは保持されています。再度アップロードするには、iCloud同期をオンにしてください。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Dane aplikacji Tabula w iCloud zostały usunięte. Dane na tym iPhonie zostają zachowane. Włącz Synchronizację z iCloud, aby przesłać je ponownie."
+            "value" : "Dane aplikacji Tabula w iCloud zostały usunięte. Dane na tym urządzeniu zostają zachowane. Włącz Synchronizację z iCloud, aby przesłać je ponownie."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Datele Tabula din iCloud au fost șterse. Datele de pe acest iPhone sunt păstrate. Activează Sincronizare iCloud pentru a le încărca din nou."
+            "value" : "Datele Tabula din iCloud au fost șterse. Datele de pe acest dispozitiv sunt păstrate. Activează Sincronizare iCloud pentru a le încărca din nou."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Údaje aplikácie Tabula v iCloude boli vymazané. Údaje v tomto iPhone zostávajú. Ak ich chcete znova nahrať, zapnite Synchronizáciu s iCloudom."
+            "value" : "Údaje aplikácie Tabula v iCloude boli vymazané. Údaje v tomto zariadení zostávajú. Ak ich chcete znova nahrať, zapnite Synchronizáciu s iCloudom."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Подаци апликације Tabula на iCloud-у су обрисани. Ваши подаци на овом iPhone-у су сачувани. Укључите iCloud синхронизацију да бисте их поново отпремили."
+            "value" : "Подаци апликације Tabula на iCloud-у су обрисани. Ваши подаци на овом уређају су сачувани. Укључите iCloud синхронизацију да бисте их поново отпремили."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Podaci aplikacije Tabula na iCloud-u su obrisani. Vaši podaci na ovom iPhone-u su sačuvani. Uključite iCloud sinhronizaciju da biste ih ponovo otpremili."
+            "value" : "Podaci aplikacije Tabula na iCloud-u su obrisani. Vaši podaci na ovom uređaju su sačuvani. Uključite iCloud sinhronizaciju da biste ih ponovo otpremili."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Дані Tabula в iCloud видалено. Ваші дані на цьому iPhone збережено. Увімкніть «Синхронізація з iCloud», щоб вивантажити їх знову."
+            "value" : "Дані Tabula в iCloud видалено. Ваші дані на цьому пристрої збережено. Увімкніть «Синхронізація з iCloud», щоб вивантажити їх знову."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabula 在 iCloud 中的数据已被删除。这台 iPhone 上的数据已保留。打开“iCloud 同步”即可重新上传。"
+            "value" : "Tabula 在 iCloud 中的数据已被删除。这台设备上的数据已保留。打开“iCloud 同步”即可重新上传。"
           }
         }
       }
@@ -107570,79 +107654,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Některé položky jsou pro iCloud příliš velké a zůstávají jen v tomto iPhonu."
+            "value" : "Některé položky jsou pro iCloud příliš velké a zůstávají jen v tomto zařízení."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Einige Objekte sind zu groß für iCloud und bleiben nur auf diesem iPhone."
+            "value" : "Einige Objekte sind zu groß für iCloud und bleiben nur auf diesem Gerät."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Some items are too large for iCloud and stay on this iPhone only."
+            "value" : "Some items are too large for iCloud and stay on this device only."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Certains éléments sont trop volumineux pour iCloud et restent uniquement sur cet iPhone."
+            "value" : "Certains éléments sont trop volumineux pour iCloud et restent uniquement sur cet appareil."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Néhány elem túl nagy az iCloudhoz, ezért csak ezen az iPhone-on marad."
+            "value" : "Néhány elem túl nagy az iCloudhoz, ezért csak ezen az eszközön marad."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "一部の項目はiCloudには大きすぎるため、このiPhoneにのみ保存されます。"
+            "value" : "一部の項目はiCloudには大きすぎるため、このデバイスにのみ保存されます。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Niektóre elementy są za duże dla iCloud i pozostają tylko na tym iPhonie."
+            "value" : "Niektóre elementy są za duże dla iCloud i pozostają tylko na tym urządzeniu."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Unele elemente sunt prea mari pentru iCloud și rămân doar pe acest iPhone."
+            "value" : "Unele elemente sunt prea mari pentru iCloud și rămân doar pe acest dispozitiv."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Niektoré položky sú pre iCloud príliš veľké a zostávajú len v tomto iPhone."
+            "value" : "Niektoré položky sú pre iCloud príliš veľké a zostávajú len v tomto zariadení."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Неке ставке су превелике за iCloud и остају само на овом iPhone-у."
+            "value" : "Неке ставке су превелике за iCloud и остају само на овом уређају."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Neke stavke su prevelike za iCloud i ostaju samo na ovom iPhone-u."
+            "value" : "Neke stavke su prevelike za iCloud i ostaju samo na ovom uređaju."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Деякі елементи завеликі для iCloud і залишаються лише на цьому iPhone."
+            "value" : "Деякі елементи завеликі для iCloud і залишаються лише на цьому пристрої."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "部分项目对 iCloud 来说太大，仅保留在这台 iPhone 上。"
+            "value" : "部分项目对 iCloud 来说太大，仅保留在这台设备上。"
           }
         }
       }
@@ -107906,79 +107990,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Vaše data zůstávají v tomto iPhonu a nekopírují se do iCloudu."
+            "value" : "Vaše data zůstávají v tomto zařízení a nekopírují se do iCloudu."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Deine Daten bleiben auf diesem iPhone und werden nicht in iCloud kopiert."
+            "value" : "Deine Daten bleiben auf diesem Gerät und werden nicht in iCloud kopiert."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your data stays on this iPhone and is not copied to iCloud."
+            "value" : "Your data stays on this device and is not copied to iCloud."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Vos données restent sur cet iPhone et ne sont pas copiées dans iCloud."
+            "value" : "Vos données restent sur cet appareil et ne sont pas copiées dans iCloud."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Az adataid ezen az iPhone-on maradnak, és nem kerülnek az iCloudba."
+            "value" : "Az adataid ezen az eszközön maradnak, és nem kerülnek az iCloudba."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "データはこのiPhoneにのみ保存され、iCloudにはコピーされません。"
+            "value" : "データはこのデバイスにのみ保存され、iCloudにはコピーされません。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Dane pozostają na tym iPhonie i nie są kopiowane do iCloud."
+            "value" : "Dane pozostają na tym urządzeniu i nie są kopiowane do iCloud."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Datele tale rămân pe acest iPhone și nu sunt copiate în iCloud."
+            "value" : "Datele tale rămân pe acest dispozitiv și nu sunt copiate în iCloud."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Vaše údaje zostávajú v tomto iPhone a nekopírujú sa do iCloudu."
+            "value" : "Vaše údaje zostávajú v tomto zariadení a nekopírujú sa do iCloudu."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ваши подаци остају на овом iPhone-у и не копирају се на iCloud."
+            "value" : "Ваши подаци остају на овом уређају и не копирају се на iCloud."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Vaši podaci ostaju na ovom iPhone-u i ne kopiraju se na iCloud."
+            "value" : "Vaši podaci ostaju na ovom uređaju i ne kopiraju se na iCloud."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ваші дані залишаються на цьому iPhone і не копіюються в iCloud."
+            "value" : "Ваші дані залишаються на цьому пристрої і не копіюються в iCloud."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "你的数据保留在这台 iPhone 上，不会复制到 iCloud。"
+            "value" : "你的数据保留在这台设备上，不会复制到 iCloud。"
           }
         }
       }
@@ -108326,79 +108410,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Synchronizace s iCloudem přijde s verzí z App Storu. Do té doby zůstávají vaše data v tomto iPhonu."
+            "value" : "Synchronizace s iCloudem přijde s verzí z App Storu. Do té doby zůstávají vaše data v tomto zařízení."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Die iCloud-Synchronisierung kommt mit der App-Store-Version. Bis dahin bleiben deine Daten auf diesem iPhone."
+            "value" : "Die iCloud-Synchronisierung kommt mit der App-Store-Version. Bis dahin bleiben deine Daten auf diesem Gerät."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iCloud sync arrives with the App Store version. Until then, your data stays on this iPhone."
+            "value" : "iCloud sync arrives with the App Store version. Until then, your data stays on this device."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "La synchronisation iCloud arrivera avec la version de l’App Store. D’ici là, vos données restent sur cet iPhone."
+            "value" : "La synchronisation iCloud arrivera avec la version de l’App Store. D’ici là, vos données restent sur cet appareil."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Az iCloud-szinkronizálás az App Store-verzióval érkezik. Addig az adataid ezen az iPhone-on maradnak."
+            "value" : "Az iCloud-szinkronizálás az App Store-verzióval érkezik. Addig az adataid ezen az eszközön maradnak."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "iCloud同期はApp Store版で利用できるようになります。それまでは、データはこのiPhoneに保存されます。"
+            "value" : "iCloud同期はApp Store版で利用できるようになります。それまでは、データはこのデバイスに保存されます。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Synchronizacja z iCloud pojawi się w wersji z App Store. Do tego czasu dane pozostają na tym iPhonie."
+            "value" : "Synchronizacja z iCloud pojawi się w wersji z App Store. Do tego czasu dane pozostają na tym urządzeniu."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Sincronizarea iCloud vine odată cu versiunea din App Store. Până atunci, datele tale rămân pe acest iPhone."
+            "value" : "Sincronizarea iCloud vine odată cu versiunea din App Store. Până atunci, datele tale rămân pe acest dispozitiv."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Synchronizácia s iCloudom príde s verziou z App Store. Dovtedy zostávajú vaše údaje v tomto iPhone."
+            "value" : "Synchronizácia s iCloudom príde s verziou z App Store. Dovtedy zostávajú vaše údaje v tomto zariadení."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "iCloud синхронизација стиже са верзијом из App Store-а. До тада ваши подаци остају на овом iPhone-у."
+            "value" : "iCloud синхронизација стиже са верзијом из App Store-а. До тада ваши подаци остају на овом уређају."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "iCloud sinhronizacija stiže sa verzijom iz App Store-a. Do tada vaši podaci ostaju na ovom iPhone-u."
+            "value" : "iCloud sinhronizacija stiže sa verzijom iz App Store-a. Do tada vaši podaci ostaju na ovom uređaju."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Синхронізація з iCloud з’явиться у версії з App Store. До того часу ваші дані залишаються на цьому iPhone."
+            "value" : "Синхронізація з iCloud з’явиться у версії з App Store. До того часу ваші дані залишаються на цьому пристрої."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "iCloud 同步将随 App Store 版本推出。在此之前，你的数据仅保存在这台 iPhone 上。"
+            "value" : "iCloud 同步将随 App Store 版本推出。在此之前，你的数据仅保存在这台设备上。"
           }
         }
       }
@@ -108830,79 +108914,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Malý jazykový model, který běží na tomto iPhonu a pomáhá číst rozvrhy ve všech jazycích včetně těch, které Apple Intelligence nepodporuje."
+            "value" : "Malý jazykový model, který běží na tomto zařízení a pomáhá číst rozvrhy ve všech jazycích včetně těch, které Apple Intelligence nepodporuje."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ein kleines Sprachmodell, das auf diesem iPhone läuft und Stundenpläne in jeder Sprache lesen hilft, auch in Sprachen, die Apple Intelligence nicht unterstützt."
+            "value" : "Ein kleines Sprachmodell, das auf diesem Gerät läuft und Stundenpläne in jeder Sprache lesen hilft, auch in Sprachen, die Apple Intelligence nicht unterstützt."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A small language model that runs on this iPhone and helps read timetables in every language, including those Apple Intelligence does not support."
+            "value" : "A small language model that runs on this device and helps read timetables in every language, including those Apple Intelligence does not support."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Un petit modèle de langage qui fonctionne sur cet iPhone et aide à lire les emplois du temps dans toutes les langues, y compris celles qu’Apple Intelligence ne prend pas en charge."
+            "value" : "Un petit modèle de langage qui fonctionne sur cet appareil et aide à lire les emplois du temps dans toutes les langues, y compris celles qu’Apple Intelligence ne prend pas en charge."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Kis nyelvi modell, amely ezen az iPhone-on fut, és minden nyelven segít beolvasni az órarendet, azokon is, amelyeket az Apple Intelligence nem támogat."
+            "value" : "Kis nyelvi modell, amely ezen az eszközön fut, és minden nyelven segít beolvasni az órarendet, azokon is, amelyeket az Apple Intelligence nem támogat."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "このiPhone上で動作する小さな言語モデルで、Apple Intelligenceが対応していない言語を含め、あらゆる言語の時間割の読み取りを助けます。"
+            "value" : "このデバイス上で動作する小さな言語モデルで、Apple Intelligenceが対応していない言語を含め、あらゆる言語の時間割の読み取りを助けます。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Mały model językowy działający na tym iPhonie, który pomaga odczytywać plany w każdym języku, także w tych, których Apple Intelligence nie obsługuje."
+            "value" : "Mały model językowy działający na tym urządzeniu, który pomaga odczytywać plany w każdym języku, także w tych, których Apple Intelligence nie obsługuje."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Un model lingvistic mic care rulează pe acest iPhone și ajută la citirea orarelor în orice limbă, inclusiv cele pe care Apple Intelligence nu le acceptă."
+            "value" : "Un model lingvistic mic care rulează pe acest dispozitiv și ajută la citirea orarelor în orice limbă, inclusiv cele pe care Apple Intelligence nu le acceptă."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Malý jazykový model, ktorý beží na tomto iPhone a pomáha čítať rozvrhy vo všetkých jazykoch vrátane tých, ktoré Apple Intelligence nepodporuje."
+            "value" : "Malý jazykový model, ktorý beží na tomto zariadení a pomáha čítať rozvrhy vo všetkých jazykoch vrátane tých, ktoré Apple Intelligence nepodporuje."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Мали језички модел који ради на овом iPhone-у и помаже у читању распореда на сваком језику, укључујући оне које Apple Intelligence не подржава."
+            "value" : "Мали језички модел који ради на овом уређају и помаже у читању распореда на сваком језику, укључујући оне које Apple Intelligence не подржава."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Mali jezički model koji radi na ovom iPhone-u i pomaže u čitanju rasporeda na svakom jeziku, uključujući one koje Apple Intelligence ne podržava."
+            "value" : "Mali jezički model koji radi na ovom uređaju i pomaže u čitanju rasporeda na svakom jeziku, uključujući one koje Apple Intelligence ne podržava."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Невелика мовна модель, що працює на цьому iPhone і допомагає читати розклади будь-якою мовою, зокрема тими, які Apple Intelligence не підтримує."
+            "value" : "Невелика мовна модель, що працює на цьому пристрої і допомагає читати розклади будь-якою мовою, зокрема тими, які Apple Intelligence не підтримує."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "一个在这台 iPhone 上运行的小型语言模型，可帮助读取各种语言的课程表，包括 Apple 智能不支持的语言。"
+            "value" : "一个在这台设备上运行的小型语言模型，可帮助读取各种语言的课程表，包括 Apple 智能不支持的语言。"
           }
         }
       }
@@ -108914,79 +108998,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Stáhne se, jen když to zvolíte, ideálně přes Wi-Fi. Vaše obrázky nikdy neopustí tento iPhone."
+            "value" : "Stáhne se, jen když to zvolíte, ideálně přes Wi-Fi. Vaše obrázky nikdy neopustí toto zařízení."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Es wird nur geladen, wenn du es willst, am besten über WLAN. Deine Bilder verlassen dieses iPhone nie."
+            "value" : "Es wird nur geladen, wenn du es willst, am besten über WLAN. Deine Bilder verlassen dieses Gerät nie."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "It will download only when you choose to, preferably over Wi-Fi. Your pictures never leave this iPhone."
+            "value" : "It will download only when you choose to, preferably over Wi-Fi. Your pictures never leave this device."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Il ne sera téléchargé que si vous le choisissez, de préférence en Wi-Fi. Vos images ne quittent jamais cet iPhone."
+            "value" : "Il ne sera téléchargé que si vous le choisissez, de préférence en Wi-Fi. Vos images ne quittent jamais cet appareil."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Csak akkor töltődik le, ha te úgy döntesz, lehetőleg Wi-Fi-n. A képeid sosem hagyják el ezt az iPhone-t."
+            "value" : "Csak akkor töltődik le, ha te úgy döntesz, lehetőleg Wi-Fi-n. A képeid sosem hagyják el ezt az eszközt."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "ダウンロードは選択した場合のみ行われます。Wi-Fiの利用をおすすめします。画像がこのiPhoneの外に出ることはありません。"
+            "value" : "ダウンロードは選択した場合のみ行われます。Wi-Fiの利用をおすすめします。画像がこのデバイスの外に出ることはありません。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Zostanie pobrany tylko wtedy, gdy zechcesz, najlepiej przez Wi-Fi. Twoje obrazy nigdy nie opuszczają tego iPhone’a."
+            "value" : "Zostanie pobrany tylko wtedy, gdy zechcesz, najlepiej przez Wi-Fi. Twoje obrazy nigdy nie opuszczają tego urządzenia."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Se descarcă doar când alegi tu, de preferință prin Wi-Fi. Imaginile tale nu părăsesc niciodată acest iPhone."
+            "value" : "Se descarcă doar când alegi tu, de preferință prin Wi-Fi. Imaginile tale nu părăsesc niciodată acest dispozitiv."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Stiahne sa, len keď to zvolíte, ideálne cez Wi-Fi. Vaše obrázky nikdy neopustia tento iPhone."
+            "value" : "Stiahne sa, len keď to zvolíte, ideálne cez Wi-Fi. Vaše obrázky nikdy neopustia toto zariadenie."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Преузеће се само када ви то изаберете, најбоље преко Wi-Fi мреже. Ваше слике никада не напуштају овај iPhone."
+            "value" : "Преузеће се само када ви то изаберете, најбоље преко Wi-Fi мреже. Ваше слике никада не напуштају овај уређај."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Preuzeće se samo kada vi to izaberete, najbolje preko Wi-Fi mreže. Vaše slike nikada ne napuštaju ovaj iPhone."
+            "value" : "Preuzeće se samo kada vi to izaberete, najbolje preko Wi-Fi mreže. Vaše slike nikada ne napuštaju ovaj uređaj."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Її буде завантажено, лише коли ви вирішите, бажано через Wi-Fi. Ваші зображення ніколи не залишають цей iPhone."
+            "value" : "Її буде завантажено, лише коли ви вирішите, бажано через Wi-Fi. Ваші зображення ніколи не залишають цей пристрій."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "只有在你选择时才会下载，建议使用 Wi-Fi。你的图片永远不会离开这台 iPhone。"
+            "value" : "只有在你选择时才会下载，建议使用 Wi-Fi。你的图片永远不会离开这台设备。"
           }
         }
       }
@@ -126470,79 +126554,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Vaše změny se zachovají, dokud je Tabula otevřená, a ukládání se zopakuje při další změně. Zkontrolujte, zda má váš iPhone volné úložiště."
+            "value" : "Vaše změny se zachovají, dokud je Tabula otevřená, a ukládání se zopakuje při další změně. Zkontrolujte, zda má vaše zařízení volné úložiště."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Deine Änderungen bleiben erhalten, solange Tabula geöffnet ist, und das Speichern wird bei deiner nächsten Änderung erneut versucht. Prüfe, ob dein iPhone freien Speicherplatz hat."
+            "value" : "Deine Änderungen bleiben erhalten, solange Tabula geöffnet ist, und das Speichern wird bei deiner nächsten Änderung erneut versucht. Prüfe, ob dein Gerät freien Speicherplatz hat."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your changes are kept while Tabula is open and saving is retried with your next change. Check that your iPhone has free storage."
+            "value" : "Your changes are kept while Tabula is open and saving is retried with your next change. Check that your device has free storage."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Vos modifications sont conservées tant que Tabula est ouverte et l’enregistrement sera retenté à votre prochaine modification. Vérifiez que votre iPhone dispose de suffisamment d’espace de stockage."
+            "value" : "Vos modifications sont conservées tant que Tabula est ouverte et l’enregistrement sera retenté à votre prochaine modification. Vérifiez que votre appareil dispose de suffisamment d’espace de stockage."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "A módosításaid addig megmaradnak, amíg a Tabula nyitva van, és a mentést a következő módosításnál újra megpróbáljuk. Ellenőrizd, hogy van-e szabad hely az iPhone-odon."
+            "value" : "A módosításaid addig megmaradnak, amíg a Tabula nyitva van, és a mentést a következő módosításnál újra megpróbáljuk. Ellenőrizd, hogy van-e szabad hely az eszközödön."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tabulaを開いている間は変更が保持され、次の変更時に保存が再試行されます。iPhoneの空き容量を確認してください。"
+            "value" : "Tabulaを開いている間は変更が保持され、次の変更時に保存が再試行されます。デバイスの空き容量を確認してください。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Twoje zmiany są zachowane, dopóki Tabula jest otwarta, a zapis zostanie ponowiony przy kolejnej zmianie. Sprawdź, czy iPhone ma wolne miejsce."
+            "value" : "Twoje zmiany są zachowane, dopóki Tabula jest otwarta, a zapis zostanie ponowiony przy kolejnej zmianie. Sprawdź, czy urządzenie ma wolne miejsce."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Modificările tale sunt păstrate cât timp Tabula e deschisă, iar salvarea se reîncearcă la următoarea modificare. Verifică dacă iPhone-ul are spațiu liber."
+            "value" : "Modificările tale sunt păstrate cât timp Tabula e deschisă, iar salvarea se reîncearcă la următoarea modificare. Verifică dacă dispozitivul are spațiu liber."
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Vaše zmeny sa zachovajú, kým je Tabula otvorená, a ukladanie sa zopakuje pri ďalšej zmene. Skontrolujte, či má váš iPhone voľné úložisko."
+            "value" : "Vaše zmeny sa zachovajú, kým je Tabula otvorená, a ukladanie sa zopakuje pri ďalšej zmene. Skontrolujte, či má vaše zariadenie voľné úložisko."
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ваше измене се чувају док је Tabula отворена, а чување ће бити поновљено при следећој измени. Проверите да ли iPhone има слободног простора."
+            "value" : "Ваше измене се чувају док је Tabula отворена, а чување ће бити поновљено при следећој измени. Проверите да ли уређај има слободног простора."
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Vaše izmene se čuvaju dok je Tabula otvorena, a čuvanje će biti ponovljeno pri sledećoj izmeni. Proverite da li iPhone ima slobodnog prostora."
+            "value" : "Vaše izmene se čuvaju dok je Tabula otvorena, a čuvanje će biti ponovljeno pri sledećoj izmeni. Proverite da li uređaj ima slobodnog prostora."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ваші зміни зберігаються, доки Tabula відкрита, а збереження буде повторено після наступної зміни. Перевірте, чи є на iPhone вільне місце."
+            "value" : "Ваші зміни зберігаються, доки Tabula відкрита, а збереження буде повторено після наступної зміни. Перевірте, чи є на пристрої вільне місце."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "只要 Tabula 保持打开，你的更改就会保留，并在下次更改时重试保存。请检查 iPhone 是否有可用存储空间。"
+            "value" : "只要 Tabula 保持打开，你的更改就会保留，并在下次更改时重试保存。请检查设备是否有可用存储空间。"
           }
         }
       }
@@ -127142,79 +127226,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ponechat tento iPhone"
+            "value" : "Ponechat toto zařízení"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Dieses iPhone behalten"
+            "value" : "Dieses Gerät behalten"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keep This iPhone"
+            "value" : "Keep This Device"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Garder cet iPhone"
+            "value" : "Garder cet appareil"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Az iPhone megtartása"
+            "value" : "Az eszköz megtartása"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "このiPhoneを優先"
+            "value" : "このデバイスを優先"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Zachowaj ten iPhone"
+            "value" : "Zachowaj to urządzenie"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Păstrează acest iPhone"
+            "value" : "Păstrează acest dispozitiv"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ponechať tento iPhone"
+            "value" : "Ponechať toto zariadenie"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Задржи овај iPhone"
+            "value" : "Задржи овај уређај"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Zadrži ovaj iPhone"
+            "value" : "Zadrži ovaj uređaj"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Залишити цей iPhone"
+            "value" : "Залишити цей пристрій"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "保留这台 iPhone"
+            "value" : "保留这台设备"
           }
         }
       }
@@ -127394,79 +127478,79 @@
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Data v tomto iPhonu i v iCloudu"
+            "value" : "Data v tomto zařízení i v iCloudu"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Daten auf diesem iPhone und in iCloud"
+            "value" : "Daten auf diesem Gerät und in iCloud"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Data on This iPhone and in iCloud"
+            "value" : "Data on This Device and in iCloud"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Données sur cet iPhone et dans iCloud"
+            "value" : "Données sur cet appareil et dans iCloud"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Adatok ezen az iPhone-on és az iCloudban"
+            "value" : "Adatok ezen az eszközön és az iCloudban"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "このiPhoneとiCloudにデータがあります"
+            "value" : "このデバイスとiCloudにデータがあります"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Dane na tym iPhonie i w iCloud"
+            "value" : "Dane na tym urządzeniu i w iCloud"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Date pe acest iPhone și în iCloud"
+            "value" : "Date pe acest dispozitiv și în iCloud"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Údaje v tomto iPhone aj v iCloude"
+            "value" : "Údaje v tomto zariadení aj v iCloude"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Подаци на овом iPhone-у и на iCloud-у"
+            "value" : "Подаци на овом уређају и на iCloud-у"
           }
         },
         "sr-Latn" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Podaci na ovom iPhone-u i na iCloud-u"
+            "value" : "Podaci na ovom uređaju i na iCloud-u"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Дані на цьому iPhone і в iCloud"
+            "value" : "Дані на цьому пристрої і в iCloud"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "这台 iPhone 和 iCloud 中都有数据"
+            "value" : "这台设备和 iCloud 中都有数据"
           }
         }
       }
@@ -139143,6 +139227,90 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "排序方式"
+          }
+        }
+      }
+    },
+    "tasks.split.placeholder" : {
+      "comment" : "Tasks tab on wide screens (iPad): shown in the detail column beside the task list until a task is chosen. Title-style capitalisation, like an empty-state title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vyberte úkol"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Aufgabe auswählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a Task"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Choisissez une tâche"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Feladat kiválasztása"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "タスクを選択"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wybierz zadanie"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Alege o sarcină"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vyberte úlohu"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Изаберите задатак"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Izaberite zadatak"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Виберіть завдання"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "选择任务"
           }
         }
       }

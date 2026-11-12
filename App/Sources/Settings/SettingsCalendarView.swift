@@ -23,6 +23,7 @@ struct SettingsCalendarView: View {
             hourCycleSection
             timeZoneSection
         }
+        .readableWidth()   // one readable column on wide screens (ADAPTIVE_LAYOUT.md)
         .navigationTitle(Text("settings.datetime.title"))
         .navigationBarTitleDisplayMode(.inline)
         .disabled(model.isReadOnly)
@@ -158,6 +159,7 @@ struct TimeZonePickerView: View {
             .accessibilityAddTraits(identifier == selected ? .isSelected : [])
         }
         .searchable(text: $query, prompt: Text("settings.calendar.timezone.search"))
+        .readableWidth()   // one readable column on wide screens (ADAPTIVE_LAYOUT.md)
         .navigationTitle(Text("settings.calendar.timezone.zone"))
         .navigationBarTitleDisplayMode(.inline)
         .disabled(model.isReadOnly)

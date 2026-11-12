@@ -37,12 +37,30 @@ struct LessonDetailTarget: Identifiable, Hashable {
     }
 }
 
+/// The Timetable tab's callbacks when the detail is its inspector column (adaptive layout): the tab presents the
+/// editors and the task detail, so a resize that turns the inspector into a sheet never closes them.
+struct LessonInspector {
+    let close: () -> Void
+    let present: (EditorPresentation) -> Void
+    let openTask: (TaskItem.ID) -> Void
+}
+
 struct LessonDetailView: View {
     let target: LessonDetailTarget
+    /// Set when shown in the Timetable tab's inspector; `nil` = the sheet (unchanged).
+    var inspector: LessonInspector?
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
     @State private var editor: EditorPresentation?
     @State private var openTask: LessonTaskTarget?
+
+    private func present(_ presentation: EditorPresentation?) {
+        if let inspector, let presentation { inspector.present(presentation) } else { editor = presentation }
+    }
+
+    private func showTask(_ id: TaskItem.ID) {
+        if let inspector { inspector.openTask(id) } else { openTask = LessonTaskTarget(taskID: id) }
+    }
 
     var body: some View {
         NavigationStack {
@@ -54,7 +72,7 @@ struct LessonDetailView: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
-                        SheetCloseButton()
+                        if let inspector { SheetCloseButton(action: inspector.close) } else { SheetCloseButton() }
                     }
                     ToolbarItem(placement: .primaryAction) {
                         Button { openLessonEditor() } label: { Text("timetable.detail.edit") }
@@ -241,19 +259,19 @@ struct LessonDetailView: View {
             .map { TaskRowModel(task: $0, subjects: subjects, now: now) }
         return Section {
             ForEach(rows) { row in
-                TaskRowView(row: row, onOpen: { openTask = LessonTaskTarget(taskID: row.id) },
+                TaskRowView(row: row, onOpen: { showTask(row.id) },
                             onToggle: { toggle(row) })
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel(Text(verbatim: row.accessibilityLabel(renderer: model.renderer)))
                     .accessibilityAddTraits(.isButton)
-                    .accessibilityAction { openTask = LessonTaskTarget(taskID: row.id) }
+                    .accessibilityAction { showTask(row.id) }
                     .accessibilityAction(named: Text(catalogKey: row.isCompleted ? "tasks.action.reopen" : "tasks.action.complete")) {
                         toggle(row)
                     }
             }
             Button {
-                editor = EditorPresentation.make(EditorContext.RouteID.newTask, context: EditorContext(
-                    timetableID: target.timetableID, target: .newTask(TaskPrefill(lesson: detail.lesson))))
+                present(EditorPresentation.make(EditorContext.RouteID.newTask, context: EditorContext(
+                    timetableID: target.timetableID, target: .newTask(TaskPrefill(lesson: detail.lesson)))))
             } label: {
                 Label { Text("timetable.detail.addHomework") } icon: { Image(systemName: "plus.circle.fill") }
                     .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
@@ -279,9 +297,9 @@ struct LessonDetailView: View {
         let lessonEditorAvailable = EditorRouteLookup.isAvailable(EditorContext.RouteID.lesson)
         return Section {
             Button {
-                editor = EditorPresentation.make(EditorContext.RouteID.dayChange, context: EditorContext(
+                present(EditorPresentation.make(EditorContext.RouteID.dayChange, context: EditorContext(
                     timetableID: target.timetableID,
-                    target: .dayChange(date: target.date, occurrence: target.occurrenceID, lessonID: detail.lessonID)))
+                    target: .dayChange(date: target.date, occurrence: target.occurrenceID, lessonID: detail.lessonID))))
             } label: {
                 Label { Text("timetable.detail.changeDay") } icon: { Image(systemName: "calendar.badge.exclamationmark") }
             }
@@ -297,7 +315,7 @@ struct LessonDetailView: View {
 
     private func openLessonEditor() {
         guard let context = lessonEditorContext else { return }
-        editor = EditorPresentation.make(EditorContext.RouteID.lesson, context: context)
+        present(EditorPresentation.make(EditorContext.RouteID.lesson, context: context))
     }
 
     /// Catalog key of a field's name in the detail list.

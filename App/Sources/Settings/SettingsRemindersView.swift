@@ -33,6 +33,7 @@ struct SettingsRemindersView: View {
             deliveryCheckSection
         }
         .labelStyle(.adaptive)   // D7: icon above the title at AX sizes ("Home-work")
+        .readableWidth()   // one readable column on wide screens (ADAPTIVE_LAYOUT.md)
         .navigationTitle(Text("settings.reminders.title"))
         .navigationBarTitleDisplayMode(.inline)
         .disabled(model.isReadOnly)

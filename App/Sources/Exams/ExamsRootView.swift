@@ -37,16 +37,23 @@ enum ExamEditorTarget: Identifiable, Hashable {
 
 struct ExamsRootView: View {
     private let initialSegment: ExamSegment
+    private let initialSelection: Exam.ID?
     @Environment(AppModel.self) private var model
     @Environment(\.dynamicTypeSize) private var typeSize
+    @Environment(\.layoutWidth) private var layoutWidth
+    @Environment(\.layoutContainerWidth) private var containerWidth
     /// `nil` = not chosen by the user yet → `initialSegment` (no `State(initialValue:)` in initialisers).
     @State private var chosenSegment: ExamSegment?
     @State private var editor: ExamEditorTarget?
-    /// The pushed details (the featured card pushes by appending its id; rows use value links).
+    /// The pushed details (the featured card pushes by appending its id; rows use value links). In the split layout
+    /// the same path is the detail column's stack (a sidebar link replaces it).
     @State private var path: [Exam.ID] = []
+    @State private var didSelectInitial = false
 
-    init(initialSegment: ExamSegment = .upcoming) {
+    /// `initialSelection`: an exam to open on appearing (screenshot route `exams.selected`).
+    init(initialSegment: ExamSegment = .upcoming, initialSelection: Exam.ID? = nil) {
         self.initialSegment = initialSegment
+        self.initialSelection = initialSelection
     }
 
     private var segment: ExamSegment { chosenSegment ?? initialSegment }
@@ -59,24 +66,65 @@ struct ExamsRootView: View {
     }
 
     var body: some View {
-        NavigationStack(path: $path) {
-            content
-                .navigationTitle(Text("exams.title"))
-                .toolbar {
-                    ToolbarItem(placement: .primaryAction) {
-                        Button { editor = .new } label: {
-                            Label { Text("exams.add") } icon: { Image(systemName: "plus") }
+        Group {
+            if layoutWidth.showsSplit {
+                // Adaptive layout: the list beside the open exam. The same `path` drives both layouts, so a resize keeps
+                // the open exam (pushed when narrow, in the detail column when wide).
+                NavigationSplitView {
+                    list
+                        .listColumnWidth()
+                } detail: {
+                    NavigationStack(path: $path) {
+                        ContentUnavailableView {
+                            Label { Text("exams.split.placeholder") } icon: { Image(systemName: "graduationcap") }
                         }
+                        .navigationDestination(for: Exam.ID.self) { detail($0) }
                     }
                 }
-                .navigationDestination(for: Exam.ID.self) { id in
-                    ExamDetailContent(examID: id)
+            } else {
+                NavigationStack(path: $path) {
+                    list.navigationDestination(for: Exam.ID.self) { detail($0) }
                 }
+            }
+        }
+        // Screenshot route `exams.selected`: once the width is measured (keyed, so the closure sees the measured layout).
+        .task(id: containerWidth > 0) {
+            guard containerWidth > 0, !didSelectInitial, let initialSelection else { return }
+            didSelectInitial = true
+            open(initialSelection)
         }
         .sheet(item: $editor) { target in
             ExamEditorView(target: target)
         }
         .closesForDeepLink { editor = nil }   // QA fix Q6: a notification tap needs the screen
+    }
+
+    /// The list with its title and toolbar (the stack's root, or the split view's list column).
+    private var list: some View {
+        content
+            .navigationTitle(Text("exams.title"))
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button { editor = .new } label: {
+                        Label { Text("exams.add") } icon: { Image(systemName: "plus") }
+                    }
+                }
+            }
+    }
+
+    /// The detail, with its editor presented by this tab (survives a resize between the two layouts).
+    private func detail(_ id: Exam.ID) -> some View {
+        ExamDetailContent(examID: id, pane: DetailPane(close: { path = [] }, edit: { editor = .existing(id) }))
+    }
+
+    /// Opens an exam: replaces the detail column when side by side, else pushes it (unchanged on iPhone).
+    private func open(_ id: Exam.ID) {
+        if layoutWidth.showsSplit { path = [id] } else { path.append(id) }
+    }
+
+    /// The exam in the detail column stays highlighted (HIG split-views.md › Best practices); nil = default background.
+    private func selectionBackground(_ id: Exam.ID) -> Color? {
+        layoutWidth.showsSplit && path.last == id ? Color(uiColor: .systemGray5) : nil
     }
 
     @ViewBuilder
@@ -145,7 +193,7 @@ struct ExamsRootView: View {
             Section {
                 // M24: the whole card is the control, with the chevron inside it. A List's own NavigationLink would put
                 // its disclosure chevron outside the card, so the card is a button that pushes the detail.
-                Button { path.append(next.id) } label: {
+                Button { open(next.id) } label: {
                     ExamFeaturedCard(row: next, facts: facts(for: next.exam), texts: texts)
                 }
                 .buttonStyle(.plain)
@@ -185,6 +233,7 @@ struct ExamsRootView: View {
         NavigationLink(value: row.id) {
             ExamRowView(row: row, facts: facts(for: row.exam), texts: texts)
         }
+        .listRowBackground(selectionBackground(row.id))
         .swipeActions(edge: .trailing, allowsFullSwipe: false) { doneAction(row) }
     }
 
@@ -217,6 +266,7 @@ struct ExamsRootView: View {
                     NavigationLink(value: row.id) {
                         ExamRowView(row: row, facts: facts(for: row.exam), texts: texts)
                     }
+                    .listRowBackground(selectionBackground(row.id))
                     .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                         if row.exam.isCompleted {
                             Button { ExamActions.reopen(row.id, model: model) } label: {

@@ -184,6 +184,20 @@ check("remote-notification" in plistlib.load(open(ROOT / "Config/App-Info.plist"
       "App-Info.plist: UIBackgroundModes has remote-notification (CKSyncEngine silent pushes)",
       "App-Info.plist: UIBackgroundModes lacks remote-notification (CKSyncEngine needs it)")
 
+# --- iPad (adaptive layout, docs/specs/ADAPTIVE_LAYOUT.md): iPhone + iPad on the Xcode path (xtool's default is [1, 2]),
+# every iPad orientation and no full-screen opt-out, so Split View / Stage Manager / windowed iPadOS can resize the app.
+ipad_plist = plistlib.load(open(ROOT / "Config/App-Info.plist", "rb"))
+families = {t: str(pj["targets"][t]["settings"]["base"].get("TARGETED_DEVICE_FAMILY"))
+            for t in ("TabulaApp", "TabulaWidgets", "TabulaPreviewCapture")}
+check(all(v == "1,2" for v in families.values()), "project.yml: TARGETED_DEVICE_FAMILY 1,2 (app, widgets, capture)",
+      f"project.yml: TARGETED_DEVICE_FAMILY must be 1,2: {families}")
+check(set(ipad_plist.get("UISupportedInterfaceOrientations~ipad", [])) == {
+          "UIInterfaceOrientationPortrait", "UIInterfaceOrientationPortraitUpsideDown",
+          "UIInterfaceOrientationLandscapeLeft", "UIInterfaceOrientationLandscapeRight"}
+      and "UIRequiresFullScreen" not in ipad_plist and "UIDeviceFamily" not in ipad_plist,
+      "App-Info.plist: four iPad orientations, no UIRequiresFullScreen / UIDeviceFamily",
+      "App-Info.plist: iPad needs all four orientations, no UIRequiresFullScreen and no UIDeviceFamily key")
+
 # --- App Intents (Phase 4 B3; RISKS #19: only Xcode writes Metadata.appintents) ------------------------------
 # The intent-driven controls compile only where the metadata exists: project.yml defines TABULA_APP_INTENTS for the
 # app and the widget; the xtool manifest does not (only `xtool-dev.sh --app-intents`, an on-device experiment).

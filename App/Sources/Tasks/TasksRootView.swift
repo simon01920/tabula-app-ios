@@ -25,25 +25,37 @@ import TimetableUI
 private enum TasksSheet: Identifiable {
     case detail(TaskItem.ID)
     case new(TaskItem.ID)
+    /// The editor of the task in the split view's detail column (presented here so a resize never closes it).
+    case edit(TaskItem.ID)
 
     var id: String {
         switch self {
         case .detail(let id): return "detail-" + id.uuidString
         case .new(let id): return "new-" + id.uuidString
+        case .edit(let id): return "edit-" + id.uuidString
         }
     }
 }
 
 struct TasksRootView: View {
     private let initialSegment: TaskSegment?
+    private let initialSelection: TaskItem.ID?
 
     /// `initialSegment`: where to scroll on appearing (screenshots, Today's overdue link); `nil` = the top.
-    init(initialSegment: TaskSegment? = nil) {
+    /// `initialSelection`: a task to open on appearing (screenshot route `tasks.selected`).
+    init(initialSegment: TaskSegment? = nil, initialSelection: TaskItem.ID? = nil) {
         self.initialSegment = initialSegment
+        self.initialSelection = initialSelection
     }
 
     @Environment(AppModel.self) private var model
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.layoutWidth) private var layoutWidth
+    @Environment(\.layoutContainerWidth) private var containerWidth
+    /// The task in the detail column when the list and the detail are side by side (`LayoutWidth.showsSplit`);
+    /// always `nil` in the one-column layout, where the detail is a sheet as before.
+    @State private var selectedTaskID: TaskItem.ID?
+    @State private var didSelectInitial = false
     @State private var subjectFilter: Subject.ID?
     @State private var kindFilter: TaskKind?
     @State private var sort: TaskSort = .due
@@ -58,26 +70,50 @@ struct TasksRootView: View {
     private var showCompleted: Bool { chosenShowCompleted ?? (initialSegment == .completed) }
 
     var body: some View {
-        NavigationStack {
-            content
-                .navigationTitle(Text("tasks.title"))
-                .toolbar {
-                    ToolbarItem(placement: .topBarLeading) { optionsMenu }
-                    ToolbarItem(placement: .primaryAction) {
-                        Button {
-                            sheet = .new(TaskItem.ID(UUID()))
-                        } label: {
-                            Label { Text("tasks.add") } icon: { Image(AppSymbol.add) }
+        Group {
+            if layoutWidth.showsSplit {
+                // Adaptive layout: the list beside the selected task (HIG split-views.md); VoiceOver reads the list first.
+                NavigationSplitView {
+                    list
+                        .listColumnWidth()
+                } detail: {
+                    if let id = selectedTaskID {
+                        TaskDetailView(taskID: id, pane: DetailPane(close: { selectedTaskID = nil },
+                                                                    edit: { sheet = .edit(id) }))
+                            .id(id)
+                    } else {
+                        ContentUnavailableView {
+                            Label { Text("tasks.split.placeholder") } icon: { Image(AppSymbol.task) }
                         }
                     }
                 }
-                .taskUndoToast($undoTaskID)
+            } else {
+                NavigationStack { list }
+            }
         }
         .sheet(item: $sheet) { sheet in
             switch sheet {
             case .detail(let id): TaskDetailView(taskID: id)
             case .new(let id): TaskQuickEntrySheet(id: id)
+            case .edit(let id): TaskEditorView(mode: .edit(id))
             }
+        }
+        // Width changes (iPad Split View, Stage Manager, Duo fold): the open task moves between the detail column and
+        // today's sheet. An open sheet is never closed here: its editor may hold unsaved changes.
+        .onChange(of: layoutWidth.showsSplit) { _, split in
+            if split {
+                if case .detail(let id)? = sheet { selectedTaskID = id }
+            } else if let id = selectedTaskID {
+                selectedTaskID = nil
+                if sheet == nil { sheet = .detail(id) }
+            }
+        }
+        // Screenshot route `tasks.selected`: once the width is measured. Keyed on it so the closure sees the measured
+        // layout (a plain `.task` kept the first, still-compact value and opened a sheet over the split: run 43117879078).
+        .task(id: containerWidth > 0) {
+            guard containerWidth > 0, !didSelectInitial, let initialSelection else { return }
+            didSelectInitial = true
+            open(initialSelection)
         }
         .closesForDeepLink { sheet = nil }   // QA fix Q6: a notification tap needs the screen
         .confirmationDialog("tasks.delete.title", isPresented: deleteDialogBinding, titleVisibility: .visible) {
@@ -96,6 +132,28 @@ struct TasksRootView: View {
                 if !model.isClockFixed { minuteTick &+= 1 }
             }
         }
+    }
+
+    /// The grouped list with its title and toolbar (the stack's root, or the split view's list column).
+    private var list: some View {
+        content
+            .navigationTitle(Text("tasks.title"))
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) { optionsMenu }
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        sheet = .new(TaskItem.ID(UUID()))
+                    } label: {
+                        Label { Text("tasks.add") } icon: { Image(AppSymbol.add) }
+                    }
+                }
+            }
+            .taskUndoToast($undoTaskID)
+    }
+
+    /// A row tap: the detail column when side by side, else the detail sheet (unchanged on iPhone).
+    private func open(_ id: TaskItem.ID) {
+        if layoutWidth.showsSplit { selectedTaskID = id } else { sheet = .detail(id) }
     }
 
     // MARK: Data
@@ -189,11 +247,14 @@ struct TasksRootView: View {
 
     private func taskRow(_ task: TaskItem, section: TaskSection?, subjects: [Subject.ID: Subject], now: LocalDateTime) -> some View {
         let row = TaskRowModel(task: task, subjects: subjects, now: now)
-        return TaskRowView(row: row, section: section, onOpen: { sheet = .detail(row.id) }, onToggle: { toggle(row) })
+        return TaskRowView(row: row, section: section, onOpen: { open(row.id) }, onToggle: { toggle(row) })
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text(verbatim: row.accessibilityLabel(renderer: model.renderer)))
             .accessibilityAddTraits(.isButton)
-            .accessibilityAction { sheet = .detail(row.id) }
+            .accessibilityAction { open(row.id) }
+            .accessibilityAddTraits(selectedTaskID == row.id ? .isSelected : [])
+            // The task in the detail column stays highlighted (HIG split-views.md › Best practices); nil = default.
+            .listRowBackground(selectedTaskID == row.id ? Color(uiColor: .systemGray5) : nil)
             .accessibilityAction(named: Text(catalogKey: row.isCompleted ? "tasks.action.reopen" : "tasks.action.complete")) {
                 toggle(row)
             }

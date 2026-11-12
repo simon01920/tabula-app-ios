@@ -53,6 +53,7 @@ struct SettingsAboutView: View {
                 }
             }
         }
+        .readableWidth()   // one readable column on wide screens (ADAPTIVE_LAYOUT.md)
         .navigationTitle(Text("settings.aboutfeedback.title"))
         .navigationBarTitleDisplayMode(.inline)
     }

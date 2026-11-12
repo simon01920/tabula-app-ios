@@ -69,6 +69,7 @@ struct SettingsImportView: View {
                 Text("settings.import.model.footer")
             }
         }
+        .readableWidth()   // one readable column on wide screens (ADAPTIVE_LAYOUT.md)
         .navigationTitle(Text("settings.import.title"))
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $importing) { PhotoImportView() }

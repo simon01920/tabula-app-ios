@@ -53,6 +53,7 @@ struct RemindersHealthView: View {
             testsSection
         }
         .labelStyle(.adaptive)   // D7: "Notifica-tions"
+        .readableWidth()   // one readable column on wide screens (ADAPTIVE_LAYOUT.md)
         .navigationTitle(Text("settings.reminder-health.title"))
         .navigationBarTitleDisplayMode(.inline)
         .task { await reminders.refreshHealth() }

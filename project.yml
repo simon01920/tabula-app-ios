@@ -93,7 +93,7 @@ targets:
         # Config/Tabula.entitlements (App Group only, shared with xtool) unless TABULA_PAID_ACCOUNT = 1, then
         # Config/Entitlements/PaidAccount/Tabula.entitlements. Selection logic: Config/AppIdentity.xcconfig.
         CODE_SIGN_ENTITLEMENTS: $(TABULA_APP_ENTITLEMENTS)
-        TARGETED_DEVICE_FAMILY: "1"         # iPhone only for v1 (iPad is a stretch goal, PRODUCT.md)
+        TARGETED_DEVICE_FAMILY: "1,2"       # iPhone + iPad (docs/specs/ADAPTIVE_LAYOUT.md); = xtool's default [1, 2]
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         # CI always builds the macro-probe variant (Xcode ships Apple's macro plugins). The local xtool
         # default is the macro-free base variant (Package.swift, CLAUDE.md rule 5).
@@ -124,7 +124,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: $(TABULA_BUNDLE_ID).TabulaWidgets   # identical to xtool's derived ID
         INFOPLIST_FILE: Config/Widgets-Info.plist
         CODE_SIGN_ENTITLEMENTS: $(TABULA_WIDGET_ENTITLEMENTS)          # same switch as the app
-        TARGETED_DEVICE_FAMILY: "1"
+        TARGETED_DEVICE_FAMILY: "1,2"
         APPLICATION_EXTENSION_API_ONLY: YES
         SKIP_INSTALL: YES
         # Phase 4 B3: Homework checkbox (Button(intent:)) + configurable Now & Next / Today (AppIntentConfiguration);
@@ -201,7 +201,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(TABULA_BUNDLE_ID).previewcapture
         TEST_TARGET_NAME: TabulaApp
-        TARGETED_DEVICE_FAMILY: "1"
+        TARGETED_DEVICE_FAMILY: "1,2"
     dependencies:
       - target: TabulaApp
 

@@ -168,6 +168,7 @@ private struct TodayContent: View {
                 }
             }
             .listStyle(.insetGrouped)
+            .readableWidth()   // one column, capped on wide screens (ADAPTIVE_LAYOUT.md); unchanged on iPhone
         }
     }
 

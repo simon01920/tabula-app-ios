@@ -16,7 +16,9 @@ Rules: newest *available* runtime of the platform; device types from that runtim
 (fallback: `devicetypes` filtered by product family and min/max runtime version). iOS default = the "Pro Max" with
 the highest model number (else the highest-numbered iPhone); watchOS default = highest model number, then size.
 An explicit --device selects the newest available runtime that supports it (U6, 2026-11-05); it errors, listing the
-newest runtime's devices, only if no available runtime has it. Stdlib only.
+newest runtime's devices, only if no available runtime has it. An explicit iOS --device may be an iPad or a
+multi-display iPhone (Duo, Fold): the multi-display skip only applies to the default pick (adaptive layout, 2026-11-11).
+Stdlib only.
 """
 import argparse
 import json
@@ -48,16 +50,21 @@ def pick(data, platform, device=""):
         raise SystemExit(f"error: no available {platform} simulator runtime "
                          f"({len(data['runtimes'])} runtimes listed in total)")
     family = FAMILY[platform]
+    # Adaptive layout (2026-11-11): an explicit iOS device may also be an iPad; the default stays an iPhone.
+    families = (family, "iPad") if platform == "iOS" and device else (family,)
+
+    def of_family(t):
+        return t.get("productFamily", family) in families and t["name"].startswith(families)
 
     def candidates_of(runtime):
         types = runtime.get("supportedDeviceTypes")
         if not types:
             v = version_tuple(runtime.get("version"))
             types = [t for t in data["devicetypes"]
-                     if (t.get("productFamily") == family or t["name"].startswith(family))
+                     if (t.get("productFamily") in families or t["name"].startswith(families))
                      and version_tuple(t.get("minRuntimeVersionString", "0")) <= v
                      <= version_tuple(t.get("maxRuntimeVersionString", "999"))]
-        return [t for t in types if t.get("productFamily", family) == family and t["name"].startswith(family)]
+        return [t for t in types if of_family(t)]
 
     # Newest runtime first. iOS without an explicit device: skip a newer runtime that only offers multi-display
     # devices (iOS 27.1 on the runner image offered only "iPhone Duo"); `simctl io screenshot` fails on those.
@@ -155,6 +162,9 @@ def self_test():
     expect("unavailable iOS 27.2 runtime (and its iPhone 18 Pro Max) ignored", lambda: pick(sample, "iOS")["SIM_NAME"],
            "iPhone 17 Pro Max")
     expect("override honoured", lambda: pick(sample, "iOS", "iPhone 16 Pro Max")["SIM_NAME"], "iPhone 16 Pro Max")
+    expect("explicit iPad override honoured", lambda: pick(sample, "iOS", "iPad Pro 13-inch (M5)")["SIM_NAME"],
+           "iPad Pro 13-inch (M5)")
+    expect("iPad never the default pick", lambda: "iPad" not in pick(sample, "iOS")["SIM_NAME"], True)
     # U6: a device only an older runtime offers (iPhone SE (3rd generation) on iOS 26.4, absent from 27.0).
     se = _dt("iPhone SE (3rd generation)", "iPhone", hi="26.9")
     older_only = json.loads(json.dumps(sample))
@@ -191,6 +201,9 @@ def self_test():
     expect("Duo ignored even without a Pro Max", lambda: pick(multi, "iOS")["SIM_NAME"], "iPhone 17")
     multi["runtimes"] = [_rt("iOS", "27.1", "24B1", [duo])]
     expect("Duo only as last resort", lambda: pick(multi, "iOS")["SIM_NAME"], "iPhone Duo")
+    multi["runtimes"] = [_rt("iOS", "27.0", "24A4", [by["iPhone 17 Pro Max"]]), _rt("iOS", "27.1", "24B1", [duo])]
+    expect("explicit Duo bypasses the multi-display skip", lambda: pick(multi, "iOS", "iPhone Duo"),
+           lambda g: isinstance(g, dict) and g["SIM_NAME"] == "iPhone Duo" and g["SIM_RUNTIME_NAME"] == "iOS 27.1")
     multi["runtimes"] = [_rt("iOS", "27.0", "24A4", [by["iPhone 17 Pro Max"]]), _rt("iOS", "27.1", "24B1", [duo])]
     expect("newer Duo-only runtime skipped for older runtime with a normal iPhone",
            lambda: (pick(multi, "iOS")["SIM_RUNTIME_NAME"], pick(multi, "iOS")["SIM_NAME"]), ("iOS 27.0", "iPhone 17 Pro Max"))
