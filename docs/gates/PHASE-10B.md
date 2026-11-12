@@ -14,7 +14,7 @@
 - **No local builds:** WSL is down (virtualization disabled in firmware, ENVIRONMENT §42). All build and test evidence is GitHub CI.
 - **iOS CI 43117958232** (bug fixes): all jobs green, 644 core and 753 TimetableUI tests.
 - **iOS CI 43121775032** (adaptive layout head `7892bbb`): all jobs green.
-- **Integration branch CI:** see the commit that merged this report.
+- **Integration CI 43229484534** (both branches merged): all jobs green, 644 core and 760 TimetableUI tests, XcodeGen iOS + watchOS build and the xtool path.
 - **Simulator screenshots read:**
   - iPhone 17 Pro Max (43117887986): no regressions.
   - iPad 11" and 13" portrait (43117879078, 43117870293), and the re-shot fixes (43121791072): split views, capped Settings, lesson inspector all as designed.
